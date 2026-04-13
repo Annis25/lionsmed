@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Maquette — Mot de passe oublié | Lions Sfax Med</title>
+
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  MAQUETTE STATIQUE — NE FAIT PAS PARTIE DE L'APPLICATION DJANGO
+  ═══════════════════════════════════════════════════════════════════════════
+  Fichier autonome, ouvrable directement dans un navigateur.
+  Aucune dépendance au projet : ni template, ni vue, ni base de données.
+  Toutes les données affichées sont fictives et servent uniquement à
+  illustrer la mise en page pour validation par le bureau du club.
+
+  ─── NOM DU CLUB — À CONFIRMER ───────────────────────────────────────────
+  Le nom définitif n'est pas arrêté. Il est centralisé dans la constante
+  CLUB_NAME, tout en bas de ce fichier (bloc <script>), et injecté partout
+  où il apparaît (titre du hero, logo, pied de page, onglet du navigateur).
+  Pour l'essayer : changer cette seule ligne et recharger la page.
+  ─────────────────────────────────────────────────────────────────────────
+-->
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  /* Configuration reprise telle quelle de templates/base.html
+     pour garantir une palette et des polices strictement identiques. */
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: {
+            50:'#EEF2F8',100:'#D5DFF0',200:'#ABBFE0',300:'#7F9FCF',400:'#557FBE',
+            500:'#2B5FAD',600:'#1E4B8E',700:'#163870',800:'#0E2550',900:'#0B1F3A',950:'#060F1D',
+          },
+          gold: {
+            50:'#FBF6EC',100:'#F5EAD1',200:'#EBD4A3',300:'#E0BE74',400:'#D6A849',
+            500:'#C9A84C',600:'#A8862A',700:'#7D641F',800:'#534215',900:'#29210A',
+          },
+          ivory: '#F8F6F0',
+
+          /* ── Couleurs relevées au pixel près sur logomed.png ──
+             lions #184898 = 63 % des pixels du logo (bleu de marque)
+             sun   #F8C800 = 33 % des pixels du logo (jaune de marque)
+             Ce sont désormais les couleurs primaires de la page ; navy et
+             gold sont conservés pour les fonds sombres et les nuances. */
+          lions: {
+            50:'#F1F4F9',100:'#DCE4F0',200:'#B5C4DE',300:'#87A0C9',400:'#4F74B1',
+            500:'#184898',600:'#153E83',700:'#11326A',800:'#0D2752',900:'#091B3A',950:'#061124',
+          },
+          sun: {
+            50:'#FFFCF0',100:'#FEF7D9',200:'#FDEDAD',300:'#FBE27A',400:'#FAD53D',
+            500:'#F8C800',600:'#D5AC00',700:'#AE8C00',800:'#866C00',900:'#5E4C00',
+          },
+        },
+        fontFamily: {
+          sans:  ['Inter', 'system-ui', 'sans-serif'],
+          serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        },
+      },
+    },
+  }
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+<style>
+  /* ── Cadre bleu marine tout autour de la page ── */
+  body {
+    border: 3px solid #184898;
+    min-height: 100vh;
+  }
+
+  /* ── Révélation au défilement (repris de static/css/main.css) ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal:nth-child(2) { transition-delay: .08s; }
+  .reveal:nth-child(3) { transition-delay: .16s; }
+  .reveal:nth-child(4) { transition-delay: .24s; }
+  .reveal:nth-child(5) { transition-delay: .32s; }
+  .reveal:nth-child(6) { transition-delay: .40s; }
+
+  .card-hover { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -18px rgba(11,31,58,.28); }
+
+  /* ── Indicateur de défilement ── */
+  @keyframes scroll-pulse {
+    0%,100% { opacity: .25; transform: scaleY(.7); }
+    50%     { opacity: .8;  transform: scaleY(1); }
+  }
+  .scroll-line { animation: scroll-pulse 2.2s ease-in-out infinite; transform-origin: top; }
+
+  /* ── Accessibilité : focus visible ── */
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid #C9A84C;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ── Respect de la préférence « animations réduites » ── */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .scroll-line { animation: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+
+<header class="pt-12 pb-2">
+  <a href="accueil.html" class="flex justify-center" aria-label="Lions Sfax Med — accueil">
+    <img src="logomed.png" alt="Lions Sfax Med" class="h-[58px] w-auto" width="1006" height="557" />
+  </a>
+</header>
+
+<main class="flex-1 flex items-center justify-center px-6 py-12">
+  <div class="w-full max-w-[440px]">
+    <div class="reveal text-center mb-8">
+      <h1 class="font-serif text-[30px] font-bold text-lions-700 mb-3">Mot de passe oublié</h1>
+      <p class="text-lions-800/60 text-[14.5px] leading-relaxed">Indiquez votre adresse e-mail : nous vous enverrons un lien pour définir un nouveau mot de passe.</p>
+    </div>
+
+    <div class="reveal bg-white rounded-2xl border border-lions-100 shadow-sm p-8 sm:p-9">
+      <form class="space-y-5" onsubmit="event.preventDefault(); alert('Maquette : le formulaire n\'est pas actif.');">
+        <div>
+          <label for="o-email" class="block text-[11px] font-bold text-lions-600 uppercase tracking-[0.14em] mb-2">Adresse e-mail</label>
+          <input id="o-email" type="email" autocomplete="email" placeholder="votre@email.com" class="w-full px-4 py-3 text-[14px] bg-lions-50/60 border border-lions-100 rounded-lg outline-none focus:border-sun-500 focus:bg-white transition-colors placeholder-lions-300">
+          <p class="text-lions-400 text-[12.5px] mt-2.5 leading-relaxed">
+            Saisissez l'adresse associée à votre compte. Vous recevrez un lien de
+            réinitialisation valable une heure.
+          </p>
+        </div>
+
+        <button type="submit"
+                class="w-full inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-lg
+                       bg-sun-500 hover:bg-sun-400 text-lions-800 font-bold text-[15px]
+                       shadow-lg shadow-sun-500/25 transition-all duration-200 hover:-translate-y-0.5">
+          Envoyer le lien de réinitialisation
+        </button>
+      </form>
+    </div>
+
+    <p class="reveal text-center mt-7">
+      <a href="connexion.html" class="inline-flex items-center gap-1.5 text-lions-600 hover:text-sun-600 text-[13.5px] font-semibold transition-colors">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7 16l-4-4m0 0l4-4m-4 4h18"/>
+        </svg>
+        Retour à la connexion
+      </a>
+    </p>
+  </div>
+</main>
+<footer class="py-8 text-center">
+  <p class="text-lions-800/40 text-[12.5px]">© 2026 <span data-club-full>Lions Sfax Med</span> — District 414-B Tunisie</p>
+</footer>
+
+<script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   NOM DU CLUB
+   ═══════════════════════════════════════════════════════════════════════
+   Le logo officiel (logomed.png) porte la mention « Lions Sfax Med » :
+   c'est donc ce nom qui est repris ici. Il reste centralisé dans ces deux
+   constantes, injectées partout où le nom apparaît (titre du hero, pied de
+   page, onglet du navigateur). Modifier ces lignes suffit à tout changer. */
+
+const CLUB_NAME  = 'Sfax Med';   // titre jaune du hero — repris du logo officiel
+const CLUB_SHORT = 'SFAX MED';   // variantes en petites capitales
+
+/* ─── Injection (ne rien modifier en dessous) ─────────────────────────── */
+document.querySelectorAll('[data-club-name]').forEach(el => {
+  el.textContent = CLUB_NAME;
+});
+document.querySelectorAll('[data-club-short]').forEach(el => {
+  el.textContent = CLUB_SHORT;
+});
+document.querySelectorAll('[data-club-full]').forEach(el => {
+  el.textContent = el.textContent.replace(/Lions Sfax Med/g, 'Lions Club ' + CLUB_NAME);
+});
+document.title = 'Maquette — Mot de passe oublié | Lions ' + CLUB_NAME;
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INTERACTIONS
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Révélation au chargement */
+document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+
+</script>
+
+</body>
+</html>

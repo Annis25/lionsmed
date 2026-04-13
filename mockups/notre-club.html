@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Maquette — Notre Club | Lions Sfax Med</title>
+
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  MAQUETTE STATIQUE — NE FAIT PAS PARTIE DE L'APPLICATION DJANGO
+  ═══════════════════════════════════════════════════════════════════════════
+  Fichier autonome, ouvrable directement dans un navigateur.
+  Aucune dépendance au projet : ni template, ni vue, ni base de données.
+  Toutes les données affichées sont fictives et servent uniquement à
+  illustrer la mise en page pour validation par le bureau du club.
+
+  ─── NOM DU CLUB — À CONFIRMER ───────────────────────────────────────────
+  Le nom définitif n'est pas arrêté. Il est centralisé dans la constante
+  CLUB_NAME, tout en bas de ce fichier (bloc <script>), et injecté partout
+  où il apparaît (titre du hero, logo, pied de page, onglet du navigateur).
+  Pour l'essayer : changer cette seule ligne et recharger la page.
+  ─────────────────────────────────────────────────────────────────────────
+-->
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  /* Configuration reprise telle quelle de templates/base.html
+     pour garantir une palette et des polices strictement identiques. */
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: {
+            50:'#EEF2F8',100:'#D5DFF0',200:'#ABBFE0',300:'#7F9FCF',400:'#557FBE',
+            500:'#2B5FAD',600:'#1E4B8E',700:'#163870',800:'#0E2550',900:'#0B1F3A',950:'#060F1D',
+          },
+          gold: {
+            50:'#FBF6EC',100:'#F5EAD1',200:'#EBD4A3',300:'#E0BE74',400:'#D6A849',
+            500:'#C9A84C',600:'#A8862A',700:'#7D641F',800:'#534215',900:'#29210A',
+          },
+          ivory: '#F8F6F0',
+
+          /* ── Couleurs relevées au pixel près sur logomed.png ──
+             lions #184898 = 63 % des pixels du logo (bleu de marque)
+             sun   #F8C800 = 33 % des pixels du logo (jaune de marque)
+             Ce sont désormais les couleurs primaires de la page ; navy et
+             gold sont conservés pour les fonds sombres et les nuances. */
+          lions: {
+            50:'#F1F4F9',100:'#DCE4F0',200:'#B5C4DE',300:'#87A0C9',400:'#4F74B1',
+            500:'#184898',600:'#153E83',700:'#11326A',800:'#0D2752',900:'#091B3A',950:'#061124',
+          },
+          sun: {
+            50:'#FFFCF0',100:'#FEF7D9',200:'#FDEDAD',300:'#FBE27A',400:'#FAD53D',
+            500:'#F8C800',600:'#D5AC00',700:'#AE8C00',800:'#866C00',900:'#5E4C00',
+          },
+        },
+        fontFamily: {
+          sans:  ['Inter', 'system-ui', 'sans-serif'],
+          serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        },
+      },
+    },
+  }
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+<style>
+  /* ── Cadre bleu marine tout autour de la page ── */
+  body {
+    border: 3px solid #184898;
+    min-height: 100vh;
+  }
+
+  /* ── Révélation au défilement (repris de static/css/main.css) ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal:nth-child(2) { transition-delay: .08s; }
+  .reveal:nth-child(3) { transition-delay: .16s; }
+  .reveal:nth-child(4) { transition-delay: .24s; }
+  .reveal:nth-child(5) { transition-delay: .32s; }
+  .reveal:nth-child(6) { transition-delay: .40s; }
+
+  .card-hover { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -18px rgba(11,31,58,.28); }
+
+  /* ── Indicateur de défilement ── */
+  @keyframes scroll-pulse {
+    0%,100% { opacity: .25; transform: scaleY(.7); }
+    50%     { opacity: .8;  transform: scaleY(1); }
+  }
+  .scroll-line { animation: scroll-pulse 2.2s ease-in-out infinite; transform-origin: top; }
+
+  /* ── Accessibilité : focus visible ── */
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid #C9A84C;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ── Respect de la préférence « animations réduites » ── */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .scroll-line { animation: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     NAVBAR — fixe, fond blanc, séparateur bas fin
+     ══════════════════════════════════════════════════════════════════════ -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-lions-100">
+  <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
+    <div class="flex items-center justify-between h-[76px] gap-6">
+
+      <!-- Logo officiel du club -->
+      <a href="accueil.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors" aria-label="Lions Sfax Med — accueil">
+        <img src="logomed.png" alt="Lions Sfax Med"
+             class="h-[52px] w-auto" width="1006" height="557" />
+      </a>
+
+      <!-- Menu principal -->
+      <nav class="hidden lg:flex items-center gap-8" aria-label="Navigation principale">
+        <a href="accueil.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors"
+           aria-current="page">Accueil</a>
+        <a href="notre-club.html" class="relative text-[15px] font-semibold text-sun-600 pb-1 after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-full after:bg-sun-600">Notre Club</a>
+        <a href="nos-actions.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Nos Actions</a>
+        <a href="evenements.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Événements</a>
+        <a href="actualites.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Actualités</a>
+        <a href="rejoindre.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Rejoindre</a>
+        <a href="contact.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Contact</a>
+      </nav>
+
+      <!-- Cloche + pastille utilisateur -->
+      <div class="flex items-center gap-4 flex-shrink-0">
+        <button type="button" class="relative text-lions-500 hover:text-sun-600 transition-colors p-1"
+                aria-label="Notifications (3 non lues)">
+          <svg class="w-[22px] h-[22px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 10-4 0v.3C7.7 6.2 6 8.4 6 11v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          <span class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-sun-500 ring-2 ring-white"></span>
+        </button>
+
+        <a href="connexion.html" class="inline-flex items-center gap-2 pl-3.5 pr-4 py-2 rounded-full
+                           bg-sun-500 hover:bg-sun-400 text-lions-800 text-sm font-semibold
+                           transition-colors">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          Fatma
+        </a>
+
+        <!-- Bouton menu mobile -->
+        <button type="button" id="menu-btn"
+                class="lg:hidden text-lions-700 p-1" aria-label="Ouvrir le menu" aria-expanded="false">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu mobile -->
+  <div id="mobile-menu" class="lg:hidden hidden border-t border-lions-100 bg-white">
+    <nav class="px-6 py-4 flex flex-col gap-1" aria-label="Navigation mobile">
+      <a href="accueil.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Accueil</a>
+      <a href="notre-club.html" class="relative text-[15px] font-semibold text-sun-600 pb-1 after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-full after:bg-sun-600">Notre Club</a>
+      <a href="nos-actions.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Nos Actions</a>
+      <a href="evenements.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Événements</a>
+      <a href="actualites.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Actualités</a>
+      <a href="rejoindre.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Rejoindre</a>
+      <a href="contact.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Contact</a>
+    </nav>
+  </div>
+</header>
+
+
+<section class="relative pt-[140px] pb-16 overflow-hidden bg-gradient-to-b from-lions-50 via-[#F6F9FD] to-white">
+  <div class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[22%] pointer-events-none select-none
+              w-[420px] max-w-[45vw] opacity-[0.05]" aria-hidden="true">
+    <img src="emblem.png" alt="" class="w-full h-auto" />
+  </div>
+  <div class="absolute -bottom-32 -left-32 w-[380px] h-[380px] pointer-events-none select-none" aria-hidden="true">
+    <svg viewBox="0 0 200 200" fill="none" class="w-full h-full">
+      <circle cx="0" cy="200" r="188" stroke="#184898" stroke-width="17" opacity=".9"/>
+      <circle cx="0" cy="200" r="164" stroke="#F8C800" stroke-width="15"/>
+      <circle cx="0" cy="200" r="140" stroke="#184898" stroke-width="20"/>
+    </svg>
+  </div>
+
+  <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+    <nav class="reveal flex items-center justify-center gap-2 text-lions-400 text-[12px] mb-7" aria-label="Fil d'Ariane">
+      <a href="accueil.html" class="hover:text-sun-600 transition-colors">Accueil</a>
+      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-sun-600 font-semibold">Notre Club</span>
+    </nav>
+    <h1 class="reveal font-serif text-[clamp(2.25rem,5.5vw,3.75rem)] font-bold text-lions-500 leading-[1.1] mb-5">Notre Club</h1>
+    <p class="reveal text-lions-800/70 text-[17px] leading-[1.75] max-w-[680px] mx-auto">Fondé en 2025 à Sfax, le club réunit des femmes et des hommes engagés pour servir leur ville avec constance et proximité.</p>
+  </div>
+  <div class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-sun-500/40 to-transparent"></div>
+</section>
+<!-- ══════════════════════════════════════════════════════════════════════
+     NOTRE CLUB
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="notre-club" class="py-20 bg-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+
+      <div class="reveal">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-9 h-px bg-sun-500"></span>
+          <span class="text-sun-700 text-[11px] font-bold uppercase tracking-[0.2em]">Notre identité</span>
+        </div>
+
+        <h2 class="font-serif text-[clamp(2rem,4vw,3rem)] font-bold text-lions-700 leading-[1.15] mb-7">
+          Une vision de service,<br>
+          <span class="text-sun-600">une mission de proximité</span>
+        </h2>
+
+        <p class="text-lions-700/70 text-[17px] leading-[1.8] mb-5">
+          Fondé en 2025 à Sfax, le <span data-club-full>Lions Sfax Med</span> rassemble des
+          membres fondateurs animés par une même volonté : servir utilement la ville,
+          ses quartiers et ses initiatives citoyennes.
+        </p>
+        <p class="text-lions-700/55 text-[15px] leading-[1.8] mb-10">
+          Nos membres sont des professionnels, entrepreneurs, médecins, enseignants
+          et citoyens engagés qui mettent leur temps, leurs compétences et leur réseau
+          au service d'actions locales utiles et mesurables.
+        </p>
+
+        <!-- Valeurs -->
+        <ul class="space-y-5 mb-10">
+          <li class="flex items-start gap-4">
+            <span class="w-11 h-11 rounded-xl bg-lions-50 border border-lions-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-lions-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.3 6.3a4.5 4.5 0 000 6.4L12 20.4l7.7-7.7a4.5 4.5 0 00-6.4-6.4L12 7.6l-1.3-1.3a4.5 4.5 0 00-6.4 0z"/>
+              </svg>
+            </span>
+            <div>
+              <h3 class="font-semibold text-lions-700 text-[15px] mb-1">Service</h3>
+              <p class="text-lions-700/55 text-[13.5px] leading-relaxed">
+                Le service aux autres est au centre de tout ce que nous faisons.
+              </p>
+            </div>
+          </li>
+          <li class="flex items-start gap-4">
+            <span class="w-11 h-11 rounded-xl bg-sun-50 border border-sun-200 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.6-4a12 12 0 01-8.6 3 12 12 0 01-8.6 3A12 12 0 003 9c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1-.1-2-.4-3z"/>
+              </svg>
+            </span>
+            <div>
+              <h3 class="font-semibold text-lions-700 text-[15px] mb-1">Intégrité</h3>
+              <p class="text-lions-700/55 text-[13.5px] leading-relaxed">
+                Transparence totale dans la gestion des fonds et la gouvernance du club.
+              </p>
+            </div>
+          </li>
+          <li class="flex items-start gap-4">
+            <span class="w-11 h-11 rounded-xl bg-lions-50 border border-lions-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-lions-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.4-1.9M17 20H7m10 0v-2c0-.7-.1-1.3-.4-1.9M7 20H2v-2a3 3 0 015.4-1.9M7 20v-2c0-.7.1-1.3.4-1.9m0 0a5 5 0 019.2 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </span>
+            <div>
+              <h3 class="font-semibold text-lions-700 text-[15px] mb-1">Amitié</h3>
+              <p class="text-lions-700/55 text-[13.5px] leading-relaxed">
+                Des liens sincères qui vont bien au-delà de l'association.
+              </p>
+            </div>
+          </li>
+        </ul>
+
+        <a href="nos-actions.html"
+           class="inline-flex items-center gap-2 text-lions-600 hover:text-sun-700 font-bold text-[15px]
+                  border-b-2 border-sun-500 hover:border-sun-600 pb-1 transition-colors">
+          Voir nos actions concrètes
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Emplacement photo -->
+      <div class="reveal relative">
+        <div class="absolute -top-5 -right-5 w-full h-full rounded-2xl border-2 border-sun-200" aria-hidden="true"></div>
+        <div class="relative rounded-2xl overflow-hidden bg-lions-50 border border-lions-100 aspect-[4/5]">
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-lions-300 p-8">
+            <svg class="w-20 h-20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.6-4.6a2 2 0 012.8 0L16 16m-2-2l1.6-1.6a2 2 0 012.8 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <p class="text-sm text-center font-medium">Photo du club<br>à fournir</p>
+          </div>
+
+          <div class="absolute bottom-5 left-5 right-5 bg-white/90 backdrop-blur-sm rounded-xl px-4 py-3
+                      border border-lions-100 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="w-9 h-9 rounded-full bg-sun-500 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4.5 h-4.5 text-lions-800" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+              </span>
+              <div>
+                <div class="text-lions-700 text-[13px] font-bold">Membre certifié LCI</div>
+                <div class="text-lions-500 text-[11px]">Lions Clubs International depuis 2025</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- ══════════════════════════════════════════════════════════════════════
+     CHIFFRES CLÉS
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="stats" class="relative bg-lions-800 py-16 overflow-hidden">
+  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sun-500/60 to-transparent"></div>
+
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-8">
+      <div class="reveal text-center">
+        <div class="font-serif text-5xl font-bold text-sun-500 mb-2">2025</div>
+        <div class="text-white/50 text-[11px] font-semibold uppercase tracking-[0.2em]">Année de fondation</div>
+        <div class="w-8 h-0.5 bg-sun-500/40 mx-auto mt-3"></div>
+      </div>
+      <div class="reveal text-center">
+        <div class="font-serif text-5xl font-bold text-sun-500 mb-2">45</div>
+        <div class="text-white/50 text-[11px] font-semibold uppercase tracking-[0.2em]">Membres</div>
+        <div class="w-8 h-0.5 bg-sun-500/40 mx-auto mt-3"></div>
+      </div>
+      <div class="reveal text-center">
+        <div class="font-serif text-5xl font-bold text-sun-500 mb-2">12</div>
+        <div class="text-white/50 text-[11px] font-semibold uppercase tracking-[0.2em]">Projets</div>
+        <div class="w-8 h-0.5 bg-sun-500/40 mx-auto mt-3"></div>
+      </div>
+      <div class="reveal text-center">
+        <div class="font-serif text-5xl font-bold text-sun-500 mb-2">500<span class="text-3xl text-sun-500/60">+</span></div>
+        <div class="text-white/50 text-[11px] font-semibold uppercase tracking-[0.2em]">Bénéficiaires</div>
+        <div class="w-8 h-0.5 bg-sun-500/40 mx-auto mt-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-sun-500/60 to-transparent"></div>
+</section>
+
+<section id="historique" class="py-24 bg-ivory">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <div class="reveal flex items-center justify-center gap-3 mb-5">
+        <span class="w-9 h-px bg-sun-500"></span>
+        <span class="text-sun-700 text-[11px] font-bold uppercase tracking-[0.2em]">Notre parcours</span>
+        <span class="w-9 h-px bg-sun-500"></span>
+      </div>
+      <h2 class="reveal font-serif text-[clamp(2rem,4vw,2.75rem)] font-bold text-lions-700 mb-5">Jalons clés</h2>
+      <p class="reveal text-lions-800/60 text-[16px] leading-relaxed">
+        Depuis sa fondation en 2025, le club a construit son action étape par étape,
+        en s'appuyant sur les besoins exprimés par le terrain.
+      </p>
+    </div>
+    <ol class="relative">
+        <li class="reveal relative flex gap-7 pb-11 last:pb-0">
+          <span class="absolute left-[27px] top-14 bottom-0 w-px bg-gradient-to-b from-sun-500/60 to-lions-100
+                       " aria-hidden="true"></span>
+          <span class="relative z-10 flex-shrink-0 w-14 h-14 rounded-full border-2 bg-lions-500 border-lions-500 text-white
+                       flex items-center justify-center font-serif font-bold text-[13px] leading-none text-center">
+            2025
+          </span>
+          <div class="pt-2 min-w-0">
+            <span class="inline-block text-[10px] font-bold uppercase tracking-[0.16em] text-sun-700
+                         bg-sun-50 border border-sun-200 px-2.5 py-1 rounded-full mb-2.5">Mars 2025</span>
+            <h3 class="font-serif text-[19px] font-bold text-lions-700 mb-2">Constitution du groupe fondateur</h3>
+            <p class="text-lions-800/60 text-[14.5px] leading-[1.75] max-w-xl">Vingt-quatre professionnels sfaxiens se réunissent autour d'un projet commun : créer un club de service ancré dans les besoins réels de la ville.</p>
+          </div>
+        </li>
+        <li class="reveal relative flex gap-7 pb-11 last:pb-0">
+          <span class="absolute left-[27px] top-14 bottom-0 w-px bg-gradient-to-b from-sun-500/60 to-lions-100
+                       " aria-hidden="true"></span>
+          <span class="relative z-10 flex-shrink-0 w-14 h-14 rounded-full border-2 bg-white border-sun-500 text-lions-600
+                       flex items-center justify-center font-serif font-bold text-[13px] leading-none text-center">
+            2025
+          </span>
+          <div class="pt-2 min-w-0">
+            <span class="inline-block text-[10px] font-bold uppercase tracking-[0.16em] text-sun-700
+                         bg-sun-50 border border-sun-200 px-2.5 py-1 rounded-full mb-2.5">Juin 2025</span>
+            <h3 class="font-serif text-[19px] font-bold text-lions-700 mb-2">Charte officielle Lions Clubs International</h3>
+            <p class="text-lions-800/60 text-[14.5px] leading-[1.75] max-w-xl">Le club reçoit sa charte du District 414-B et rejoint officiellement le réseau mondial de Lions Clubs International.</p>
+          </div>
+        </li>
+        <li class="reveal relative flex gap-7 pb-11 last:pb-0">
+          <span class="absolute left-[27px] top-14 bottom-0 w-px bg-gradient-to-b from-sun-500/60 to-lions-100
+                       " aria-hidden="true"></span>
+          <span class="relative z-10 flex-shrink-0 w-14 h-14 rounded-full border-2 bg-white border-sun-500 text-lions-600
+                       flex items-center justify-center font-serif font-bold text-[13px] leading-none text-center">
+            2025
+          </span>
+          <div class="pt-2 min-w-0">
+            <span class="inline-block text-[10px] font-bold uppercase tracking-[0.16em] text-sun-700
+                         bg-sun-50 border border-sun-200 px-2.5 py-1 rounded-full mb-2.5">Octobre 2025</span>
+            <h3 class="font-serif text-[19px] font-bold text-lions-700 mb-2">Premier projet Vision</h3>
+            <p class="text-lions-800/60 text-[14.5px] leading-[1.75] max-w-xl">Organisation d'une première caravane de dépistage ophtalmologique dans un quartier périphérique de Sfax, en partenariat avec des praticiens bénévoles.</p>
+          </div>
+        </li>
+        <li class="reveal relative flex gap-7 pb-11 last:pb-0">
+          <span class="absolute left-[27px] top-14 bottom-0 w-px bg-gradient-to-b from-sun-500/60 to-lions-100
+                       " aria-hidden="true"></span>
+          <span class="relative z-10 flex-shrink-0 w-14 h-14 rounded-full border-2 bg-white border-sun-500 text-lions-600
+                       flex items-center justify-center font-serif font-bold text-[13px] leading-none text-center">
+            2026
+          </span>
+          <div class="pt-2 min-w-0">
+            <span class="inline-block text-[10px] font-bold uppercase tracking-[0.16em] text-sun-700
+                         bg-sun-50 border border-sun-200 px-2.5 py-1 rounded-full mb-2.5">Février 2026</span>
+            <h3 class="font-serif text-[19px] font-bold text-lions-700 mb-2">Programme Jeunesse & Éducation</h3>
+            <p class="text-lions-800/60 text-[14.5px] leading-[1.75] max-w-xl">Lancement du soutien scolaire et de l'accompagnement de collégiens, construit avec trois établissements partenaires.</p>
+          </div>
+        </li>
+        <li class="reveal relative flex gap-7 pb-11 last:pb-0">
+          <span class="absolute left-[27px] top-14 bottom-0 w-px bg-gradient-to-b from-sun-500/60 to-lions-100
+                       hidden" aria-hidden="true"></span>
+          <span class="relative z-10 flex-shrink-0 w-14 h-14 rounded-full border-2 bg-white border-sun-500 text-lions-600
+                       flex items-center justify-center font-serif font-bold text-[13px] leading-none text-center">
+            2026
+          </span>
+          <div class="pt-2 min-w-0">
+            <span class="inline-block text-[10px] font-bold uppercase tracking-[0.16em] text-sun-700
+                         bg-sun-50 border border-sun-200 px-2.5 py-1 rounded-full mb-2.5">Juin 2026</span>
+            <h3 class="font-serif text-[19px] font-bold text-lions-700 mb-2">Cap des 45 membres</h3>
+            <p class="text-lions-800/60 text-[14.5px] leading-[1.75] max-w-xl">Le club franchit le seuil des 45 membres actifs et structure ses six commissions thématiques.</p>
+          </div>
+        </li>
+    </ol>
+  </div>
+</section>
+<section id="valeurs" class="py-24 bg-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <div class="reveal flex items-center justify-center gap-3 mb-5">
+        <span class="w-9 h-px bg-sun-500"></span>
+        <span class="text-sun-700 text-[11px] font-bold uppercase tracking-[0.2em]">Notre éthique</span>
+        <span class="w-9 h-px bg-sun-500"></span>
+      </div>
+      <h2 class="reveal font-serif text-[clamp(2rem,4vw,2.75rem)] font-bold text-lions-700 mb-5">
+        Nos Valeurs Fondamentales
+      </h2>
+      <p class="reveal text-lions-800/60 text-[16px] leading-relaxed">
+        Six principes qui guident chacune de nos décisions et chacun de nos actes.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <article class="reveal card-hover bg-white rounded-2xl p-8 border border-lions-100">
+        <span class="w-[52px] h-[52px] rounded-xl bg-lions-50 flex items-center justify-center mb-6">
+          <svg class="w-6 h-6 text-lions-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4.3 6.3a4.5 4.5 0 000 6.4L12 20.4l7.7-7.7a4.5 4.5 0 00-6.4-6.4L12 7.6l-1.3-1.3a4.5 4.5 0 00-6.4 0z"/></svg>
+        </span>
+        <h3 class="font-serif text-xl font-bold text-lions-700 mb-3">Service</h3>
+        <p class="text-lions-800/60 text-[14px] leading-[1.75] mb-6">Le service aux autres est au centre de tout ce que nous faisons. Chaque heure, chaque don, chaque geste compte.</p>
+        <span class="inline-block text-[11px] font-bold px-3 py-1.5 rounded-full border bg-lions-50 text-lions-600 border-lions-100">We Serve</span>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl p-8 border border-lions-100">
+        <span class="w-[52px] h-[52px] rounded-xl bg-sun-50 flex items-center justify-center mb-6">
+          <svg class="w-6 h-6 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.6-4a12 12 0 01-8.6 3 12 12 0 01-8.6 3A12 12 0 003 9c0 5.6 3.8 10.3 9 11.6 5.2-1.3 9-6 9-11.6 0-1-.1-2-.4-3z"/></svg>
+        </span>
+        <h3 class="font-serif text-xl font-bold text-lions-700 mb-3">Intégrité</h3>
+        <p class="text-lions-800/60 text-[14px] leading-[1.75] mb-6">Transparence totale dans la gestion des fonds, la gouvernance du club et nos relations avec les partenaires.</p>
+        <span class="inline-block text-[11px] font-bold px-3 py-1.5 rounded-full border bg-sun-50 text-sun-700 border-sun-200">Éthique absolue</span>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl p-8 border border-lions-100">
+        <span class="w-[52px] h-[52px] rounded-xl bg-lions-50 flex items-center justify-center mb-6">
+          <svg class="w-6 h-6 text-lions-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.4-1.9M17 20H7m10 0v-2c0-.7-.1-1.3-.4-1.9M7 20H2v-2a3 3 0 015.4-1.9M7 20v-2c0-.7.1-1.3.4-1.9m0 0a5 5 0 019.2 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </span>
+        <h3 class="font-serif text-xl font-bold text-lions-700 mb-3">Amitié</h3>
+        <p class="text-lions-800/60 text-[14px] leading-[1.75] mb-6">Les liens qui se forgent au sein du club vont bien au-delà de l'association et traversent les générations.</p>
+        <span class="inline-block text-[11px] font-bold px-3 py-1.5 rounded-full border bg-lions-50 text-lions-600 border-lions-100">Fraternité durable</span>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl p-8 border border-lions-100">
+        <span class="w-[52px] h-[52px] rounded-xl bg-green-50 flex items-center justify-center mb-6">
+          <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 11h2a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v3M8 4v1.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1M15 20.5V18a2 2 0 012-2h3"/></svg>
+        </span>
+        <h3 class="font-serif text-xl font-bold text-lions-700 mb-3">Diversité</h3>
+        <p class="text-lions-800/60 text-[14px] leading-[1.75] mb-6">Le club est ouvert à toutes et tous, sans distinction de profession, d'origine ou de génération.</p>
+        <span class="inline-block text-[11px] font-bold px-3 py-1.5 rounded-full border bg-green-50 text-green-700 border-green-100">Une seule famille</span>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl p-8 border border-lions-100">
+        <span class="w-[52px] h-[52px] rounded-xl bg-sun-50 flex items-center justify-center mb-6">
+          <svg class="w-6 h-6 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.3 6.9L21 12l-5.7 2.1L13 21l-2.3-6.9L5 12l5.7-2.1L13 3z"/></svg>
+        </span>
+        <h3 class="font-serif text-xl font-bold text-lions-700 mb-3">Excellence</h3>
+        <p class="text-lions-800/60 text-[14px] leading-[1.75] mb-6">Chaque projet est mené avec le plus haut niveau de préparation et de suivi. L'excellence est un standard, pas un luxe.</p>
+        <span class="inline-block text-[11px] font-bold px-3 py-1.5 rounded-full border bg-sun-50 text-sun-700 border-sun-200">Toujours mieux</span>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl p-8 border border-lions-100">
+        <span class="w-[52px] h-[52px] rounded-xl bg-lions-50 flex items-center justify-center mb-6">
+          <svg class="w-6 h-6 text-lions-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </span>
+        <h3 class="font-serif text-xl font-bold text-lions-700 mb-3">Responsabilité</h3>
+        <p class="text-lions-800/60 text-[14px] leading-[1.75] mb-6">Être Lions, c'est accepter une responsabilité envers sa communauté, ses partenaires et les générations futures.</p>
+        <span class="inline-block text-[11px] font-bold px-3 py-1.5 rounded-full border bg-lions-50 text-lions-600 border-lions-100">S'engager vraiment</span>
+      </article>
+    </div>
+  </div>
+</section>
+<section id="bureau" class="py-24 bg-ivory">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <div class="reveal flex items-center justify-center gap-3 mb-5">
+        <span class="w-9 h-px bg-sun-500"></span>
+        <span class="text-sun-700 text-[11px] font-bold uppercase tracking-[0.2em]">Année 2025–2026</span>
+        <span class="w-9 h-px bg-sun-500"></span>
+      </div>
+      <h2 class="reveal font-serif text-[clamp(2rem,4vw,2.75rem)] font-bold text-lions-700 mb-5">
+        Le Bureau du Club
+      </h2>
+      <p class="reveal text-lions-800/60 text-[16px] leading-relaxed">
+        Des bénévoles qui consacrent leur temps et leur expertise à la conduite du club
+        et à la réussite de ses projets.
+      </p>
+    </div>
+
+    <div class="flex justify-center mb-8">
+      <article class="reveal relative bg-lions-800 rounded-2xl overflow-hidden w-full max-w-sm text-center">
+        <span class="block h-1 bg-gradient-to-r from-transparent via-sun-500 to-transparent"></span>
+        <div class="p-9">
+          <span class="relative inline-flex mb-5">
+            <span class="w-24 h-24 rounded-full bg-lions-600 border-2 border-sun-500/60
+                         flex items-center justify-center">
+              <span class="font-serif font-bold text-2xl text-sun-500">MT</span>
+            </span>
+            <span class="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-green-400 border-2 border-lions-800"></span>
+          </span>
+          <div class="text-sun-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">Président</div>
+          <h3 class="font-serif text-2xl font-bold text-white mb-1.5">Mehdi Trabelsi</h3>
+          <p class="text-white/45 text-[13px] mb-5">Directeur général</p>
+          <p class="text-white/60 text-[13.5px] leading-relaxed">
+            Lion depuis 2025, il impulse les projets à fort impact social et représente
+            le club auprès du district.
+          </p>
+        </div>
+      </article>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <article class="reveal card-hover bg-white rounded-2xl border border-lions-100 overflow-hidden text-center">
+        <span class="block h-1 bg-gradient-to-r from-transparent via-lions-200 to-transparent"></span>
+        <div class="p-7">
+          <span class="w-[68px] h-[68px] rounded-full bg-lions-50 border-2 border-lions-100
+                       flex items-center justify-center mx-auto mb-4">
+            <span class="font-serif font-bold text-[19px] text-lions-500">SB</span>
+          </span>
+          <div class="text-lions-400 text-[10px] font-bold uppercase tracking-[0.16em] mb-1.5">Vice-Présidente</div>
+          <h3 class="font-serif text-[17px] font-bold text-lions-700 mb-1">Salma Ben Salah</h3>
+          <p class="text-lions-800/50 text-[13px]">Médecin ophtalmologiste</p>
+        </div>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl border border-lions-100 overflow-hidden text-center">
+        <span class="block h-1 bg-gradient-to-r from-transparent via-lions-200 to-transparent"></span>
+        <div class="p-7">
+          <span class="w-[68px] h-[68px] rounded-full bg-lions-50 border-2 border-lions-100
+                       flex items-center justify-center mx-auto mb-4">
+            <span class="font-serif font-bold text-[19px] text-lions-500">KA</span>
+          </span>
+          <div class="text-lions-400 text-[10px] font-bold uppercase tracking-[0.16em] mb-1.5">Secrétaire général</div>
+          <h3 class="font-serif text-[17px] font-bold text-lions-700 mb-1">Karim Abdallah</h3>
+          <p class="text-lions-800/50 text-[13px]">Avocat d'affaires</p>
+        </div>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl border border-lions-100 overflow-hidden text-center">
+        <span class="block h-1 bg-gradient-to-r from-transparent via-lions-200 to-transparent"></span>
+        <div class="p-7">
+          <span class="w-[68px] h-[68px] rounded-full bg-lions-50 border-2 border-lions-100
+                       flex items-center justify-center mx-auto mb-4">
+            <span class="font-serif font-bold text-[19px] text-lions-500">NM</span>
+          </span>
+          <div class="text-lions-400 text-[10px] font-bold uppercase tracking-[0.16em] mb-1.5">Trésorière</div>
+          <h3 class="font-serif text-[17px] font-bold text-lions-700 mb-1">Nadia Miled</h3>
+          <p class="text-lions-800/50 text-[13px]">Directrice financière</p>
+        </div>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl border border-lions-100 overflow-hidden text-center">
+        <span class="block h-1 bg-gradient-to-r from-transparent via-lions-200 to-transparent"></span>
+        <div class="p-7">
+          <span class="w-[68px] h-[68px] rounded-full bg-lions-50 border-2 border-lions-100
+                       flex items-center justify-center mx-auto mb-4">
+            <span class="font-serif font-bold text-[19px] text-lions-500">YC</span>
+          </span>
+          <div class="text-lions-400 text-[10px] font-bold uppercase tracking-[0.16em] mb-1.5">Communication</div>
+          <h3 class="font-serif text-[17px] font-bold text-lions-700 mb-1">Youssef Chahed</h3>
+          <p class="text-lions-800/50 text-[13px]">Consultant en marketing</p>
+        </div>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl border border-lions-100 overflow-hidden text-center">
+        <span class="block h-1 bg-gradient-to-r from-transparent via-lions-200 to-transparent"></span>
+        <div class="p-7">
+          <span class="w-[68px] h-[68px] rounded-full bg-lions-50 border-2 border-lions-100
+                       flex items-center justify-center mx-auto mb-4">
+            <span class="font-serif font-bold text-[19px] text-lions-500">LM</span>
+          </span>
+          <div class="text-lions-400 text-[10px] font-bold uppercase tracking-[0.16em] mb-1.5">Commission Jeunesse</div>
+          <h3 class="font-serif text-[17px] font-bold text-lions-700 mb-1">Leïla Mansour</h3>
+          <p class="text-lions-800/50 text-[13px]">Enseignante</p>
+        </div>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl border border-lions-100 overflow-hidden text-center">
+        <span class="block h-1 bg-gradient-to-r from-transparent via-lions-200 to-transparent"></span>
+        <div class="p-7">
+          <span class="w-[68px] h-[68px] rounded-full bg-lions-50 border-2 border-lions-100
+                       flex items-center justify-center mx-auto mb-4">
+            <span class="font-serif font-bold text-[19px] text-lions-500">AS</span>
+          </span>
+          <div class="text-lions-400 text-[10px] font-bold uppercase tracking-[0.16em] mb-1.5">Commission Santé</div>
+          <h3 class="font-serif text-[17px] font-bold text-lions-700 mb-1">Ahmed Sfar</h3>
+          <p class="text-lions-800/50 text-[13px]">Pharmacien</p>
+        </div>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl border border-lions-100 overflow-hidden text-center">
+        <span class="block h-1 bg-gradient-to-r from-transparent via-lions-200 to-transparent"></span>
+        <div class="p-7">
+          <span class="w-[68px] h-[68px] rounded-full bg-lions-50 border-2 border-lions-100
+                       flex items-center justify-center mx-auto mb-4">
+            <span class="font-serif font-bold text-[19px] text-lions-500">RM</span>
+          </span>
+          <div class="text-lions-400 text-[10px] font-bold uppercase tracking-[0.16em] mb-1.5">Commission Environnement</div>
+          <h3 class="font-serif text-[17px] font-bold text-lions-700 mb-1">Rania Msaddak</h3>
+          <p class="text-lions-800/50 text-[13px]">Ingénieure agronome</p>
+        </div>
+      </article>
+    </div>
+
+    <p class="reveal text-center text-lions-800/50 text-[13px] mt-10">
+      Le club compte également des directeurs de projets et des responsables de commissions
+      thématiques. <a href="contact.html" class="text-lions-600 hover:text-sun-600 font-semibold underline underline-offset-2 transition-colors">Contactez-nous</a>
+      pour en savoir plus.
+    </p>
+  </div>
+</section>
+<section id="avantages" class="py-24 bg-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <div class="reveal flex items-center justify-center gap-3 mb-5">
+        <span class="w-9 h-px bg-sun-500"></span>
+        <span class="text-sun-700 text-[11px] font-bold uppercase tracking-[0.2em]">Devenir membre</span>
+        <span class="w-9 h-px bg-sun-500"></span>
+      </div>
+      <h2 class="reveal font-serif text-[clamp(2rem,4vw,2.75rem)] font-bold text-lions-700 mb-5">
+        Les avantages de l'adhésion
+      </h2>
+      <p class="reveal text-lions-800/60 text-[16px] leading-relaxed">
+        Rejoindre le club, c'est intégrer un réseau, se former et agir concrètement.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <article class="reveal card-hover bg-white rounded-2xl p-7 border border-lions-100">
+        <span class="w-11 h-11 rounded-xl bg-sun-50 border border-sun-200 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.4-1.9M17 20H7m10 0v-2c0-.7-.1-1.3-.4-1.9M7 20H2v-2a3 3 0 015.4-1.9M7 20v-2c0-.7.1-1.3.4-1.9m0 0a5 5 0 019.2 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </span>
+        <h3 class="font-serif text-[18px] font-bold text-lions-700 mb-2.5">Un réseau international</h3>
+        <p class="text-lions-800/60 text-[14px] leading-[1.75]">Accès au réseau mondial de Lions Clubs International, présent dans plus de 200 pays, et à ses programmes d'échange.</p>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl p-7 border border-lions-100">
+        <span class="w-11 h-11 rounded-xl bg-sun-50 border border-sun-200 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </span>
+        <h3 class="font-serif text-[18px] font-bold text-lions-700 mb-2.5">Un impact mesurable</h3>
+        <p class="text-lions-800/60 text-[14px] leading-[1.75]">Participer à des projets concrets au service de Sfax, avec un suivi et des résultats rendus publics chaque année.</p>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl p-7 border border-lions-100">
+        <span class="w-11 h-11 rounded-xl bg-sun-50 border border-sun-200 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.25v13m0-13C10.8 5.5 9.2 5 7.5 5S4.2 5.5 3 6.25v13C4.2 18.5 5.8 18 7.5 18s3.3.5 4.5 1.25m0-13C13.2 5.5 14.8 5 16.5 5s3.3.5 4.5 1.25v13C19.8 18.5 18.2 18 16.5 18s-3.3.5-4.5 1.25"/></svg>
+        </span>
+        <h3 class="font-serif text-[18px] font-bold text-lions-700 mb-2.5">Une formation continue</h3>
+        <p class="text-lions-800/60 text-[14px] leading-[1.75]">Programmes de leadership, ateliers de gestion de projet et accompagnement des nouveaux membres dès leur arrivée.</p>
+      </article>
+      <article class="reveal card-hover bg-white rounded-2xl p-7 border border-lions-100">
+        <span class="w-11 h-11 rounded-xl bg-sun-50 border border-sun-200 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.3 6.9L21 12l-5.7 2.1L13 21l-2.3-6.9L5 12l5.7-2.1L13 3z"/></svg>
+        </span>
+        <h3 class="font-serif text-[18px] font-bold text-lions-700 mb-2.5">Une reconnaissance</h3>
+        <p class="text-lions-800/60 text-[14px] leading-[1.75]">Valorisation de l'engagement et de la constance, au sein du club comme auprès du district et de la fédération.</p>
+      </article>
+    </div>
+    <div class="reveal mt-14 text-center">
+      <a href="rejoindre.html"
+         class="group inline-flex items-center justify-center gap-2.5 px-9 py-4 rounded-lg
+                bg-sun-500 hover:bg-sun-400 text-lions-800 text-[15px] font-bold
+                shadow-lg shadow-sun-500/30 transition-all duration-200 hover:-translate-y-0.5">
+        Rejoindre le club
+        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+<!-- ══════════════════════════════════════════════════════════════════════
+     PIED DE PAGE
+     ══════════════════════════════════════════════════════════════════════ -->
+<footer class="bg-lions-900 pt-16 pb-8">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
+
+      <div class="lg:col-span-2">
+        <div class="flex items-center gap-4 mb-6">
+          <!-- Emblème seul : le logo complet, dont le texte est bleu,
+               serait illisible sur ce fond sombre. -->
+          <img src="emblem.png" alt="" class="h-14 w-auto" aria-hidden="true" />
+          <span class="leading-tight">
+            <span class="block font-serif text-[19px] font-bold text-white">Lions</span>
+            <span class="block font-serif text-[19px] font-bold text-sun-500" data-club-name>Sfax Med</span>
+          </span>
+        </div>
+        <p class="text-white/45 text-[13.5px] leading-[1.8] max-w-sm">
+          Club humanitaire engagé à Sfax pour la solidarité, la santé, l'éducation,
+          l'environnement et l'action citoyenne.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="text-white text-[11px] font-bold uppercase tracking-[0.18em] mb-5">Navigation</h4>
+        <ul class="space-y-2.5">
+          <li><a href="notre-club.html"  class="text-white/45 hover:text-sun-500 text-[13.5px] transition-colors">Notre Club</a></li>
+          <li><a href="nos-actions.html" class="text-white/45 hover:text-sun-500 text-[13.5px] transition-colors">Nos Actions</a></li>
+          <li><a href="evenements.html"  class="text-white/45 hover:text-sun-500 text-[13.5px] transition-colors">Événements</a></li>
+          <li><a href="actualites.html"  class="text-white/45 hover:text-sun-500 text-[13.5px] transition-colors">Actualités</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white text-[11px] font-bold uppercase tracking-[0.18em] mb-5">Contact</h4>
+        <ul class="space-y-2.5 text-[13.5px] text-white/45">
+          <li>secretariat@lionsmed.tn</li>
+          <li>+216 00 000 000</li>
+          <li>Sfax — Tunisie</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-white/30 text-[12px]">
+        © 2026 <span data-club-full>Lions Sfax Med</span>. Tous droits réservés.
+      </p>
+      <p class="text-white/30 text-[12px]">District 414-B — Tunisie</p>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   NOM DU CLUB
+   ═══════════════════════════════════════════════════════════════════════
+   Le logo officiel (logomed.png) porte la mention « Lions Sfax Med » :
+   c'est donc ce nom qui est repris ici. Il reste centralisé dans ces deux
+   constantes, injectées partout où le nom apparaît (titre du hero, pied de
+   page, onglet du navigateur). Modifier ces lignes suffit à tout changer. */
+
+const CLUB_NAME  = 'Sfax Med';   // titre jaune du hero — repris du logo officiel
+const CLUB_SHORT = 'SFAX MED';   // variantes en petites capitales
+
+/* ─── Injection (ne rien modifier en dessous) ─────────────────────────── */
+document.querySelectorAll('[data-club-name]').forEach(el => {
+  el.textContent = CLUB_NAME;
+});
+document.querySelectorAll('[data-club-short]').forEach(el => {
+  el.textContent = CLUB_SHORT;
+});
+document.querySelectorAll('[data-club-full]').forEach(el => {
+  el.textContent = el.textContent.replace(/Lions Sfax Med/g, 'Lions Club ' + CLUB_NAME);
+});
+document.title = 'Maquette — Notre Club | Lions ' + CLUB_NAME;
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INTERACTIONS
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* 1 — Menu mobile */
+const menuBtn = document.getElementById('menu-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+if (menuBtn && mobileMenu) {
+  menuBtn.addEventListener('click', () => {
+    const ouvert = !mobileMenu.classList.contains('hidden');
+    mobileMenu.classList.toggle('hidden');
+    menuBtn.setAttribute('aria-expanded', String(!ouvert));
+  });
+  mobileMenu.querySelectorAll('a').forEach(lien => {
+    lien.addEventListener('click', () => {
+      mobileMenu.classList.add('hidden');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
+}
+
+/* 2 — Révélation progressive au défilement */
+const aReveler = document.querySelectorAll('.reveal');
+if ('IntersectionObserver' in window) {
+  const observateur = new IntersectionObserver((entrees) => {
+    entrees.forEach(entree => {
+      if (entree.isIntersecting) {
+        entree.target.classList.add('visible');
+        observateur.unobserve(entree.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+  aReveler.forEach(el => observateur.observe(el));
+} else {
+  aReveler.forEach(el => el.classList.add('visible'));
+}
+
+</script>
+
+</body>
+</html>
