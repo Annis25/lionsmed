@@ -1,0 +1,275 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Connexion Membres | Lions Club Sfax Méditerranée</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              50:'#EEF2F8',100:'#D5DFF0',200:'#ABBFE0',300:'#7F9FCF',400:'#557FBE',
+              500:'#2B5FAD',600:'#1E4B8E',700:'#163870',800:'#0E2550',900:'#0B1F3A',950:'#060F1D',
+            },
+            gold: {
+              50:'#FBF6EC',100:'#F5EAD1',200:'#EBD4A3',300:'#E0BE74',400:'#D6A849',
+              500:'#C9A84C',600:'#A8862A',700:'#7D641F',800:'#534215',
+            },
+            ivory: '#F8F6F0',
+          },
+          fontFamily: {
+            sans:  ['Inter','system-ui','sans-serif'],
+            serif: ['"Playfair Display"','Georgia','serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    .card-glow { box-shadow: 0 0 40px rgba(201,168,76,.08); }
+    .input-focus:focus { box-shadow: 0 0 0 3px rgba(43,95,173,.12); }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen bg-navy-950 flex">
+
+<div class="flex min-h-screen w-full">
+
+  {# ── PANNEAU GAUCHE ── #}
+  <div class="hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden flex-col items-center justify-center p-16" aria-hidden="true">
+    <div class="absolute inset-0 bg-gradient-to-br from-navy-950 via-navy-900 to-[#0d2847]"></div>
+    <div class="absolute inset-0 opacity-[0.04]"
+         style="background-image:repeating-linear-gradient(45deg,#C9A84C 0px,#C9A84C 1px,transparent 0px,transparent 50%);background-size:30px 30px;"></div>
+    <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-gold-500/8 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-navy-600/30 blur-3xl pointer-events-none"></div>
+    <div class="absolute top-0 right-0 bottom-0 w-px bg-gradient-to-b from-transparent via-gold-500/25 to-transparent"></div>
+
+    <div class="relative z-10 flex flex-col items-center text-center max-w-md">
+      <div class="w-20 h-20 rounded-full border-2 border-gold-400/50 bg-gold-400/5 flex items-center justify-center mb-8">
+        <svg class="w-10 h-10 text-gold-400" viewBox="0 0 32 32" fill="currentColor">
+          <path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2zm-1 19.95V16.5H9l7-10.45v5.45h6L15 21.95z"/>
+        </svg>
+      </div>
+      <div class="mb-6">
+        <div class="font-serif text-3xl font-bold text-white tracking-tight mb-1">Lions Club</div>
+        <div class="text-gold-400 text-sm font-semibold tracking-[0.3em] uppercase">Sfax&#8209;Méditerranée</div>
+      </div>
+      <div class="w-16 h-px bg-gold-500/40 mb-6"></div>
+      <p class="font-serif text-white/55 text-lg italic font-light leading-relaxed mb-10">
+        « We Serve — Servir, c'est<br>notre raison d'être »
+      </p>
+      <div class="flex flex-wrap justify-center gap-2">
+        <span class="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-white/40 text-xs tracking-wider">Service</span>
+        <span class="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-white/40 text-xs tracking-wider">Intégrité</span>
+        <span class="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-white/40 text-xs tracking-wider">Amitié</span>
+        <span class="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-white/40 text-xs tracking-wider">Excellence</span>
+      </div>
+    </div>
+
+    <div class="absolute bottom-8 left-0 right-0 text-center">
+      <p class="text-white/20 text-xs tracking-widest uppercase">District 414-B Tunisie · Fondé en 1967</p>
+    </div>
+  </div>
+
+  {# ── PANNEAU DROIT : formulaire ── #}
+  <div class="flex-1 lg:w-1/2 xl:w-[45%] flex items-center justify-center bg-white min-h-screen px-6 py-12 sm:px-10">
+    <div class="w-full max-w-md">
+
+      {# Mobile header #}
+      <div class="lg:hidden flex flex-col items-center text-center mb-10">
+        <div class="w-14 h-14 rounded-full border-2 border-navy-800/30 flex items-center justify-center mb-4">
+          <svg class="w-7 h-7 text-navy-700" viewBox="0 0 32 32" fill="currentColor">
+            <path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2zm-1 19.95V16.5H9l7-10.45v5.45h6L15 21.95z"/>
+          </svg>
+        </div>
+        <div class="font-serif font-bold text-navy-900 text-xl mb-0.5">Lions Club</div>
+        <div class="text-gold-600 text-[11px] font-semibold tracking-[0.25em] uppercase">Sfax-Méditerranée</div>
+      </div>
+
+      <div class="mb-8">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-6 h-px bg-gold-500"></span>
+          <span class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Espace membres</span>
+        </div>
+        <h1 class="font-serif text-2xl sm:text-3xl font-bold text-navy-900 mb-2">Connexion</h1>
+        <p class="text-gray-500 text-sm leading-relaxed">
+          Accédez à votre espace privé et gérez votre participation aux activités du club.
+        </p>
+      </div>
+
+      {# Messages Django (erreurs / succès) #}
+      {% if messages %}
+        {% for message in messages %}
+        <div class="mb-5 flex items-start gap-3 p-4 rounded-xl border
+                    {% if message.tags == 'success' %}bg-green-50 border-green-200
+                    {% elif message.tags == 'error' %}bg-red-50 border-red-200
+                    {% else %}bg-blue-50 border-blue-200{% endif %}"
+             role="alert">
+          <svg class="w-5 h-5 flex-shrink-0 mt-0.5
+                      {% if message.tags == 'success' %}text-green-500
+                      {% elif message.tags == 'error' %}text-red-500
+                      {% else %}text-blue-500{% endif %}"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <p class="text-sm {% if message.tags == 'success' %}text-green-700{% elif message.tags == 'error' %}text-red-700{% else %}text-blue-700{% endif %}">
+            {{ message }}
+          </p>
+        </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" action="{% url 'login' %}" novalidate autocomplete="on" class="space-y-5">
+        {% csrf_token %}
+        {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}" />
+        {% endif %}
+
+        <div>
+          <label for="email" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            Adresse e-mail <span class="text-red-400" aria-hidden="true">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+              <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <input type="email" id="email" name="email" required autocomplete="email"
+                   placeholder="votre@email.com"
+                   class="input-focus w-full pl-10 pr-4 py-3 text-sm text-gray-700 bg-gray-50 border border-gray-200
+                          rounded-lg outline-none focus:border-navy-400 transition-all placeholder-gray-400">
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            Mot de passe <span class="text-red-400" aria-hidden="true">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+              <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+            </div>
+            <input type="password" id="password" name="password" required autocomplete="current-password"
+                   placeholder="••••••••"
+                   class="input-focus w-full pl-10 pr-12 py-3 text-sm text-gray-700 bg-gray-50 border border-gray-200
+                          rounded-lg outline-none focus:border-navy-400 transition-all placeholder-gray-400">
+            <button type="button" id="toggle-password"
+                    aria-label="Afficher ou masquer le mot de passe"
+                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-navy-600 transition-colors">
+              <svg id="eye-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              <svg id="eye-off-icon" class="w-4 h-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn"
+                class="group relative w-full flex items-center justify-center gap-2 px-6 py-3.5
+                       bg-navy-900 hover:bg-navy-800 text-white font-semibold text-sm rounded-lg
+                       shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+          <span id="btn-text" class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+            </svg>
+            Se connecter
+          </span>
+          <span id="btn-loading" class="hidden items-center gap-2">
+            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            Vérification…
+          </span>
+          <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-3/4 h-0.5
+                       bg-gradient-to-r from-transparent via-gold-400 to-transparent
+                       transition-all duration-300 rounded-full" aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <div class="mt-8 pt-7 border-t border-gray-100">
+        <div class="bg-ivory rounded-xl p-5 border border-gray-200">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-navy-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-4 h-4 text-navy-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-navy-800 font-semibold text-xs mb-1">Accès réservé aux membres</p>
+              <p class="text-gray-500 text-xs leading-relaxed">
+                Vos identifiants vous ont été communiqués par le secrétariat du club.
+              </p>
+              <a href="mailto:secretariat@lionsmed.tn"
+                 class="mt-2 inline-flex items-center gap-1.5 text-xs text-navy-600 hover:text-gold-600 font-medium transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                secretariat@lionsmed.tn
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 flex items-center justify-between text-xs">
+        <a href="{% url 'home' %}" class="inline-flex items-center gap-1.5 text-gray-400 hover:text-navy-600 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/>
+          </svg>
+          Retour au site
+        </a>
+        <a href="{% url 'rejoindre' %}" class="text-gold-600 hover:text-gold-700 font-medium transition-colors">
+          Rejoindre le club →
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn  = document.getElementById('toggle-password');
+  const pwdInput   = document.getElementById('password');
+  const eyeIcon    = document.getElementById('eye-icon');
+  const eyeOffIcon = document.getElementById('eye-off-icon');
+  if (toggleBtn && pwdInput) {
+    toggleBtn.addEventListener('click', () => {
+      const isPassword = pwdInput.type === 'password';
+      pwdInput.type = isPassword ? 'text' : 'password';
+      eyeIcon.classList.toggle('hidden', isPassword);
+      eyeOffIcon.classList.toggle('hidden', !isPassword);
+    });
+  }
+  const form = document.querySelector('form');
+  const submitBtn = document.getElementById('submit-btn');
+  const btnText = document.getElementById('btn-text');
+  const btnLoading = document.getElementById('btn-loading');
+  if (form && submitBtn) {
+    form.addEventListener('submit', () => {
+      submitBtn.disabled = true;
+      btnText.classList.add('hidden');
+      btnLoading.classList.remove('hidden');
+      btnLoading.classList.add('flex');
+    });
+  }
+  const emailInput = document.getElementById('email');
+  if (emailInput && !emailInput.value) emailInput.focus();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+{% extends 'admin_custom/base_admin.html' %}
+{% load static %}
+
+{% block title %}{% if is_create %}Nouvel article{% else %}Éditer {{ article.title }}{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-5 max-w-3xl">
+
+  <div class="flex items-center gap-3">
+    <a href="{% url 'admin_articles' %}" class="text-gray-400 hover:text-navy-600 transition-colors">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/></svg>
+    </a>
+    <div class="flex-1 min-w-0">
+      <h1 class="font-serif text-2xl font-bold text-navy-900">
+        {% if is_create %}Nouvel article{% else %}Éditer l'article{% endif %}
+      </h1>
+      {% if not is_create %}
+      <p class="text-gray-500 text-sm mt-0.5">{{ article.title }}</p>
+      {% endif %}
+    </div>
+    {% if not is_create %}
+    {# Toggle publication accessible aussi depuis le formulaire #}
+    <form method="post" action="{% url 'admin_article_toggle_status' article.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{% url 'admin_article_edit' article.id %}">
+      <button type="submit"
+              class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg transition-colors
+                     {% if article.status == 'PUBLISHED' %}bg-amber-50 hover:bg-amber-100 text-amber-700{% else %}bg-green-50 hover:bg-green-100 text-green-700{% endif %}">
+        {% if article.status == 'PUBLISHED' %}Dépublier{% else %}Publier{% endif %}
+      </button>
+    </form>
+    {% endif %}
+  </div>
+
+  {% if form.non_field_errors %}
+  <div class="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+    {% for error in form.non_field_errors %}
+    <p class="text-sm text-red-700">{{ error }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-6">
+    <form method="post" action="" enctype="multipart/form-data" class="space-y-5">
+      {% csrf_token %}
+
+      <div>
+        <label for="{{ form.title.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+          {{ form.title.label }} <span class="text-red-400">*</span>
+        </label>
+        {{ form.title }}
+        {% for error in form.title.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div>
+        <label for="{{ form.excerpt.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+          {{ form.excerpt.label }}
+        </label>
+        {{ form.excerpt }}
+        <p class="text-xs text-gray-400 mt-1">Laissé vide, il est généré depuis le début du contenu.</p>
+        {% for error in form.excerpt.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div>
+        <label for="{{ form.content.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+          {{ form.content.label }} <span class="text-red-400">*</span>
+        </label>
+        {{ form.content }}
+        {% for error in form.content.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div>
+          <label for="{{ form.category.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            {{ form.category.label }}
+          </label>
+          {{ form.category }}
+          {% for error in form.category.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.status.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            {{ form.status.label }}
+          </label>
+          {{ form.status }}
+          {% for error in form.status.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.reading_time.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            {{ form.reading_time.label }}
+          </label>
+          {{ form.reading_time }}
+          {% for error in form.reading_time.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <div>
+        <label for="{{ form.image.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+          {{ form.image.label }}
+        </label>
+        {{ form.image }}
+        {% for error in form.image.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+        <button type="submit"
+                class="px-6 py-2.5 bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold rounded-lg transition-colors">
+          {% if is_create %}Créer l'article{% else %}Enregistrer{% endif %}
+        </button>
+        <a href="{% url 'admin_articles' %}"
+           class="px-5 py-2.5 text-sm text-gray-500 hover:text-navy-700 font-medium transition-colors">
+          Annuler
+        </a>
+        {% if not is_create and article.status == 'PUBLISHED' %}
+        <a href="{% url 'actualite_detail' article.slug %}" target="_blank" rel="noopener"
+           class="ml-auto inline-flex items-center gap-1.5 text-sm text-navy-600 hover:text-gold-600 font-semibold transition-colors">
+          Voir sur le site
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

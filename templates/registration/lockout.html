@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Accès temporairement bloqué | Lions Club Sfax Méditerranée</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: {
+        navy: { 50:'#f1f5f9', 100:'#e2e8f0', 600:'#334e68', 700:'#243b53', 800:'#102a43', 900:'#0a1f33', 950:'#061726' },
+        gold: { 100:'#f7ecd0', 300:'#e3cd8a', 400:'#d9bd68', 500:'#c9a84c', 600:'#a88b3d' },
+      }, fontFamily: { serif: ['Georgia','serif'] } } }
+    }
+  </script>
+</head>
+<body class="bg-navy-950 min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center">
+
+    <div class="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto mb-5">
+      <svg class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+      </svg>
+    </div>
+
+    <h1 class="font-serif text-2xl font-bold text-navy-900 mb-3">Accès temporairement bloqué</h1>
+
+    <p class="text-gray-600 text-sm leading-relaxed mb-6">
+      Trop de tentatives de connexion infructueuses ont été enregistrées.
+      Par sécurité, l'accès depuis cet appareil est suspendu pendant
+      <strong class="text-navy-800">30 minutes</strong>.
+    </p>
+
+    <p class="text-gray-500 text-xs leading-relaxed mb-6">
+      Si vous avez oublié vos identifiants, contactez le secrétariat du club
+      plutôt que de multiplier les tentatives.
+    </p>
+
+    <a href="/"
+       class="inline-flex items-center justify-center gap-2 w-full px-6 py-3
+              bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold rounded-lg
+              transition-colors duration-200">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/>
+      </svg>
+      Retour à l'accueil
+    </a>
+  </div>
+</body>
+</html>

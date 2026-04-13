@@ -1,0 +1,1029 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accueil{% endblock %}
+{% block meta_description %}Lions Club de Tunis-Médina — Servir, unir et transformer notre communauté depuis 1967. Rejoignez-nous dans notre mission humanitaire.{% endblock %}
+
+{% block content %}
+
+{# ================================================================
+   1. SECTION HERO — Plein écran, typographie premium, double CTA
+   ================================================================ #}
+<section id="accueil" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+
+  <!-- Fond gradient institutionnel (remplacer bg-image par une vraie photo avec classe bg-cover) -->
+  <div class="absolute inset-0 bg-gradient-to-br from-navy-950 via-navy-900 to-[#0d2847]">
+    <!-- Motif géométrique décoratif subtil -->
+    <div class="absolute inset-0 opacity-[0.03]"
+         style="background-image: repeating-linear-gradient(45deg, #C9A84C 0px, #C9A84C 1px, transparent 0px, transparent 50%);
+                background-size: 30px 30px;">
+    </div>
+    <!-- Cercles lumineux d'ambiance -->
+    <div class="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-gold-500/5 blur-3xl"></div>
+    <div class="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-navy-700/30 blur-3xl"></div>
+  </div>
+
+  <!-- Liseré doré en haut -->
+  <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-gold-500 to-transparent"></div>
+
+  <!-- Contenu héro centré -->
+  <div class="relative z-10 max-w-4xl mx-auto px-6 sm:px-8 text-center pt-24 pb-20">
+
+    <!-- Badge District -->
+    <div class="inline-flex items-center gap-2.5 px-5 py-2 mb-8
+                bg-white/5 border border-gold-400/25 rounded-full
+                backdrop-blur-sm text-gold-300 text-xs font-medium tracking-widest uppercase
+                fade-in-up">
+      <span class="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse"></span>
+      Lions Clubs International &bull; District 414-B Tunisie
+    </div>
+
+    <!-- Titre principal -->
+    <h1 class="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.1] mb-5 fade-in-up">
+      Lions Club<br>
+      <span class="text-gold-400">Tunis&#8209;Médina</span>
+    </h1>
+
+    <!-- Devise en italique -->
+    <p class="font-serif text-xl sm:text-2xl text-white/60 italic font-light tracking-wide mb-6 fade-in-up">
+      « We Serve — Servir, c'est notre raison d'être »
+    </p>
+
+    <!-- Sous-titre descriptif -->
+    <p class="text-white/55 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mb-10 fade-in-up">
+      Depuis 1967, notre club réunit des femmes et des hommes engagés pour bâtir
+      une Tunisie plus solidaire, à travers des actions concrètes au service des
+      communautés les plus vulnérables.
+    </p>
+
+    <!-- Boutons d'action -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 fade-in-up">
+      <a href="#nos-actions"
+         class="group w-full sm:w-auto inline-flex items-center justify-center gap-2
+                px-8 py-3.5 bg-gold-500 hover:bg-gold-400 text-navy-900
+                text-sm font-semibold rounded-md
+                shadow-lg shadow-gold-500/20 hover:shadow-gold-400/30
+                transition-all duration-200 hover:-translate-y-0.5">
+        Découvrir nos actions
+        <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+      <a href="#rejoindre"
+         class="group w-full sm:w-auto inline-flex items-center justify-center gap-2
+                px-8 py-3.5 border-2 border-white/25 hover:border-white/50
+                text-white text-sm font-medium rounded-md
+                transition-all duration-200 hover:-translate-y-0.5">
+        Rejoindre le club
+      </a>
+    </div>
+  </div>
+
+  <!-- Indicateur de défilement -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2
+              text-white/25 hover:text-white/50 transition-colors duration-200 cursor-pointer"
+       onclick="document.getElementById('stats').scrollIntoView({behavior: 'smooth'})">
+    <span class="text-[10px] tracking-[0.3em] uppercase font-medium">Défiler</span>
+    <div class="flex flex-col gap-1 items-center">
+      <span class="w-px h-6 bg-gradient-to-b from-white/30 to-transparent scroll-chevron"></span>
+    </div>
+  </div>
+
+</section>
+
+
+{# ================================================================
+   2. BANDE DE STATISTIQUES — Chiffres clés sur fond navy
+   ================================================================ #}
+<section id="stats" aria-label="Chiffres clés du club">
+  <div class="bg-navy-900 py-14">
+    <!-- Liseré doré supérieur -->
+    <div class="h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent mb-14"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-6">
+
+        <!-- Stat 1 -->
+        <div class="text-center fade-in-up">
+          <div class="text-4xl sm:text-5xl font-serif font-bold text-gold-400 mb-1 counter" data-target="57">57</div>
+          <div class="text-white/40 text-xs uppercase tracking-widest font-medium">Années d'engagement</div>
+        </div>
+
+        <!-- Stat 2 -->
+        <div class="text-center fade-in-up">
+          <div class="text-4xl sm:text-5xl font-serif font-bold text-gold-400 mb-1 counter" data-target="86">86</div>
+          <div class="text-white/40 text-xs uppercase tracking-widest font-medium">Membres actifs</div>
+        </div>
+
+        <!-- Stat 3 -->
+        <div class="text-center fade-in-up">
+          <div class="text-4xl sm:text-5xl font-serif font-bold text-gold-400 mb-1 counter" data-target="320">320+</div>
+          <div class="text-white/40 text-xs uppercase tracking-widest font-medium">Projets réalisés</div>
+        </div>
+
+        <!-- Stat 4 -->
+        <div class="text-center fade-in-up">
+          <div class="text-4xl sm:text-5xl font-serif font-bold text-gold-400 mb-1">14 000+</div>
+          <div class="text-white/40 text-xs uppercase tracking-widest font-medium">Bénéficiaires aidés</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent mt-14"></div>
+  </div>
+</section>
+
+
+{# ================================================================
+   3. NOTRE CLUB — Mission, valeurs, identité
+   ================================================================ #}
+<section id="notre-club" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+      <!-- Texte -->
+      <div class="fade-in-up">
+        <!-- Label de section -->
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-px bg-gold-500"></span>
+          <span class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Notre identité</span>
+        </div>
+
+        <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-navy-900 leading-tight mb-6">
+          Un siècle de service,<br>
+          <em class="not-italic text-gold-600">une mission intemporelle</em>
+        </h2>
+
+        <p class="text-gray-600 text-base sm:text-lg leading-relaxed mb-5">
+          Fondé en <strong class="text-navy-800 font-semibold">1967 à Tunis</strong>, le Lions Club Tunis-Médina
+          est l'une des plus anciennes sections Lions de Tunisie. Affilié à
+          <em>Lions Clubs International</em> — 1,4 million de membres dans 210 pays —
+          notre club incarne au quotidien les valeurs universelles de
+          service, d'amitié et d'intégrité.
+        </p>
+
+        <p class="text-gray-500 text-sm sm:text-base leading-relaxed mb-8">
+          Nos membres sont des professionnels, entrepreneurs, médecins, enseignants
+          et citoyens engagés qui consacrent leur temps et leurs ressources à
+          améliorer concrètement la vie de nos concitoyens les plus vulnérables.
+        </p>
+
+        <!-- Trois valeurs Lions -->
+        <div class="space-y-4 mb-10">
+          {% for valeur in valeurs_club|default:'' %}{% endfor %}
+          <!-- Fidélité aux données statiques car les valeurs sont fixes -->
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-lg bg-navy-50 border border-navy-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-navy-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-navy-800 text-sm mb-0.5">Humanisme & Solidarité</h3>
+              <p class="text-gray-500 text-xs leading-relaxed">Agir avec bienveillance pour améliorer le bien-être des communautés locales.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-lg bg-gold-50 border border-gold-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-gold-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-navy-800 text-sm mb-0.5">Leadership & Engagement citoyen</h3>
+              <p class="text-gray-500 text-xs leading-relaxed">Former des leaders responsables qui inspirent et transforment leur entourage.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-lg bg-navy-50 border border-navy-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-navy-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-navy-800 text-sm mb-0.5">Intégrité & Excellence</h3>
+              <p class="text-gray-500 text-xs leading-relaxed">Respecter des standards éthiques élevés dans toutes nos actions et décisions.</p>
+            </div>
+          </div>
+        </div>
+
+        <a href="#nos-actions"
+           class="inline-flex items-center gap-2 text-navy-700 hover:text-gold-600 font-semibold text-sm
+                  border-b-2 border-gold-400/40 hover:border-gold-500 pb-0.5
+                  transition-all duration-200">
+          Voir nos actions concrètes
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Visuel décoratif -->
+      <div class="relative fade-in-up">
+        <!-- Cadre décoratif décalé -->
+        <div class="absolute -top-4 -right-4 w-full h-full rounded-2xl border-2 border-gold-200/60"></div>
+        <!-- Zone image principale (remplacer par une vraie photo) -->
+        <div class="relative rounded-2xl overflow-hidden bg-gradient-to-br from-navy-800 to-navy-950 aspect-[4/5]
+                    shadow-2xl shadow-navy-900/20">
+          <!-- Placeholder visuel jusqu'à l'ajout d'une vraie photo -->
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-white/20 p-8">
+            <svg class="w-24 h-24 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <p class="text-sm text-center">Photo du club ou illustration<br>à ajouter ici</p>
+          </div>
+          {# Décommenter et adapter : <img src="{% static 'images/club-photo.jpg' %}" alt="Les membres du Lions Club Tunis-Médina" class="w-full h-full object-cover"> #}
+
+          <!-- Pastille flottante -->
+          <div class="absolute bottom-6 left-6 right-6 bg-navy-900/80 backdrop-blur-sm rounded-xl px-4 py-3
+                      border border-white/10">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-gold-500/20 border border-gold-400/30 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-gold-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div>
+                <div class="text-white text-xs font-semibold">Membre certifié LCI</div>
+                <div class="text-white/45 text-[10px]">Lions Clubs International depuis 1967</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{# ================================================================
+   4. NOS ACTIONS — 6 domaines d'intervention
+   ================================================================ #}
+<section id="nos-actions" class="py-24 bg-ivory">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- En-tête de section -->
+    <div class="text-center max-w-2xl mx-auto mb-14 fade-in-up">
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <span class="w-8 h-px bg-gold-500"></span>
+        <span class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Ce que nous faisons</span>
+        <span class="w-8 h-px bg-gold-500"></span>
+      </div>
+      <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-navy-900 leading-tight mb-4">
+        Nos Domaines d'Action
+      </h2>
+      <p class="text-gray-500 text-base leading-relaxed">
+        Six axes prioritaires alignés sur les causes mondiales de Lions Clubs International,
+        adaptés aux réalités et aux besoins de la Tunisie.
+      </p>
+    </div>
+
+    <!-- Grille des actions -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Carte 1 : Vision -->
+      <article class="bg-white rounded-2xl p-7 border border-gray-100 card-hover fade-in-up group">
+        <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-5 group-hover:bg-navy-100 transition-colors">
+          <svg class="w-6 h-6 text-navy-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-lg font-semibold text-navy-800 mb-2">Programme Vision</h3>
+        <p class="text-gray-500 text-sm leading-relaxed mb-4">
+          Distribution de lunettes, dépistage de la cataracte et soutien aux personnes
+          déficientes visuelles à travers toute la Tunisie.
+        </p>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-navy-600 font-semibold bg-navy-50 px-2.5 py-1 rounded-full">
+            1 200 bénéficiaires/an
+          </span>
+        </div>
+      </article>
+
+      <!-- Carte 2 : Santé -->
+      <article class="bg-white rounded-2xl p-7 border border-gray-100 card-hover fade-in-up group">
+        <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center mb-5 group-hover:bg-red-100 transition-colors">
+          <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-lg font-semibold text-navy-800 mb-2">Santé & Diabète</h3>
+        <p class="text-gray-500 text-sm leading-relaxed mb-4">
+          Dépistage gratuit du diabète, sensibilisation et soutien aux patients dans les
+          quartiers périurbains de Tunis.
+        </p>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-red-600 font-semibold bg-red-50 px-2.5 py-1 rounded-full">
+            3 campagnes/an
+          </span>
+        </div>
+      </article>
+
+      <!-- Carte 3 : Éducation -->
+      <article class="bg-white rounded-2xl p-7 border border-gray-100 card-hover fade-in-up group">
+        <div class="w-12 h-12 rounded-xl bg-gold-50 flex items-center justify-center mb-5 group-hover:bg-gold-100 transition-colors">
+          <svg class="w-6 h-6 text-gold-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path d="M12 14l9-5-9-5-9 5 9 5z"/>
+            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-lg font-semibold text-navy-800 mb-2">Éducation & Jeunesse</h3>
+        <p class="text-gray-500 text-sm leading-relaxed mb-4">
+          Bourses scolaires, Lions Quest et accompagnement des enfants issus de
+          familles précaires pour leur réussite scolaire.
+        </p>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-yellow-700 font-semibold bg-yellow-50 px-2.5 py-1 rounded-full">
+            40 bourses attribuées
+          </span>
+        </div>
+      </article>
+
+      <!-- Carte 4 : Environnement -->
+      <article class="bg-white rounded-2xl p-7 border border-gray-100 card-hover fade-in-up group">
+        <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center mb-5 group-hover:bg-green-100 transition-colors">
+          <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-lg font-semibold text-navy-800 mb-2">Environnement</h3>
+        <p class="text-gray-500 text-sm leading-relaxed mb-4">
+          Plantation d'arbres, nettoyage de plages et sensibilisation des jeunes à
+          la préservation de l'environnement méditerranéen.
+        </p>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-green-700 font-semibold bg-green-50 px-2.5 py-1 rounded-full">
+            2 000 arbres plantés
+          </span>
+        </div>
+      </article>
+
+      <!-- Carte 5 : Aide alimentaire -->
+      <article class="bg-white rounded-2xl p-7 border border-gray-100 card-hover fade-in-up group">
+        <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center mb-5 group-hover:bg-orange-100 transition-colors">
+          <svg class="w-6 h-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m6.364 1.636l-.707.707M21 12h-1M17.657 17.657l-.707-.707M12 20v1M6.343 17.657l-.707.707M4 12H3M6.343 6.343l-.707-.707"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-lg font-semibold text-navy-800 mb-2">Lutte contre la faim</h3>
+        <p class="text-gray-500 text-sm leading-relaxed mb-4">
+          Distribution de couffins alimentaires durant Ramadan, opérations solidaires
+          dans les zones rurales défavorisées.
+        </p>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-orange-700 font-semibold bg-orange-50 px-2.5 py-1 rounded-full">
+            500 familles aidées
+          </span>
+        </div>
+      </article>
+
+      <!-- Carte 6 : Catastrophes & Urgences -->
+      <article class="bg-white rounded-2xl p-7 border border-gray-100 card-hover fade-in-up group">
+        <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center mb-5 group-hover:bg-purple-100 transition-colors">
+          <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-lg font-semibold text-navy-800 mb-2">Aide d'urgence</h3>
+        <p class="text-gray-500 text-sm leading-relaxed mb-4">
+          Mobilisation rapide lors de catastrophes naturelles ou de crises humanitaires,
+          en coordination avec le réseau Lions mondial.
+        </p>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-purple-700 font-semibold bg-purple-50 px-2.5 py-1 rounded-full">
+            Réseau mondial actif
+          </span>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+{# ================================================================
+   5. ÉVÉNEMENTS À VENIR
+   ================================================================ #}
+<section id="evenements" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- En-tête -->
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12 fade-in-up">
+      <div>
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-px bg-gold-500"></span>
+          <span class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Agenda</span>
+        </div>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-navy-900">Prochains Événements</h2>
+      </div>
+      <a href="#" class="inline-flex items-center gap-1.5 text-navy-600 hover:text-gold-600 text-sm font-semibold
+                         border-b border-gold-300/50 hover:border-gold-500 pb-0.5 transition-all duration-200 self-start sm:self-auto">
+        Voir tout l'agenda
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Liste des événements -->
+    <div class="space-y-4">
+
+      {# Dans une vraie app, cette liste viendrait du contexte Django :
+         {% for evt in evenements_a_venir %} ... {% endfor %}
+         Pour l'instant, les événements sont en dur. #}
+
+      <!-- Événement 1 (vedette) -->
+      <article class="group relative bg-navy-900 rounded-2xl overflow-hidden fade-in-up">
+        <div class="absolute inset-0 bg-gradient-to-r from-navy-950/80 to-navy-800/50"></div>
+        <div class="absolute top-0 left-0 bottom-0 w-1 bg-gold-500"></div>
+        <div class="relative flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 sm:p-8">
+          <!-- Date -->
+          <div class="flex-shrink-0 text-center w-16">
+            <div class="text-3xl font-serif font-bold text-gold-400 leading-none">28</div>
+            <div class="text-white/60 text-xs uppercase tracking-wider font-medium mt-1">Avr</div>
+            <div class="text-white/40 text-xs">2026</div>
+          </div>
+          <!-- Séparateur vertical -->
+          <div class="hidden sm:block w-px h-14 bg-white/15 flex-shrink-0"></div>
+          <!-- Détails -->
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-gold-400 bg-gold-400/10
+                           border border-gold-400/20 px-2.5 py-1 rounded-full">
+                Événement phare
+              </span>
+              <span class="text-[10px] text-white/50 uppercase tracking-wider">Gala annuel</span>
+            </div>
+            <h3 class="font-serif text-xl font-semibold text-white mb-1">
+              Gala de Bienfaisance 2026 — « Lumière sur l'Avenir »
+            </h3>
+            <p class="text-white/55 text-sm">
+              Dîner de gala au profit du programme Vision — Hôtel The Residence, La Marsa
+            </p>
+          </div>
+          <!-- CTA -->
+          <div class="flex-shrink-0">
+            <a href="#" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gold-500 hover:bg-gold-400
+                               text-navy-900 text-sm font-semibold rounded-md
+                               transition-all duration-200 group-hover:shadow-lg group-hover:shadow-gold-500/20">
+              S'inscrire
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Événements suivants (format compact) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <!-- Événement 2 -->
+        <article class="flex items-start gap-5 p-5 border border-gray-100 rounded-xl card-hover fade-in-up bg-white">
+          <div class="flex-shrink-0 w-14 h-14 rounded-xl bg-navy-900 flex flex-col items-center justify-center">
+            <span class="text-lg font-serif font-bold text-gold-400 leading-none">12</span>
+            <span class="text-white/60 text-[10px] uppercase tracking-wider">Mai</span>
+          </div>
+          <div class="min-w-0">
+            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Réunion mensuelle</span>
+            <h3 class="text-navy-800 font-semibold text-sm mt-0.5 mb-1">Assemblée générale ordinaire — Mai 2026</h3>
+            <p class="text-gray-500 text-xs leading-relaxed">
+              Maison des Associations, Av. Habib Bourguiba, Tunis — 19h00
+            </p>
+          </div>
+        </article>
+
+        <!-- Événement 3 -->
+        <article class="flex items-start gap-5 p-5 border border-gray-100 rounded-xl card-hover fade-in-up bg-white">
+          <div class="flex-shrink-0 w-14 h-14 rounded-xl bg-green-700 flex flex-col items-center justify-center">
+            <span class="text-lg font-serif font-bold text-white leading-none">22</span>
+            <span class="text-white/70 text-[10px] uppercase tracking-wider">Mai</span>
+          </div>
+          <div class="min-w-0">
+            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Action environnement</span>
+            <h3 class="text-navy-800 font-semibold text-sm mt-0.5 mb-1">Grande opération de plantation — Forêt de Ain Draham</h3>
+            <p class="text-gray-500 text-xs leading-relaxed">
+              Ain Draham, Jendouba — Départ 07h00 depuis Tunis
+            </p>
+          </div>
+        </article>
+
+        <!-- Événement 4 -->
+        <article class="flex items-start gap-5 p-5 border border-gray-100 rounded-xl card-hover fade-in-up bg-white">
+          <div class="flex-shrink-0 w-14 h-14 rounded-xl bg-red-600 flex flex-col items-center justify-center">
+            <span class="text-lg font-serif font-bold text-white leading-none">05</span>
+            <span class="text-white/70 text-[10px] uppercase tracking-wider">Jun</span>
+          </div>
+          <div class="min-w-0">
+            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Santé</span>
+            <h3 class="text-navy-800 font-semibold text-sm mt-0.5 mb-1">Caravane de dépistage du diabète — Sfax</h3>
+            <p class="text-gray-500 text-xs leading-relaxed">
+              Hôpital Hédi Chaker, Sfax — En partenariat avec la STRS
+            </p>
+          </div>
+        </article>
+
+        <!-- Événement 5 -->
+        <article class="flex items-start gap-5 p-5 border border-gray-100 rounded-xl card-hover fade-in-up bg-white">
+          <div class="flex-shrink-0 w-14 h-14 rounded-xl bg-gold-500 flex flex-col items-center justify-center">
+            <span class="text-lg font-serif font-bold text-navy-900 leading-none">14</span>
+            <span class="text-navy-900/70 text-[10px] uppercase tracking-wider">Jun</span>
+          </div>
+          <div class="min-w-0">
+            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Remise de prix</span>
+            <h3 class="text-navy-800 font-semibold text-sm mt-0.5 mb-1">Cérémonie d'attribution des bourses scolaires 2026</h3>
+            <p class="text-gray-500 text-xs leading-relaxed">
+              Salle de conférences, Hôtel Laico, Tunis — 10h00
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{# ================================================================
+   6. ACTUALITÉS RÉCENTES — Grille de 3 cartes articles
+   ================================================================ #}
+<section id="actualites" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- En-tête -->
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12 fade-in-up">
+      <div>
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-8 h-px bg-gold-500"></span>
+          <span class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Notre actualité</span>
+        </div>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-navy-900">Dernières Actualités</h2>
+      </div>
+      <a href="#" class="inline-flex items-center gap-1.5 text-navy-600 hover:text-gold-600 text-sm font-semibold
+                         border-b border-gold-300/50 hover:border-gold-500 pb-0.5 transition-all duration-200 self-start sm:self-auto">
+        Toutes les actualités
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+    </div>
+
+    {# Dans une vraie app : {% for article in actualites_recentes %} ... {% endfor %}
+       Les articles viendraient du contexte Django via la view.
+       Pour l'instant, les données sont en dur. #}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+
+      <!-- Article vedette (carte plus grande) -->
+      <article class="lg:col-span-1 group flex flex-col rounded-2xl overflow-hidden border border-gray-100 card-hover fade-in-up bg-white">
+        <!-- Visuel -->
+        <div class="relative h-52 bg-gradient-to-br from-navy-800 to-navy-950 overflow-hidden flex-shrink-0">
+          {# Remplacer par : <img src="{{ article.image.url }}" alt="{{ article.titre }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"> #}
+          <div class="absolute inset-0 flex items-center justify-center text-white/15">
+            <svg class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <!-- Catégorie badge -->
+          <div class="absolute top-4 left-4">
+            <span class="inline-block px-3 py-1 bg-gold-500 text-navy-900 text-[10px] font-bold uppercase tracking-widest rounded-full">
+              Programme Vision
+            </span>
+          </div>
+        </div>
+        <!-- Corps de la carte -->
+        <div class="flex flex-col flex-1 p-6">
+          <div class="flex items-center gap-2 text-xs text-gray-400 mb-3">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <time datetime="2026-04-02">2 avril 2026</time>
+            <span class="text-gray-200">·</span>
+            <span>5 min de lecture</span>
+          </div>
+          <h3 class="font-serif text-lg font-semibold text-navy-800 leading-snug mb-3 group-hover:text-gold-700 transition-colors">
+            <a href="#">
+              Plus de 300 paires de lunettes offertes lors de la caravane ophtalmo de Jendouba
+            </a>
+          </h3>
+          <p class="text-gray-500 text-sm leading-relaxed flex-1 mb-5">
+            Notre dernière caravane médicale dans le gouvernorat de Jendouba a permis
+            d'offrir des consultations gratuites et 312 paires de lunettes correctrices à
+            des personnes défavorisées sans accès aux soins.
+          </p>
+          <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+            <!-- Auteur -->
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-full bg-navy-100 border border-navy-200 flex items-center justify-center text-navy-600 font-bold text-[10px]">
+                LB
+              </div>
+              <span class="text-xs text-gray-500 font-medium">Lassaad Bel Haj</span>
+            </div>
+            <a href="#" class="text-xs font-semibold text-navy-600 hover:text-gold-600 transition-colors flex items-center gap-1">
+              Lire
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Article 2 -->
+      <article class="group flex flex-col rounded-2xl overflow-hidden border border-gray-100 card-hover fade-in-up bg-white">
+        <div class="relative h-52 bg-gradient-to-br from-green-800 to-green-950 overflow-hidden flex-shrink-0">
+          <div class="absolute inset-0 flex items-center justify-center text-white/15">
+            <svg class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div class="absolute top-4 left-4">
+            <span class="inline-block px-3 py-1 bg-green-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-full">
+              Environnement
+            </span>
+          </div>
+        </div>
+        <div class="flex flex-col flex-1 p-6">
+          <div class="flex items-center gap-2 text-xs text-gray-400 mb-3">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <time datetime="2026-03-21">21 mars 2026</time>
+            <span class="text-gray-200">·</span>
+            <span>3 min de lecture</span>
+          </div>
+          <h3 class="font-serif text-lg font-semibold text-navy-800 leading-snug mb-3 group-hover:text-gold-700 transition-colors">
+            <a href="#">
+              1 200 arbres plantés lors de la Journée Mondiale de la Forêt à Ain Draham
+            </a>
+          </h3>
+          <p class="text-gray-500 text-sm leading-relaxed flex-1 mb-5">
+            Mobilisant 95 membres et bénévoles, notre opération de reboisement
+            dans la forêt d'Ain Draham a battu un record d'engagement pour
+            ce club. Une réussite collective saluée par le district.
+          </p>
+          <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-full bg-green-100 border border-green-200 flex items-center justify-center text-green-700 font-bold text-[10px]">
+                RM
+              </div>
+              <span class="text-xs text-gray-500 font-medium">Rania Msaddak</span>
+            </div>
+            <a href="#" class="text-xs font-semibold text-navy-600 hover:text-gold-600 transition-colors flex items-center gap-1">
+              Lire
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Article 3 -->
+      <article class="group flex flex-col rounded-2xl overflow-hidden border border-gray-100 card-hover fade-in-up bg-white">
+        <div class="relative h-52 bg-gradient-to-br from-gold-700 to-[#7D5A1C] overflow-hidden flex-shrink-0">
+          <div class="absolute inset-0 flex items-center justify-center text-white/15">
+            <svg class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div class="absolute top-4 left-4">
+            <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-widest rounded-full border border-white/25">
+              Vie du club
+            </span>
+          </div>
+        </div>
+        <div class="flex flex-col flex-1 p-6">
+          <div class="flex items-center gap-2 text-xs text-gray-400 mb-3">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <time datetime="2026-03-10">10 mars 2026</time>
+            <span class="text-gray-200">·</span>
+            <span>4 min de lecture</span>
+          </div>
+          <h3 class="font-serif text-lg font-semibold text-navy-800 leading-snug mb-3 group-hover:text-gold-700 transition-colors">
+            <a href="#">
+              Passation de service : retour sur l'assemblée élective du club — mars 2026
+            </a>
+          </h3>
+          <p class="text-gray-500 text-sm leading-relaxed flex-1 mb-5">
+            Lors de l'assemblée générale extraordinaire du 10 mars, le nouveau bureau
+            2026–2027 a été élu à l'unanimité. Retour sur les moments forts de cette
+            soirée de transmission et d'engagement.
+          </p>
+          <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-full bg-gold-100 border border-gold-200 flex items-center justify-center text-gold-700 font-bold text-[10px]">
+                MT
+              </div>
+              <span class="text-xs text-gray-500 font-medium">Mehdi Trabelsi</span>
+            </div>
+            <a href="#" class="text-xs font-semibold text-navy-600 hover:text-gold-600 transition-colors flex items-center gap-1">
+              Lire
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+{# ================================================================
+   7. CITATION / TÉMOIGNAGE — Rupture visuelle premium
+   ================================================================ #}
+<section id="citation" aria-label="Citation du président" class="py-20 bg-navy-900 relative overflow-hidden">
+  <!-- Décorations -->
+  <div class="absolute -right-20 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gold-500/5 blur-3xl pointer-events-none"></div>
+  <div class="h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent mb-16"></div>
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in-up">
+    <!-- Guillemets décoratifs -->
+    <div class="font-serif text-8xl text-gold-500/20 leading-none select-none mb-2" aria-hidden="true">"</div>
+
+    <blockquote class="font-serif text-xl sm:text-2xl lg:text-3xl text-white font-light leading-relaxed italic -mt-8">
+      Être Lions, c'est choisir chaque jour d'agir plutôt que de subir,
+      de donner plutôt que d'attendre, de bâtir des ponts là où d'autres
+      voient des frontières.
+    </blockquote>
+
+    <div class="mt-8 flex flex-col items-center gap-2">
+      <div class="w-12 h-px bg-gold-500/50"></div>
+      <div class="flex items-center gap-3 mt-3">
+        <!-- Avatar placeholder -->
+        <div class="w-10 h-10 rounded-full bg-gold-500/20 border border-gold-400/30 flex items-center justify-center text-gold-400 font-serif font-bold text-sm">
+          MT
+        </div>
+        <div class="text-left">
+          <div class="text-white font-semibold text-sm">Mehdi Trabelsi</div>
+          <div class="text-white/45 text-xs">Président — Lions Club Tunis-Médina · 2025–2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent mt-16"></div>
+</section>
+
+
+{# ================================================================
+   7. REJOINDRE LE CLUB — CTA final
+   ================================================================ #}
+<section id="rejoindre" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="bg-gradient-to-br from-navy-900 to-[#0d2847] rounded-3xl overflow-hidden relative">
+      <!-- Décorations géométriques -->
+      <div class="absolute top-0 right-0 w-72 h-72 rounded-full bg-gold-500/5 blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-navy-700/50 blur-2xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+      <!-- Liseré doré -->
+      <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-gold-500 to-transparent"></div>
+
+      <div class="relative px-8 py-16 sm:px-16 sm:py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+        <!-- Texte CTA -->
+        <div class="fade-in-up">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="w-6 h-px bg-gold-500"></span>
+            <span class="text-gold-400 text-xs font-semibold uppercase tracking-widest">Nous rejoindre</span>
+          </div>
+          <h2 class="font-serif text-3xl sm:text-4xl font-bold text-white leading-tight mb-5">
+            Devenez Membre du<br>
+            <span class="text-gold-400">Lions Club Tunis-Médina</span>
+          </h2>
+          <p class="text-white/60 text-sm sm:text-base leading-relaxed mb-8">
+            Rejoignez une communauté de femmes et d'hommes d'exception engagés pour
+            le service humanitaire. Participez à des projets concrets, développez votre
+            réseau professionnel et laissez votre empreinte positive sur la société.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a href="#contact"
+               class="inline-flex items-center justify-center gap-2 px-7 py-3.5
+                      bg-gold-500 hover:bg-gold-400 text-navy-900 font-semibold text-sm rounded-md
+                      transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gold-500/25">
+              Déposer ma candidature
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            </a>
+            <a href="#notre-club"
+               class="inline-flex items-center justify-center gap-2 px-7 py-3.5
+                      border border-white/25 hover:border-white/50 text-white text-sm font-medium rounded-md
+                      transition-all duration-200 hover:-translate-y-0.5">
+              En savoir plus
+            </a>
+          </div>
+        </div>
+
+        <!-- Avantages de l'adhésion -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 fade-in-up">
+          {% for avantage in avantages|default:'' %}{% endfor %}
+          <!-- Avantages en dur (données fixes) -->
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5">
+            <div class="w-8 h-8 rounded-lg bg-gold-500/15 border border-gold-400/20 flex items-center justify-center mb-3">
+              <svg class="w-4 h-4 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+            <h4 class="text-white font-semibold text-sm mb-1">Réseau international</h4>
+            <p class="text-white/45 text-xs leading-relaxed">Accès au réseau mondial de 1,4 M de membres Lions dans 210 pays</p>
+          </div>
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5">
+            <div class="w-8 h-8 rounded-lg bg-gold-500/15 border border-gold-400/20 flex items-center justify-center mb-3">
+              <svg class="w-4 h-4 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <h4 class="text-white font-semibold text-sm mb-1">Impact réel</h4>
+            <p class="text-white/45 text-xs leading-relaxed">Participer à des projets concrets qui changent des vies chaque année</p>
+          </div>
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5">
+            <div class="w-8 h-8 rounded-lg bg-gold-500/15 border border-gold-400/20 flex items-center justify-center mb-3">
+              <svg class="w-4 h-4 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+            </div>
+            <h4 class="text-white font-semibold text-sm mb-1">Formation continue</h4>
+            <p class="text-white/45 text-xs leading-relaxed">Programmes de formation Lions Leadership et développement personnel</p>
+          </div>
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5">
+            <div class="w-8 h-8 rounded-lg bg-gold-500/15 border border-gold-400/20 flex items-center justify-center mb-3">
+              <svg class="w-4 h-4 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+              </svg>
+            </div>
+            <h4 class="text-white font-semibold text-sm mb-1">Reconnaissance</h4>
+            <p class="text-white/45 text-xs leading-relaxed">Distinctions et mérites Lions pour les membres les plus engagés</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{# ================================================================
+   8. FORMULAIRE DE CONTACT / CANDIDATURE
+   ================================================================ #}
+<section id="contact" class="py-24 bg-ivory">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
+
+      <!-- Colonne gauche : informations -->
+      <div class="lg:col-span-2 fade-in-up">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-px bg-gold-500"></span>
+          <span class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Contact</span>
+        </div>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-navy-900 leading-tight mb-5">
+          Prenons contact
+        </h2>
+        <p class="text-gray-500 text-sm leading-relaxed mb-8">
+          Pour toute demande d'information, proposition de partenariat ou candidature
+          d'adhésion, n'hésitez pas à nous contacter. Notre équipe vous répondra
+          sous 48 heures.
+        </p>
+
+        <div class="space-y-5">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-navy-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-navy-800 font-semibold text-sm">Adresse e-mail</div>
+              <a href="mailto:contact@lions-tunismedina.org" class="text-gray-500 text-sm hover:text-gold-600 transition-colors">
+                contact@lions-tunismedina.org
+              </a>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-navy-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-navy-800 font-semibold text-sm">Téléphone</div>
+              <a href="tel:+21670000000" class="text-gray-500 text-sm hover:text-gold-600 transition-colors">
+                +216 70 000 000
+              </a>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-navy-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-navy-800 font-semibold text-sm">Réunions mensuelles</div>
+              <div class="text-gray-500 text-sm">2e lundi de chaque mois — 19h00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Colonne droite : formulaire -->
+      <div class="lg:col-span-3 fade-in-up">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          {# Formulaire Django — à connecter à une view qui gère l'envoi #}
+          <form method="post" action="#" class="space-y-5" novalidate>
+            {% csrf_token %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label for="prenom" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+                  Prénom <span class="text-red-400">*</span>
+                </label>
+                <input type="text" id="prenom" name="prenom" required autocomplete="given-name"
+                       placeholder="Votre prénom"
+                       class="w-full px-4 py-3 text-sm text-gray-700 bg-gray-50 border border-gray-200
+                              rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400
+                              transition-all duration-200 placeholder-gray-400" />
+              </div>
+              <div>
+                <label for="nom" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+                  Nom <span class="text-red-400">*</span>
+                </label>
+                <input type="text" id="nom" name="nom" required autocomplete="family-name"
+                       placeholder="Votre nom de famille"
+                       class="w-full px-4 py-3 text-sm text-gray-700 bg-gray-50 border border-gray-200
+                              rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400
+                              transition-all duration-200 placeholder-gray-400" />
+              </div>
+            </div>
+            <div>
+              <label for="email" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+                Adresse e-mail <span class="text-red-400">*</span>
+              </label>
+              <input type="email" id="email" name="email" required autocomplete="email"
+                     placeholder="votre@email.com"
+                     class="w-full px-4 py-3 text-sm text-gray-700 bg-gray-50 border border-gray-200
+                            rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400
+                            transition-all duration-200 placeholder-gray-400" />
+            </div>
+            <div>
+              <label for="objet" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+                Objet
+              </label>
+              <select id="objet" name="objet"
+                      class="w-full px-4 py-3 text-sm text-gray-700 bg-gray-50 border border-gray-200
+                             rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400
+                             transition-all duration-200 appearance-none cursor-pointer">
+                <option value="">Sélectionner un objet…</option>
+                <option value="adhesion">Demande d'adhésion</option>
+                <option value="partenariat">Proposition de partenariat</option>
+                <option value="don">Don / Généreux don</option>
+                <option value="evenement">Participation à un événement</option>
+                <option value="presse">Contact presse / médias</option>
+                <option value="autre">Autre demande</option>
+              </select>
+            </div>
+            <div>
+              <label for="message" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+                Message <span class="text-red-400">*</span>
+              </label>
+              <textarea id="message" name="message" required rows="5"
+                        placeholder="Décrivez votre demande en quelques lignes…"
+                        class="w-full px-4 py-3 text-sm text-gray-700 bg-gray-50 border border-gray-200
+                               rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400
+                               transition-all duration-200 placeholder-gray-400 resize-none"></textarea>
+            </div>
+            <div class="pt-1">
+              <button type="submit"
+                      class="w-full inline-flex items-center justify-center gap-2 px-8 py-4
+                             bg-navy-900 hover:bg-navy-800 text-white font-semibold text-sm rounded-lg
+                             shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+                Envoyer le message
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                </svg>
+              </button>
+            </div>
+            <p class="text-center text-gray-400 text-xs">
+              Vos données sont traitées conformément à notre
+              <a href="#" class="text-navy-600 hover:text-gold-600 underline underline-offset-2 transition-colors">politique de confidentialité</a>.
+            </p>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

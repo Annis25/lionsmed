@@ -1,0 +1,149 @@
+{% extends 'admin_custom/base_admin.html' %}
+{% load static %}
+
+{% block title %}Cotisations{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-5">
+
+  <div>
+    <h1 class="font-serif text-2xl font-bold text-navy-900">Cotisations</h1>
+    <p class="text-gray-500 text-sm mt-0.5">Suivi des cotisations annuelles</p>
+  </div>
+
+  {# Filtres #}
+  <div class="bg-white rounded-2xl border border-gray-100 p-4">
+    <form method="get" action="" class="flex flex-wrap items-end gap-3">
+      <div>
+        <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">Année</label>
+        <select name="year" class="py-2.5 px-3 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 transition-all">
+          {% for year in years %}
+          <option value="{{ year }}" {% if year_filter == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">Statut</label>
+        <select name="status" class="py-2.5 px-3 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 transition-all">
+          <option value="">Tous</option>
+          {% for value, label in status_choices %}
+          <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="px-5 py-2.5 bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold rounded-lg transition-colors">
+        Filtrer
+      </button>
+    </form>
+  </div>
+
+  {# Stats rapides #}
+  <div class="grid grid-cols-3 gap-4">
+    <div class="bg-green-50 border border-green-200 rounded-2xl p-4 text-center">
+      <div class="text-3xl font-serif font-bold text-green-700">{{ stats.paid }}</div>
+      <div class="text-green-600 text-xs font-semibold mt-1">Payées</div>
+    </div>
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+      <div class="text-3xl font-serif font-bold text-amber-700">{{ stats.pending }}</div>
+      <div class="text-amber-600 text-xs font-semibold mt-1">En attente</div>
+    </div>
+    <div class="bg-red-50 border border-red-200 rounded-2xl p-4 text-center">
+      <div class="text-3xl font-serif font-bold text-red-700">{{ stats.overdue }}</div>
+      <div class="text-red-600 text-xs font-semibold mt-1">En retard</div>
+    </div>
+  </div>
+
+  {# Membres sans cotisation + bouton créer tout #}
+  {% if members_without %}
+  <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between gap-4 flex-wrap">
+    <div>
+      <div class="font-semibold text-amber-800 text-sm mb-0.5">
+        {{ members_without.count }} membre{{ members_without.count|pluralize }} sans cotisation {{ year_filter }}
+      </div>
+      <div class="text-amber-600 text-xs">
+        {{ members_without|slice:":5"|join:", " }}
+        {% if members_without.count > 5 %}… et {{ members_without.count|add:"-5" }} autres{% endif %}
+      </div>
+    </div>
+    <form method="post" action=""
+          onsubmit="return confirm('Créer les cotisations 2025 pour tous les membres sans cotisation ?')">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create_all">
+      <button type="submit"
+              class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-lg transition-colors">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Créer cotisations {{ year_filter }}
+      </button>
+    </form>
+  </div>
+  {% endif %}
+
+  {# Tableau cotisations #}
+  <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+    {% if cotisations %}
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-gray-100 bg-gray-50">
+            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Membre</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Année</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Montant</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Paiement</th>
+            <th class="px-4 py-3.5"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for cotis in cotisations %}
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-5 py-3.5">
+              <div class="text-sm font-semibold text-navy-800">{{ cotis.member.get_full_name|default:cotis.member.username }}</div>
+              <div class="text-xs text-gray-400">{{ cotis.member.email }}</div>
+            </td>
+            <td class="px-4 py-3.5 text-sm font-medium text-navy-700">{{ cotis.year }}</td>
+            <td class="px-4 py-3.5 text-sm font-semibold text-navy-700">{{ cotis.amount }} TND</td>
+            <td class="px-4 py-3.5">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full
+                {% if cotis.status == 'PAID' %}bg-green-100 text-green-700
+                {% elif cotis.status == 'OVERDUE' %}bg-red-100 text-red-700
+                {% else %}bg-amber-100 text-amber-700{% endif %}">
+                {{ cotis.get_status_display }}
+              </span>
+            </td>
+            <td class="px-4 py-3.5 text-xs text-gray-400 hidden md:table-cell">
+              {{ cotis.payment_date|date:"d/m/Y"|default:"—" }}
+            </td>
+            <td class="px-4 py-3.5 text-right">
+              {% if cotis.status != 'PAID' %}
+              <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="mark_paid">
+                <input type="hidden" name="cotisation_id" value="{{ cotis.id }}">
+                <button type="submit"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 text-xs font-semibold rounded-lg transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                  Marquer payée
+                </button>
+              </form>
+              {% else %}
+              <span class="text-xs text-green-600 font-medium flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Réglée
+              </span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+      <svg class="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+      <p class="text-gray-500 font-semibold">Aucune cotisation pour {{ year_filter }}</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

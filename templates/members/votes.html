@@ -1,0 +1,157 @@
+{% extends 'members/base_member.html' %}
+{% load static dict_filters %}
+
+{% block title %}Votes{% endblock %}
+
+{% block member_content %}
+<div class="space-y-6">
+
+  <div>
+    <h1 class="font-serif text-2xl font-bold text-navy-900">Votes</h1>
+    <p class="text-gray-500 text-sm mt-0.5">Participez aux décisions du club</p>
+  </div>
+
+  {# ── VOTES OUVERTS ── #}
+  <div class="space-y-4">
+    <div class="flex items-center gap-3">
+      <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+      <h2 class="font-serif text-lg font-bold text-navy-900">Votes ouverts</h2>
+    </div>
+
+    {% if open_votes %}
+    {% for vote in open_votes %}
+    <div class="bg-white rounded-2xl border border-gray-100 p-6">
+      <div class="flex items-start justify-between gap-4 mb-3">
+        <div class="flex-1">
+          <h3 class="font-serif text-lg font-bold text-navy-900 mb-1">{{ vote.title }}</h3>
+          <p class="text-gray-600 text-sm leading-relaxed">{{ vote.question }}</p>
+        </div>
+        <div class="text-xs text-gray-400 text-right flex-shrink-0">
+          <div>Clôture le</div>
+          <div class="font-semibold text-navy-600">{{ vote.date_end|date:"d F Y" }}</div>
+          <div class="text-gray-400">{{ vote.date_end|date:"H:i" }}</div>
+        </div>
+      </div>
+
+      {% if vote.id in my_votes %}
+      {# Déjà voté #}
+      <div class="mt-4 pt-4 border-t border-gray-100">
+        <div class="flex items-center gap-3 mb-3">
+          <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="text-sm text-gray-600">Vous avez voté :
+            <span class="font-bold
+              {% with choice=my_votes|get_item:vote.id %}
+              {% if choice == 'POUR' %}text-green-600{% elif choice == 'CONTRE' %}text-red-600{% else %}text-gray-600{% endif %}
+              {% endwith %}">
+              {{ my_votes|get_item:vote.id|default:"-" }}
+            </span>
+          </span>
+        </div>
+        {% if vote.show_results_live %}
+        {# Résultats en temps réel #}
+        <div class="space-y-2">
+          {% for result in vote.results %}
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="font-medium {% if result.choice == 'POUR' %}text-green-700{% elif result.choice == 'CONTRE' %}text-red-700{% else %}text-gray-600{% endif %}">
+                {{ result.choice }}
+              </span>
+              <span class="text-gray-500">{{ result.count }} / {{ vote.total_votes }}</span>
+            </div>
+            <div class="h-2 rounded-full bg-gray-100 overflow-hidden">
+              {% if vote.total_votes > 0 %}
+              <div class="h-full rounded-full transition-all duration-500
+                {% if result.choice == 'POUR' %}bg-green-400{% elif result.choice == 'CONTRE' %}bg-red-400{% else %}bg-gray-300{% endif %}"
+                   style="width: {% widthratio result.count vote.total_votes 100 %}%"></div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      {% else %}
+      {# Pas encore voté — formulaire #}
+      <form method="post" action="" class="mt-4 pt-4 border-t border-gray-100">
+        {% csrf_token %}
+        <input type="hidden" name="vote_id" value="{{ vote.id }}">
+        <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Votre choix :</div>
+        <div class="flex flex-wrap gap-3">
+          <button type="submit" name="choice" value="POUR"
+                  class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3
+                         bg-green-50 hover:bg-green-100 border-2 border-green-200 hover:border-green-400
+                         text-green-700 font-semibold text-sm rounded-xl transition-all duration-200 hover:-translate-y-0.5">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+            Pour
+          </button>
+          <button type="submit" name="choice" value="CONTRE"
+                  class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3
+                         bg-red-50 hover:bg-red-100 border-2 border-red-200 hover:border-red-400
+                         text-red-700 font-semibold text-sm rounded-xl transition-all duration-200 hover:-translate-y-0.5">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"/></svg>
+            Contre
+          </button>
+          <button type="submit" name="choice" value="ABSTENTION"
+                  class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3
+                         bg-gray-50 hover:bg-gray-100 border-2 border-gray-200 hover:border-gray-400
+                         text-gray-600 font-semibold text-sm rounded-xl transition-all duration-200 hover:-translate-y-0.5">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6"/></svg>
+            Abstention
+          </button>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="bg-white rounded-2xl border border-gray-100 p-10 text-center">
+      <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      </div>
+      <p class="text-gray-500 font-semibold">Aucun vote ouvert</p>
+      <p class="text-gray-400 text-sm mt-1">Vous serez notifié lors du prochain scrutin.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  {# ── VOTES CLÔTURÉS ── #}
+  {% if closed_votes %}
+  <div class="space-y-4">
+    <h2 class="font-serif text-lg font-bold text-navy-900 text-opacity-70">Votes clôturés</h2>
+    {% for vote in closed_votes %}
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 opacity-80">
+      <div class="flex items-center justify-between gap-4 mb-4">
+        <h3 class="font-serif text-base font-semibold text-navy-800">{{ vote.title }}</h3>
+        <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-gray-100 text-gray-500">Clôturé</span>
+      </div>
+      <p class="text-gray-500 text-sm mb-4">{{ vote.question }}</p>
+      {% if vote.total_votes > 0 %}
+      <div class="space-y-2">
+        {% for result in vote.results %}
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="font-medium {% if result.choice == 'POUR' %}text-green-700{% elif result.choice == 'CONTRE' %}text-red-700{% else %}text-gray-600{% endif %}">
+              {{ result.choice }}
+            </span>
+            <span class="text-gray-400">{{ result.count }} vote{{ result.count|pluralize }} ({% widthratio result.count vote.total_votes 100 %}%)</span>
+          </div>
+          <div class="h-2 rounded-full bg-gray-100 overflow-hidden">
+            <div class="h-full rounded-full
+              {% if result.choice == 'POUR' %}bg-green-400{% elif result.choice == 'CONTRE' %}bg-red-400{% else %}bg-gray-300{% endif %}"
+                 style="width: {% widthratio result.count vote.total_votes 100 %}%"></div>
+          </div>
+        </div>
+        {% endfor %}
+        <div class="text-xs text-gray-400 text-right pt-1">{{ vote.total_votes }} vote{{ vote.total_votes|pluralize }} au total</div>
+      </div>
+      {% else %}
+      <p class="text-xs text-gray-400">Aucun vote enregistré.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends 'admin_custom/base_admin.html' %}
+{% load static %}
+
+{% block title %}Gestion des actualités{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-5">
+
+  <div class="flex items-center justify-between gap-4 flex-wrap">
+    <div>
+      <h1 class="font-serif text-2xl font-bold text-navy-900">Actualités</h1>
+      <p class="text-gray-500 text-sm mt-0.5">{{ total }} article{{ total|pluralize }} trouvé{{ total|pluralize }}</p>
+    </div>
+    <a href="{% url 'admin_article_create' %}"
+       class="inline-flex items-center gap-2 px-5 py-2.5 bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold rounded-lg transition-colors">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Nouvel article
+    </a>
+  </div>
+
+  {# Filtres #}
+  <div class="bg-white rounded-2xl border border-gray-100 p-4">
+    <form method="get" action="" class="flex flex-wrap items-end gap-3">
+      <div class="flex-1 min-w-48">
+        <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">Recherche</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <input type="text" name="q" value="{{ search }}" placeholder="Titre, contenu…"
+                 class="w-full pl-9 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400 transition-all">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">Statut</label>
+        <select name="status" class="py-2.5 px-3 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400 transition-all">
+          <option value="">Tous</option>
+          {% for value, label in status_choices %}
+          <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">Catégorie</label>
+        <select name="categorie" class="py-2.5 px-3 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400 transition-all">
+          <option value="">Toutes</option>
+          {% for cat in categories %}
+          <option value="{{ cat.slug }}" {% if selected_cat == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="px-5 py-2.5 bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold rounded-lg transition-colors">
+        Filtrer
+      </button>
+      {% if search or selected_status or selected_cat %}
+      <a href="{% url 'admin_articles' %}" class="px-4 py-2.5 text-sm text-gray-500 hover:text-navy-700 font-medium transition-colors">Effacer</a>
+      {% endif %}
+    </form>
+  </div>
+
+  {# Tableau articles #}
+  <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+    {% if articles %}
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-gray-100 bg-gray-50">
+            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Article</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Catégorie</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Auteur</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Publication</th>
+            <th class="px-4 py-3.5"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for article in articles %}
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-5 py-4">
+              <div class="flex items-center gap-3">
+                {% if article.image %}
+                <img src="{{ article.image.url }}" alt="{{ article.title }}"
+                     class="w-10 h-10 rounded-lg object-cover border border-gray-200 flex-shrink-0">
+                {% else %}
+                <div class="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center text-navy-400 flex-shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                </div>
+                {% endif %}
+                <div class="min-w-0">
+                  <div class="text-sm font-semibold text-navy-800">{{ article.title }}</div>
+                  <div class="text-xs text-gray-400">{{ article.reading_time }} min de lecture</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-4">
+              {% if article.category %}
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
+                {{ article.category.name }}
+              </span>
+              {% else %}
+              <span class="text-xs text-gray-300">—</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-600">
+              {{ article.author.get_full_name|default:article.author.username|default:"—" }}
+            </td>
+            <td class="px-4 py-4">
+              {% if article.status == 'PUBLISHED' %}
+              <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-green-100 text-green-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Publié
+              </span>
+              {% else %}
+              <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">Brouillon</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-4 text-xs text-gray-400">
+              {% if article.published_at %}{{ article.published_at|date:"d/m/Y" }}{% else %}—{% endif %}
+            </td>
+            <td class="px-4 py-4">
+              <div class="flex items-center justify-end gap-2">
+                {# Toggle publication : bascule DRAFT ↔ PUBLISHED en un clic #}
+                <form method="post" action="{% url 'admin_article_toggle_status' article.id %}">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors
+                                 {% if article.status == 'PUBLISHED' %}bg-amber-50 hover:bg-amber-100 text-amber-700{% else %}bg-green-50 hover:bg-green-100 text-green-700{% endif %}">
+                    {% if article.status == 'PUBLISHED' %}
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                    Dépublier
+                    {% else %}
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    Publier
+                    {% endif %}
+                  </button>
+                </form>
+                <a href="{% url 'admin_article_edit' article.id %}"
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-navy-50 hover:bg-navy-100 text-navy-700 text-xs font-semibold rounded-lg transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  Éditer
+                </a>
+                {% if user.role == 'SUPER_ADMIN' or user.role == 'PRESIDENT' or user.is_superuser %}
+                <form method="post" action="{% url 'admin_article_delete' article.id %}"
+                      onsubmit="return confirm('Supprimer définitivement « {{ article.title|escapejs }} » ?');">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-lg transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Supprimer
+                  </button>
+                </form>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+      <svg class="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+      <p class="text-gray-500 font-semibold">Aucun article trouvé</p>
+      <p class="text-gray-400 text-sm mt-1">Créez un article ou modifiez vos critères de recherche.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

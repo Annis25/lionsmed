@@ -1,0 +1,372 @@
+/* ================================================================
+   LIONS CLUB TUNIS-MÉDINA — Styles personnalisés
+   Tailwind CSS est géré via CDN. Ce fichier complète Tailwind
+   avec des animations et comportements non couverts par les utilitaires.
+   ================================================================ */
+
+/* ── Scrollbar personnalisée ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #C9A84C; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #A8862A; }
+
+/* ── NAVBAR : état au scroll ─────────────────────────────────── */
+#navbar {
+  /* État par défaut : transparent (sur le Hero) */
+  background: transparent;
+}
+
+#navbar.scrolled {
+  background: rgba(11, 31, 58, 0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 1px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Liseré doré sous la navbar au scroll */
+#navbar.scrolled::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.4), transparent);
+}
+
+/* ── SCROLL REVEAL ───────────────────────────────────────────── */
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.fade-in-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Décalage progressif pour les groupes d'éléments */
+.fade-in-up:nth-child(2) { transition-delay: 0.08s; }
+.fade-in-up:nth-child(3) { transition-delay: 0.16s; }
+.fade-in-up:nth-child(4) { transition-delay: 0.24s; }
+.fade-in-up:nth-child(5) { transition-delay: 0.32s; }
+.fade-in-up:nth-child(6) { transition-delay: 0.40s; }
+
+/* ── CARD HOVER ──────────────────────────────────────────────── */
+.card-hover {
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.07);
+}
+
+/* ── SCROLL CHEVRON ANIMÉ ────────────────────────────────────── */
+@keyframes chevron-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50%       { transform: translateY(6px); opacity: 1; }
+}
+.scroll-chevron {
+  animation: chevron-bounce 1.8s ease-in-out infinite;
+}
+
+/* ── TEXTE DORÉ DÉGRADÉ ──────────────────────────────────────── */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #C9A84C 0%, #E8D5A3 60%, #C9A84C 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── FOCUS ACCESSIBLE ────────────────────────────────────────── */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #C9A84C;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── SÉLECTOR PERSONNALISÉ ───────────────────────────────────── */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem !important;
+}
+
+/* ── MESSAGES DJANGO ─────────────────────────────────────────── */
+.message-toast {
+  pointer-events: all;
+}
+
+/* ── ANIMATION PULSATION POINT HERO ─────────────────────────── */
+@keyframes pulse-gold {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(0.85); }
+}
+.animate-pulse {
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+
+/* ── SMOOTH SCROLL POUR ANCRES ───────────────────────────────── */
+html { scroll-behavior: smooth; }
+
+/* ── OFFSET DU SCROLL (compenser la navbar fixe) ────────────── */
+:target::before {
+  content: '';
+  display: block;
+  height: 5.5rem; /* hauteur de la navbar */
+  margin-top: -5.5rem;
+}
+
+/* ── IMPRESSION ──────────────────────────────────────────────── */
+@media print {
+  #navbar, footer { display: none; }
+  .fade-in-up { opacity: 1; transform: none; }
+}
+
+/* ============================================
+   RESPONSIVE MOBILE — corrections globales
+   ============================================ */
+
+/* Empêche tout overflow horizontal */
+html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* ---- HERO SECTION ---- */
+@media (max-width: 768px) {
+
+    /* Titre principal hero */
+    .hero-title,
+    h1.hero-title {
+        font-size: clamp(2rem, 8vw, 3.5rem) !important;
+        line-height: 1.15 !important;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Sous-titre gold "Sfax-Méditerranée" */
+    .hero-subtitle,
+    h1 span.text-gold,
+    .hero-section h1 span {
+        font-size: clamp(1.8rem, 7.5vw, 3rem) !important;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        display: block;
+    }
+
+    /* Devise italique */
+    .hero-tagline,
+    .hero-section .italic,
+    .hero-section em {
+        font-size: clamp(0.85rem, 3.5vw, 1.1rem) !important;
+        white-space: normal !important;
+        overflow-wrap: break-word;
+    }
+
+    /* Texte description hero */
+    .hero-section p,
+    .hero-description {
+        font-size: clamp(0.9rem, 3.5vw, 1rem) !important;
+        padding: 0 1rem;
+    }
+
+    /* Boutons hero côte à côte → empilés */
+    .hero-buttons,
+    .hero-section .flex.gap-4,
+    .hero-section .btn-group {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.75rem !important;
+        padding: 0 1rem;
+    }
+
+    .hero-section a,
+    .hero-buttons a {
+        width: 100% !important;
+        text-align: center !important;
+    }
+
+    /* Conteneur hero padding */
+    .hero-section,
+    section.hero {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
+
+/* ---- STATS SECTION ---- */
+@media (max-width: 768px) {
+    .stats-grid,
+    .stats-section .grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1rem !important;
+    }
+
+    .stat-number {
+        font-size: clamp(1.8rem, 7vw, 2.5rem) !important;
+    }
+}
+
+/* ---- CARDS GRILLES ---- */
+@media (max-width: 768px) {
+    /* Grilles 3 colonnes → 1 colonne */
+    .grid-cols-3,
+    .lg\:grid-cols-3 {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Grilles 2 colonnes → 1 colonne */
+    .grid-cols-2,
+    .lg\:grid-cols-2,
+    .md\:grid-cols-2 {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Cards padding */
+    .card,
+    .action-card,
+    .event-card,
+    .news-card {
+        padding: 1rem !important;
+    }
+}
+
+/* ---- NAVIGATION SIDEBAR MEMBRES ---- */
+@media (max-width: 768px) {
+    /* Sidebar → devient menu horizontal scrollable en haut */
+    .member-sidebar,
+    .sidebar-nav {
+        width: 100% !important;
+        height: auto !important;
+        position: relative !important;
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        padding: 0.5rem !important;
+        gap: 0.5rem !important;
+        white-space: nowrap !important;
+    }
+
+    .member-sidebar a,
+    .sidebar-nav a {
+        flex-shrink: 0 !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 0.5rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Layout sidebar + contenu → colonne */
+    .member-layout,
+    .dashboard-layout,
+    .sidebar-layout {
+        flex-direction: column !important;
+    }
+
+    /* Contenu principal pleine largeur */
+    .member-content,
+    .main-content {
+        width: 100% !important;
+        padding: 1rem !important;
+    }
+}
+
+/* ---- TABLEAUX ADMIN ---- */
+@media (max-width: 768px) {
+    /* Tables scrollables horizontalement */
+    .table-responsive,
+    .admin-table-wrapper {
+        overflow-x: auto !important;
+    }
+
+    table {
+        min-width: 600px;
+    }
+
+    /* Cacher colonnes moins importantes */
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* ---- PANEL ADMIN SIDEBAR ---- */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 100% !important;
+        height: auto !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        padding: 0.5rem !important;
+        gap: 0.5rem !important;
+    }
+
+    .admin-sidebar a {
+        flex-shrink: 0 !important;
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.75rem !important;
+        white-space: nowrap !important;
+    }
+
+    .admin-layout {
+        flex-direction: column !important;
+    }
+}
+
+/* ---- FOOTER ---- */
+@media (max-width: 768px) {
+    .footer-grid,
+    footer .grid {
+        grid-template-columns: 1fr !important;
+        gap: 2rem !important;
+    }
+}
+
+/* ---- FORMULAIRES ---- */
+@media (max-width: 768px) {
+    .form-grid,
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    input, textarea, select {
+        width: 100% !important;
+        font-size: 16px !important; /* évite le zoom auto iOS */
+    }
+}
+
+/* ---- CALENDRIER MEMBRES ---- */
+@media (max-width: 768px) {
+    .calendar-grid {
+        font-size: 0.7rem !important;
+    }
+
+    .calendar-day {
+        min-height: 40px !important;
+        padding: 2px !important;
+    }
+
+    .calendar-event-badge {
+        font-size: 0.6rem !important;
+        padding: 1px 3px !important;
+    }
+}
+
+/* ---- ÉVÉNEMENTS DETAIL ---- */
+@media (max-width: 768px) {
+    .event-detail-grid,
+    .event-info-grid {
+        grid-template-columns: 1fr !important;
+    }
+}

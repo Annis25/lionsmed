@@ -1,0 +1,145 @@
+{% extends 'admin_custom/base_admin.html' %}
+{% load static %}
+
+{% block title %}Envoyer une notification{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-5 max-w-2xl">
+
+  <div>
+    <h1 class="font-serif text-2xl font-bold text-navy-900">Envoyer une notification</h1>
+    <p class="text-gray-500 text-sm mt-0.5">Notifiez les membres via leur espace en ligne</p>
+  </div>
+
+  {# Compteurs par cible #}
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div class="bg-white border border-gray-100 rounded-xl p-3 text-center">
+      <div class="text-2xl font-serif font-bold text-navy-800">{{ member_counts.ALL }}</div>
+      <div class="text-xs text-gray-400 font-medium mt-0.5">Tous les membres</div>
+    </div>
+    <div class="bg-white border border-gray-100 rounded-xl p-3 text-center">
+      <div class="text-2xl font-serif font-bold text-navy-800">{{ member_counts.BUREAU }}</div>
+      <div class="text-xs text-gray-400 font-medium mt-0.5">Bureau et +</div>
+    </div>
+    <div class="bg-white border border-gray-100 rounded-xl p-3 text-center">
+      <div class="text-2xl font-serif font-bold text-navy-800">{{ member_counts.COMITE }}</div>
+      <div class="text-xs text-gray-400 font-medium mt-0.5">Comité</div>
+    </div>
+    <div class="bg-white border border-gray-100 rounded-xl p-3 text-center">
+      <div class="text-2xl font-serif font-bold text-navy-800">{{ member_counts.MEMBRE }}</div>
+      <div class="text-xs text-gray-400 font-medium mt-0.5">Membres simples</div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-6">
+    <form method="post" action="" class="space-y-5" id="notif-form">
+      {% csrf_token %}
+
+      <div>
+        <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+          Titre <span class="text-red-400">*</span>
+        </label>
+        <input type="text" name="title" required maxlength="200"
+               placeholder="Ex : Rappel réunion mensuelle"
+               class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400 transition-all">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+          Message <span class="text-red-400">*</span>
+        </label>
+        <textarea name="message" required rows="4"
+                  placeholder="Contenu de la notification…"
+                  class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400 transition-all resize-none"></textarea>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">Type</label>
+          <select name="notif_type"
+                  class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400 transition-all">
+            {% for value, label in notif_types %}
+            <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            Destinataires
+          </label>
+          <select name="target" id="target-select"
+                  class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400 transition-all">
+            {% for value, label in targets %}
+            <option value="{{ value }}" data-count="{{ member_counts|default:'{}' }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+          <p id="recipient-preview" class="text-xs text-navy-600 font-semibold mt-1.5">
+            → {{ member_counts.ALL }} destinataire{{ member_counts.ALL|pluralize }}
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+          Lien (optionnel)
+        </label>
+        <input type="text" name="link"
+               placeholder="/espace-membre/votes/"
+               class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400 transition-all">
+        <p class="text-xs text-gray-400 mt-1">URL relative vers laquelle la notification redirige.</p>
+      </div>
+
+      {# Aperçu notification #}
+      <div class="border border-gray-200 rounded-xl p-4 bg-blue-50">
+        <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Aperçu</div>
+        <div class="flex items-start gap-3 p-3 bg-white border border-blue-100 rounded-lg">
+          <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          </div>
+          <div>
+            <div id="preview-title" class="text-sm font-semibold text-navy-800">Titre de la notification</div>
+            <div id="preview-msg" class="text-xs text-gray-500 mt-0.5">Message de la notification…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-gray-100">
+        <button type="submit"
+                onclick="return confirm('Confirmer l\'envoi de cette notification ?')"
+                class="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-navy-900 hover:bg-navy-800 text-white font-semibold text-sm rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+          Envoyer la notification
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<script>
+const COUNTS = {
+  ALL: {{ member_counts.ALL }},
+  BUREAU: {{ member_counts.BUREAU }},
+  COMITE: {{ member_counts.COMITE }},
+  MEMBRE: {{ member_counts.MEMBRE }},
+};
+
+const targetSelect = document.getElementById('target-select');
+const recipientPreview = document.getElementById('recipient-preview');
+const titleInput = document.querySelector('input[name="title"]');
+const msgInput = document.querySelector('textarea[name="message"]');
+const previewTitle = document.getElementById('preview-title');
+const previewMsg = document.getElementById('preview-msg');
+
+targetSelect.addEventListener('change', () => {
+  const count = COUNTS[targetSelect.value] || 0;
+  recipientPreview.textContent = `→ ${count} destinataire${count > 1 ? 's' : ''}`;
+});
+titleInput.addEventListener('input', () => {
+  previewTitle.textContent = titleInput.value || 'Titre de la notification';
+});
+msgInput.addEventListener('input', () => {
+  previewMsg.textContent = msgInput.value || 'Message de la notification…';
+});
+</script>
+{% endblock %}

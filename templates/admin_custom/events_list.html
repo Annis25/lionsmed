@@ -1,0 +1,156 @@
+{% extends 'admin_custom/base_admin.html' %}
+{% load static %}
+
+{% block title %}Gestion des événements{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-5">
+
+  <div class="flex items-center justify-between gap-4 flex-wrap">
+    <div>
+      <h1 class="font-serif text-2xl font-bold text-navy-900">Événements</h1>
+      <p class="text-gray-500 text-sm mt-0.5">{{ total }} événement{{ total|pluralize }} trouvé{{ total|pluralize }}</p>
+    </div>
+    <a href="{% url 'admin_event_create' %}"
+       class="inline-flex items-center gap-2 px-5 py-2.5 bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold rounded-lg transition-colors">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Nouvel événement
+    </a>
+  </div>
+
+  {# Filtres #}
+  <div class="bg-white rounded-2xl border border-gray-100 p-4">
+    <form method="get" action="" class="flex flex-wrap items-end gap-3">
+      <div class="flex-1 min-w-48">
+        <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">Recherche</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <input type="text" name="q" value="{{ search }}" placeholder="Titre, lieu…"
+                 class="w-full pl-9 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400 transition-all">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">Type</label>
+        <select name="type" class="py-2.5 px-3 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400 transition-all">
+          <option value="">Tous les types</option>
+          {% for value, label in type_choices %}
+          <option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">Période</label>
+        <select name="period" class="py-2.5 px-3 text-sm bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400 transition-all">
+          <option value="">Toutes</option>
+          <option value="upcoming" {% if selected_period == 'upcoming' %}selected{% endif %}>À venir</option>
+          <option value="past" {% if selected_period == 'past' %}selected{% endif %}>Passés</option>
+        </select>
+      </div>
+      <button type="submit" class="px-5 py-2.5 bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold rounded-lg transition-colors">
+        Filtrer
+      </button>
+      {% if search or selected_type or selected_period %}
+      <a href="{% url 'admin_events' %}" class="px-4 py-2.5 text-sm text-gray-500 hover:text-navy-700 font-medium transition-colors">Effacer</a>
+      {% endif %}
+    </form>
+  </div>
+
+  {# Tableau événements #}
+  <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+    {% if events %}
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-gray-100 bg-gray-50">
+            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Événement</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Lieu</th>
+            <th class="text-left px-4 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
+            <th class="px-4 py-3.5"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for event in events %}
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-5 py-4">
+              <div class="flex items-center gap-3">
+                {% if event.image %}
+                <img src="{{ event.image.url }}" alt="{{ event.title }}"
+                     class="w-10 h-10 rounded-lg object-cover border border-gray-200 flex-shrink-0">
+                {% else %}
+                <div class="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center text-navy-400 flex-shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                {% endif %}
+                <div class="min-w-0">
+                  <div class="text-sm font-semibold text-navy-800">{{ event.title }}</div>
+                  <div class="text-xs text-gray-400">
+                    {% if event.is_payant %}{{ event.price }} TND{% else %}Gratuit{% endif %}
+                    {% if event.capacity %} · {{ event.capacity }} places{% endif %}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-4">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
+                {{ event.get_event_type_display }}
+              </span>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-600">{{ event.date_start|date:"d/m/Y H:i" }}</td>
+            <td class="px-4 py-4 text-sm text-gray-600">{{ event.location }}</td>
+            <td class="px-4 py-4">
+              <div class="flex flex-wrap items-center gap-1.5">
+                {% if event.is_public %}
+                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-green-100 text-green-700">
+                  <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Public
+                </span>
+                {% else %}
+                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-gray-100 text-gray-500">Privé</span>
+                {% endif %}
+                {% if event.is_featured %}
+                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-gold-100 text-gold-700">À la une</span>
+                {% endif %}
+                {% if event.date_start < now %}
+                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-gray-100 text-gray-400">Passé</span>
+                {% endif %}
+              </div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="flex items-center justify-end gap-2">
+                <a href="{% url 'admin_event_edit' event.id %}"
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-navy-50 hover:bg-navy-100 text-navy-700 text-xs font-semibold rounded-lg transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  Éditer
+                </a>
+                {% if user.role == 'SUPER_ADMIN' or user.role == 'PRESIDENT' or user.is_superuser %}
+                <form method="post" action="{% url 'admin_event_delete' event.id %}"
+                      onsubmit="return confirm('Supprimer définitivement « {{ event.title|escapejs }} » ?');">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-lg transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Supprimer
+                  </button>
+                </form>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+      <svg class="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <p class="text-gray-500 font-semibold">Aucun événement trouvé</p>
+      <p class="text-gray-400 text-sm mt-1">Créez un événement ou modifiez vos critères de recherche.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

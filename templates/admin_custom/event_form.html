@@ -1,0 +1,146 @@
+{% extends 'admin_custom/base_admin.html' %}
+{% load static %}
+
+{% block title %}{% if is_create %}Nouvel événement{% else %}Éditer {{ event.title }}{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-5 max-w-3xl">
+
+  <div class="flex items-center gap-3">
+    <a href="{% url 'admin_events' %}" class="text-gray-400 hover:text-navy-600 transition-colors">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/></svg>
+    </a>
+    <div>
+      <h1 class="font-serif text-2xl font-bold text-navy-900">
+        {% if is_create %}Nouvel événement{% else %}Éditer l'événement{% endif %}
+      </h1>
+      {% if not is_create %}
+      <p class="text-gray-500 text-sm mt-0.5">{{ event.title }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if form.non_field_errors %}
+  <div class="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+    {% for error in form.non_field_errors %}
+    <p class="text-sm text-red-700">{{ error }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-6">
+    <form method="post" action="" enctype="multipart/form-data" class="space-y-5">
+      {% csrf_token %}
+
+      <div>
+        <label for="{{ form.title.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+          {{ form.title.label }} <span class="text-red-400">*</span>
+        </label>
+        {{ form.title }}
+        {% for error in form.title.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div>
+        <label for="{{ form.description.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+          {{ form.description.label }} <span class="text-red-400">*</span>
+        </label>
+        {{ form.description }}
+        {% for error in form.description.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label for="{{ form.event_type.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            {{ form.event_type.label }}
+          </label>
+          {{ form.event_type }}
+          {% for error in form.event_type.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.location.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            {{ form.location.label }} <span class="text-red-400">*</span>
+          </label>
+          {{ form.location }}
+          {% for error in form.location.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label for="{{ form.date_start.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            {{ form.date_start.label }} <span class="text-red-400">*</span>
+          </label>
+          {{ form.date_start }}
+          {% for error in form.date_start.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.date_end.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            {{ form.date_end.label }}
+          </label>
+          {{ form.date_end }}
+          {% for error in form.date_end.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label for="{{ form.price.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            {{ form.price.label }}
+          </label>
+          {{ form.price }}
+          {% for error in form.price.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.capacity.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+            {{ form.capacity.label }}
+          </label>
+          {{ form.capacity }}
+          {% for error in form.capacity.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <div>
+        <label for="{{ form.image.id_for_label }}" class="block text-xs font-semibold text-navy-700 uppercase tracking-wider mb-1.5">
+          {{ form.image.label }}
+        </label>
+        {{ form.image }}
+        {% for error in form.image.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="space-y-3 pt-4 border-t border-gray-100">
+        <label class="flex items-center gap-2.5 cursor-pointer">
+          {{ form.is_public }}
+          <span class="text-sm text-navy-700 font-medium">{{ form.is_public.label }}</span>
+        </label>
+        <label class="flex items-center gap-2.5 cursor-pointer">
+          {{ form.is_payant }}
+          <span class="text-sm text-navy-700 font-medium">{{ form.is_payant.label }}</span>
+        </label>
+        <label class="flex items-center gap-2.5 cursor-pointer">
+          {{ form.is_featured }}
+          <span class="text-sm text-navy-700 font-medium">{{ form.is_featured.label }}</span>
+        </label>
+      </div>
+
+      <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+        <button type="submit"
+                class="px-6 py-2.5 bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold rounded-lg transition-colors">
+          {% if is_create %}Créer l'événement{% else %}Enregistrer{% endif %}
+        </button>
+        <a href="{% url 'admin_events' %}"
+           class="px-5 py-2.5 text-sm text-gray-500 hover:text-navy-700 font-medium transition-colors">
+          Annuler
+        </a>
+        {% if not is_create and event.is_public %}
+        <a href="{% url 'evenement_detail' event.slug %}" target="_blank" rel="noopener"
+           class="ml-auto inline-flex items-center gap-1.5 text-sm text-navy-600 hover:text-gold-600 font-semibold transition-colors">
+          Voir sur le site
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

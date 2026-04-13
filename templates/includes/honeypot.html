@@ -1,0 +1,19 @@
+{% comment %}
+Champ-piège anti-robots.
+
+Invisible pour un visiteur (retiré du flux, masqué, hors du parcours clavier et
+ignoré par les lecteurs d'écran), mais présent dans le HTML : un robot qui
+remplit automatiquement tous les champs le renseigne et se trahit.
+
+Le nom du champ doit rester aligné sur core.views.HONEYPOT_FIELD.
+{% endcomment %}
+<div style="position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden;"
+     aria-hidden="true">
+  <label for="id_{{ honeypot_field|default:'website' }}">Ne pas remplir ce champ</label>
+  <input type="text"
+         id="id_{{ honeypot_field|default:'website' }}"
+         name="{{ honeypot_field|default:'website' }}"
+         value=""
+         tabindex="-1"
+         autocomplete="off">
+</div>
