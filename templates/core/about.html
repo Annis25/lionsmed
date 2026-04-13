@@ -1,0 +1,779 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}À Propos{% endblock %}
+{% block meta_description %}Découvrez l'histoire, la mission, les valeurs et l'équipe dirigeante du Lions Club Sfax Méditerranée, membre actif de Lions Clubs International depuis 2025.{% endblock %}
+
+{% block content %}
+
+<section class="relative pt-32 pb-20 overflow-hidden bg-navy-900">
+
+  
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute inset-0 opacity-[0.03]"
+         style="background-image: repeating-linear-gradient(45deg, #C9A84C 0px, #C9A84C 1px, transparent 0px, transparent 50%);
+                background-size: 30px 30px;"></div>
+    <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-gold-500/5 blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-72 h-72 rounded-full bg-navy-700/40 blur-3xl"></div>
+  </div>
+
+  
+  <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-gold-500 to-transparent"></div>
+
+  <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+    
+    <nav aria-label="Fil d'Ariane" class="flex items-center justify-center gap-2 text-white/40 text-xs mb-8 fade-in-up">
+      <a href="{% url 'home' %}" class="hover:text-gold-400 transition-colors duration-200">Accueil</a>
+      <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-gold-400 font-medium">À Propos</span>
+    </nav>
+
+    
+    <div class="inline-flex items-center gap-2.5 px-5 py-2 mb-6
+                bg-white/5 border border-gold-400/20 rounded-full
+                text-gold-300 text-xs font-medium tracking-widest uppercase fade-in-up">
+      <span class="w-1.5 h-1.5 rounded-full bg-gold-400"></span>
+      Lion Club Sfax Méditerranée — Fondé en 2025
+    </div>
+
+    
+    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5 fade-in-up">
+      Notre Club,<br>
+      <span class="text-gold-400">Notre Histoire</span>
+    </h1>
+
+    
+    <p class="text-white/55 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto fade-in-up">
+      Depuis plus de cinq décennies, le Lions Club Sfax Méditerranée incarne l'engagement
+      humanitaire, la solidarité et le service au cœur de la société tunisienne.
+      Découvrez qui nous sommes, ce en quoi nous croyons et les femmes et hommes
+      qui portent cette mission chaque jour.
+    </p>
+  </div>
+
+  
+  <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent"></div>
+</section>
+
+<section id="histoire" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+      
+      <div class="fade-in-up">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-px bg-gold-500"></span>
+          <span class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Notre histoire</span>
+        </div>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-navy-900 leading-tight mb-6">
+          Plus de depuis 2025 au<br>
+          <em class="not-italic text-gold-600">service de la Tunisie</em>
+        </h2>
+        <p class="text-gray-600 text-base leading-relaxed mb-5">
+          Fondé en <strong class="text-navy-800">2025 à Sfax</strong>, notre club est l'une des premières sections
+          Lions établies en Tunisie. Depuis ses origines, il a grandi, évolué et
+          su s'adapter aux défis de chaque époque, tout en restant fidèle à sa
+          raison d'être : <em>servir les personnes dans le besoin.</em>
+        </p>
+        <p class="text-gray-500 text-sm leading-relaxed">
+          Aujourd'hui reconnu comme l'un des clubs les plus actifs du District 414-B,
+          le Lions Club Sfax Méditerranée réunit plus de 86 membres issus de tous les
+          horizons professionnels, unis par des valeurs communes et un engagement
+          concret pour le bien commun.
+        </p>
+      </div>
+
+      
+      <div class="relative fade-in-up">
+        
+        <div class="absolute left-6 top-3 bottom-3 w-0.5 bg-gradient-to-b from-gold-400 via-gold-300/50 to-transparent"></div>
+
+        <ol class="space-y-8 relative" aria-label="Jalons historiques du club">
+
+          
+          <li class="flex gap-6 items-start pl-1">
+            <div class="relative flex-shrink-0 w-12 h-12 rounded-full bg-navy-900 border-2 border-gold-500
+                        flex items-center justify-center z-10">
+              <span class="text-gold-400 font-serif font-bold text-xs">2025</span>
+            </div>
+            <div class="pt-2.5">
+              <h3 class="font-semibold text-navy-800 text-sm mb-1">Fondation du club</h3>
+              <p class="text-gray-500 text-xs leading-relaxed">
+                Un groupe de 24 professionnels tunisois fondent le club, affilié dès sa création
+                à Lions Clubs International. Première charte officielle lors d'une cérémonie
+                à l'Hôtel Africa de Sfax.
+              </p>
+            </div>
+          </li>
+
+          
+          <li class="flex gap-6 items-start pl-1">
+            <div class="relative flex-shrink-0 w-12 h-12 rounded-full bg-white border-2 border-gold-300
+                        flex items-center justify-center z-10">
+              <span class="text-navy-600 font-serif font-bold text-xs">1985</span>
+            </div>
+            <div class="pt-2.5">
+              <h3 class="font-semibold text-navy-800 text-sm mb-1">Lancement du Programme Vision en Tunisie</h3>
+              <p class="text-gray-500 text-xs leading-relaxed">
+                Le club initie la première caravane de dépistage ophtalmologique dans le pays,
+                qui deviendra le programme Vision le plus important du district.
+              </p>
+            </div>
+          </li>
+
+          
+          <li class="flex gap-6 items-start pl-1">
+            <div class="relative flex-shrink-0 w-12 h-12 rounded-full bg-white border-2 border-gold-300
+                        flex items-center justify-center z-10">
+              <span class="text-navy-600 font-serif font-bold text-xs">1999</span>
+            </div>
+            <div class="pt-2.5">
+              <h3 class="font-semibold text-navy-800 text-sm mb-1">Prix d'excellence du District 414-B</h3>
+              <p class="text-gray-500 text-xs leading-relaxed">
+                Récompensé pour la qualité et le volume de ses actions humanitaires,
+                le club reçoit le trophée d'excellence du district pour la première fois.
+              </p>
+            </div>
+          </li>
+
+          
+          <li class="flex gap-6 items-start pl-1">
+            <div class="relative flex-shrink-0 w-12 h-12 rounded-full bg-white border-2 border-gold-300
+                        flex items-center justify-center z-10">
+              <span class="text-navy-600 font-serif font-bold text-xs">2011</span>
+            </div>
+            <div class="pt-2.5">
+              <h3 class="font-semibold text-navy-800 text-sm mb-1">Mobilisation post-Révolution</h3>
+              <p class="text-gray-500 text-xs leading-relaxed">
+                Face aux défis sociaux de la transition, le club intensifie ses activités
+                et coordonne une aide d'urgence dans plusieurs gouvernorats défavorisés.
+              </p>
+            </div>
+          </li>
+
+          
+          <li class="flex gap-6 items-start pl-1">
+            <div class="relative flex-shrink-0 w-12 h-12 rounded-full bg-gold-500 border-2 border-gold-600
+                        flex items-center justify-center z-10">
+              <span class="text-navy-900 font-serif font-bold text-xs">2024</span>
+            </div>
+            <div class="pt-2.5">
+              <h3 class="font-semibold text-navy-800 text-sm mb-1">Lancement de la plateforme numérique</h3>
+              <p class="text-gray-500 text-xs leading-relaxed">
+                Le club se modernise avec la mise en ligne de sa plateforme digitale,
+                facilitant la communication, les événements et la gestion des membres.
+              </p>
+            </div>
+          </li>
+
+        </ol>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="mission" class="py-24 bg-ivory relative overflow-hidden">
+  
+  <div class="absolute right-0 top-0 bottom-0 w-1/2 bg-navy-950/[0.02] pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    
+    <div class="flex items-center justify-center gap-3 mb-4 fade-in-up">
+      <span class="w-8 h-px bg-gold-500"></span>
+      <span class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Ce qui nous guide</span>
+      <span class="w-8 h-px bg-gold-500"></span>
+    </div>
+    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-navy-900 text-center mb-14 fade-in-up">
+      Mission &amp; Vision
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+      
+      <div class="relative bg-navy-900 rounded-3xl overflow-hidden p-10 fade-in-up">
+        
+        <div class="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-gold-500/8 pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-navy-700/40 blur-2xl pointer-events-none"></div>
+        
+        <div class="absolute top-6 right-8 font-serif text-8xl font-bold text-white/[0.04] select-none leading-none" aria-hidden="true">01</div>
+
+        <div class="relative z-10">
+          <div class="w-12 h-12 rounded-xl bg-gold-500/20 border border-gold-400/30 flex items-center justify-center mb-6">
+            <svg class="w-6 h-6 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <h3 class="font-serif text-2xl font-bold text-white mb-4">Notre Mission</h3>
+          <p class="text-white/65 text-base leading-relaxed mb-6">
+            Nous réunissons des femmes et des hommes d'action pour
+            <strong class="text-white font-medium">identifier les besoins de nos communautés</strong>
+            et y répondre concrètement — qu'il s'agisse de santé visuelle, d'alimentation,
+            d'éducation, d'environnement ou d'aide d'urgence.
+          </p>
+          <p class="text-white/50 text-sm leading-relaxed">
+            En alignement avec la mission mondiale de <em>Lions Clubs International</em>,
+            nous agissons localement avec des moyens professionnels, éthiques et durables.
+          </p>
+          
+          <div class="mt-8 p-4 bg-white/5 border border-gold-400/20 rounded-xl">
+            <p class="text-gold-300 font-serif italic text-sm leading-relaxed">
+              « Autonomiser les bénévoles pour servir leurs communautés, répondre
+              aux besoins humanitaires et promouvoir la paix et la compréhension
+              internationales. »
+            </p>
+            <div class="mt-2 text-white/30 text-xs">— Lions Clubs International</div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="relative bg-white border border-gray-100 rounded-3xl overflow-hidden p-10 shadow-sm fade-in-up">
+        
+        <div class="absolute top-6 right-8 font-serif text-8xl font-bold text-navy-900/[0.04] select-none leading-none" aria-hidden="true">02</div>
+
+        <div class="relative z-10">
+          <div class="w-12 h-12 rounded-xl bg-navy-100 border border-navy-200 flex items-center justify-center mb-6">
+            <svg class="w-6 h-6 text-navy-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </div>
+          <h3 class="font-serif text-2xl font-bold text-navy-900 mb-4">Notre Vision</h3>
+          <p class="text-gray-600 text-base leading-relaxed mb-6">
+            Être le club humanitaire de référence en Tunisie, reconnu pour
+            <strong class="text-navy-800 font-medium">l'impact mesurable</strong> de ses actions,
+            la diversité de ses membres et son ancrage profond dans chaque région
+            du pays.
+          </p>
+          <p class="text-gray-500 text-sm leading-relaxed mb-8">
+            Nous aspirons à une Tunisie où chaque individu, quelle que soit sa condition,
+            peut accéder aux soins essentiels, à l'éducation et à de meilleures
+            perspectives d'avenir.
+          </p>
+          
+          <ul class="space-y-3">
+            <li class="flex items-center gap-3 text-sm text-gray-600">
+              <span class="w-5 h-5 rounded-full bg-gold-100 border border-gold-300 flex items-center justify-center flex-shrink-0">
+                <svg class="w-3 h-3 text-gold-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
+              </span>
+              Atteindre 200 membres actifs d'ici 2030
+            </li>
+            <li class="flex items-center gap-3 text-sm text-gray-600">
+              <span class="w-5 h-5 rounded-full bg-gold-100 border border-gold-300 flex items-center justify-center flex-shrink-0">
+                <svg class="w-3 h-3 text-gold-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
+              </span>
+              Couvrir 12 gouvernorats avec des projets permanents
+            </li>
+            <li class="flex items-center gap-3 text-sm text-gray-600">
+              <span class="w-5 h-5 rounded-full bg-gold-100 border border-gold-300 flex items-center justify-center flex-shrink-0">
+                <svg class="w-3 h-3 text-gold-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
+              </span>
+              Créer un fonds annuel de 100 000 TND pour les actions sociales
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="valeurs" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    
+    <div class="text-center max-w-xl mx-auto mb-14 fade-in-up">
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <span class="w-8 h-px bg-gold-500"></span>
+        <span class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Notre éthique</span>
+        <span class="w-8 h-px bg-gold-500"></span>
+      </div>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-navy-900 mb-3">Nos Valeurs Fondamentales</h2>
+      <p class="text-gray-500 text-sm leading-relaxed">
+        Six principes qui guident chacune de nos décisions et chacun de nos actes.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      
+      <article class="group bg-white border border-gray-100 rounded-2xl p-8 card-hover fade-in-up
+                      hover:border-navy-200 transition-colors duration-200">
+        <div class="w-14 h-14 rounded-2xl bg-navy-900 flex items-center justify-center mb-6
+                    group-hover:bg-navy-800 transition-colors duration-200">
+          <svg class="w-7 h-7 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-xl font-semibold text-navy-900 mb-3">Service</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">
+          Le service aux autres est au centre de tout ce que nous faisons.
+          Chaque heure, chaque don, chaque geste compte et transforme une vie.
+        </p>
+        <div class="mt-6 pt-5 border-t border-gray-100">
+          <div class="text-gold-600 text-xs font-semibold uppercase tracking-widest">We Serve</div>
+        </div>
+      </article>
+
+      
+      <article class="group bg-white border border-gray-100 rounded-2xl p-8 card-hover fade-in-up
+                      hover:border-navy-200 transition-colors duration-200">
+        <div class="w-14 h-14 rounded-2xl bg-navy-900 flex items-center justify-center mb-6
+                    group-hover:bg-navy-800 transition-colors duration-200">
+          <svg class="w-7 h-7 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-xl font-semibold text-navy-900 mb-3">Intégrité</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">
+          Nous agissons avec une transparence totale dans la gestion des fonds,
+          la gouvernance du club et nos relations avec les partenaires et bénéficiaires.
+        </p>
+        <div class="mt-6 pt-5 border-t border-gray-100">
+          <div class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Éthique absolue</div>
+        </div>
+      </article>
+
+      
+      <article class="group bg-white border border-gray-100 rounded-2xl p-8 card-hover fade-in-up
+                      hover:border-navy-200 transition-colors duration-200">
+        <div class="w-14 h-14 rounded-2xl bg-navy-900 flex items-center justify-center mb-6
+                    group-hover:bg-navy-800 transition-colors duration-200">
+          <svg class="w-7 h-7 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-xl font-semibold text-navy-900 mb-3">Amitié</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">
+          Les liens qui se forgent au sein du club vont bien au-delà de l'association.
+          Nous construisons des amitiés sincères qui traversent les générations.
+        </p>
+        <div class="mt-6 pt-5 border-t border-gray-100">
+          <div class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Fraternité durable</div>
+        </div>
+      </article>
+
+      
+      <article class="group bg-white border border-gray-100 rounded-2xl p-8 card-hover fade-in-up
+                      hover:border-navy-200 transition-colors duration-200">
+        <div class="w-14 h-14 rounded-2xl bg-navy-900 flex items-center justify-center mb-6
+                    group-hover:bg-navy-800 transition-colors duration-200">
+          <svg class="w-7 h-7 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-xl font-semibold text-navy-900 mb-3">Diversité &amp; Inclusion</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">
+          Notre club est ouvert à toutes et tous, sans distinction de profession,
+          d'origine ou de génération. La diversité de nos membres est notre force.
+        </p>
+        <div class="mt-6 pt-5 border-t border-gray-100">
+          <div class="text-gold-600 text-xs font-semibold uppercase tracking-widest">210 pays, une famille</div>
+        </div>
+      </article>
+
+      
+      <article class="group bg-white border border-gray-100 rounded-2xl p-8 card-hover fade-in-up
+                      hover:border-navy-200 transition-colors duration-200">
+        <div class="w-14 h-14 rounded-2xl bg-navy-900 flex items-center justify-center mb-6
+                    group-hover:bg-navy-800 transition-colors duration-200">
+          <svg class="w-7 h-7 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-xl font-semibold text-navy-900 mb-3">Excellence</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">
+          Nous nous engageons à réaliser chaque projet avec le plus haut niveau
+          de qualité, de préparation et de suivi. L'excellence est un standard,
+          pas un luxe.
+        </p>
+        <div class="mt-6 pt-5 border-t border-gray-100">
+          <div class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Toujours mieux</div>
+        </div>
+      </article>
+
+      
+      <article class="group bg-white border border-gray-100 rounded-2xl p-8 card-hover fade-in-up
+                      hover:border-navy-200 transition-colors duration-200">
+        <div class="w-14 h-14 rounded-2xl bg-navy-900 flex items-center justify-center mb-6
+                    group-hover:bg-navy-800 transition-colors duration-200">
+          <svg class="w-7 h-7 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <h3 class="font-serif text-xl font-semibold text-navy-900 mb-3">Responsabilité</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">
+          Chaque membre s'engage personnellement. Être Lions, c'est accepter
+          une responsabilité envers sa communauté, ses partenaires et
+          les générations futures.
+        </p>
+        <div class="mt-6 pt-5 border-t border-gray-100">
+          <div class="text-gold-600 text-xs font-semibold uppercase tracking-widest">S'engager vraiment</div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="bureau" class="py-24 bg-ivory">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    
+    <div class="text-center max-w-xl mx-auto mb-14 fade-in-up">
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <span class="w-8 h-px bg-gold-500"></span>
+        <span class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Année 2025–2026</span>
+        <span class="w-8 h-px bg-gold-500"></span>
+      </div>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-navy-900 mb-3">Notre Bureau Actuel</h2>
+      <p class="text-gray-500 text-sm leading-relaxed">
+        Des professionnels engagés qui consacrent leur énergie et leur expertise
+        à la conduite du club et à la réussite de nos projets.
+      </p>
+    </div>
+
+    
+
+    
+    <div class="flex justify-center mb-8">
+      <article class="relative bg-navy-900 rounded-2xl overflow-hidden w-full max-w-sm text-center fade-in-up group">
+        
+        <div class="h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent"></div>
+        <div class="p-8">
+          
+          <div class="relative inline-flex mb-5">
+            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-navy-700 to-navy-800
+                        border-2 border-gold-400/50 flex items-center justify-center
+                        group-hover:border-gold-400 transition-all duration-200">
+              
+              <span class="font-serif font-bold text-2xl text-gold-400">MT</span>
+            </div>
+            
+            <span class="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-green-400 border-2 border-navy-900" aria-hidden="true"></span>
+          </div>
+          <div class="text-gold-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5">Président du Club</div>
+          <h3 class="font-serif text-xl font-semibold text-white mb-1">Mehdi Trabelsi</h3>
+          <p class="text-white/45 text-xs mb-4">Directeur général — Groupe Trabelsi Industries</p>
+          <p class="text-white/55 text-xs leading-relaxed">
+            Lion depuis 2008, Mehdi dirige le club avec vision et humilité.
+            Il impulse les projets à fort impact social et représente le club
+            au niveau du district.
+          </p>
+          
+          <div class="my-5 h-px bg-white/10"></div>
+          
+          <div class="flex items-center justify-center gap-4">
+            <a href="#" aria-label="LinkedIn de Mehdi Trabelsi"
+               class="text-white/30 hover:text-gold-400 transition-colors duration-200">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+                <circle cx="4" cy="4" r="2"/>
+              </svg>
+            </a>
+            <a href="mailto:president@lionsmed.tn" aria-label="Email du président"
+               class="text-white/30 hover:text-gold-400 transition-colors duration-200">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      {% for membre_bureau in bureau_restant|default:'' %}{% endfor %}
+      
+
+      
+      <article class="bg-white border border-gray-100 rounded-2xl overflow-hidden card-hover fade-in-up group text-center">
+        <div class="h-0.5 bg-gradient-to-r from-transparent via-navy-300 to-transparent"></div>
+        <div class="p-7">
+          <div class="w-16 h-16 rounded-full bg-navy-50 border border-navy-200 flex items-center justify-center
+                      mx-auto mb-4 group-hover:border-navy-400 transition-colors duration-200">
+            <span class="font-serif font-bold text-lg text-navy-600">SB</span>
+          </div>
+          <div class="text-navy-500 text-[10px] font-bold uppercase tracking-widest mb-1">Vice-Présidente</div>
+          <h3 class="font-serif text-base font-semibold text-navy-800 mb-0.5">Salma Ben Salah</h3>
+          <p class="text-gray-400 text-xs mb-3">Médecin ophtalmologiste</p>
+          <p class="text-gray-500 text-xs leading-relaxed">
+            Coordinatrice du programme Vision et marraine de la caravane annuelle de dépistage.
+          </p>
+        </div>
+      </article>
+
+      
+      <article class="bg-white border border-gray-100 rounded-2xl overflow-hidden card-hover fade-in-up group text-center">
+        <div class="h-0.5 bg-gradient-to-r from-transparent via-navy-300 to-transparent"></div>
+        <div class="p-7">
+          <div class="w-16 h-16 rounded-full bg-navy-50 border border-navy-200 flex items-center justify-center
+                      mx-auto mb-4 group-hover:border-navy-400 transition-colors duration-200">
+            <span class="font-serif font-bold text-lg text-navy-600">KA</span>
+          </div>
+          <div class="text-navy-500 text-[10px] font-bold uppercase tracking-widest mb-1">Secrétaire Général</div>
+          <h3 class="font-serif text-base font-semibold text-navy-800 mb-0.5">Karim Abdallah</h3>
+          <p class="text-gray-400 text-xs mb-3">Avocat d'affaires</p>
+          <p class="text-gray-500 text-xs leading-relaxed">
+            Garant de la bonne gouvernance, de la conformité statutaire et
+            de la communication interne du club.
+          </p>
+        </div>
+      </article>
+
+      
+      <article class="bg-white border border-gray-100 rounded-2xl overflow-hidden card-hover fade-in-up group text-center">
+        <div class="h-0.5 bg-gradient-to-r from-transparent via-navy-300 to-transparent"></div>
+        <div class="p-7">
+          <div class="w-16 h-16 rounded-full bg-navy-50 border border-navy-200 flex items-center justify-center
+                      mx-auto mb-4 group-hover:border-navy-400 transition-colors duration-200">
+            <span class="font-serif font-bold text-lg text-navy-600">NM</span>
+          </div>
+          <div class="text-navy-500 text-[10px] font-bold uppercase tracking-widest mb-1">Trésorière</div>
+          <h3 class="font-serif text-base font-semibold text-navy-800 mb-0.5">Nadia Miled</h3>
+          <p class="text-gray-400 text-xs mb-3">Directrice financière</p>
+          <p class="text-gray-500 text-xs leading-relaxed">
+            Pilote les finances du club avec rigueur, établit les rapports annuels
+            et supervise l'allocation des fonds.
+          </p>
+        </div>
+      </article>
+
+      
+      <article class="bg-white border border-gray-100 rounded-2xl overflow-hidden card-hover fade-in-up group text-center">
+        <div class="h-0.5 bg-gradient-to-r from-transparent via-navy-300 to-transparent"></div>
+        <div class="p-7">
+          <div class="w-16 h-16 rounded-full bg-navy-50 border border-navy-200 flex items-center justify-center
+                      mx-auto mb-4 group-hover:border-navy-400 transition-colors duration-200">
+            <span class="font-serif font-bold text-lg text-navy-600">YC</span>
+          </div>
+          <div class="text-navy-500 text-[10px] font-bold uppercase tracking-widest mb-1">Communication</div>
+          <h3 class="font-serif text-base font-semibold text-navy-800 mb-0.5">Youssef Chahed</h3>
+          <p class="text-gray-400 text-xs mb-3">Consultant en marketing</p>
+          <p class="text-gray-500 text-xs leading-relaxed">
+            Gère la présence digitale, l'identité visuelle du club et
+            les relations avec les médias et partenaires.
+          </p>
+        </div>
+      </article>
+
+    </div>
+
+    
+    <p class="text-center text-gray-400 text-xs mt-8 fade-in-up">
+      Le club compte également 3 directeurs de projets et 6 responsables de commissions thématiques.<br>
+      <a href="#contact" class="text-navy-600 hover:text-gold-600 underline underline-offset-2 transition-colors">
+        Contactez-nous
+      </a> pour obtenir l'annuaire complet des membres.
+    </p>
+
+  </div>
+</section>
+
+<section id="chiffres" class="bg-navy-900 relative overflow-hidden" aria-label="Chiffres clés du Lions Club Sfax Méditerranée">
+  <div class="h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent"></div>
+
+  
+  <div class="absolute inset-0 opacity-[0.025] pointer-events-none"
+       style="background-image: radial-gradient(circle at 1px 1px, #C9A84C 1px, transparent 0);
+              background-size: 28px 28px;"></div>
+  <div class="absolute -right-24 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gold-500/5 blur-3xl pointer-events-none"></div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-8 text-center">
+
+      
+      <div class="fade-in-up">
+        <div class="text-5xl sm:text-6xl font-serif font-bold text-gold-400 leading-none mb-2">57</div>
+        <div class="text-white/40 text-xs uppercase tracking-widest font-semibold">Années d'existence</div>
+        <div class="w-8 h-0.5 bg-gold-500/30 mx-auto mt-3"></div>
+      </div>
+
+      
+      <div class="fade-in-up">
+        <div class="text-5xl sm:text-6xl font-serif font-bold text-gold-400 leading-none mb-2">86</div>
+        <div class="text-white/40 text-xs uppercase tracking-widest font-semibold">Membres actifs</div>
+        <div class="w-8 h-0.5 bg-gold-500/30 mx-auto mt-3"></div>
+      </div>
+
+      
+      <div class="fade-in-up">
+        <div class="text-5xl sm:text-6xl font-serif font-bold text-gold-400 leading-none mb-2">320<span class="text-3xl text-gold-400/60">+</span></div>
+        <div class="text-white/40 text-xs uppercase tracking-widest font-semibold">Projets réalisés</div>
+        <div class="w-8 h-0.5 bg-gold-500/30 mx-auto mt-3"></div>
+      </div>
+
+      
+      <div class="fade-in-up">
+        <div class="text-4xl sm:text-5xl font-serif font-bold text-gold-400 leading-none mb-2">14&nbsp;000<span class="text-2xl text-gold-400/60">+</span></div>
+        <div class="text-white/40 text-xs uppercase tracking-widest font-semibold">Bénéficiaires aidés</div>
+        <div class="w-8 h-0.5 bg-gold-500/30 mx-auto mt-3"></div>
+      </div>
+
+    </div>
+
+    
+    <div class="mt-14 text-center fade-in-up">
+      <div class="inline-flex items-center gap-4">
+        <div class="w-12 h-px bg-gold-500/40"></div>
+        <p class="text-white/35 text-xs font-medium uppercase tracking-[0.25em]">
+          Membre Lions Clubs International · District 414-B Tunisie · Depuis 2025
+        </p>
+        <div class="w-12 h-px bg-gold-500/40"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent"></div>
+</section>
+
+<section id="engagement" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    
+    <div class="text-center max-w-2xl mx-auto mb-12 fade-in-up">
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <span class="w-8 h-px bg-gold-500"></span>
+        <span class="text-gold-600 text-xs font-semibold uppercase tracking-widest">Passez à l'action</span>
+        <span class="w-8 h-px bg-gold-500"></span>
+      </div>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-navy-900 mb-4">
+        Rejoignez l'aventure Lions
+      </h2>
+      <p class="text-gray-500 text-base leading-relaxed">
+        Il y a plusieurs façons de contribuer à la mission du Lions Club Sfax Méditerranée.
+        Choisissez l'engagement qui vous correspond.
+      </p>
+    </div>
+
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+
+      
+      <div class="relative bg-navy-900 rounded-2xl overflow-hidden p-8 fade-in-up group">
+        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-gold-500 to-transparent"></div>
+        <div class="absolute -bottom-8 -right-8 w-32 h-32 rounded-full bg-gold-500/8 pointer-events-none"></div>
+        <div class="relative z-10">
+          <div class="w-12 h-12 rounded-xl bg-gold-500/20 border border-gold-400/30 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+          </div>
+          <h3 class="font-serif text-xl font-bold text-white mb-3">Devenir Membre</h3>
+          <p class="text-white/60 text-sm leading-relaxed mb-6">
+            Rejoignez notre communauté de 86 membres actifs. Partagez vos compétences,
+            élargissez votre réseau et construisez quelque chose qui dure.
+          </p>
+          <ul class="space-y-2 mb-7">
+            <li class="flex items-center gap-2.5 text-white/55 text-xs">
+              <svg class="w-3.5 h-3.5 text-gold-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+              Accès au réseau Lions mondial
+            </li>
+            <li class="flex items-center gap-2.5 text-white/55 text-xs">
+              <svg class="w-3.5 h-3.5 text-gold-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+              Participation aux projets humanitaires
+            </li>
+            <li class="flex items-center gap-2.5 text-white/55 text-xs">
+              <svg class="w-3.5 h-3.5 text-gold-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+              Formations Lions Leadership
+            </li>
+          </ul>
+          <a href="{% url 'home' %}#contact"
+             class="inline-flex items-center gap-2 px-6 py-3 bg-gold-500 hover:bg-gold-400
+                    text-navy-900 text-sm font-bold rounded-md w-full justify-center
+                    transition-all duration-200 hover:shadow-lg hover:shadow-gold-500/25 group-hover:-translate-y-0.5">
+            Déposer ma candidature
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      
+      <div class="relative bg-ivory border border-gray-100 rounded-2xl overflow-hidden p-8 fade-in-up group">
+        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-navy-300 to-transparent"></div>
+        <div class="absolute -bottom-8 -right-8 w-32 h-32 rounded-full bg-navy-100/80 pointer-events-none"></div>
+        <div class="relative z-10">
+          <div class="w-12 h-12 rounded-xl bg-navy-100 border border-navy-200 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-navy-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-serif text-xl font-bold text-navy-900 mb-3">Soutenir nos Actions</h3>
+          <p class="text-gray-600 text-sm leading-relaxed mb-6">
+            Vous ne pouvez pas rejoindre le club mais souhaitez contribuer ?
+            Votre don finance directement nos programmes : Vision, Diabète,
+            Éducation et aide d'urgence.
+          </p>
+          <ul class="space-y-2 mb-7">
+            <li class="flex items-center gap-2.5 text-gray-500 text-xs">
+              <svg class="w-3.5 h-3.5 text-navy-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+              100% des dons affectés aux projets
+            </li>
+            <li class="flex items-center gap-2.5 text-gray-500 text-xs">
+              <svg class="w-3.5 h-3.5 text-navy-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+              Rapport annuel transparent
+            </li>
+            <li class="flex items-center gap-2.5 text-gray-500 text-xs">
+              <svg class="w-3.5 h-3.5 text-navy-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+              Reçu fiscal disponible sur demande
+            </li>
+          </ul>
+          
+          <a href="{% url 'home' %}#contact"
+             class="inline-flex items-center gap-2 px-6 py-3 bg-navy-900 hover:bg-navy-800
+                    text-white text-sm font-bold rounded-md w-full justify-center
+                    transition-all duration-200 group-hover:-translate-y-0.5">
+            Faire un don
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    
+    <div class="text-center mt-12 fade-in-up">
+      <a href="{% url 'home' %}"
+         class="inline-flex items-center gap-2 text-gray-400 hover:text-navy-600 text-sm
+                transition-colors duration-200">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/>
+        </svg>
+        Retour à l'accueil
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

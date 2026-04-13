@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{% block meta_description %}Lions Club Sfax Méditerranée — We Serve — Sfax, Tunisie.{% endblock %}" />
+  <meta name="theme-color" content="#0B1F3A" />
+
+  <title>{% block title %}Lions Club Sfax Méditerranée{% endblock %} | Lions Club International</title>
+
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Bleu marine institutionnel profond
+            navy: {
+              50:  '#EEF2F8',
+              100: '#D5DFF0',
+              200: '#ABBFE0',
+              300: '#7F9FCF',
+              400: '#557FBE',
+              500: '#2B5FAD',
+              600: '#1E4B8E',
+              700: '#163870',
+              800: '#0E2550',
+              900: '#0B1F3A',
+              950: '#060F1D',
+            },
+            // Or institutionnel premium
+            gold: {
+              50:  '#FBF6EC',
+              100: '#F5EAD1',
+              200: '#EBD4A3',
+              300: '#E0BE74',
+              400: '#D6A849',
+              500: '#C9A84C',
+              600: '#A8862A',
+              700: '#7D641F',
+              800: '#534215',
+              900: '#29210A',
+            },
+            // Ivoire doux pour les fonds alternés
+            ivory: '#F8F6F0',
+          },
+          fontFamily: {
+            sans:  ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+          },
+        },
+      },
+    }
+  </script>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+  
+  <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="font-sans bg-white text-gray-800 antialiased">
+
+  
+  {% include 'includes/navbar.html' %}
+
+  
+  {% if messages %}
+  <div id="messages-container" class="fixed top-24 right-4 z-50 flex flex-col gap-2 w-full max-w-sm pointer-events-none">
+    {% for message in messages %}
+    <div class="message-toast pointer-events-auto flex items-start gap-3 p-4 rounded-lg shadow-xl bg-white border-l-4
+                {% if message.tags == 'success' %}border-green-500
+                {% elif message.tags == 'error' %}border-red-500
+                {% elif message.tags == 'warning' %}border-yellow-500
+                {% else %}border-navy-500{% endif %}
+                translate-x-full transition-all duration-300"
+         role="alert">
+      <p class="text-sm text-gray-700 flex-1">{{ message }}</p>
+      <button onclick="this.parentElement.remove()"
+              class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+              aria-label="Fermer">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  
+  <main id="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  
+  {% include 'includes/footer.html' %}
+
+  
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+
+</body>
+</html>

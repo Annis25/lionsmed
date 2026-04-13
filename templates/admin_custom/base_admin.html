@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 pt-20 flex">
+
+  {# ── SIDEBAR ── #}
+  <aside class="w-64 flex-shrink-0 hidden lg:flex flex-col bg-navy-950 min-h-screen fixed top-20 left-0 bottom-0 z-20 border-r border-white/5">
+    {# Header admin #}
+    <div class="px-5 py-5 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-gold-500/20 border border-gold-400/30 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="text-white text-xs font-bold uppercase tracking-widest">Panel Admin</div>
+          <div class="text-white/40 text-[10px]">Lions Club Sfax Méd.</div>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center gap-2.5">
+        <div class="w-7 h-7 rounded-full bg-navy-700 flex items-center justify-center flex-shrink-0">
+          <span class="text-gold-400 text-[10px] font-bold">{{ user.first_name|first|default:user.username|first|upper }}</span>
+        </div>
+        <div class="min-w-0">
+          <div class="text-white/80 text-xs font-semibold truncate">{{ user.get_full_name|default:user.username }}</div>
+          <div class="text-white/30 text-[10px]">{{ user.get_role_display }}</div>
+        </div>
+      </div>
+    </div>
+
+    {# Navigation #}
+    <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      {% with request.resolver_match.url_name as current %}
+
+      <a href="{% url 'admin_dashboard' %}"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
+                {% if current == 'admin_dashboard' %}bg-white/10 text-white{% else %}text-white/50 hover:text-white hover:bg-white/5{% endif %}">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm12 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+        </svg>
+        Tableau de bord
+      </a>
+
+      <a href="{% url 'admin_members' %}"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
+                {% if current == 'admin_members' or current == 'admin_member_edit' %}bg-white/10 text-white{% else %}text-white/50 hover:text-white hover:bg-white/5{% endif %}">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Membres
+      </a>
+
+      <a href="{% url 'admin_requests' %}"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
+                {% if current == 'admin_requests' %}bg-white/10 text-white{% else %}text-white/50 hover:text-white hover:bg-white/5{% endif %}">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        Candidatures
+        {% if pending_count %}
+        <span class="ml-auto inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full">
+          {{ pending_count }}
+        </span>
+        {% endif %}
+      </a>
+
+      <a href="{% url 'admin_cotisations' %}"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
+                {% if current == 'admin_cotisations' %}bg-white/10 text-white{% else %}text-white/50 hover:text-white hover:bg-white/5{% endif %}">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+        </svg>
+        Cotisations
+      </a>
+
+      <a href="{% url 'admin_send_notification' %}"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150
+                {% if current == 'admin_send_notification' %}bg-white/10 text-white{% else %}text-white/50 hover:text-white hover:bg-white/5{% endif %}">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+        </svg>
+        Envoyer notification
+      </a>
+
+      {% endwith %}
+
+      <div class="pt-4 mt-4 border-t border-white/10 space-y-0.5">
+        <a href="{% url 'dashboard' %}"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 transition-all duration-150">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/>
+          </svg>
+          Retour espace membre
+        </a>
+        <a href="/admin/"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 transition-all duration-150">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Admin Django
+        </a>
+      </div>
+    </nav>
+
+    {# Bouton déconnexion #}
+    <div class="px-3 pb-4 border-t border-white/10 pt-4">
+      <a href="{% url 'logout' %}"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400/70 hover:text-red-300 hover:bg-red-500/10 transition-all duration-150">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        Déconnexion
+      </a>
+    </div>
+  </aside>
+
+  {# ── CONTENU PRINCIPAL ── #}
+  <div class="flex-1 lg:ml-64 min-w-0">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {% block admin_content %}{% endblock %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
