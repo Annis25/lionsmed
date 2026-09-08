@@ -12,3 +12,4 @@ private_media/
 *.log.*
 logs/
 staticfiles/
+.claude/settings.local.json

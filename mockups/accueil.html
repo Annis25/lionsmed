@@ -54,7 +54,7 @@
       "logo": "https://lionsmed.tn/assets/images/logomed.png",
       "image": "https://lionsmed.tn/assets/images/og-accueil.jpg",
       "description": "Le Lions Club Sfax-Méditerranée est un club Lions basé à Sfax, en Tunisie, rattaché au District 414-B. Ses quatre axes prioritaires sont le diabète, l'environnement, l'humanitaire et la jeunesse.",
-      "email": "contact@lionsmed.tn",
+      "email": "secretariat@lionsmed.tn",
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Sfax",
@@ -97,6 +97,7 @@
 <a class="skip-link" href="#contenu">Aller au contenu principal</a>
 
 <!-- ═══ EN-TÊTE ═══════════════════════════════════════════════════════════ -->
+<!-- ══ EN-TÊTE PARTAGÉ — deviendra un include Django, garder identique sur toutes les pages ══ -->
 <header class="site-header">
   <div class="container">
     <div class="nav-bar">
@@ -111,21 +112,16 @@
 
       <nav class="nav-main" aria-label="Navigation principale">
         <ul class="nav-list">
-          <li class="nav-item"><a class="nav-link" href="accueil.html" aria-current="page">Accueil</a></li>
+          <li class="nav-item"><a class="nav-link actif" href="accueil.html" aria-current="page">Accueil</a></li>
           <li class="nav-item"><a class="nav-link" href="notre-club.html">Notre Club</a></li>
           <li class="nav-item"><a class="nav-link" href="nos-actions.html">Nos Actions</a></li>
-          <li class="nav-item"><a class="nav-link" href="evenements.html">Événements</a></li>
-          <li class="nav-item"><a class="nav-link" href="actualites.html">Actualités</a></li>
           <li class="nav-item"><a class="nav-link" href="rejoindre.html">Nous rejoindre</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
         </ul>
       </nav>
 
       <div class="nav-actions">
-        <a class="nav-search" href="contact.html" aria-label="Rechercher">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.6-3.6"></path>
-          </svg>
-        </a>
+        <!-- Recherche : à réintroduire quand la page de recherche existera -->
         <a class="btn btn--solid btn--sm nav-login" href="connexion.html">Se connecter</a>
         <button class="nav-burger" type="button" aria-expanded="false" aria-controls="menu-mobile" aria-label="Ouvrir le menu">
           <span></span><span></span><span></span>
@@ -134,22 +130,21 @@
 
     </div>
   </div>
-</header>
 
-<nav class="nav-mobile" id="menu-mobile" aria-label="Navigation mobile">
-  <ul class="nav-mobile__list">
-    <li><a href="accueil.html" aria-current="page">Accueil</a></li>
-    <li><a href="notre-club.html">Notre Club</a></li>
-    <li><a href="nos-actions.html">Nos Actions</a></li>
-    <li><a href="evenements.html">Événements</a></li>
-    <li><a href="actualites.html">Actualités</a></li>
-    <li><a href="rejoindre.html">Nous rejoindre</a></li>
-    <li><a href="contact.html">Contact</a></li>
-  </ul>
-  <div class="nav-mobile__cta">
-    <a class="btn btn--solid btn--block" href="connexion.html">Se connecter</a>
-  </div>
-</nav>
+  <nav class="nav-mobile" id="menu-mobile" aria-label="Navigation mobile">
+    <ul class="nav-mobile__list">
+      <li><a class="nav-mobile__link actif" href="accueil.html" aria-current="page">Accueil</a></li>
+      <li><a class="nav-mobile__link" href="notre-club.html">Notre Club</a></li>
+      <li><a class="nav-mobile__link" href="nos-actions.html">Nos Actions</a></li>
+      <li><a class="nav-mobile__link" href="rejoindre.html">Nous rejoindre</a></li>
+      <li><a class="nav-mobile__link" href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-mobile__cta">
+      <a class="btn btn--solid btn--block" href="connexion.html">Se connecter</a>
+    </div>
+  </nav>
+</header>
+<!-- ══ FIN EN-TÊTE PARTAGÉ ══ -->
 
 
 <main id="contenu">
@@ -245,6 +240,9 @@
 
       <!-- DONNÉE À VALIDER PAR LE CLUB : reprises de la base sitecontent, à confirmer par le bureau. -->
       <dl class="intro__reperes">
+        <!-- DONNÉE À VALIDER PAR LE CLUB : un club fondé en 2025 affichant
+             12 actions et 500 personnes accompagnées appelle une confirmation
+             du bureau, sur l'année comme sur les chiffres. -->
         <div class="intro__repere">
           <dt>2025</dt>
           <dd>Année de fondation du club, à Sfax.</dd>
@@ -418,11 +416,14 @@
 <!-- ═══ GRANDES CAUSES LIONS ══════════════════════════════════════════════ -->
 <!-- Traitement volontairement discret : ces causes internationales ne sont
      jamais présentées au même niveau que les quatre axes prioritaires. -->
-<section class="section section--tight section--fond-2" aria-labelledby="titre-causes">
+<section class="section section--tight section--fond-2 causes" aria-labelledby="titre-causes">
   <div class="container">
 
-    <div class="section-head section-head--centre reveal">
-      <h2 id="titre-causes">Également engagés aux côtés des grandes causes Lions</h2>
+    <!-- Section secondaire : pas de filet or, titre nettement plus petit que
+         celui des axes prioritaires. La hiérarchie doit rester lisible d'un
+         coup d'œil, sans lire les titres. -->
+    <div class="section-head section-head--centre section-head--secondaire reveal">
+      <h2 class="causes__titre" id="titre-causes">Également engagés aux côtés des grandes causes Lions</h2>
     </div>
 
     <ul class="causes__liste reveal">
@@ -509,25 +510,18 @@
           <span class="stat__label">personnes accompagnées</span>
         </div>
 
-        <div class="stat">
-          <!-- Une année ne se compte pas depuis zéro : pas d'attribut data-compteur. -->
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 21V4a1 1 0 0 1 1-1h12l-2.5 4L18 11H6"></path>
-          </svg>
-          <span class="stat__valeur">2025</span>
-          <span class="stat__label">année de fondation</span>
-        </div>
-
       </div>
 
-      <div class="chiffres__sceau" aria-hidden="true">
-        <img src="assets/images/emblem-256.png" width="256" height="243" alt="" loading="lazy">
-        <span>WE SERVE</span>
-      </div>
+      <!-- L'année de fondation figure dans les repères de « Qui sommes-nous »,
+           où elle est à sa place : ce n'est pas une statistique. -->
+      <p class="chiffres__devise">WE SERVE</p>
 
     </div>
 
-    <p class="demo-note chiffres__note">Chiffres à confirmer par le bureau avant mise en ligne.</p>
+    <div class="chiffres__note">
+      <p class="text-meta">Chiffres arrêtés au titre de l'année 2025.</p>
+      <p class="demo-note">Chiffres à confirmer par le bureau avant mise en ligne.</p>
+    </div>
 
   </div>
 </section>
@@ -559,6 +553,8 @@
         <div class="evenements">
 
           <article class="card evenement">
+            <!-- DONNÉE À VALIDER PAR LE CLUB : photographie authentique du club associée à un contenu
+                 de démonstration. L'association photo ↔ événement n'est pas documentée. -->
             <div class="media media--16x10 evenement__media" data-attendu="evenement-1 · 16/10 · min 1100×688">
               <p class="evenement__date"><b>12</b><span>Juin</span></p>
               <img src="assets/images/evenement-1-640.webp"
@@ -586,6 +582,8 @@
           </article>
 
           <article class="card evenement">
+            <!-- DONNÉE À VALIDER PAR LE CLUB : photographie authentique du club associée à un contenu
+                 de démonstration. L'association photo ↔ événement n'est pas documentée. -->
             <div class="media media--16x10 evenement__media" data-attendu="evenement-2 · 16/10 · min 1100×688">
               <p class="evenement__date"><b>14</b><span>Juin</span></p>
               <img src="assets/images/evenement-2-640.webp"
@@ -613,6 +611,8 @@
           </article>
 
           <article class="card evenement">
+            <!-- DONNÉE À VALIDER PAR LE CLUB : photographie authentique du club associée à un contenu
+                 de démonstration. L'association photo ↔ événement n'est pas documentée. -->
             <div class="media media--16x10 evenement__media" data-attendu="evenement-3 · 16/10 · min 1100×688">
               <p class="evenement__date"><b>19</b><span>Juin</span></p>
               <img src="assets/images/evenement-3-640.webp"
@@ -659,7 +659,9 @@
         <div class="actualites">
 
           <article class="actualite">
-            <div class="media media--1x1 actualite__media" data-attendu="actualite-1 · 1/1 · min 480×480">
+            <!-- DONNÉE À VALIDER PAR LE CLUB : photographie authentique du club associée à un contenu
+                   de démonstration. L'association photo ↔ actualité n'est pas documentée. -->
+              <div class="media media--1x1 actualite__media" data-attendu="actualite-1 · 1/1 · min 480×480">
               <img src="assets/images/actualite-1-240.webp"
                    srcset="assets/images/actualite-1-240.webp 240w,
                            assets/images/actualite-1-480.webp 480w"
@@ -674,7 +676,9 @@
           </article>
 
           <article class="actualite">
-            <div class="media media--1x1 actualite__media" data-attendu="actualite-2 · 1/1 · min 480×480">
+            <!-- DONNÉE À VALIDER PAR LE CLUB : photographie authentique du club associée à un contenu
+                   de démonstration. L'association photo ↔ actualité n'est pas documentée. -->
+              <div class="media media--1x1 actualite__media" data-attendu="actualite-2 · 1/1 · min 480×480">
               <img src="assets/images/actualite-2-240.webp"
                    srcset="assets/images/actualite-2-240.webp 240w,
                            assets/images/actualite-2-480.webp 480w"
@@ -689,7 +693,9 @@
           </article>
 
           <article class="actualite">
-            <div class="media media--1x1 actualite__media" data-attendu="actualite-3 · 1/1 · min 480×480">
+            <!-- DONNÉE À VALIDER PAR LE CLUB : photographie authentique du club associée à un contenu
+                   de démonstration. L'association photo ↔ actualité n'est pas documentée. -->
+              <div class="media media--1x1 actualite__media" data-attendu="actualite-3 · 1/1 · min 480×480">
               <img src="assets/images/actualite-3-240.webp"
                    srcset="assets/images/actualite-3-240.webp 240w,
                            assets/images/actualite-3-480.webp 480w"
@@ -718,7 +724,7 @@
 
       <!-- Emploi structurel de l'arc : l'arche, reprise du contour du sceau.
            Elle ne s'utilise nulle part ailleurs sur la page. -->
-      <div class="rejoindre__media media" data-attendu="rejoindre · 3/2 · min 1600×1067">
+      <div class="rejoindre__media media media--arche" data-attendu="rejoindre · 3/2 · min 1600×1067">
         <img src="assets/images/rejoindre-1100.webp"
              srcset="assets/images/rejoindre-640.webp 640w,
                      assets/images/rejoindre-1100.webp 1100w,
@@ -750,6 +756,7 @@
 
 
 <!-- ═══ PIED DE PAGE ══════════════════════════════════════════════════════ -->
+<!-- ══ PIED DE PAGE PARTAGÉ — deviendra un include Django, garder identique sur toutes les pages ══ -->
 <footer class="site-footer">
   <div class="container">
 
@@ -826,13 +833,14 @@
             </span>
           </li>
           <li>
-            <!-- DONNÉE À VALIDER PAR LE CLUB : la base sitecontent indique
-                 secretariat@lionsmed.tn. Adresse à trancher par le bureau. -->
-            <a href="mailto:contact@lionsmed.tn">
+            <!-- DONNÉE À VALIDER PAR LE CLUB : adresse déclarée par le club dans
+                 sitecontent.SiteConfig. Une adresse contact@lionsmed.tn a également
+                 été évoquée. Le bureau doit trancher. -->
+            <a href="mailto:secretariat@lionsmed.tn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3.5 7 8.5 6 8.5-6"></path>
               </svg>
-              contact@lionsmed.tn
+              secretariat@lionsmed.tn
             </a>
           </li>
         </ul>
@@ -845,13 +853,13 @@
       <nav aria-label="Liens légaux">
         <a href="mentions-legales.html">Mentions légales</a>
         <a href="confidentialite.html">Politique de confidentialité</a>
-        <!-- LIEN À CRÉER : la page « Plan du site » reste à produire. -->
-        <a href="#">Plan du site</a>
+        <a href="plan-du-site.html">Plan du site</a>
       </nav>
     </div>
 
   </div>
 </footer>
+<!-- ══ FIN PIED DE PAGE PARTAGÉ ══ -->
 
 <button class="to-top" type="button" aria-label="Revenir en haut de la page">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

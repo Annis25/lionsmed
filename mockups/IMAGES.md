@@ -117,6 +117,13 @@ illisible : **cadrage serré obligatoire**.
 
 ### 12 — Bloc « Nous rejoindre » ✅ servi
 
+**Sert deux pages** : le bloc de conversion de `accueil.html` et celui de
+`rejoindre.html`. Même fichier, même arche, deux traitements différents — fondu vers le
+navy sur l'accueil, plein cadre sur fond blanc sur `rejoindre.html`.
+**À trancher par le bureau** : une photographie distincte pour `rejoindre.html` serait
+préférable. Le club n'en a pas fourni d'autre, et aucune des huit autres photos en place
+ne convient à ce cadrage.
+
 | | |
 |---|---|
 | **Nom de base** | `rejoindre` · **Variantes** `-640` `-1100` `-1600` · **Ratio** 3/2 · **Minimum** `1600×1067` |
@@ -134,6 +141,49 @@ illisible : **cadrage serré obligatoire**.
 | **Cadrage** | Sujet centré, marge de sécurité de 60 px sur les quatre bords : les plateformes rognent différemment. La bannière du club doit rester lisible. |
 | **Priorité** | Moyenne |
 | **Photo en place** | `club-exterieur-original.jpg`, recadrée pour garder la bannière dans le cadre |
+
+---
+
+## Associations photo ↔ contenu à confirmer
+
+Six emplacements portent une **photographie authentique du club** rattachée à un
+**contenu de démonstration** (titres, dates et lieux repris des tables `events_event` et
+`news_article`).
+
+**Le rattachement n'est documenté nulle part.** Une photo réelle placée sous un titre
+d'événement affirme implicitement que cet événement a eu lieu, à cette date, avec ces
+personnes. C'est la même réserve que celle qui a fait laisser les quatre cartes d'axes en
+repère technique, et elle est tracée au même niveau : chaque emplacement porte dans le
+HTML le commentaire
+
+```html
+<!-- DONNÉE À VALIDER PAR LE CLUB : photographie authentique du club associée à un contenu
+     de démonstration. L'association photo ↔ événement n'est pas documentée. -->
+```
+
+Les `alt` décrivent **strictement ce que montre la photographie**, jamais le contenu
+auquel elle est rattachée. Un écart visible entre les deux colonnes ci-dessous est donc
+normal, et voulu : il signale que le rattachement reste à établir.
+
+| Emplacement | Contenu affiché (démonstration) | Ce que montre réellement la photo | Source |
+|---|---|---|---|
+| `evenement-1` | Assemblée générale ordinaire — 12 juin, Maison des Associations, Sfax | Membres réunis autour d'une table lors d'une soirée en salle de réception | `club-tablee-original.jpg` |
+| `evenement-2` | Attribution des bourses scolaires — 14 juin, Salle de conférences, Sfax | Membres en gilets jaunes sur la plage, le soir, avec la bannière du club | `club-plage-original.jpg` |
+| `evenement-3` | Caravane de dépistage du diabète — 19 juin, Hôpital Hédi Chaker, Sfax | Groupe en blouses blanches et gilets Lions en salle de réunion, autour de matériel médical | `club-remise-materiel-original.jpg` |
+| `actualite-1` | Caravane de dépistage du diabète à Sfax — 27 mai 2026 | Matériel médical présenté sur une table lors d'une remise d'équipement | `club-rencontre-original.jpg` |
+| `actualite-2` | Passation de service : retour sur l'assemblée élective — 16 mai 2026 | Six personnes en casaques et charlottes chirurgicales devant un écran médical | `club-bloc-medical-original.jpg` |
+| `actualite-3` | Attribution des bourses scolaires 2025-2026 — 20 avril 2026 | Membres réunis autour d'une table le soir, sous une pergola | `club-soiree-original.jpg` |
+
+**Deux façons de lever la réserve**, au choix du bureau :
+
+1. **Confirmer** que la photo correspond bien à l'événement ou à l'actualité — le
+   commentaire est alors supprimé et l'`alt` peut mentionner l'événement.
+2. **Fournir la bonne photo** pour chaque contenu, ou **corriger le contenu** pour qu'il
+   corresponde à la photo.
+
+Les associations n'ont volontairement **pas** été choisies pour paraître plausibles :
+rendre le rattachement crédible sans l'avoir vérifié rendrait l'erreur plus difficile à
+repérer, pas moins probable.
 
 ---
 
@@ -347,3 +397,53 @@ Ne pas modifier ces fichiers : tout ce que sert la page en dérive.
 | `og-accueil` | `og-accueil.jpg` 1200×630 | ✅ 1/1 |
 
 **19 fichiers déposés sur 27.** Les 8 manquants correspondent aux 4 cartes d'axes.
+
+
+---
+
+## À valider par le bureau avant mise en ligne
+
+*Liste à cocher. Chaque point doit être tranché par une personne du bureau. Les deux
+derniers sont techniques et reviennent à l'intégrateur.*
+
+- [ ] **Droit à l'image.** Les neuf photographies en place montrent des personnes
+      reconnaissables. Chacune a-t-elle accepté la publication sur le site public ?
+      *Cette vérification n'a pas été faite.*
+
+- [ ] **Photos des événements.** Les trois photos illustrant « Assemblée générale
+      ordinaire », « Attribution des bourses scolaires » et « Caravane de dépistage du
+      diabète » correspondent-elles bien à ces événements ? Voir le tableau
+      « Associations photo ↔ contenu à confirmer ». Sinon : fournir la bonne photo, ou
+      corriger l'intitulé.
+
+- [ ] **Photos des actualités.** Même question pour les trois vignettes d'actualités.
+
+- [ ] **Adresse e-mail officielle.** La page affiche `secretariat@lionsmed.tn`, valeur
+      déclarée par le club. Une adresse `contact@lionsmed.tn` a également été évoquée.
+      Laquelle retenir ?
+
+- [ ] **Axe Humanitaire.** La page regroupe deux entrées distinctes — « Lutte contre la
+      faim » et « Aide d'urgence » — sous un axe unique « Humanitaire ». Ce regroupement
+      est-il validé ?
+
+- [ ] **Statistiques.** Les chiffres affichés sont **45 membres engagés**, **12 actions
+      réalisées**, **500 personnes accompagnées**, au titre de l'**année 2025**. Sont-ils
+      exacts ? La période de référence est-elle la bonne ?
+
+- [ ] **Quatre photographies d'axes.** Elles manquent, et ce sont les quatre images les
+      plus visibles de la page. En attendant, quatre cadres gris s'affichent à leur
+      place. Le détail de la commande figure dans « Photos réelles à demander au club ».
+
+- [ ] **Photo réutilisée sur deux pages.** La photographie `rejoindre` illustre à la
+      fois le bloc de conversion de l'accueil et celui de `rejoindre.html`. Est-ce
+      acceptable, ou faut-il fournir une seconde photographie ?
+
+- [ ] **Retrait de `noindex, follow`.** Tant que cette ligne est présente dans
+      chaque page, celle-ci **n'est pas référencée par les moteurs de recherche**. Elle
+      doit être retirée au moment de la mise en ligne, et pas avant — sur les neuf pages
+      construites, `sitemap.xml` n'ayant aucun effet tant qu'elle subsiste.
+
+- [ ] **Contrôle technique final.** Ces deux commandes doivent renvoyer `0` :
+      `grep -c "ALT À RÉÉCRIRE" mockups/accueil.html` et
+      `grep -c "tmp-" mockups/accueil.html`.
+

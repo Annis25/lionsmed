@@ -5,9 +5,11 @@
    Chaque module se contente d'un retour anticipé si son point d'ancrage est
    absent — la feuille sert des pages de structures différentes.
 
-     1 · Menu burger            4 · Compteurs animés
-     2 · Sous-menu déroulant    5 · Retour en haut
-     3 · Révélation au scroll   6 · Année courante
+     1 · Menu burger            5 · Retour en haut
+     2 · Sous-menu déroulant    6 · Année courante
+     3 · Révélation au scroll   7 · Formulaires de maquette
+     4 · Compteurs animés       8 · Afficher / masquer un mot de passe
+                                9 · Repère d'emplacement d'image manquante
    ═══════════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -162,4 +164,57 @@
   Array.prototype.forEach.call(annees, function (el) {
     el.textContent = String(new Date().getFullYear());
   });
+
+  /* ─── 7 · FORMULAIRES DE MAQUETTE ──────────────────────────────────────── */
+  /* Aucun formulaire de la maquette ne soumet quoi que ce soit. Le blocage est
+     posé ici plutôt que page par page, et ne concerne que les formulaires qui
+     se déclarent explicitement comme maquettes. */
+  var maquettes = document.querySelectorAll('form[data-maquette]');
+  Array.prototype.forEach.call(maquettes, function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      console.info('Maquette : soumission bloquee. Ce formulaire sera branche a l\'integration Django.');
+    });
+  });
+
+  /* ─── 8 · AFFICHER / MASQUER UN MOT DE PASSE ───────────────────────────── */
+  /* Le bouton porte son état dans aria-pressed et change de libellé : l'état
+     n'est jamais transmis par la seule icône. */
+  var yeux = document.querySelectorAll('[data-oeil]');
+  Array.prototype.forEach.call(yeux, function (bouton) {
+    var champ = document.getElementById(bouton.getAttribute('data-oeil'));
+    if (!champ) return;
+    bouton.addEventListener('click', function () {
+      var visible = champ.type === 'text';
+      champ.type = visible ? 'password' : 'text';
+      bouton.setAttribute('aria-pressed', String(!visible));
+      bouton.setAttribute('aria-label', visible ? 'Afficher le mot de passe' : 'Masquer le mot de passe');
+    });
+  });
+
+  /* ─── 9 · REPÈRE D'EMPLACEMENT D'IMAGE MANQUANTE ───────────────────────── */
+  /* Tant qu'un fichier image est absent, son conteneur affiche un repère
+     technique (nom de fichier attendu, ratio, dimensions minimales) décrit
+     dans lions.css. Dès que le fichier est déposé, l'image charge, aucune
+     erreur n'est levée, la classe n'est jamais posée : le repère ne coûte
+     alors strictement rien. Aucune modification de code au dépôt.
+     Partagé : toute page portant des .media en a besoin. */
+  var marquerVide = function (img) {
+    var conteneur = img.closest('.media');
+    if (conteneur) conteneur.classList.add('media--vide');
+  };
+
+  /* Capture : attrape aussi les images différées, qui échoueront plus tard. */
+  document.addEventListener('error', function (e) {
+    if (e.target && e.target.tagName === 'IMG') marquerVide(e.target);
+  }, true);
+
+  /* Rattrapage : ce script est différé, certaines images ont pu échouer avant
+     que l'écouteur ci-dessus ne soit posé. naturalWidth à 0 sur une image
+     déclarée complète signale un chargement échoué. */
+  var imagesMedia = document.querySelectorAll('.media img');
+  Array.prototype.forEach.call(imagesMedia, function (img) {
+    if (img.complete && img.naturalWidth === 0) marquerVide(img);
+  });
+
 })();

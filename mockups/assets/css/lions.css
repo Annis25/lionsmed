@@ -8,7 +8,7 @@
 
    La signature graphique repose sur trois emplois de l'arc, et trois seulement :
      · monumental   — arcs concentriques du hero        (accueil.css)
-     · structurel   — l'arche, --r-arche                (accueil.css)
+     · structurel   — l'arche, --r-arche                (ici, .media--arche)
      · de détail    — le filet or de 56 × 2 px          (ici, .section-head)
 
    Sommaire
@@ -18,7 +18,9 @@
      04 · Mise en page        10 · Pied de page
      05 · Surtitres, méta     11 · Révélation au défilement
      06 · Boutons et liens    12 · Divers
-                              13 · Animations réduites
+     13 · Pages intérieures   15 · Pages d'accès
+     14 · Formulaires         16 · Alertes
+                              17 · Animations réduites
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ─── 01 · JETONS ────────────────────────────────────────────────────────── */
@@ -60,8 +62,8 @@
   --e5: 24px; --e6: 32px;  --e7: 48px;  --e8: 64px;
   --e9: 96px; --e10:128px; --e11:160px;
 
-  --section-y: clamp(88px, 10vw, 160px);
-  --head-gap:  clamp(40px, 5vw, 72px);
+  --section-y: clamp(80px, 8vw, 120px);
+  --head-gap:  clamp(32px, 4vw, 56px);
   --gouttiere: clamp(20px, 5vw, 56px);
   --conteneur: 1200px;
   --hauteur-nav: 70px;
@@ -178,7 +180,7 @@ p:last-child { margin-bottom: 0; }
 .container--narrow { max-width: 780px; }
 
 .section { padding-block: var(--section-y); }
-.section--tight { padding-block: clamp(64px, 7vw, 112px); }
+.section--tight { padding-block: clamp(56px, 6vw, 88px); }
 .section--fond   { background: var(--fond); }
 .section--fond-2 { background: var(--fond-2); }
 .section--sombre { background: var(--navy); }
@@ -195,6 +197,7 @@ p:last-child { margin-bottom: 0; }
   background: var(--or);
   margin-bottom: var(--e5);
 }
+.section-head--secondaire::before { display: none; }
 .section-head--centre { text-align: center; }
 .section-head--centre::before { margin-inline: auto; }
 .section-head--centre h2 { margin-inline: auto; }
@@ -206,10 +209,17 @@ p:last-child { margin-bottom: 0; }
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
+  align-items: last baseline;
   justify-content: space-between;
   gap: var(--e5);
 }
-.section-head--split::before { flex-basis: 100%; }
+/* Le pseudo-élément occupe une ligne entière pour forcer le retour, mais ne
+   peint que 56 px d'or : sans cela, flex-basis:100% étirait le filet. */
+.section-head--split::before {
+  flex: 0 0 100%;
+  width: auto;
+  background: linear-gradient(90deg, var(--or) 0 56px, transparent 56px);
+}
 
 /* ─── 05 · SURTITRES ET MÉTADONNÉES ──────────────────────────────────────── */
 /* Seule exception aux capitales, avec « WE SERVE ». */
@@ -307,6 +317,14 @@ p:last-child { margin-bottom: 0; }
 .media--3x2   { aspect-ratio: 3 / 2; }
 .media--1x1   { aspect-ratio: 1 / 1; }
 
+/* L'arche — emploi STRUCTUREL de la signature (§2 du skill) : la forme vient
+   du contour du sceau. Un seul bloc visuel majeur par page, jamais deux.
+   Seule la forme est mutualisée ; le cadrage et les fondus restent à la page. */
+.media--arche { border-radius: var(--r-arche); }
+@media (max-width: 1080px) {
+  .media--arche { border-radius: 160px 160px 3px 3px; }
+}
+
 /* Repère technique — visible UNIQUEMENT quand le fichier est absent.
    Posé par le gestionnaire onerror (accueil.js). Tant que l'image charge,
    rien de tout cela n'est peint : le repère ne coûte rien en production.
@@ -395,9 +413,13 @@ p:last-child { margin-bottom: 0; }
   transition: color var(--duree) var(--courbe);
 }
 .nav-link:hover { color: var(--bleu); }
-/* L'état actif n'est pas signalé par la seule couleur : un filet or l'accompagne */
-.nav-link[aria-current="page"] { color: var(--bleu); font-weight: 600; }
-.nav-link[aria-current="page"]::after {
+/* L'état actif n'est pas signalé par la seule couleur : un filet or l'accompagne.
+   `aria-current` porte la sémantique, `.actif` sert de crochet de style à
+   l'intégration Django. Les deux sont posés ensemble sur le lien courant. */
+.nav-link[aria-current="page"],
+.nav-link.actif { color: var(--bleu); font-weight: 600; }
+.nav-link[aria-current="page"]::after,
+.nav-link.actif::after {
   content: "";
   display: block;
   height: 2.5px;
@@ -448,6 +470,8 @@ p:last-child { margin-bottom: 0; }
 .dropdown a:hover { background: var(--fond); color: var(--bleu); }
 
 .nav-actions { display: flex; align-items: center; gap: var(--e3); flex: none; }
+/* DORMANT — la loupe est retirée de la barre tant qu'aucune page de recherche
+   n'existe (skill lionsmed-design §15). Le style est conservé pour son retour. */
 .nav-search {
   display: inline-flex;
   align-items: center;
@@ -511,7 +535,8 @@ p:last-child { margin-bottom: 0; }
   font-weight: 500;
   border-bottom: 1px solid var(--bord);
 }
-.nav-mobile__list a[aria-current="page"] { color: var(--bleu); font-weight: 700; }
+.nav-mobile__list a[aria-current="page"],
+.nav-mobile__list a.actif { color: var(--bleu); font-weight: 700; }
 .nav-mobile__sub { padding: 0 0 var(--e2) var(--e4); }
 .nav-mobile__sub a { font-size: .9375rem; color: var(--gris); border-bottom: 0; }
 .nav-mobile__cta { margin-top: var(--e6); }
@@ -550,7 +575,8 @@ p:last-child { margin-bottom: 0; }
   color: var(--sur-sombre);
   margin-bottom: var(--e3);
 }
-.footer-brand__place { display: block; font-size: var(--t-meta); color: var(--or); margin-bottom: var(--e4); }
+/* Ni or ni bleu : en or, cette ligne se lisait comme un lien cliquable. */
+.footer-brand__place { display: block; font-size: var(--t-meta); color: var(--sur-sombre-doux); margin-bottom: var(--e4); }
 .footer-brand__text  { font-size: var(--t-meta); line-height: 1.8; margin: 0; }
 
 .footer-title {
@@ -663,7 +689,356 @@ p:last-child { margin-bottom: 0; }
   border: 0;
 }
 
-/* ─── 13 · ANIMATIONS RÉDUITES ───────────────────────────────────────────── */
+/* ─── 13 · PAGES INTÉRIEURES ─────────────────────────────────────────────── */
+/* Bandeau d'ouverture court — environ un tiers du hero d'accueil. Seul emploi
+   de la signature graphique sur les pages intérieures. */
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--navy);
+  color: var(--sur-sombre-doux);
+  padding-block: clamp(56px, 6vw, 88px);
+}
+.page-hero__arcs {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: min(520px, 54vw);
+  height: auto;
+  transform: translate(34%, -50%);
+  opacity: .42;
+  pointer-events: none;
+}
+.page-hero__contenu { position: relative; z-index: 2; }
+.page-hero h1 {
+  color: var(--sur-sombre);
+  font-size: clamp(2.25rem, 4.4vw, 3.5rem);
+  max-width: 16ch;
+}
+/* Même ponctuation que .section-head : le filet or de 56 × 2 px. */
+.page-hero h1::before {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 2px;
+  background: var(--or);
+  margin-bottom: var(--e5);
+}
+.page-hero .lede { color: var(--sur-sombre-doux); margin-top: var(--e5); }
+
+/* Fil d'Ariane — présent à l'écran, pour que le JSON-LD BreadcrumbList
+   corresponde à quelque chose de réel. */
+.fil-ariane { margin-bottom: var(--e5); }
+.fil-ariane ol { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); }
+.fil-ariane li { display: flex; align-items: center; gap: var(--e2); font-size: var(--t-meta); }
+.fil-ariane a { color: var(--sur-sombre-doux); transition: color var(--duree) var(--courbe); }
+.fil-ariane a:hover { color: var(--or); }
+.fil-ariane [aria-current="page"] { color: var(--sur-sombre); font-weight: 500; }
+.fil-ariane svg { color: var(--sur-sombre-faible); flex: none; }
+
+/* Deux colonnes déséquilibrées, réutilisable */
+.split-page { display: grid; grid-template-columns: 1fr; gap: var(--e8); }
+@media (min-width: 1081px) {
+  .split-page { grid-template-columns: 1.5fr 1fr; gap: var(--e9); align-items: start; }
+}
+
+.encadre {
+  background: var(--fond);
+  border: 1px solid var(--bord);
+  border-radius: var(--r-carte);
+  padding: var(--e6);
+}
+.encadre + .encadre { margin-top: var(--e5); }
+/* Liste de coordonnées sur fond clair — pendant de .footer-list, qui n'est
+   lisible que sur fond sombre. */
+/* Ronds sociaux sur fond clair — .footer-social n'est lisible que sur navy. */
+.reseaux { display: flex; flex-wrap: wrap; gap: var(--e2); }
+.reseaux a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--bord);
+  border-radius: 50%;
+  background: var(--blanc);
+  color: var(--gris);
+  transition: background-color var(--duree) var(--courbe),
+              color var(--duree) var(--courbe),
+              border-color var(--duree) var(--courbe);
+}
+.reseaux a:hover { background: var(--bleu); border-color: var(--bleu); color: var(--blanc); }
+
+.liste-info { display: grid; gap: var(--e3); }
+.liste-info li { display: flex; align-items: flex-start; gap: var(--e3); font-size: .9375rem; color: var(--gris); }
+.liste-info svg { flex: none; margin-top: 2px; color: var(--bleu); }
+.liste-info a { color: var(--gris); transition: color var(--duree) var(--courbe); }
+.liste-info a:hover { color: var(--bleu); }
+/* Le reset supprime les puces : une liste d'étapes numérotées récupère son
+   compteur explicitement, sinon l'ordre n'est plus lisible. */
+.liste-info--etapes { counter-reset: etape; }
+.liste-info--etapes li { counter-increment: etape; }
+.liste-info--etapes li::before {
+  content: counter(etape);
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bleu);
+  color: var(--blanc);
+  font-size: .75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Liste de liens sur fond clair — pendant de .footer-list, qui n'est lisible
+   que sur navy. Le filet qui précède le lien est dessiné, pas un glyphe. */
+.liste-liens { display: grid; }
+.liste-liens a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e3);
+  padding-block: var(--e3);
+  font-size: .9375rem;
+  color: var(--gris);
+  transition: color var(--duree) var(--courbe);
+}
+.liste-liens a::before {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 1px;
+  background: var(--bord);
+  transition: background-color var(--duree) var(--courbe);
+}
+.liste-liens a:hover { color: var(--bleu); }
+.liste-liens a:hover::before { background: var(--or); }
+.liste-liens [aria-current="page"] { color: var(--bleu); font-weight: 600; }
+.liste-liens [aria-current="page"]::before { background: var(--or); }
+
+/* Répartition en colonnes de blocs courts, sans hauteur imposée. */
+.colonnes { display: grid; grid-template-columns: 1fr; gap: var(--e7) var(--gouttiere); }
+@media (min-width: 640px)  { .colonnes { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1081px) { .colonnes { grid-template-columns: repeat(3, 1fr); } }
+
+.encadre__titre {
+  font-size: var(--t-eyebrow);
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--bleu);
+  margin: 0 0 var(--e4);
+}
+
+/* ─── 14 · FORMULAIRES ───────────────────────────────────────────────────── */
+.formulaire { display: grid; gap: var(--e5); }
+.formulaire__actions { display: flex; flex-wrap: wrap; gap: var(--e3); align-items: center; }
+
+.champ { display: grid; gap: var(--e2); }
+.champ__label { font-size: .9375rem; font-weight: 600; color: var(--encre); }
+/* Un champ obligatoire est signalé par un mot, pas par un astérisque seul. */
+.champ__requis { font-weight: 400; font-size: var(--t-meta); color: var(--gris); }
+
+.champ__input {
+  width: 100%;
+  min-height: 48px;                 /* confortable au doigt */
+  padding: var(--e3) var(--e4);
+  font: inherit;
+  font-size: 1rem;
+  color: var(--encre);
+  background: var(--blanc);
+  border: 1px solid var(--bord);
+  border-radius: var(--r-carte);
+  transition: border-color var(--duree) var(--courbe),
+              box-shadow var(--duree) var(--courbe);
+}
+.champ__input::placeholder { color: var(--gris-clair); }
+/* Survol et focus sont distincts : le survol épaissit le trait, le focus pose
+   le contour or du système. */
+.champ__input:hover { border-color: var(--gris-clair); }
+.champ__input:focus-visible {
+  outline: 3px solid var(--or);
+  outline-offset: 2px;
+  border-color: var(--bleu);
+}
+textarea.champ__input { min-height: 160px; resize: vertical; line-height: 1.7; }
+
+select.champ__input {
+  appearance: none;
+  padding-right: var(--e8);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235A6B85' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--e4) center;
+}
+
+.champ__aide { font-size: var(--t-meta); color: var(--gris); }
+
+/* L'erreur porte une icône et un texte : jamais la couleur seule. */
+.champ__erreur {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e2);
+  font-size: var(--t-meta);
+  font-weight: 500;
+  color: #B3243B;                   /* 6,6:1 sur blanc */
+}
+.champ__erreur svg { flex: none; margin-top: 2px; }
+.champ--erreur .champ__input { border-color: #B3243B; box-shadow: 0 0 0 1px #B3243B; }
+
+/* Mot de passe — bouton afficher/masquer */
+.champ__mdp { position: relative; }
+.champ__mdp .champ__input { padding-right: 56px; }
+.champ__oeil {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 44px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--gris);
+  cursor: pointer;
+  transition: background-color var(--duree) var(--courbe), color var(--duree) var(--courbe);
+}
+.champ__oeil:hover { background: var(--fond-2); color: var(--bleu); }
+.champ__oeil [data-oeil-ferme] { display: none; }
+.champ__oeil[aria-pressed="true"] [data-oeil-ouvert] { display: none; }
+.champ__oeil[aria-pressed="true"] [data-oeil-ferme] { display: block; }
+
+/* Cases à cocher et boutons radio */
+.choix {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--e3);
+  align-items: start;
+  min-height: 44px;
+  padding-block: var(--e2);
+  cursor: pointer;
+}
+.choix input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--bleu); flex: none; }
+.choix span { font-size: .9375rem; line-height: 1.6; color: var(--gris); }
+.choix a { color: var(--bleu); text-decoration: underline; text-underline-offset: 2px; }
+.choix-groupe { display: grid; gap: var(--e1); }
+
+/* Regroupement visuel d'un formulaire long */
+.groupe { border: 0; margin: 0; padding: 0; min-width: 0; }
+/* Le filet de séparation est dessiné en pseudo-élément : posé sur la bordure
+   du fieldset, il passerait derrière la légende (comportement natif). */
+.groupe + .groupe { position: relative; margin-top: var(--e7); padding-top: var(--e7); }
+.groupe + .groupe::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: var(--bord);
+}
+.groupe__legende {
+  /* float + width sortent la légende de la mise en page native du fieldset et
+     la remettent dans le flux : le filet de séparation passe alors au-dessus
+     d'elle, et non derrière. */
+  float: left;
+  width: 100%;
+  padding: 0;
+  margin-bottom: var(--e5);
+  font-family: var(--police-titre);
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--encre);
+}
+.groupe__champs { clear: both; display: grid; gap: var(--e5); }
+@media (min-width: 640px) {
+  .groupe__champs--paire { grid-template-columns: 1fr 1fr; }
+}
+
+/* ─── 15 · PAGES D'ACCÈS ─────────────────────────────────────────────────── */
+/* Gabarit commun à la connexion et à la réinitialisation de mot de passe. */
+.page-acces {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  min-height: clamp(500px, 62vh, 680px);
+  padding-block: clamp(48px, 6vw, 80px);
+  background: var(--navy);
+}
+.page-acces__arcs {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: min(680px, 68vw);
+  height: auto;
+  transform: translate(32%, -50%);
+  opacity: .4;
+  pointer-events: none;
+}
+.page-acces .container { display: grid; justify-items: center; }
+.carte-acces {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 440px;
+  padding: clamp(28px, 4vw, 48px);
+  background: var(--blanc);
+  border-radius: var(--r-carte);
+  box-shadow: var(--ombre);
+}
+.carte-acces h1 {
+  font-size: clamp(1.625rem, 2.6vw, 2rem);
+  max-width: none;
+  line-height: 1.15;
+}
+.carte-acces__intro { margin: var(--e4) 0 0; font-size: .9375rem; color: var(--gris); }
+.carte-acces .formulaire { margin-top: var(--e6); }
+.carte-acces__ligne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e3);
+}
+.carte-acces__pied {
+  margin-top: var(--e6);
+  padding-top: var(--e5);
+  border-top: 1px solid var(--bord);
+  font-size: .9375rem;
+  color: var(--gris);
+}
+.sous-carte {
+  position: relative;
+  z-index: 2;
+  margin-top: var(--e5);
+  text-align: center;
+  font-size: .9375rem;
+  color: var(--sur-sombre-doux);
+}
+.sous-carte a { color: var(--or); font-weight: 600; }
+
+/* ─── 16 · ALERTES ───────────────────────────────────────────────────────── */
+/* Réservées aux exemples d'états, laissés en commentaire dans le HTML tant que
+   la maquette est présentée : un bandeau visible sur un formulaire vierge se
+   lit comme un bug. Le style existe, le balisage attend l'intégration. */
+.alerte {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e3);
+  padding: var(--e4) var(--e5);
+  border: 1px solid;
+  border-radius: var(--r-carte);
+  font-size: .9375rem;
+  line-height: 1.6;
+}
+.alerte svg { flex: none; margin-top: 3px; }
+.alerte p { margin: 0; max-width: none; }
+.alerte--succes { background: #EAF6EF; border-color: #B9E0C9; color: #14603A; }
+.alerte--info   { background: var(--fond-2); border-color: var(--bord); color: var(--encre); }
+
+/* ─── 17 · ANIMATIONS RÉDUITES ───────────────────────────────────────────── */
 /* Tout est neutralisé, et les éléments s'affichent à leur état final. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

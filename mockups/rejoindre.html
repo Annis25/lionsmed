@@ -1,466 +1,408 @@
-<!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<!doctype html>
+<html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Maquette — Rejoindre | Lions Sfax Med</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!--
-  ═══════════════════════════════════════════════════════════════════════════
-  MAQUETTE STATIQUE — NE FAIT PAS PARTIE DE L'APPLICATION DJANGO
-  ═══════════════════════════════════════════════════════════════════════════
-  Fichier autonome, ouvrable directement dans un navigateur.
-  Aucune dépendance au projet : ni template, ni vue, ni base de données.
-  Toutes les données affichées sont fictives et servent uniquement à
-  illustrer la mise en page pour validation par le bureau du club.
+<title>Nous rejoindre — Lions Club Sfax-Méditerranée</title>
+<meta name="description" content="Devenir membre du Lions Club Sfax-Méditerranée : ce que le club apporte, le parcours d’adhésion et ce que nous attendons d’un membre. Sfax, Tunisie — District 414-B.">
 
-  ─── NOM DU CLUB — À CONFIRMER ───────────────────────────────────────────
-  Le nom définitif n'est pas arrêté. Il est centralisé dans la constante
-  CLUB_NAME, tout en bas de ce fichier (bloc <script>), et injecté partout
-  où il apparaît (titre du hero, logo, pied de page, onglet du navigateur).
-  Pour l'essayer : changer cette seule ligne et recharger la page.
-  ─────────────────────────────────────────────────────────────────────────
--->
+<!-- MAQUETTE DE VALIDATION — RETIRER CETTE LIGNE À LA MISE EN LIGNE.
+     Tant qu'elle est présente, la page n'est pas indexée par les moteurs. -->
+<meta name="robots" content="noindex, follow">
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  /* Configuration reprise telle quelle de templates/base.html
-     pour garantir une palette et des polices strictement identiques. */
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          navy: {
-            50:'#EEF2F8',100:'#D5DFF0',200:'#ABBFE0',300:'#7F9FCF',400:'#557FBE',
-            500:'#2B5FAD',600:'#1E4B8E',700:'#163870',800:'#0E2550',900:'#0B1F3A',950:'#060F1D',
-          },
-          gold: {
-            50:'#FBF6EC',100:'#F5EAD1',200:'#EBD4A3',300:'#E0BE74',400:'#D6A849',
-            500:'#C9A84C',600:'#A8862A',700:'#7D641F',800:'#534215',900:'#29210A',
-          },
-          ivory: '#F8F6F0',
+<meta name="theme-color" content="#0E2E5E">
+<link rel="canonical" href="https://lionsmed.tn/rejoindre/">
 
-          /* ── Couleurs relevées au pixel près sur logomed.png ──
-             lions #184898 = 63 % des pixels du logo (bleu de marque)
-             sun   #F8C800 = 33 % des pixels du logo (jaune de marque)
-             Ce sont désormais les couleurs primaires de la page ; navy et
-             gold sont conservés pour les fonds sombres et les nuances. */
-          lions: {
-            50:'#F1F4F9',100:'#DCE4F0',200:'#B5C4DE',300:'#87A0C9',400:'#4F74B1',
-            500:'#184898',600:'#153E83',700:'#11326A',800:'#0D2752',900:'#091B3A',950:'#061124',
-          },
-          sun: {
-            50:'#FFFCF0',100:'#FEF7D9',200:'#FDEDAD',300:'#FBE27A',400:'#FAD53D',
-            500:'#F8C800',600:'#D5AC00',700:'#AE8C00',800:'#866C00',900:'#5E4C00',
-          },
-        },
-        fontFamily: {
-          sans:  ['Inter', 'system-ui', 'sans-serif'],
-          serif: ['"Playfair Display"', 'Georgia', 'serif'],
-        },
-      },
-    },
-  }
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_TN">
+<meta property="og:site_name" content="Lions Club Sfax-Méditerranée">
+<meta property="og:title" content="Nous rejoindre — Lions Club Sfax-Méditerranée">
+<meta property="og:description" content="Ce que le club apporte, le parcours d’adhésion et ce que nous attendons d’un membre.">
+<meta property="og:url" content="https://lionsmed.tn/rejoindre/">
+<meta property="og:image" content="https://lionsmed.tn/assets/images/og-accueil.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Membres du Lions Club Sfax-Méditerranée réunis en extérieur autour de la bannière du club.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Nous rejoindre — Lions Club Sfax-Méditerranée">
+<meta name="twitter:description" content="Ce que le club apporte, le parcours d’adhésion et ce que nous attendons d’un membre.">
+<meta name="twitter:image" content="https://lionsmed.tn/assets/images/og-accueil.jpg">
+
+<link rel="icon" href="assets/images/emblem-256.png" type="image/png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap">
+
+<link rel="stylesheet" href="assets/css/lions.css">
+<link rel="stylesheet" href="assets/css/rejoindre.css">
+<script src="assets/js/lions.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type":"ListItem","position":1,"name":"Accueil","item":"https://lionsmed.tn/"},
+    {"@type":"ListItem","position":2,"name":"Nous rejoindre"}
+  ]
+}
 </script>
-
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
-
-<style>
-  /* ── Cadre bleu marine tout autour de la page ── */
-  body {
-    border: 3px solid #184898;
-    min-height: 100vh;
-  }
-
-  /* ── Révélation au défilement (repris de static/css/main.css) ── */
-  .reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
-  }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
-  .reveal:nth-child(2) { transition-delay: .08s; }
-  .reveal:nth-child(3) { transition-delay: .16s; }
-  .reveal:nth-child(4) { transition-delay: .24s; }
-  .reveal:nth-child(5) { transition-delay: .32s; }
-  .reveal:nth-child(6) { transition-delay: .40s; }
-
-  .card-hover { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
-  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -18px rgba(11,31,58,.28); }
-
-  /* ── Indicateur de défilement ── */
-  @keyframes scroll-pulse {
-    0%,100% { opacity: .25; transform: scaleY(.7); }
-    50%     { opacity: .8;  transform: scaleY(1); }
-  }
-  .scroll-line { animation: scroll-pulse 2.2s ease-in-out infinite; transform-origin: top; }
-
-  /* ── Accessibilité : focus visible ── */
-  a:focus-visible, button:focus-visible {
-    outline: 2px solid #C9A84C;
-    outline-offset: 3px;
-    border-radius: 4px;
-  }
-
-  /* ── Respect de la préférence « animations réduites » ── */
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-    .scroll-line { animation: none; }
-    html { scroll-behavior: auto; }
-  }
-</style>
 </head>
 
-<!-- ══════════════════════════════════════════════════════════════════════
-     NAVBAR — fixe, fond blanc, séparateur bas fin
-     ══════════════════════════════════════════════════════════════════════ -->
-<header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-lions-100">
-  <div class="max-w-[1400px] mx-auto px-6 lg:px-10">
-    <div class="flex items-center justify-between h-[76px] gap-6">
+<body>
 
-      <!-- Logo officiel du club -->
-      <a href="accueil.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors" aria-label="Lions Sfax Med — accueil">
-        <img src="logomed.png" alt="Lions Sfax Med"
-             class="h-[52px] w-auto" width="1006" height="557" />
+<a class="skip-link" href="#contenu">Aller au contenu principal</a>
+
+<!-- ══ EN-TÊTE PARTAGÉ — deviendra un include Django, garder identique sur toutes les pages ══ -->
+<header class="site-header">
+  <div class="container">
+    <div class="nav-bar">
+
+      <a class="brand" href="accueil.html" aria-label="Lions Club Sfax-Méditerranée — retour à l'accueil">
+        <img class="brand__logo" src="assets/images/emblem-256.png" width="256" height="243" alt="">
+        <span class="brand__name">
+          <span>Lions Club</span>
+          <span>Sfax-Méditerranée</span>
+        </span>
       </a>
 
-      <!-- Menu principal -->
-      <nav class="hidden lg:flex items-center gap-8" aria-label="Navigation principale">
-        <a href="accueil.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors"
-           aria-current="page">Accueil</a>
-        <a href="notre-club.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Notre Club</a>
-        <a href="nos-actions.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Nos Actions</a>
-        <a href="evenements.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Événements</a>
-        <a href="actualites.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Actualités</a>
-        <a href="rejoindre.html" class="relative text-[15px] font-semibold text-sun-600 pb-1 after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-full after:bg-sun-600">Rejoindre</a>
-        <a href="contact.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Contact</a>
+      <nav class="nav-main" aria-label="Navigation principale">
+        <ul class="nav-list">
+          <li class="nav-item"><a class="nav-link" href="accueil.html">Accueil</a></li>
+          <li class="nav-item"><a class="nav-link" href="notre-club.html">Notre Club</a></li>
+          <li class="nav-item"><a class="nav-link" href="nos-actions.html">Nos Actions</a></li>
+          <li class="nav-item"><a class="nav-link actif" href="rejoindre.html" aria-current="page">Nous rejoindre</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+        </ul>
       </nav>
 
-      <!-- Cloche + pastille utilisateur -->
-      <div class="flex items-center gap-4 flex-shrink-0">
-        <button type="button" class="relative text-lions-500 hover:text-sun-600 transition-colors p-1"
-                aria-label="Notifications (3 non lues)">
-          <svg class="w-[22px] h-[22px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.7V5a2 2 0 10-4 0v.3C7.7 6.2 6 8.4 6 11v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-          </svg>
-          <span class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-sun-500 ring-2 ring-white"></span>
-        </button>
-
-        <a href="connexion.html" class="inline-flex items-center gap-2 pl-3.5 pr-4 py-2 rounded-full
-                           bg-sun-500 hover:bg-sun-400 text-lions-800 text-sm font-semibold
-                           transition-colors">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-          </svg>
-          Fatma
-        </a>
-
-        <!-- Bouton menu mobile -->
-        <button type="button" id="menu-btn"
-                class="lg:hidden text-lions-700 p-1" aria-label="Ouvrir le menu" aria-expanded="false">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/>
-          </svg>
+      <div class="nav-actions">
+        <!-- Recherche : à réintroduire quand la page de recherche existera -->
+        <a class="btn btn--solid btn--sm nav-login" href="connexion.html">Se connecter</a>
+        <button class="nav-burger" type="button" aria-expanded="false" aria-controls="menu-mobile" aria-label="Ouvrir le menu">
+          <span></span><span></span><span></span>
         </button>
       </div>
+
     </div>
   </div>
 
-  <!-- Menu mobile -->
-  <div id="mobile-menu" class="lg:hidden hidden border-t border-lions-100 bg-white">
-    <nav class="px-6 py-4 flex flex-col gap-1" aria-label="Navigation mobile">
-      <a href="accueil.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Accueil</a>
-      <a href="notre-club.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Notre Club</a>
-      <a href="nos-actions.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Nos Actions</a>
-      <a href="evenements.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Événements</a>
-      <a href="actualites.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Actualités</a>
-      <a href="rejoindre.html" class="relative text-[15px] font-semibold text-sun-600 pb-1 after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-full after:bg-sun-600">Rejoindre</a>
-      <a href="contact.html" class="text-[15px] font-medium text-lions-600 hover:text-sun-600 transition-colors">Contact</a>
-    </nav>
-  </div>
+  <nav class="nav-mobile" id="menu-mobile" aria-label="Navigation mobile">
+    <ul class="nav-mobile__list">
+      <li><a class="nav-mobile__link" href="accueil.html">Accueil</a></li>
+      <li><a class="nav-mobile__link" href="notre-club.html">Notre Club</a></li>
+      <li><a class="nav-mobile__link" href="nos-actions.html">Nos Actions</a></li>
+      <li><a class="nav-mobile__link actif" href="rejoindre.html" aria-current="page">Nous rejoindre</a></li>
+      <li><a class="nav-mobile__link" href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-mobile__cta">
+      <a class="btn btn--solid btn--block" href="connexion.html">Se connecter</a>
+    </div>
+  </nav>
 </header>
+<!-- ══ FIN EN-TÊTE PARTAGÉ ══ -->
+<main id="contenu">
 
-
-<section class="relative pt-[140px] pb-16 overflow-hidden bg-gradient-to-b from-lions-50 via-[#F6F9FD] to-white">
-  <div class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[22%] pointer-events-none select-none
-              w-[420px] max-w-[45vw] opacity-[0.05]" aria-hidden="true">
-    <img src="emblem.png" alt="" class="w-full h-auto" />
-  </div>
-  <div class="absolute -bottom-32 -left-32 w-[380px] h-[380px] pointer-events-none select-none" aria-hidden="true">
-    <svg viewBox="0 0 200 200" fill="none" class="w-full h-full">
-      <circle cx="0" cy="200" r="188" stroke="#184898" stroke-width="17" opacity=".9"/>
-      <circle cx="0" cy="200" r="164" stroke="#F8C800" stroke-width="15"/>
-      <circle cx="0" cy="200" r="140" stroke="#184898" stroke-width="20"/>
-    </svg>
-  </div>
-
-  <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
-    <nav class="reveal flex items-center justify-center gap-2 text-lions-400 text-[12px] mb-7" aria-label="Fil d'Ariane">
-      <a href="accueil.html" class="hover:text-sun-600 transition-colors">Accueil</a>
-      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-      </svg>
-      <span class="text-sun-600 font-semibold">Rejoindre le club</span>
-    </nav>
-    <h1 class="reveal font-serif text-[clamp(2.25rem,5.5vw,3.75rem)] font-bold text-lions-500 leading-[1.1] mb-5">Rejoindre le club</h1>
-    <p class="reveal text-lions-800/70 text-[17px] leading-[1.75] max-w-[680px] mx-auto">Le club recrute des femmes et des hommes prêts à donner un peu de leur temps pour des projets utiles à Sfax.</p>
-  </div>
-  <div class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-sun-500/40 to-transparent"></div>
-</section>
-
-<section class="py-24 bg-white">
-  <div class="max-w-5xl mx-auto px-6">
-    <div class="text-center max-w-3xl mx-auto mb-16">
-      <div class="reveal flex items-center justify-center gap-3 mb-5">
-        <span class="w-9 h-px bg-sun-500"></span>
-        <span class="text-sun-700 text-[11px] font-bold uppercase tracking-[0.2em]">Pourquoi nous rejoindre</span>
-        <span class="w-9 h-px bg-sun-500"></span>
-      </div>
-      <h2 class="reveal font-serif text-[clamp(2rem,4vw,2.75rem)] font-bold text-lions-700 mb-6">
-        Servir, apprendre, appartenir
-      </h2>
-      <p class="reveal text-lions-800/70 text-[17px] leading-[1.8]">
-        Rejoindre le Lions Club, ce n'est pas seulement donner du temps. C'est intégrer un
-        collectif structuré qui transforme l'envie d'aider en projets menés jusqu'au bout,
-        avec des moyens, une méthode et un réseau.
-      </p>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14">
-      <div class="reveal text-center">
-        <span class="w-14 h-14 rounded-2xl bg-sun-50 border border-sun-200 flex items-center justify-center mx-auto mb-6">
-          <svg class="w-6 h-6 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-        </span>
-        <h3 class="font-serif text-[20px] font-bold text-lions-700 mb-3">Un impact concret</h3>
-        <p class="text-lions-800/60 text-[14.5px] leading-[1.8]">Vos compétences servent directement des projets menés à Sfax : dépistages, soutien scolaire, actions environnementales. Rien d'abstrait, rien de lointain.</p>
-      </div>
-      <div class="reveal text-center">
-        <span class="w-14 h-14 rounded-2xl bg-sun-50 border border-sun-200 flex items-center justify-center mx-auto mb-6">
-          <svg class="w-6 h-6 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.4-1.9M17 20H7m10 0v-2c0-.7-.1-1.3-.4-1.9M7 20H2v-2a3 3 0 015.4-1.9M7 20v-2c0-.7.1-1.3.4-1.9m0 0a5 5 0 019.2 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
-        </span>
-        <h3 class="font-serif text-[20px] font-bold text-lions-700 mb-3">Des amitiés durables</h3>
-        <p class="text-lions-800/60 text-[14.5px] leading-[1.8]">Le club réunit des profils très différents autour d'un même engagement. Les liens qui s'y nouent dépassent largement le cadre associatif.</p>
-      </div>
-      <div class="reveal text-center">
-        <span class="w-14 h-14 rounded-2xl bg-sun-50 border border-sun-200 flex items-center justify-center mx-auto mb-6">
-          <svg class="w-6 h-6 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.25v13m0-13C10.8 5.5 9.2 5 7.5 5S4.2 5.5 3 6.25v13C4.2 18.5 5.8 18 7.5 18s3.3.5 4.5 1.25m0-13C13.2 5.5 14.8 5 16.5 5s3.3.5 4.5 1.25v13C19.8 18.5 18.2 18 16.5 18s-3.3.5-4.5 1.25"/>
-          </svg>
-        </span>
-        <h3 class="font-serif text-[20px] font-bold text-lions-700 mb-3">Un développement personnel</h3>
-        <p class="text-lions-800/60 text-[14.5px] leading-[1.8]">Conduire un projet, animer une commission, prendre la parole : le club est un terrain d'apprentissage autant qu'un lieu d'action.</p>
-      </div>
-    </div>
+<!-- ═══ OUVERTURE ═════════════════════════════════════════════════════════ -->
+<section class="page-hero">
+  <svg class="page-hero__arcs" viewBox="0 0 1100 1100" fill="none" aria-hidden="true" focusable="false">
+    <circle cx="550" cy="550" r="150" stroke="#F8C800" stroke-width="1.6"/>
+    <circle cx="550" cy="550" r="230" stroke="#9CC0EE" stroke-width="1.4"/>
+    <circle cx="550" cy="550" r="310" stroke="#F8C800" stroke-width="1.6"/>
+    <circle cx="550" cy="550" r="390" stroke="#9CC0EE" stroke-width="1.4"/>
+    <circle cx="550" cy="550" r="470" stroke="#F8C800" stroke-width="1.6"/>
+    <circle cx="550" cy="550" r="550" stroke="#9CC0EE" stroke-width="1.4"/>
+  </svg>
+  <div class="container page-hero__contenu">
+      <nav class="fil-ariane" aria-label="Fil d'Ariane">
+        <ol>
+          <li><a href="accueil.html">Accueil</a></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg><span aria-current="page">Nous rejoindre</span></li>
+        </ol>
+      </nav>
+      <h1>Nous rejoindre</h1>
+      <p class="lede">Nous accueillons des femmes et des hommes prêts à donner du temps à Sfax. Voici ce que le club apporte, et ce qu’il demande.</p>
   </div>
 </section>
 
+<!-- ═══ POURQUOI NOUS REJOINDRE ═══════════════════════════════════════════ -->
+<section class="section" aria-labelledby="titre-pourquoi">
+  <div class="container">
+    <div class="pourquoi__grille reveal">
 
-<section id="avantages" class="py-24 bg-white">
-  <div class="max-w-6xl mx-auto px-6">
-    <div class="text-center max-w-2xl mx-auto mb-14">
-      <div class="reveal flex items-center justify-center gap-3 mb-5">
-        <span class="w-9 h-px bg-sun-500"></span>
-        <span class="text-sun-700 text-[11px] font-bold uppercase tracking-[0.2em]">Devenir membre</span>
-        <span class="w-9 h-px bg-sun-500"></span>
-      </div>
-      <h2 class="reveal font-serif text-[clamp(2rem,4vw,2.75rem)] font-bold text-lions-700 mb-5">
-        Les avantages de l'adhésion
-      </h2>
-      <p class="reveal text-lions-800/60 text-[16px] leading-relaxed">
-        Rejoindre le club, c'est intégrer un réseau, se former et agir concrètement.
-      </p>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <article class="reveal card-hover bg-white rounded-2xl p-7 border border-lions-100">
-        <span class="w-11 h-11 rounded-xl bg-sun-50 border border-sun-200 flex items-center justify-center mb-5">
-          <svg class="w-5 h-5 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.4-1.9M17 20H7m10 0v-2c0-.7-.1-1.3-.4-1.9M7 20H2v-2a3 3 0 015.4-1.9M7 20v-2c0-.7.1-1.3.4-1.9m0 0a5 5 0 019.2 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        </span>
-        <h3 class="font-serif text-[18px] font-bold text-lions-700 mb-2.5">Un réseau international</h3>
-        <p class="text-lions-800/60 text-[14px] leading-[1.75]">Accès au réseau mondial de Lions Clubs International, présent dans plus de 200 pays, et à ses programmes d'échange.</p>
-      </article>
-      <article class="reveal card-hover bg-white rounded-2xl p-7 border border-lions-100">
-        <span class="w-11 h-11 rounded-xl bg-sun-50 border border-sun-200 flex items-center justify-center mb-5">
-          <svg class="w-5 h-5 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-        </span>
-        <h3 class="font-serif text-[18px] font-bold text-lions-700 mb-2.5">Un impact mesurable</h3>
-        <p class="text-lions-800/60 text-[14px] leading-[1.75]">Participer à des projets concrets au service de Sfax, avec un suivi et des résultats rendus publics chaque année.</p>
-      </article>
-      <article class="reveal card-hover bg-white rounded-2xl p-7 border border-lions-100">
-        <span class="w-11 h-11 rounded-xl bg-sun-50 border border-sun-200 flex items-center justify-center mb-5">
-          <svg class="w-5 h-5 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.25v13m0-13C10.8 5.5 9.2 5 7.5 5S4.2 5.5 3 6.25v13C4.2 18.5 5.8 18 7.5 18s3.3.5 4.5 1.25m0-13C13.2 5.5 14.8 5 16.5 5s3.3.5 4.5 1.25v13C19.8 18.5 18.2 18 16.5 18s-3.3.5-4.5 1.25"/></svg>
-        </span>
-        <h3 class="font-serif text-[18px] font-bold text-lions-700 mb-2.5">Une formation continue</h3>
-        <p class="text-lions-800/60 text-[14px] leading-[1.75]">Programmes de leadership, ateliers de gestion de projet et accompagnement des nouveaux membres dès leur arrivée.</p>
-      </article>
-      <article class="reveal card-hover bg-white rounded-2xl p-7 border border-lions-100">
-        <span class="w-11 h-11 rounded-xl bg-sun-50 border border-sun-200 flex items-center justify-center mb-5">
-          <svg class="w-5 h-5 text-sun-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.3 6.9L21 12l-5.7 2.1L13 21l-2.3-6.9L5 12l5.7-2.1L13 3z"/></svg>
-        </span>
-        <h3 class="font-serif text-[18px] font-bold text-lions-700 mb-2.5">Une reconnaissance</h3>
-        <p class="text-lions-800/60 text-[14px] leading-[1.75]">Valorisation de l'engagement et de la constance, au sein du club comme auprès du district et de la fédération.</p>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="py-24 bg-ivory">
-  <div class="max-w-4xl mx-auto px-6">
-    <div class="reveal relative rounded-3xl bg-lions-800 overflow-hidden text-center px-8 sm:px-14 py-16">
-      <span class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-sun-500 to-transparent"></span>
-      <div class="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-sun-500/[0.07] blur-2xl" aria-hidden="true"></div>
-      <div class="absolute right-4 bottom-4 w-40 opacity-[0.07] pointer-events-none" aria-hidden="true">
-        <img src="emblem.png" alt="" class="w-full h-auto" />
-      </div>
-
-      <div class="relative">
-        <h2 class="font-serif text-[clamp(1.85rem,4vw,2.6rem)] font-bold text-white leading-tight mb-5">
-          Prêt à nous rejoindre ?
-        </h2>
-        <p class="text-white/60 text-[16px] leading-[1.8] max-w-xl mx-auto mb-10">
-          Déposez votre candidature en quelques minutes. Le bureau l'examine sous quinze jours
-          et vous recontacte pour un premier échange.
-        </p>
-        <a href="candidature.html"
-           class="group inline-flex items-center justify-center gap-2.5 px-10 py-4.5 py-4 rounded-lg
-                  bg-sun-500 hover:bg-sun-400 text-lions-800 text-[16px] font-bold
-                  shadow-xl shadow-sun-500/25 transition-all duration-200 hover:-translate-y-0.5">
-          Déposer ma candidature
-          <svg class="w-4.5 h-4.5 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-          </svg>
-        </a>
-        <p class="text-white/35 text-[12.5px] mt-6">
-          Une question avant de vous lancer ?
-          <a href="contact.html" class="text-sun-500 hover:text-sun-400 font-semibold underline underline-offset-2">Écrivez-nous</a>
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- ══════════════════════════════════════════════════════════════════════
-     PIED DE PAGE
-     ══════════════════════════════════════════════════════════════════════ -->
-<footer class="bg-lions-900 pt-16 pb-8">
-  <div class="max-w-6xl mx-auto px-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
-
-      <div class="lg:col-span-2">
-        <div class="flex items-center gap-4 mb-6">
-          <!-- Emblème seul : le logo complet, dont le texte est bleu,
-               serait illisible sur ce fond sombre. -->
-          <img src="emblem.png" alt="" class="h-14 w-auto" aria-hidden="true" />
-          <span class="leading-tight">
-            <span class="block font-serif text-[19px] font-bold text-white">Lions</span>
-            <span class="block font-serif text-[19px] font-bold text-sun-500" data-club-name>Sfax Med</span>
-          </span>
+      <div>
+        <div class="section-head">
+          <span class="eyebrow">Devenir membre</span>
+          <h2 id="titre-pourquoi">Servir, apprendre, appartenir.</h2>
         </div>
-        <p class="text-white/45 text-[13.5px] leading-[1.8] max-w-sm">
-          Club humanitaire engagé à Sfax pour la solidarité, la santé, l'éducation,
-          l'environnement et l'action citoyenne.
+        <p class="lede">Rejoindre le club, ce n’est pas seulement donner du temps. C’est entrer dans un collectif qui mène ses projets jusqu’au bout, avec une méthode, des moyens et un réseau.</p>
+        <p class="text-soft">Le Lions Club Sfax-Méditerranée est un club Lions basé à Sfax, en Tunisie, rattaché au District&nbsp;414-B. Ses quatre axes prioritaires sont le diabète, l’environnement, l’humanitaire et la jeunesse.</p>
+      </div>
+
+      <!-- Titres et descriptions repris tels quels de la base, table
+           sitecontent_membershipbenefit. Seule la hiérarchie visuelle est un
+           choix éditorial : « Impact réel » porte la section, les trois autres
+           se lisent en filet. -->
+      <div>
+        <div class="raison-majeure">
+          <h3>Impact réel</h3>
+          <p>Participer à des projets concrets au service de Sfax et de ses habitants.</p>
+          <div class="raison-majeure__chiffres">
+            <span class="raison-majeure__chiffre"><b>45</b> membres</span>
+            <span class="raison-majeure__chiffre"><b>12</b> projets</span>
+            <span class="raison-majeure__chiffre"><b>500</b> bénéficiaires</span>
+          </div>
+          <p class="demo-note">Chiffres arrêtés au titre de l’année 2025, à confirmer par le bureau.</p>
+        </div>
+
+        <ul class="raisons">
+          <li>
+            <h3>Réseau international</h3>
+            <p>Accès au réseau mondial de Lions Clubs International dans plus de 200 pays.</p>
+          </li>
+          <li>
+            <h3>Formation continue</h3>
+            <p>Programmes de formation, d’échange et de développement des compétences.</p>
+          </li>
+          <li>
+            <h3>Reconnaissance</h3>
+            <p>Valorisation de l’engagement, de la constance et de l’esprit de service.</p>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LE PARCOURS D'ADHÉSION ════════════════════════════════════════════ -->
+<section class="section section--fond" aria-labelledby="titre-parcours">
+  <div class="container">
+
+    <div class="section-head reveal">
+      <span class="eyebrow">Comment ça se passe</span>
+      <h2 id="titre-parcours">Le parcours d’adhésion</h2>
+      <p class="lede">Trois étapes, sans zone d’ombre. Vous savez à chaque instant où en est votre candidature.</p>
+    </div>
+
+    <!-- DONNÉE À VALIDER PAR LE CLUB : le parcours réel — parrainage, entretien,
+         intronisation — ne nous a pas été communiqué. Les trois étapes ci-dessous
+         décrivent le circuit effectivement implémenté (dépôt, examen par le bureau,
+         réponse), sans délai ni intermédiaire inventé. Elles reprennent mot pour mot
+         celles de candidature.html : les deux pages doivent rester alignées. -->
+    <div class="parcours reveal">
+      <div class="parcours__pas">
+        <h3>Vous déposez votre candidature</h3>
+        <p>Le formulaire en ligne suffit. Aucun dossier à constituer, aucune pièce à joindre.</p>
+      </div>
+      <div class="parcours__pas">
+        <h3>Le bureau du club l’examine</h3>
+        <p>Votre candidature est présentée au bureau, qui se prononce en réunion.</p>
+      </div>
+      <div class="parcours__pas">
+        <h3>Nous vous répondons par e-mail</h3>
+        <p>La réponse arrive à l’adresse que vous nous aurez indiquée, quelle qu’elle soit.</p>
+      </div>
+    </div>
+
+    <div class="parcours__pied reveal">
+      <p class="text-soft">Nous vous demanderons votre nom, une adresse e-mail, un téléphone, votre profession et quelques lignes de motivation. Rien de plus.</p>
+      <a class="link-arrow" href="candidature.html">Voir le formulaire <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ CE QUE NOUS ATTENDONS ═════════════════════════════════════════════ -->
+<section class="section section--sombre attentes" aria-labelledby="titre-attentes">
+  <div class="container">
+
+    <div class="section-head reveal">
+      <span class="eyebrow">Sans détour</span>
+      <h2 id="titre-attentes">Ce que nous attendons d’un membre</h2>
+      <p class="lede">Mieux vaut le dire avant qu’après. Un club ne tient que par la régularité de ses membres.</p>
+    </div>
+
+    <!-- CONTENU DE DÉMONSTRATION : la formulation des engagements attendus n'a pas
+         été transmise par le club. Seul le rythme des réunions est officiel — il
+         vient de sitecontent.SiteConfig (« 2e lundi de chaque mois », 19:00).
+         DONNÉE À VALIDER PAR LE CLUB : montant, échéance et modalités de la
+         cotisation annuelle. Le modèle members.Cotisation en atteste l'existence
+         et le caractère annuel ; le montant n'est indiqué nulle part. -->
+    <div class="attentes__grille reveal">
+      <div class="attente">
+        <h3>Être là</h3>
+        <p>Nous nous réunissons le 2<sup>e</sup> lundi de chaque mois, à 19&nbsp;h. C’est en réunion que les projets se décident et que les comptes se rendent.</p>
+      </div>
+      <div class="attente">
+        <h3>Mettre la main à la pâte</h3>
+        <p>Une action se prépare, se mène sur le terrain, puis se raconte. Nous comptons sur chaque membre à ces trois moments, pas seulement au dernier.</p>
+      </div>
+      <div class="attente">
+        <h3>Tenir ses engagements</h3>
+        <p>L’adhésion suppose une cotisation annuelle et une présence dans la durée. Un engagement mesuré et tenu vaut mieux qu’une promesse large.</p>
+      </div>
+    </div>
+
+    <p class="demo-note reveal">Ces engagements décrivent l’esprit du club&nbsp;; leur formulation définitive revient au bureau.</p>
+
+  </div>
+</section>
+
+<!-- ═══ DÉPOSER UNE CANDIDATURE ═══════════════════════════════════════════ -->
+<section class="section" aria-labelledby="titre-conversion">
+  <div class="container">
+    <div class="conversion__grille reveal">
+
+      <!-- Emploi structurel de l'arc : l'arche, reprise du contour du sceau.
+           Une seule fois sur la page.
+           DONNÉE À VALIDER PAR LE CLUB : cette photographie sert déjà le bloc
+           « Nous rejoindre » de l'accueil. Elle est juste de sujet, mais une
+           image distincte serait préférable ; le club n'en a pas fourni d'autre.
+           Personnes reconnaissables : accord de publication à vérifier. -->
+      <div class="conversion__media media media--arche" data-attendu="rejoindre · 3/2 · min 1600×1067">
+        <img src="assets/images/rejoindre-1100.webp"
+             srcset="assets/images/rejoindre-640.webp 640w,
+                     assets/images/rejoindre-1100.webp 1100w,
+                     assets/images/rejoindre-1600.webp 1600w"
+             sizes="(max-width: 1080px) 100vw, 38vw"
+             width="1100" height="733" loading="lazy" decoding="async"
+             alt="Huit membres du club en gilets Lions, souriants, réunis en extérieur devant des cartons de dons.">
+      </div>
+
+      <div class="conversion__texte">
+        <div class="section-head">
+          <span class="eyebrow">Prêt à vous lancer&nbsp;?</span>
+          <h2 id="titre-conversion">Déposez votre candidature.</h2>
+        </div>
+        <p class="lede">Quelques minutes suffisent. Si vous hésitez encore, écrivez-nous d’abord&nbsp;: nous répondons aux questions avant les candidatures.</p>
+        <div class="conversion__actions">
+          <a class="btn btn--primary" href="candidature.html">
+            Déposer ma candidature
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 12h15"></path><path d="m13 6 6 6-6 6"></path>
+            </svg>
+          </a>
+          <a class="btn btn--outline" href="contact.html">Nous écrire</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ══ PIED DE PAGE PARTAGÉ — deviendra un include Django, garder identique sur toutes les pages ══ -->
+<footer class="site-footer">
+  <div class="container">
+
+    <div class="footer-grid">
+
+      <div class="footer-brand">
+        <img class="footer-brand__logo" src="assets/images/emblem-256.png" width="256" height="243" alt="" loading="lazy">
+        <span class="footer-brand__name">Lions Club<br>Sfax-Méditerranée</span>
+        <span class="footer-brand__place">Sfax, Tunisie</span>
+        <p class="footer-brand__text">
+          Membre de Lions Clubs International<br>
+          District 414-B — Tunisie<br>
+          Agir localement, rayonner ensemble.
         </p>
+        <div class="footer-social">
+          <a href="https://www.facebook.com/" aria-label="Facebook" rel="noopener noreferrer" target="_blank">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 3h-2.5A3.5 3.5 0 0 0 9 6.5V9H6.5v3H9v9h3.5v-9H15l.5-3h-3V6.8c0-.5.4-.8.9-.8H15V3Z"></path>
+            </svg>
+          </a>
+          <a href="https://www.instagram.com/" aria-label="Instagram" rel="noopener noreferrer" target="_blank">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"></circle>
+            </svg>
+          </a>
+          <a href="https://www.linkedin.com/" aria-label="LinkedIn" rel="noopener noreferrer" target="_blank">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="3"></rect><path d="M7.5 10.5V17"></path><path d="M7.5 7.3v.1"></path><path d="M11.5 17v-3.6a2.2 2.2 0 0 1 4.4 0V17"></path><path d="M11.5 10.5V17"></path>
+            </svg>
+          </a>
+          <a href="https://www.youtube.com/" aria-label="YouTube" rel="noopener noreferrer" target="_blank">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2.5" y="6" width="19" height="12" rx="4"></rect><path d="m10.5 9.5 4.5 2.5-4.5 2.5v-5Z"></path>
+            </svg>
+          </a>
+        </div>
       </div>
 
-      <div>
-        <h4 class="text-white text-[11px] font-bold uppercase tracking-[0.18em] mb-5">Navigation</h4>
-        <ul class="space-y-2.5">
-          <li><a href="notre-club.html"  class="text-white/45 hover:text-sun-500 text-[13.5px] transition-colors">Notre Club</a></li>
-          <li><a href="nos-actions.html" class="text-white/45 hover:text-sun-500 text-[13.5px] transition-colors">Nos Actions</a></li>
-          <li><a href="evenements.html"  class="text-white/45 hover:text-sun-500 text-[13.5px] transition-colors">Événements</a></li>
-          <li><a href="actualites.html"  class="text-white/45 hover:text-sun-500 text-[13.5px] transition-colors">Actualités</a></li>
+      <nav aria-labelledby="footer-liens">
+        <h2 class="footer-title" id="footer-liens">Liens rapides</h2>
+        <ul class="footer-list">
+          <li><a href="accueil.html">Accueil</a></li>
+          <li><a href="notre-club.html">Notre Club</a></li>
+          <li><a href="nos-actions.html">Nos Actions</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="actualites.html">Actualités</a></li>
+          <li><a href="rejoindre.html">Nous rejoindre</a></li>
+          <li><a href="contact.html">Contact</a></li>
         </ul>
-      </div>
+      </nav>
+
+      <nav aria-labelledby="footer-club">
+        <h2 class="footer-title" id="footer-club">Notre club</h2>
+        <ul class="footer-list">
+          <li><a href="notre-club.html#notre-club">Qui sommes-nous</a></li>
+          <li><a href="notre-club.html#historique">Notre histoire</a></li>
+          <li><a href="notre-club.html#valeurs">Nos valeurs</a></li>
+          <li><a href="notre-club.html#bureau">Notre bureau</a></li>
+          <li><a href="https://www.lionsclubs.org/fr" rel="noopener noreferrer" target="_blank">Lions Clubs International</a></li>
+          <!-- LIEN À CRÉER : aucune page District 414-B n'existe encore dans la maquette. -->
+          <li><a href="#">District 414-B</a></li>
+        </ul>
+      </nav>
 
       <div>
-        <h4 class="text-white text-[11px] font-bold uppercase tracking-[0.18em] mb-5">Contact</h4>
-        <ul class="space-y-2.5 text-[13.5px] text-white/45">
-          <li>secretariat@lionsmed.tn</li>
-          <li>+216 00 000 000</li>
-          <li>Sfax — Tunisie</li>
+        <h2 class="footer-title" id="footer-contact">Contact</h2>
+        <ul class="footer-list" aria-labelledby="footer-contact">
+          <li>
+            <span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Sfax, Tunisie
+            </span>
+          </li>
+          <li>
+            <!-- DONNÉE À VALIDER PAR LE CLUB : adresse déclarée par le club dans
+                 sitecontent.SiteConfig. Une adresse contact@lionsmed.tn a également
+                 été évoquée. Le bureau doit trancher. -->
+            <a href="mailto:secretariat@lionsmed.tn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3.5 7 8.5 6 8.5-6"></path>
+              </svg>
+              secretariat@lionsmed.tn
+            </a>
+          </li>
         </ul>
       </div>
 
     </div>
 
-    <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-      <p class="text-white/30 text-[12px]">
-        © 2026 <span data-club-full>Lions Sfax Med</span>. Tous droits réservés.
-      </p>
-      <p class="text-white/30 text-[12px]">District 414-B — Tunisie</p>
+    <div class="footer-bottom">
+      <p>© <span data-annee>2026</span> Lions Club Sfax-Méditerranée. Tous droits réservés.</p>
+      <nav aria-label="Liens légaux">
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="confidentialite.html">Politique de confidentialité</a>
+        <a href="plan-du-site.html">Plan du site</a>
+      </nav>
     </div>
+
   </div>
 </footer>
-
-
-<script>
-<script>
-/* ═══════════════════════════════════════════════════════════════════════
-   NOM DU CLUB
-   ═══════════════════════════════════════════════════════════════════════
-   Le logo officiel (logomed.png) porte la mention « Lions Sfax Med » :
-   c'est donc ce nom qui est repris ici. Il reste centralisé dans ces deux
-   constantes, injectées partout où le nom apparaît (titre du hero, pied de
-   page, onglet du navigateur). Modifier ces lignes suffit à tout changer. */
-
-const CLUB_NAME  = 'Sfax Med';   // titre jaune du hero — repris du logo officiel
-const CLUB_SHORT = 'SFAX MED';   // variantes en petites capitales
-
-/* ─── Injection (ne rien modifier en dessous) ─────────────────────────── */
-document.querySelectorAll('[data-club-name]').forEach(el => {
-  el.textContent = CLUB_NAME;
-});
-document.querySelectorAll('[data-club-short]').forEach(el => {
-  el.textContent = CLUB_SHORT;
-});
-document.querySelectorAll('[data-club-full]').forEach(el => {
-  el.textContent = el.textContent.replace(/Lions Sfax Med/g, 'Lions Club ' + CLUB_NAME);
-});
-document.title = 'Maquette — Rejoindre | Lions ' + CLUB_NAME;
-
-
-/* ═══════════════════════════════════════════════════════════════════════
-   INTERACTIONS
-   ═══════════════════════════════════════════════════════════════════════ */
-
-/* 1 — Menu mobile */
-const menuBtn = document.getElementById('menu-btn');
-const mobileMenu = document.getElementById('mobile-menu');
-if (menuBtn && mobileMenu) {
-  menuBtn.addEventListener('click', () => {
-    const ouvert = !mobileMenu.classList.contains('hidden');
-    mobileMenu.classList.toggle('hidden');
-    menuBtn.setAttribute('aria-expanded', String(!ouvert));
-  });
-  mobileMenu.querySelectorAll('a').forEach(lien => {
-    lien.addEventListener('click', () => {
-      mobileMenu.classList.add('hidden');
-      menuBtn.setAttribute('aria-expanded', 'false');
-    });
-  });
-}
-
-/* 2 — Révélation progressive au défilement */
-const aReveler = document.querySelectorAll('.reveal');
-if ('IntersectionObserver' in window) {
-  const observateur = new IntersectionObserver((entrees) => {
-    entrees.forEach(entree => {
-      if (entree.isIntersecting) {
-        entree.target.classList.add('visible');
-        observateur.unobserve(entree.target);
-      }
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
-  aReveler.forEach(el => observateur.observe(el));
-} else {
-  aReveler.forEach(el => el.classList.add('visible'));
-}
-
-</script>
+<!-- ══ FIN PIED DE PAGE PARTAGÉ ══ -->
+<button class="to-top" type="button" aria-label="Revenir en haut de la page">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 19V5"></path><path d="m6 11 6-6 6 6"></path>
+  </svg>
+</button>
 
 </body>
 </html>
