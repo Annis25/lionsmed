@@ -140,3 +140,15 @@
 }
 .conversion__texte .lede { margin: var(--e5) 0 var(--e7); }
 .conversion__actions { display: flex; flex-wrap: wrap; gap: var(--e4); }
+
+/* Densité de la page intérieure, sans changement de composition. */
+.public-dense .pourquoi__grille, .public-dense .conversion__grille { gap: var(--e6); }
+.public-dense .raison-majeure { padding-bottom: var(--e5); }
+.public-dense .raisons li { padding-block: var(--e4); }
+.public-dense .parcours, .public-dense .attentes__grille { gap: var(--e5); }
+.public-dense .parcours__pas { padding-top: var(--e4); }
+.public-dense .parcours__pied, .public-dense .attentes .demo-note { margin-top: var(--e5); }
+.public-dense .conversion__texte .lede { margin-block: var(--e4) var(--e5); }
+@media(max-width:899px) {
+ .public-dense .attente + .attente { padding-top: var(--e5); }
+}

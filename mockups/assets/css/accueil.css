@@ -37,9 +37,9 @@
     var(--navy) 0%,
     rgba(14,46,94,.985) 30%,
     rgba(14,46,94,.88) 48%,
-    rgba(14,46,94,.58) 68%,
-    rgba(14,46,94,.34) 86%,
-    rgba(14,46,94,.26) 100%);
+    rgba(14,46,94,.76) 68%,
+    rgba(14,46,94,.55) 86%,
+    rgba(14,46,94,.40) 100%);
 }
 
 /* Voile bas — garantit le contraste AA de la mention de lieu, posée sur la
@@ -62,7 +62,7 @@
   right: 0;
   width: min(880px, 74vw);
   height: auto;
-  transform: translate(30%, -50%);
+  transform: translate(60%, -50%);
   opacity: .55;
   pointer-events: none;
 }
@@ -115,7 +115,7 @@
   font-size: var(--t-eyebrow);
   font-weight: 600;
   letter-spacing: .2em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--sur-sombre);
 }
 
@@ -130,7 +130,7 @@
   gap: var(--e2);
   text-align: right;
 }
-.hero__lieu svg { color: var(--or); margin-top: 2px; }
+.hero__lieu svg { color: var(--or); margin-top: var(--e1); }
 .hero__lieu strong { display: block; font-size: .9375rem; color: var(--sur-sombre); font-weight: 600; }
 .hero__lieu em { display: block; font-size: var(--t-meta); color: var(--sur-sombre-doux); font-style: italic; }
 
@@ -177,7 +177,7 @@
   z-index: 2;
   width: 52px;
   height: 52px;
-  margin-top: -50px;
+  margin-top: calc(-1 * var(--e7));
   border-radius: 50%;
   border: 3px solid var(--blanc);
   display: grid;
@@ -185,10 +185,10 @@
   color: var(--blanc);
   flex: none;
 }
-.axe__pastille--diabete     { background: #1A5FBF; }
-.axe__pastille--environnement { background: #2FA36B; }
-.axe__pastille--humanitaire { background: #E2445C; }
-.axe__pastille--jeunesse    { background: #F0A81E; }
+.axe__pastille--diabete     { background: var(--bleu); }
+.axe__pastille--environnement { background: var(--bleu); }
+.axe__pastille--humanitaire { background: var(--bleu); }
+.axe__pastille--jeunesse    { background: var(--bleu); }
 .axe h3 { margin-top: var(--e1); }
 /* Les descriptions ont des longueurs inégales : le lien reste ancré en bas. */
 .axe .card__body > p { flex: 1; }
@@ -197,7 +197,7 @@
 /* ─── CAUSES — bande basse, alignement horizontal, traitement discret ────── */
 /* Padding plus court que --section-y : c'est une bande, pas une section pleine.
    Réduit d'autant le blanc qui la séparait de la grille des axes. */
-.causes { padding-block: clamp(40px, 4.5vw, 64px); }
+.causes { padding-block: clamp(48px, 4.5vw, 64px); }
 .causes .section-head { margin-bottom: var(--e6); }
 .causes__liste {
   display: grid;
@@ -221,7 +221,7 @@
 
 /* ─── CHIFFRES — bandeau navy, chiffres énormes ──────────────────────────── */
 .chiffres {
-  padding-block: clamp(48px, 5vw, 72px);
+  padding-block: clamp(48px, 5vw, 64px);
   position: relative;
   background:
     radial-gradient(120% 140% at 18% 0%, rgba(24,72,152,.55) 0%, transparent 62%),
@@ -321,11 +321,11 @@
 }
 .evenement__date b { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .evenement__date span {
-  margin-top: 3px;
+  margin-top: var(--e1);
   font-size: .625rem;
   font-weight: 600;
   letter-spacing: .14em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--sur-sombre-doux);
 }
 .evenement .link-arrow { font-size: var(--t-meta); }
@@ -447,7 +447,7 @@
       var(--navy) 78%,
       var(--navy) 100%);
   }
-  .hero__arcs { width: 130vw; transform: translate(30%, -50%); opacity: .3; }
+  .hero__arcs { width: 130vw; transform: translate(60%, -50%); opacity: .3; }
   .js .hero.is-ready .hero__arcs { opacity: .3; animation-name: arcsEntreeMobile; }
   /* Le hero repasse en colonne : la mention de lieu se range sous le contenu
      au lieu de flotter à sa droite. */

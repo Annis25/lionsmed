@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Menu public : ouverture, boucle Tab, Échap et retour du focus",
+    "ok": true
+  },
+  {
+    "name": "Lien d’évitement et focus visible",
+    "ok": true
+  },
+  {
+    "name": "Filtre public et état sans résultat",
+    "ok": true
+  },
+  {
+    "name": "Aucune soumission de formulaire",
+    "ok": true
+  },
+  {
+    "name": "Afficher et masquer le mot de passe",
+    "ok": true
+  },
+  {
+    "name": "Invité : aucun vote et aucun annuaire",
+    "ok": true
+  },
+  {
+    "name": "Bureau : aucune publication publique",
+    "ok": true
+  },
+  {
+    "name": "Président autorisé à publier, Directeur en supervision",
+    "ok": true
+  },
+  {
+    "name": "Sélecteur de rôle et navigation le conservent",
+    "ok": true
+  },
+  {
+    "name": "Votes : choix multiple, blanc exclusif, confirmation, verrouillage et clôture",
+    "ok": true
+  },
+  {
+    "name": "Satisfaction : sélection et quatre états",
+    "ok": true
+  },
+  {
+    "name": "Notifications : lu et non lu",
+    "ok": true
+  },
+  {
+    "name": "Profil : e-mail non modifiable et aperçu photo local",
+    "ok": true
+  },
+  {
+    "name": "Calendrier ICS : téléchargement local",
+    "ok": true
+  },
+  {
+    "name": "Menu privé : ouverture et Échap",
+    "ok": true
+  }
+]

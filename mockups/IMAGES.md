@@ -447,3 +447,25 @@ derniers sont techniques et reviennent à l'intégrateur.*
       `grep -c "ALT À RÉÉCRIRE" mockups/accueil.html` et
       `grep -c "tmp-" mockups/accueil.html`.
 
+
+## Audit global — 8 septembre 2026
+
+- Aucun fichier image téléchargé, aucune photographie ajoutée ou réattribuée.
+- Les variantes existantes et leurs noms sont conservés. Les quatre axes de l’accueil
+  attendent toujours leurs huit WebP (`640` et `1100`), avec repères techniques et
+  commentaires `ALT À RÉÉCRIRE APRÈS DÉPÔT DE LA PHOTO`.
+- Les textes alternatifs décrivent les groupes, vêtements et objets visibles sans
+  attribuer une qualité de membre, une identité ou une fonction aux personnes.
+- Les nouvelles pages éditoriales restent typographiques tant que les photographies
+  officielles et leur contexte ne sont pas validés. Aucune photo réelle n’illustre
+  une nouvelle action de démonstration.
+- L’élection de démonstration réserve deux portraits carrés : `candidat-a-480.webp`
+  et `candidat-b-480.webp`, minimum 480 × 480. Ce sont des repères techniques sans
+  photographie ni identité. Les candidats devront confirmer leur profil et leur
+  autorisation avant de brancher ces portraits.
+- L’aperçu de photo du profil utilise uniquement un fichier choisi localement ; aucun
+  upload. Son URL temporaire est révoquée au remplacement et ne survit pas à la page.
+- L’emblème existant est réutilisé dans les neuf maquettes e-mail. Aucun nouvel asset
+  de marque n’est nécessaire.
+- Le consentement des personnes reconnaissables, les associations photo/contenu des
+  six extraits de l’accueil et l’adresse e-mail officielle restent à valider.

@@ -1,0 +1,87 @@
+{
+  "pages": 49,
+  "forms": 16,
+  "errors": [],
+  "images_attendues": [
+    {
+      "page": "accueil.html",
+      "src": "assets/images/tmp-axe-diabete-640.webp",
+      "attendu": true
+    },
+    {
+      "page": "accueil.html",
+      "src": "assets/images/tmp-axe-diabete-1100.webp",
+      "attendu": true
+    },
+    {
+      "page": "accueil.html",
+      "src": "assets/images/tmp-axe-environnement-1100.webp",
+      "attendu": true
+    },
+    {
+      "page": "accueil.html",
+      "src": "assets/images/tmp-axe-environnement-640.webp",
+      "attendu": true
+    },
+    {
+      "page": "accueil.html",
+      "src": "assets/images/tmp-axe-humanitaire-640.webp",
+      "attendu": true
+    },
+    {
+      "page": "accueil.html",
+      "src": "assets/images/tmp-axe-humanitaire-1100.webp",
+      "attendu": true
+    },
+    {
+      "page": "accueil.html",
+      "src": "assets/images/tmp-axe-jeunesse-640.webp",
+      "attendu": true
+    },
+    {
+      "page": "accueil.html",
+      "src": "assets/images/tmp-axe-jeunesse-1100.webp",
+      "attendu": true
+    }
+  ],
+  "header_hashes": {
+    "evenement-detail.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "evenements.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "action-detail.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "confidentialite.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "mot-de-passe-oublie.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "accueil.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "connexion.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "notre-club.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "home.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "article-detail.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "contact.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "nos-actions.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "plan-du-site.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "aaa.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "rejoindre.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "mentions-legales.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "candidature.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87",
+    "actualites.html": "6fec4de66d7d88574c79cacfd1efa9c497fdfa37ce6debb7d8961928889fea87"
+  },
+  "footer_hashes": {
+    "evenement-detail.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "evenements.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "action-detail.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "confidentialite.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "mot-de-passe-oublie.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "accueil.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "connexion.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "notre-club.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "home.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "article-detail.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "contact.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "nos-actions.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "plan-du-site.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "aaa.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "rejoindre.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "mentions-legales.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "candidature.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871",
+    "actualites.html": "e88b81a5e1cbd9e39839990e00b39301da8a8ee5efe7e9b37c92b5650cf3e871"
+  }
+}

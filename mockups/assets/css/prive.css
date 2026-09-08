@@ -1,614 +1,251 @@
 @charset "UTF-8";
-/* ═══════════════════════════════════════════════════════════════════════════
-   ESPACE PRIVÉ — coquille applicative
-   ═══════════════════════════════════════════════════════════════════════════
-   Consomme les jetons de lions.css. N'en redéfinit AUCUN : même palette, même
-   typographie, mêmes rayons, mêmes ombres que le site public.
+/* Espace privé — proportions inspirées du commit 8e63540, sans restauration.
+   Passe UI isolée à la demande du propriétaire : aucune règle métier ou permission.
+   Les composants de base et jetons restent dans lions.css, inchangé.
+   Exceptions du skill : pas d'arc ; Playfair au h1 et aux chiffres ; espacements
+   exclusivement --e* ; or réservé aux actions attendues et au focus accessible. */
 
-   Registre différent, volontairement : l'espace privé est un OUTIL DE TRAVAIL.
-     · pas de signature de l'arc — ni arcs concentriques, ni arche, ni filet or
-       au-dessus des titres (exception consignée au §2 du skill) ;
-     · Playfair réservé au h1 et aux grands chiffres, Inter partout ailleurs ;
-     · espacement plus serré — --section-y ne s'applique pas ici ;
-     · le bleu reste la couleur d'action, l'or est réservé à ce qui attend
-       une action du membre.
+/* Échelle et coquille */
+.prive-dense .app-shell { grid-template-columns: 240px minmax(0,1fr); font-size: .875rem; line-height: 1.6; }
+.prive-dense .app-shell.est-replie { grid-template-columns: var(--nav-rail) minmax(0,1fr); }
+.prive-dense .app-contenu { width: 100%; max-width: 1280px; margin-inline: auto; padding: var(--e5) var(--e6) var(--e6); }
+.prive-dense .app-titre { margin: 0 0 var(--e4); }
+.prive-dense .app-titre h1 { font-size: 1.75rem; line-height: 1.1; max-width: 13ch; }
+.prive-dense .app-titre__contexte { margin: var(--e1) 0 0; font-size: .8125rem; line-height: 1.5; color: var(--gris); }
+.prive-dense .app-shell h2 { font-size: 1.0625rem; line-height: 1.4; }
+.prive-dense .app-shell h3 { font-size: .9375rem; line-height: 1.4; }
+.prive-dense .app-shell p { margin-block: var(--e2); max-width: 62ch; }
+.prive-dense .app-section { margin-bottom: var(--e5); }
+.prive-dense .bloc-titre { margin-bottom: var(--e3); gap: var(--e2); }
+.prive-dense .app-header { min-height: 64px; padding-inline: var(--e6); gap: var(--e3); }
+.prive-dense .app-bascule { width: 44px; height: 44px; }
 
-   Les composants sont nommés génériquement : ils serviront aux quinze écrans.
+/* Navigation fine, icônes distinctes et identité du compte */
+.prive-dense .app-nav__marque { padding-inline: var(--e4); gap: var(--e2); }
+.prive-dense .app-nav__liste { padding: var(--e3) var(--e2); gap: 0; }
+.prive-dense .app-nav__lien { min-height: 44px; padding: var(--e2) var(--e3); gap: var(--e3); font-size: .8125rem; }
+.prive-dense .app-nav__lien svg { width: 18px; height: 18px; }
+.prive-dense .app-nav__pied { padding: var(--e2); }
+.prive-dense .compte-identite { display: flex; align-items: center; gap: var(--e2); padding: 0 var(--e2); min-height: 44px; }
+.compte-identite__texte { display: grid; text-align: left; line-height: 1.4; font-size: .75rem; }
+.compte-identite__texte strong { font-size: .8125rem; font-weight: 600; }
+.compte-identite__texte > span { color: var(--gris); }
+.identite-avatar { width: 48px; height: 48px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--fond-2); color: var(--bleu); border: 1px solid var(--bord); }
+.identite-avatar svg { width: 24px; height: 24px; }
+.identite-avatar--petit { width: 32px; height: 32px; }
+.identite-avatar--petit svg { width: 18px; height: 18px; }
+.identite-titre { display: flex; align-items: center; gap: var(--e3); margin-bottom: var(--e4); }
+.prive-dense .identite-titre .app-titre { margin: 0; }
 
-   Sommaire
-     01 · Coquille            05 · Cartes
-     02 · Barre latérale      06 · Badges
-     03 · En-tête applicatif  07 · Tableaux
-     04 · Titre de page       08 · État vide
-                              09 · Jauge
-                              10 · Grilles de blocs
-                              11 · Responsive
-                              12 · Animations réduites
-   ═══════════════════════════════════════════════════════════════════════════ */
+/* Les informations de maquette occupent une barre, sans disparaître. */
+.atelier-barre { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: var(--e4); align-items: start; margin-bottom: var(--e5); padding: var(--e3) var(--e4); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--blanc); }
+.prive-dense .role-preview { display: grid; grid-template-columns: auto minmax(0,1fr); gap: var(--e1) var(--e2); margin: 0; align-items: center; }
+.prive-dense .role-preview label { font-size: .75rem; }
+.prive-dense .role-preview p { grid-column: 1/-1; margin: 0; font-size: .75rem; line-height: 1.5; }
+.prive-dense .atelier-barre .notice-demo { padding: 0 0 0 var(--e4); margin: 0; background: transparent; border-left: 1px solid var(--bord); font-size: .75rem; line-height: 1.6; color: var(--gris); }
 
-/* ─── 01 · COQUILLE ──────────────────────────────────────────────────────── */
-/* Ces trois propriétés personnalisées sont NOUVELLES et locales à la coquille :
-   elles ne redéfinissent aucun jeton de lions.css. */
-.app-shell {
-  --nav-large:  260px;
-  --nav-rail:    72px;
-  --h-entete:    64px;
+/* Panneaux, listes et cartes : densité de la référence. */
+.prive-dense .workspace-panel { padding: var(--e4); margin-block: var(--e4); }
+.prive-dense .workspace-panel > h2 { margin-bottom: var(--e3); }
+.prive-dense .workspace-panel > p:first-of-type { margin-top: 0; }
+.prive-dense .carte-action, .prive-dense .carte-info { padding: var(--e4); gap: var(--e3); }
+.prive-dense .carte-action p, .prive-dense .carte-info p { font-size: .8125rem; margin: 0; }
+.prive-dense .carte-action h3, .prive-dense .carte-info h3 { font-size: .9375rem; }
+.prive-dense .carte-action__icone, .prive-dense .carte-info__icone { width: 32px; height: 32px; }
+.prive-dense .grille-actions, .prive-dense .grille-blocs { gap: var(--e3); }
+.prive-dense .carte-action__echeance { font-size: .75rem; }
+.prive-dense .jauge__ligne { margin: 0 0 var(--e1); font-size: .75rem; }
+.prive-dense .jauge { gap: var(--e1); }
+.prive-dense .btn { min-height: 44px; padding: var(--e2) var(--e4); font-size: .8125rem; line-height: 1.4; }
+.prive-dense .link-arrow { font-size: .8125rem; min-height: 44px; }
+.prive-dense .button-row { gap: var(--e2); }
+.prive-dense .editorial-grid { gap: var(--e3); }
+.prive-dense .editorial-card { padding: var(--e4); gap: var(--e2); }
+.prive-dense .editorial-card p { margin: 0; font-size: .8125rem; }
+.prive-dense .editorial-card h3 { font-size: .9375rem; }
+.prive-dense .editorial-card .eyebrow { margin: 0; font-size: .6875rem; }
+.prive-dense .raccourci-mandat { display: grid; grid-template-columns: minmax(0,1fr) auto; column-gap: var(--e4); row-gap: var(--e1); align-items: center; }
+.prive-dense .raccourci-mandat h2 { font-size: .9375rem; margin: 0; }
+.prive-dense .raccourci-mandat p { margin: 0; font-size: .8125rem; }
+.prive-dense .raccourci-mandat > a { grid-column: 2; grid-row: 1 / span 2; }
+.prive-dense .etat-vide { padding: var(--e5) var(--e4); gap: var(--e2); }
+.prive-dense .etat-vide p { font-size: .8125rem; margin: 0; }
+.prive-dense .bloc-date { gap: var(--e3); }
+.prive-dense .bloc-date__jour { width: 56px; padding-block: var(--e2); }
+.prive-dense .bloc-date__jour b { font-size: 1.5rem; }
+.prive-dense .paire-liste { gap: var(--e2); }
+.prive-dense .paire-liste dd, .prive-dense .paire-liste dt { font-size: .8125rem; }
+.prive-dense .app-note { font-size: .75rem; padding-top: var(--e3); }
 
-  display: grid;
-  grid-template-columns: var(--nav-large) minmax(0, 1fr);
-  min-height: 100vh;
-  background: var(--fond);
+/* Formulaires : deux colonnes sur desktop, mêmes champs et même comportement. */
+.prive-dense .formulaire { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--e3) var(--e4); }
+.prive-dense .workspace-panel > .formulaire { max-width: 960px; }
+.prive-dense .formulaire > :is(p,fieldset,.duo,button,[data-form-status],.profil-photo,[data-election-preview]) { grid-column: 1/-1; }
+.prive-dense .formulaire > button { justify-self: start; margin: 0; }
+.prive-dense .formulaire > .champ:has(textarea) { grid-column: 1/-1; }
+.prive-dense .formulaire > p { margin: 0; }
+.prive-dense .champ { gap: var(--e1); }
+.prive-dense .champ__label, .prive-dense .champ > label { font-size: .8125rem; line-height: 1.5; }
+.prive-dense .champ__requis { font-size: .75rem; }
+.prive-dense .champ__input { min-height: 44px; height: 44px; padding: var(--e2) var(--e3); font-size: .875rem; line-height: 1.5; }
+.prive-dense select.champ__input { padding-right: var(--e6); background-position: right var(--e3) center; }
+.prive-dense textarea.champ__input { min-height: 96px; height: 96px; }
+.prive-dense input[type="file"] { height: auto; font-size: .8125rem; padding: var(--e2); }
+.prive-dense .champ__aide { font-size: .75rem; }
+.prive-dense .duo { gap: var(--e3) var(--e4); }
+.prive-dense .groupe + .groupe { margin-top: var(--e4); padding-top: var(--e4); }
+.prive-dense .groupe__champs { gap: var(--e3); }
+.prive-dense legend { font-size: .875rem; margin-bottom: var(--e2); }
+.prive-dense .choix { min-height: 44px; align-items: center; gap: var(--e3); padding: var(--e2) var(--e3); border: 1px solid var(--bord); border-radius: var(--r-carte); margin-bottom: var(--e2); }
+.prive-dense .choix span { font-size: .875rem; }
+.prive-dense .choix:has(input:checked) { border-color: var(--bleu); background: var(--fond-2); }
+.prive-dense .choix input { margin: 0; }
+.prive-dense [data-state-selector], .prive-dense [data-ballot-type] { max-width: 400px; }
+.prive-dense details { margin-top: var(--e3); }
+.prive-dense summary { font-size: .8125rem; padding-block: var(--e2); }
+.prive-dense dialog { padding: var(--e5); }
+
+/* Profil : photo à côté de la fiche ; parcours et mandats structurés. */
+.profil-photo { display: flex; align-items: center; gap: var(--e4); padding: var(--e3); background: var(--fond); border: 1px solid var(--bord); border-radius: var(--r-carte); }
+.profil-photo__visuel { position: relative; flex: none; width: 80px; height: 80px; }
+.identite-avatar--photo { width: 80px; height: 80px; }
+.identite-avatar--photo svg { width: 40px; height: 40px; }
+.profil-photo .portrait-preview { position: absolute; inset: 0; width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
+.profil-photo__texte { display: grid; gap: var(--e1); min-width: 0; flex: 1; }
+.profil-photo__texte > strong { font-size: .9375rem; }
+.meta-ligne { color: var(--gris); font-size: .75rem; }
+.prive-dense .profil-photo input { max-width: 360px; }
+.prive-dense .champ-verrouille > label { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); }
+.prive-dense .champ-verrouille input { background: var(--fond); border-style: dashed; }
+.prive-dense .profil-parcours .experience-form { padding-left: var(--e4); border-left: 2px solid var(--bord); }
+.prive-dense .mandats-timeline { border: 0; border-left: 2px solid var(--bleu); border-radius: 0; padding-left: var(--e3); }
+.prive-dense .mandats-timeline td { vertical-align: top; }
+
+/* Annuaire : avatars et métadonnées plutôt que grandes cartes de texte. */
+.prive-dense .membre-compact { display: grid; grid-template-columns: 48px minmax(0,1fr); align-content: start; column-gap: var(--e3); row-gap: var(--e1); }
+.membre-compact > .identite-avatar { grid-column: 1; grid-row: 1 / span 3; }
+.prive-dense .membre-compact > :not(.identite-avatar) { grid-column: 2; }
+.prive-dense .membre-compact .eyebrow { text-transform: none; letter-spacing: normal; color: var(--bleu); font-size: .75rem; }
+.prive-dense .membre-metadonnees { display: grid; font-size: .75rem; color: var(--gris); }
+.prive-dense .membre-compact .link-arrow { min-height: 44px; margin-top: 0; }
+
+/* Calendrier : les mêmes lignes deviennent un agenda avec repères de date. */
+.prive-dense .agenda-cadre { border: 0; }
+.prive-dense .agenda-compact { display: block; }
+.prive-dense .agenda-compact caption { display: block; text-align: left; padding: 0 0 var(--e3); font-size: .8125rem; }
+.prive-dense .agenda-compact thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.prive-dense .agenda-compact tbody { display: grid; gap: var(--e2); }
+.prive-dense .agenda-compact tr { display: grid; grid-template-columns: 200px minmax(0,1fr) 112px; align-items: center; gap: var(--e3); padding: var(--e3); border: 1px solid var(--bord); border-radius: var(--r-carte); margin: 0; }
+.prive-dense .agenda-compact td { padding: 0; border: 0; }
+.prive-dense .agenda-compact td:first-child { grid-column: 2; grid-row: 1; font-weight: 600; }
+.prive-dense .agenda-compact td:nth-child(2) { grid-column: 1; grid-row: 1; display: flex; align-items: center; gap: var(--e3); }
+.prive-dense .agenda-compact td:last-child { grid-column: 3; grid-row: 1; font-size: .75rem; color: var(--gris); }
+.prive-dense .agenda-compact td::before { display: none; }
+.agenda-date { display: grid; justify-items: center; min-width: 44px; padding: var(--e2); background: var(--fond-2); color: var(--bleu); border-radius: var(--r-carte); line-height: 1.1; }
+.agenda-date b { font-family: var(--police-titre); font-size: 1.375rem; font-weight: 600; }
+.agenda-date > span { font-size: .6875rem; }
+.agenda-horaire { display: grid; gap: var(--e1); font-size: .75rem; color: var(--gris); }
+.agenda-horaire strong { color: var(--encre); font-weight: 600; }
+
+/* Échelle émotionnelle compacte : cinq choix dans une seule bande. */
+.prive-dense .emotion-scale { grid-template-columns: repeat(5,minmax(0,1fr)); gap: var(--e1); margin-block: var(--e3); padding: var(--e2); background: var(--fond); border: 1px solid var(--bord); border-radius: var(--r-carte); }
+.prive-dense .emotion { display: flex; flex-direction: column; align-items: center; gap: var(--e2); padding: var(--e3) var(--e2); min-height: 44px; border: 1px solid transparent; border-radius: var(--r-carte); background: transparent; }
+.prive-dense .emotion svg { width: 32px; height: 32px; }
+.prive-dense .emotion span { font-size: .75rem; line-height: 1.3; min-height: var(--e6); }
+.prive-dense .emotion input { width: 16px; height: 16px; order: 3; }
+.prive-dense .emotion:has(input:checked) { background: var(--blanc); border: 1px solid var(--bleu); }
+.prive-dense .page-satisfaction { max-width: 960px; }
+.prive-dense.page-satisfaction [data-page-permissions], .prive-dense.page-votes [data-page-permissions] { max-width: 960px; }
+
+/* Documents, notifications, cotisations, présences : lignes et indicateurs. */
+.prive-dense .filter-bar { grid-template-columns: minmax(0,1fr) minmax(160px,240px) auto; gap: var(--e3); margin-block: var(--e3); }
+.prive-dense .filter-bar [data-count] { grid-column: auto; padding-bottom: var(--e3); font-size: .75rem; white-space: nowrap; }
+.prive-dense .tableau { font-size: .8125rem; }
+.prive-dense .tableau caption { padding: var(--e3); font-size: .75rem; }
+.prive-dense .tableau th, .prive-dense .tableau td { padding: var(--e2) var(--e3); line-height: 1.5; }
+.prive-dense .tableau td a { display: inline-flex; align-items: center; min-height: 44px; }
+.prive-dense .tableau th { font-size: .75rem; }
+.statut-compact { display: inline-block; padding: var(--e1) var(--e2); background: var(--fond-2); color: var(--encre); border-radius: var(--r-pilule); font-size: .75rem; line-height: 1.4; }
+.prive-dense .notification-row { padding-block: var(--e3); gap: var(--e3); align-items: center; }
+.prive-dense .notification-row h3 { margin-top: var(--e1); }
+.prive-dense .notification-row time { font-size: .75rem; }
+.prive-dense .notification-row .link-arrow { min-height: 44px; }
+.prive-dense .liste-notifs li { padding-block: var(--e3); }
+.prive-dense .liste-notifs h3 { font-size: .875rem; }
+.prive-dense .liste-notifs p, .prive-dense .liste-notifs time { font-size: .75rem; }
+.prive-dense .metrics { margin-block: var(--e3); gap: var(--e4); }
+.prive-dense .metric { padding-left: var(--e3); gap: var(--e1); }
+.prive-dense .metric strong { font-size: 1.75rem; line-height: 1.15; }
+.prive-dense .metric span { font-size: .75rem; }
+.prive-dense .distribution { margin-block: var(--e4); gap: var(--e2); max-width: 800px; }
+.prive-dense .distribution figcaption { font-size: .8125rem; margin-bottom: var(--e1); }
+.prive-dense .distribution-row { font-size: .8125rem; }
+.prive-dense meter { height: 16px; }
+
+/* Pilotage : indicateurs sobres et accès courts conservant les permissions. */
+.pilotage-kpis { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--e4); padding-block: var(--e3); }
+.prive-dense .pilotage-outils .editorial-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.prive-dense .outil-compact { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 0 var(--e3); padding: var(--e3); border-radius: var(--r-carte); background: var(--fond); }
+.prive-dense .outil-compact h3 { grid-column: 1; }
+.prive-dense .outil-compact p { grid-column: 1; font-size: .75rem; }
+.prive-dense .outil-compact a { grid-column: 2; grid-row: 1 / span 2; align-self: center; max-width: 18ch; }
+
+@media (min-width:1081px) {
+ .prive-dense .duo { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .prive-dense .profil-securite .formulaire { grid-template-columns: repeat(3,minmax(0,1fr)); }
+ .prive-dense .experience-form > .champ:has(textarea) { grid-column: auto; }
 }
-.app-shell.est-replie { grid-template-columns: var(--nav-rail) minmax(0, 1fr); }
-
-.app-main { min-width: 0; display: flex; flex-direction: column; }
-.app-contenu { padding: var(--e6) var(--e7) var(--e9); }
-
-/* Voile du tiroir — n'existe qu'en dessous de 760 px */
-.app-voile {
-  position: fixed;
-  inset: 0;
-  z-index: 150;
-  background: rgba(10, 35, 73, .5);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity var(--duree) var(--courbe), visibility var(--duree) var(--courbe);
+@media (max-width:1080px) {
+ .prive-dense .app-contenu { padding: var(--e5); }
+ .prive-dense .app-header { padding-inline: var(--e5); }
+ .prive-dense .formulaire { grid-template-columns: minmax(0,1fr); }
+ .prive-dense .atelier-barre { grid-template-columns: minmax(0,1fr); gap: var(--e2); padding: var(--e3); }
+ .prive-dense .atelier-barre .notice-demo { padding: 0; border: 0; }
+ .prive-dense .filter-bar { grid-template-columns: minmax(0,1fr) minmax(160px,1fr); }
+ .prive-dense .filter-bar [data-count] { grid-column: 1/-1; padding: 0; }
+ .prive-dense .pilotage-outils .editorial-grid { grid-template-columns: minmax(0,1fr); }
 }
-.app-voile.est-visible { opacity: 1; visibility: visible; }
-
-/* ─── 02 · BARRE LATÉRALE ────────────────────────────────────────────────── */
-.app-nav {
-  position: sticky;
-  top: 0;
-  z-index: 160;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  background: var(--blanc);
-  border-right: 1px solid var(--bord);
+@media (max-width:760px) {
+ .prive-dense .app-shell, .prive-dense .app-shell.est-replie { grid-template-columns: minmax(0,1fr); }
+ .prive-dense .app-contenu { padding: var(--e4); }
+ .prive-dense .app-header { padding-inline: var(--e4); gap: var(--e2); }
+ .prive-dense .app-titre h1 { font-size: 1.5rem; }
+ .compte-identite__texte { display: none; }
+ .prive-dense .atelier-barre { margin-bottom: var(--e4); }
+ .prive-dense .role-preview { grid-template-columns: auto minmax(0,1fr); }
+ .prive-dense .workspace-panel { padding: var(--e3); }
+ .prive-dense .raccourci-mandat { grid-template-columns: minmax(0,1fr); gap: var(--e2); }
+ .prive-dense .raccourci-mandat > a { grid-row: auto; grid-column: 1; justify-self: start; }
+ .prive-dense .tableau tr { margin-bottom: var(--e2); padding: var(--e3); }
+ .prive-dense .tableau td { padding: var(--e1) 0; gap: var(--e2); }
+ .prive-dense .tableau td a { min-height: 44px; }
+ .prive-dense .notification-row { flex-direction: row; align-items: start; }
+ .prive-dense .notification-row > div { min-width: 0; flex: 1; }
+ .prive-dense .notification-row button { max-width: 112px; padding-inline: var(--e2); }
+ .prive-dense .agenda-compact tr { grid-template-columns: 64px minmax(0,1fr); padding: var(--e3); gap: var(--e2); }
+ .prive-dense .agenda-compact td:first-child { grid-row: 1; grid-column: 2; }
+ .prive-dense .agenda-compact td:nth-child(2) { grid-row: 1 / span 2; grid-column: 1; display: grid; grid-template-columns: minmax(0,1fr); justify-items: center; gap: var(--e1); }
+ .prive-dense .agenda-compact td:last-child { grid-row: 2; grid-column: 2; }
+ .agenda-horaire > span { font-size: .6875rem; }
+ .prive-dense .agenda-compact td { padding: 0; }
+ .prive-dense .agenda-date { width: 44px; }
+ .prive-dense .emotion-scale { gap: 0; padding: var(--e1); }
+ .prive-dense .emotion { padding: var(--e2) var(--e1); gap: var(--e2); text-align: center; }
+ .prive-dense .emotion svg { width: 28px; height: 28px; }
+ .prive-dense .emotion span { font-size: .6875rem; overflow-wrap: normal; hyphens: auto; }
+ .prive-dense .emotion input { width: 16px; height: 16px; }
+ .profil-photo { gap: var(--e3); }
+ .profil-photo__visuel, .identite-avatar--photo, .profil-photo .portrait-preview { width: 64px; height: 64px; }
+ .prive-dense .profil-photo input { width: 100%; }
+ .prive-dense .pilotage-kpis { gap: var(--e2); }
+ .prive-dense .pilotage-kpis .metric { padding-left: var(--e2); }
+ .prive-dense .pilotage-kpis .metric strong { font-size: 1.5rem; }
+ .prive-dense .outil-compact { grid-template-columns: minmax(0,1fr); }
+ .prive-dense .outil-compact a { grid-column: 1; grid-row: auto; max-width: none; }
 }
-
-.app-nav__marque {
-  display: flex;
-  align-items: center;
-  gap: var(--e3);
-  height: var(--h-entete);
-  padding-inline: var(--e5);
-  border-bottom: 1px solid var(--bord);
-  flex: none;
-}
-.app-nav__marque img { height: 32px; width: auto; flex: none; }
-.app-nav__marque span {
-  display: flex;
-  flex-direction: column;
-  font-size: .8125rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--bleu);
-  white-space: nowrap;
-}
-.app-nav__marque span span:last-child { font-size: .75rem; font-weight: 600; }
-
-.app-nav__liste { padding: var(--e4) var(--e3); display: grid; gap: 2px; }
-.app-nav__titre {
-  padding: var(--e4) var(--e3) var(--e2);
-  font-size: var(--t-eyebrow);
-  font-weight: 700;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--gris);
-}
-
-.app-nav__lien {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--e3);
-  min-height: 44px;
-  padding: var(--e2) var(--e3);
-  border-radius: 8px;
-  font-size: .9375rem;
-  font-weight: 500;
-  color: var(--encre);
-  transition: background-color var(--duree) var(--courbe), color var(--duree) var(--courbe);
-}
-.app-nav__lien svg { flex: none; color: var(--gris); transition: color var(--duree) var(--courbe); }
-.app-nav__lien:hover { background: var(--fond); color: var(--bleu); }
-.app-nav__lien:hover svg { color: var(--bleu); }
-
-/* L'état actif n'est jamais porté par la seule couleur : fond + barre bleue. */
-.app-nav__lien[aria-current="page"],
-.app-nav__lien.actif {
-  background: var(--fond-2);
-  color: var(--bleu);
-  font-weight: 600;
-}
-.app-nav__lien[aria-current="page"] svg,
-.app-nav__lien.actif svg { color: var(--bleu); }
-.app-nav__lien[aria-current="page"]::before,
-.app-nav__lien.actif::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 8px;
-  bottom: 8px;
-  width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: var(--bleu);
-}
-
-.app-nav__pied {
-  margin-top: auto;
-  padding: var(--e4) var(--e3);
-  border-top: 1px solid var(--bord);
-}
-
-/* Mode rail : le libellé sort de l'écran mais reste dans l'arbre
-   d'accessibilité — le lien garde son nom, jamais une icône muette. */
-.est-replie .app-nav__libelle,
-.est-replie .app-nav__marque span,
-.est-replie .app-nav__titre {
-  position: absolute !important;
-  width: 1px; height: 1px;
-  margin: -1px; padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-}
-.est-replie .app-nav__marque { justify-content: center; padding-inline: var(--e2); }
-.est-replie .app-nav__lien { justify-content: center; padding-inline: 0; }
-.est-replie .app-nav__titre { display: block; height: 1px; padding: 0; }
-
-/* ─── 03 · EN-TÊTE APPLICATIF ────────────────────────────────────────────── */
-.app-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  gap: var(--e4);
-  min-height: var(--h-entete);
-  padding-inline: var(--e7);
-  background: var(--blanc);
-  border-bottom: 1px solid var(--bord);
-}
-.app-header__fil { flex: 1; min-width: 0; }
-.app-header__fil ol { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); }
-.app-header__fil li { display: flex; align-items: center; gap: var(--e2); font-size: var(--t-meta); color: var(--gris); }
-.app-header__fil a { color: var(--gris); transition: color var(--duree) var(--courbe); }
-.app-header__fil a:hover { color: var(--bleu); }
-.app-header__fil [aria-current="page"] { color: var(--encre); font-weight: 600; }
-.app-header__fil svg { color: var(--gris-clair); flex: none; }
-
-/* Bouton de repli / tiroir */
-.app-bascule {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  flex: none;
-  border: 1px solid var(--bord);
-  border-radius: 8px;
-  background: var(--blanc);
-  color: var(--gris);
-  cursor: pointer;
-  transition: background-color var(--duree) var(--courbe), color var(--duree) var(--courbe);
-}
-.app-bascule:hover { background: var(--fond); color: var(--bleu); }
-
-/* Cloche — c'est un vrai lien vers le bloc des notifications de la page ;
-   il deviendra le lien vers notifications.html à l'intégration. */
-.app-cloche {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  flex: none;
-  border-radius: 8px;
-  color: var(--gris);
-  transition: background-color var(--duree) var(--courbe), color var(--duree) var(--courbe);
-}
-.app-cloche:hover { background: var(--fond); color: var(--bleu); }
-/* La pastille porte un nombre, pas une simple couleur. */
-.app-cloche__pastille {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  min-width: 18px;
-  height: 18px;
-  padding-inline: 4px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--r-pilule);
-  background: var(--bleu);
-  color: var(--blanc);
-  font-size: .6875rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-/* Menu du compte — réemploi de .nav-item / .nav-toggle / .dropdown de
-   lions.css : le comportement (ouverture, Échap, clic extérieur, sortie de
-   focus) est déjà porté par lions.js. Seule l'apparence est reprise ici. */
-.app-compte { flex: none; }
-.app-compte .nav-toggle {
-  width: auto;
-  height: 44px;
-  gap: var(--e3);
-  padding: 0 var(--e3);
-  border-radius: 8px;
-  color: var(--encre);
-}
-.app-compte .nav-toggle:hover { background: var(--fond); }
-.app-compte__avatar {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--fond-2);
-  color: var(--bleu);
-  font-size: .8125rem;
-  font-weight: 700;
-}
-.app-compte__ident { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; }
-.app-compte__nom  { font-size: .875rem; font-weight: 600; }
-.app-compte__role { font-size: var(--t-meta); color: var(--gris); }
-/* L'or est réservé à ce qui attend une action : le liseré or du .dropdown
-   public n'a pas lieu d'être sur un menu de compte. */
-.app-compte .dropdown { left: auto; right: 0; min-width: 220px; border-top: 1px solid var(--bord); border-radius: var(--r-carte); }
-
-/* ─── 04 · TITRE DE PAGE ─────────────────────────────────────────────────── */
-.app-titre { margin-bottom: var(--e6); }
-.app-titre h1 {
-  font-size: clamp(1.75rem, 2.6vw, 2.25rem);
-  line-height: 1.1;
-  max-width: none;
-}
-.app-titre__contexte {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--e2) var(--e4);
-  margin-top: var(--e3);
-  font-size: .9375rem;
-  color: var(--gris);
-}
-.app-titre__contexte b { color: var(--encre); font-weight: 600; }
-
-.bloc-titre {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--e3);
-  margin-bottom: var(--e4);
-}
-.bloc-titre h2 {
-  font-family: var(--police);          /* Inter : dans un outil, pas de Playfair */
-  font-size: 1.0625rem;
-  font-weight: 600;
-  letter-spacing: 0;
-  max-width: none;
-}
-.bloc-titre h3 { font-size: 1rem; font-weight: 600; }
-
-/* ─── 05 · CARTES ────────────────────────────────────────────────────────── */
-.carte-action,
-.carte-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--e4);
-  padding: var(--e5);
-  background: var(--blanc);
-  border: 1px solid var(--bord);
-  border-radius: var(--r-carte);
-}
-.carte-action__haut,
-.carte-info__haut { display: flex; align-items: flex-start; gap: var(--e3); }
-.carte-action__icone,
-.carte-info__icone {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  flex: none;
-  border-radius: 8px;
-  background: var(--fond-2);
-  color: var(--bleu);
-}
-.carte-action h3,
-.carte-info h3 { font-size: 1rem; font-weight: 600; }
-.carte-action p,
-.carte-info p { margin: 0; font-size: .9375rem; color: var(--gris); }
-.carte-action__echeance {
-  display: flex;
-  align-items: center;
-  gap: var(--e2);
-  font-size: var(--t-meta);
-  font-weight: 500;
-  color: var(--gris);
-}
-.carte-action__echeance svg { flex: none; }
-.carte-action .btn { align-self: flex-start; margin-top: auto; }
-
-/* Variante urgente — seul emploi de l'or dans l'espace privé : il signale
-   qu'une action est attendue du membre, et rien d'autre. */
-.carte-action--urgent { border-color: #F1DFA0; box-shadow: inset 3px 0 0 var(--or); }
-.carte-action--urgent .carte-action__icone { background: #FFF7DB; color: #7A5C00; }
-.carte-action--urgent .carte-action__echeance { color: #7A5C00; }
-
-/* ─── 06 · BADGES ────────────────────────────────────────────────────────── */
-/* Toujours un texte. Le rond coloré ne fait que rendre la lecture plus rapide. */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--e2);
-  padding: 3px var(--e3);
-  border: 1px solid;
-  border-radius: var(--r-pilule);
-  font-size: var(--t-meta);
-  font-weight: 600;
-  line-height: 1.5;
-  white-space: nowrap;
-}
-.badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
-
-.badge--paye,
-.badge--present        { background: #EAF6EF; border-color: #B9E0C9; color: #14603A; }
-.badge--a-regulariser  { background: #FBECEF; border-color: #F0C7CF; color: #B3243B; }
-.badge--absent         { background: var(--fond);   border-color: var(--bord); color: var(--gris); }
-.badge--excuse         { background: var(--fond-2); border-color: #CBDDF2;     color: var(--bleu); }
-.badge--en-cours       { background: #FFF7DB; border-color: #F1DFA0; color: #7A5C00; }
-.badge--clos           { background: var(--fond);   border-color: var(--bord); color: var(--gris); }
-
-/* ─── 07 · TABLEAUX ──────────────────────────────────────────────────────── */
-/* Pas d'overflow ici : `overflow: hidden` ferait de ce cadre le conteneur de
-   défilement de référence du thead collant, qui descendrait alors de sa propre
-   hauteur et recouvrirait la première ligne. Les angles sont arrondis sur les
-   cellules d'extrémité à la place. */
-.tableau-cadre {
-  background: var(--blanc);
-  border: 1px solid var(--bord);
-  border-radius: var(--r-carte);
-}
-.tableau { width: 100%; border-collapse: collapse; }
-.tableau caption:not(.visually-hidden) { text-align: left; padding: var(--e5) var(--e5) 0; font-size: .9375rem; color: var(--gris); }
-.tableau th, .tableau td { padding: var(--e3) var(--e5); text-align: left; }
-/* Pas de capitale intégrale : l'échelle et la graisse suffisent (§1). */
-.tableau thead th {
-  position: sticky;
-  top: var(--h-entete);
-  z-index: 2;
-  background: var(--blanc);
-  border-bottom: 1px solid var(--bord);
-  font-size: var(--t-meta);
-  font-weight: 600;
-  color: var(--gris);
-}
-.tableau tbody td { border-bottom: 1px solid var(--bord); font-size: .9375rem; }
-.tableau tbody tr:last-child td { border-bottom: 0; }
-.tableau thead th:first-child { border-top-left-radius: var(--r-carte); }
-.tableau thead th:last-child  { border-top-right-radius: var(--r-carte); }
-.tableau tbody tr:last-child td:first-child { border-bottom-left-radius: var(--r-carte); }
-.tableau tbody tr:last-child td:last-child  { border-bottom-right-radius: var(--r-carte); }
-.tableau tbody tr:hover { background: var(--fond); }
-.tableau .num { font-variant-numeric: tabular-nums; }
-
-.tableau__tri {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--e2);
-  min-height: 32px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-}
-.tableau__tri:hover { color: var(--bleu); }
-.tableau__tri svg { color: var(--gris-clair); transition: color var(--duree) var(--courbe), transform var(--duree) var(--courbe); }
-.tableau__tri:hover svg { color: var(--bleu); }
-[aria-sort="ascending"]  .tableau__tri svg { color: var(--bleu); }
-[aria-sort="descending"] .tableau__tri svg { color: var(--bleu); transform: rotate(180deg); }
-
-/* ─── 08 · ÉTAT VIDE ─────────────────────────────────────────────────────── */
-/* Jamais une zone blanche muette : ce qui manque, et quoi faire. */
-.etat-vide {
-  display: grid;
-  justify-items: center;
-  gap: var(--e3);
-  padding: var(--e8) var(--e5);
-  text-align: center;
-  background: var(--blanc);
-  border: 1px dashed var(--bord);
-  border-radius: var(--r-carte);
-}
-.etat-vide__icone {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--fond-2);
-  color: var(--bleu);
-}
-.etat-vide h3 { font-size: 1rem; font-weight: 600; }
-.etat-vide p { margin: 0; max-width: 46ch; font-size: .9375rem; color: var(--gris); }
-
-/* ─── 09 · JAUGE ─────────────────────────────────────────────────────────── */
-/* La valeur est écrite en toutes lettres à côté : si prive.js ne s'exécute
-   pas, la barre reste à zéro mais l'information, elle, est là. */
-.jauge { display: grid; gap: var(--e2); }
-.jauge__ligne {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--e3);
-  font-size: var(--t-meta);
-  color: var(--gris);
-}
-.jauge__ligne b { color: var(--encre); font-variant-numeric: tabular-nums; }
-.jauge__piste { height: 8px; background: var(--fond-2); border-radius: var(--r-pilule); overflow: hidden; }
-.jauge__barre { width: 0; height: 100%; background: var(--bleu); border-radius: inherit; transition: width .6s var(--courbe); }
-
-/* ─── 10 · GRILLES DE BLOCS ──────────────────────────────────────────────── */
-.grille-actions { display: grid; grid-template-columns: 1fr; gap: var(--e4); }
-@media (min-width: 900px) { .grille-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-
-.grille-blocs { display: grid; grid-template-columns: 1fr; gap: var(--e4); }
-@media (min-width: 1100px) {
-  .grille-blocs--60-40 { grid-template-columns: 60fr 40fr; }
-  .grille-blocs--40-60 { grid-template-columns: 40fr 60fr; }
-}
-
-.fiche-membre { margin-top: var(--e4); }
-
-.app-section { margin-bottom: var(--e7); }
-.app-section:last-child { margin-bottom: 0; }
-
-/* Bloc « prochaine réunion » — traitement dominant, pastille de date */
-.bloc-date {
-  display: flex;
-  gap: var(--e5);
-  align-items: flex-start;
-}
-.bloc-date__jour {
-  display: grid;
-  place-items: center;
-  width: 72px;
-  padding: var(--e3) 0;
-  flex: none;
-  border-radius: var(--r-carte);
-  background: var(--navy);
-  color: var(--sur-sombre);
-  line-height: 1.1;
-}
-.bloc-date__jour b {
-  font-family: var(--police-titre);
-  font-size: 1.75rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-.bloc-date__jour span { font-size: var(--t-meta); color: var(--sur-sombre-doux); }
-
-/* Liste de notifications — porte elle-même l'habillage de carte : son titre
-   vit au-dessus, sur le fond de l'application, aligné sur celui du tableau. */
-.liste-notifs { display: grid; }
-.liste-notifs li { display: flex; gap: var(--e3); padding-block: var(--e4); border-top: 1px solid var(--bord); }
-.liste-notifs li:first-child { border-top: 0; padding-top: 0; }
-.liste-notifs__pastille { width: 8px; height: 8px; margin-top: 7px; flex: none; border-radius: 50%; background: var(--bord); }
-.liste-notifs li[data-non-lue] .liste-notifs__pastille { background: var(--bleu); }
-.liste-notifs h3 { font-size: .9375rem; font-weight: 600; }
-.liste-notifs p { margin: var(--e1) 0 0; font-size: var(--t-meta); color: var(--gris); }
-.liste-notifs time { display: block; margin-top: var(--e2); font-size: var(--t-meta); color: var(--gris); }
-
-/* Liste de paires libellé / valeur — fiche de consultation */
-.paire-liste { display: grid; gap: var(--e3); margin: 0; }
-.paire-liste > div { display: grid; grid-template-columns: 40% minmax(0, 1fr); gap: var(--e3); align-items: baseline; }
-.paire-liste dt { font-size: var(--t-meta); font-weight: 600; color: var(--gris); }
-.paire-liste dd { margin: 0; font-size: .9375rem; color: var(--encre); }
-
-/* Note de bas de bloc — plus discrète que le corps, jamais sous le seuil AA. */
-.app-note {
-  margin: 0;
-  padding-top: var(--e4);
-  border-top: 1px solid var(--bord);
-  font-size: var(--t-meta);
-  color: var(--gris);
-}
-
-/* ─── 11 · RESPONSIVE ────────────────────────────────────────────────────── */
-@media (max-width: 1080px) {
-  .app-contenu { padding: var(--e5) var(--e5) var(--e8); }
-  .app-header  { padding-inline: var(--e5); }
-}
-
-/* Tiroir — la barre latérale sort du flux et se referme sur un voile. */
-@media (max-width: 760px) {
-  .app-shell,
-  .app-shell.est-replie { grid-template-columns: minmax(0, 1fr); }
-  .app-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 280px;
-    max-width: 86vw;
-    transform: translateX(-100%);
-    visibility: hidden;
-    box-shadow: var(--ombre);
-    transition: transform var(--duree) var(--courbe), visibility var(--duree) var(--courbe);
-  }
-  .app-nav.est-ouverte { transform: none; visibility: visible; }
-  /* En tiroir, le rail n'a plus de sens : les libellés reviennent. */
-  .est-replie .app-nav__libelle,
-  .est-replie .app-nav__marque span,
-  .est-replie .app-nav__titre {
-    position: static !important;
-    width: auto; height: auto;
-    margin: 0;
-    overflow: visible;
-    clip: auto;
-    clip-path: none;
-    white-space: normal;
-  }
-  .est-replie .app-nav__marque { justify-content: flex-start; padding-inline: var(--e5); }
-  .est-replie .app-nav__lien { justify-content: flex-start; padding-inline: var(--e3); }
-  .est-replie .app-nav__titre { height: auto; padding: var(--e4) var(--e3) var(--e2); }
-
-  .app-compte__ident { display: none; }
-  /* Le fil d'Ariane se réduit à la page courante : sur 375 px, il passait à la
-     ligne et faisait déborder l'en-tête de sa hauteur. */
-  .app-header__fil li:not(:last-child) { display: none; }
-  .app-header__fil li:last-child svg { display: none; }
-  .app-contenu { padding: var(--e5) var(--e4) var(--e8); }
-  .app-header  { padding-inline: var(--e4); gap: var(--e2); }
-
-  /* Le tableau devient une liste de blocs : jamais de défilement horizontal. */
-  .tableau-cadre { border: 0; background: transparent; border-radius: 0; }
-  .tableau, .tableau tbody, .tableau tr, .tableau td { display: block; }
-  .tableau caption { padding: 0 0 var(--e4); }
-  .tableau thead {
-    position: absolute;
-    width: 1px; height: 1px;
-    margin: -1px; padding: 0;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-  }
-  .tableau tr {
-    margin-bottom: var(--e4);
-    padding: var(--e4);
-    background: var(--blanc);
-    border: 1px solid var(--bord);
-    border-radius: var(--r-carte);
-  }
-  .tableau tbody tr:hover { background: var(--blanc); }
-  .tableau td { display: grid; grid-template-columns: 40% minmax(0, 1fr); gap: var(--e3); padding: var(--e2) 0; border: 0; }
-  .tableau tbody td { border-bottom: 0; }
-  .tableau td::before {
-    content: attr(data-libelle);
-    font-size: var(--t-meta);
-    font-weight: 600;
-    color: var(--gris);
-  }
-}
-
-@media (max-width: 430px) {
-  .bloc-date { flex-direction: column; gap: var(--e4); }
-  .carte-action .btn, .carte-info .btn { width: 100%; }
-}
-
-/* ─── 12 · ANIMATIONS RÉDUITES ───────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .app-nav, .app-voile, .jauge__barre, .tableau__tri svg { transition: none !important; }
+@media(max-width:520px) {
+ .prive-dense .filter-bar { grid-template-columns: minmax(0,1fr); gap: var(--e2); }
+ .prive-dense .bloc-date { flex-direction: row; }
+ .prive-dense .carte-action .btn, .prive-dense .carte-info .btn { width: auto; }
+ .prive-dense .notification-row { flex-wrap: wrap; }
 }

@@ -1,0 +1,445 @@
+[
+  {
+    "fichier": "IMAGES.md",
+    "octets": 22532,
+    "sha256": "559b55239ec86928aa0b2bddd0fb2c922458b7d6d37ed5febe879eeeb7d6a656"
+  },
+  {
+    "fichier": "_backup/accueil.html.bak",
+    "octets": 60725,
+    "sha256": "16e05c9b3c280a396813c2ca6f06558685a466520b792e60eb6d095bad2755f3"
+  },
+  {
+    "fichier": "_backup/audit-hashes-before.json",
+    "octets": 79161,
+    "sha256": "e50a8e45ba5a577bf4d8ec79ff64f8b34ebebba44efb43e655b0865947416fa9"
+  },
+  {
+    "fichier": "_backup/verification-before.json",
+    "octets": 80714,
+    "sha256": "fbcbf0927a1a3a1c28fb951ff171b6fa2fe05558ff5e6993a86cb363848d4e94"
+  },
+  {
+    "fichier": "aaa.html",
+    "octets": 497385,
+    "sha256": "f0599ccdf07cea5f33bf914fdb38a7421de7d5cc087082837688810d998bd054",
+    "h1": 1,
+    "tailwind": false,
+    "styles_inline": 5,
+    "liens_vides": 7,
+    "noindex": false,
+    "description": true,
+    "canonical": true,
+    "jsonld": true
+  },
+  {
+    "fichier": "accueil.html",
+    "octets": 47747,
+    "sha256": "f96ac9d4dc80ad1fe75938dbdd5039d62274a58c21ccef4be4c366756d6b92c3",
+    "h1": 1,
+    "tailwind": false,
+    "styles_inline": 0,
+    "liens_vides": 1,
+    "noindex": true,
+    "description": true,
+    "canonical": true,
+    "jsonld": true
+  },
+  {
+    "fichier": "actualites.html",
+    "octets": 30037,
+    "sha256": "fbb7ff722d69d1b8c2261f257c21aece58f21401d3094a5f4193cff249cc9f24",
+    "h1": 1,
+    "tailwind": true,
+    "styles_inline": 0,
+    "liens_vides": 6,
+    "noindex": false,
+    "description": false,
+    "canonical": false,
+    "jsonld": false
+  },
+  {
+    "fichier": "assets/css/accueil.css",
+    "octets": 20185,
+    "sha256": "5e03ee1f3ca41bdaca23179c05a0f49a2eaab902db76b5df78877dc94818a276"
+  },
+  {
+    "fichier": "assets/css/lions.css",
+    "octets": 37264,
+    "sha256": "3dcf08140c213ed416f1945459e0a8a2fa67cdcd0f6cf9039733c49874454ab2"
+  },
+  {
+    "fichier": "assets/css/prive.css",
+    "octets": 23417,
+    "sha256": "a525b168c89265921da4fae0c71a2ca76d5d41d76beccd887a802ac456d297ac"
+  },
+  {
+    "fichier": "assets/css/rejoindre.css",
+    "octets": 5716,
+    "sha256": "88cc459efa063d75bc796317c2b856545a98a96e69d8fc4ed750d4f0e40c0d1c"
+  },
+  {
+    "fichier": "assets/images/actualite-1-240.webp",
+    "octets": 12340,
+    "sha256": "892a8d73f55a9cda1aab5941dfe981d4a901c441b53add2fd1240cb2ddf524e3"
+  },
+  {
+    "fichier": "assets/images/actualite-1-480.webp",
+    "octets": 33648,
+    "sha256": "dc87b83d1c617fe874fc71fbe97c9d45592b8f855c4767dd3c6fc32c07820c9e"
+  },
+  {
+    "fichier": "assets/images/actualite-2-240.webp",
+    "octets": 9164,
+    "sha256": "85a25aca52e3d74ed013d5a8e35fa2566f16a50ccb2c5e03636c3b3e816c1a8e"
+  },
+  {
+    "fichier": "assets/images/actualite-2-480.webp",
+    "octets": 27304,
+    "sha256": "0860eace91199e5aead2b5ba14834aa2c662cf7b64e6587822ac5253a81b86d2"
+  },
+  {
+    "fichier": "assets/images/actualite-3-240.webp",
+    "octets": 10658,
+    "sha256": "b3358b461c79be6040679c9934f2f07b8f6cd0c8e8faa064f590cc88f577a1f8"
+  },
+  {
+    "fichier": "assets/images/actualite-3-480.webp",
+    "octets": 31796,
+    "sha256": "8606619893b3c6e855ab5611b53c3bcf19a9374cae88a2bb8cc342ae8c0bcfbf"
+  },
+  {
+    "fichier": "assets/images/emblem-256.png",
+    "octets": 12929,
+    "sha256": "38297459aee4b2e92f91c1c5efe436620d39f4a933f98475ac73c25bee060fc1"
+  },
+  {
+    "fichier": "assets/images/emblem.png",
+    "octets": 57534,
+    "sha256": "fd2963eee548aa5cf913b2cb82f50a08339b286278b0b7d0674d76e824d5f7e2"
+  },
+  {
+    "fichier": "assets/images/evenement-1-1100.webp",
+    "octets": 61522,
+    "sha256": "41e6b0db854aadd853d085a34a9335687267ceaaa7453b822a6788e36f112d36"
+  },
+  {
+    "fichier": "assets/images/evenement-1-640.webp",
+    "octets": 30786,
+    "sha256": "95f9658c34a7edce218bfc630aa6714bf746bd251b2b0f48530f83a257375b75"
+  },
+  {
+    "fichier": "assets/images/evenement-2-1100.webp",
+    "octets": 63240,
+    "sha256": "48a5763285e24fc5df27c733735efe07cb7ac0f57445bd37666352071741931a"
+  },
+  {
+    "fichier": "assets/images/evenement-2-640.webp",
+    "octets": 30380,
+    "sha256": "36f421652e7d77721a18b8d08a9e361e28c960563a31c7b21c03b28a2ec9ff3d"
+  },
+  {
+    "fichier": "assets/images/evenement-3-1100.webp",
+    "octets": 77752,
+    "sha256": "63142b406f27fc0435c4f954103b2a88a5d2bac2b83dfe8c2d94764198abd8d4"
+  },
+  {
+    "fichier": "assets/images/evenement-3-640.webp",
+    "octets": 33974,
+    "sha256": "fb1217381bafb8fe9e6fb9941cce68247ec1e4a27c052523d58980d472e5efea"
+  },
+  {
+    "fichier": "assets/images/hero-principal-1100.webp",
+    "octets": 105090,
+    "sha256": "d56b5b73ad29aff943701c1c86f6336b773a2b1e92a61752ef0cf2479c1a6d43"
+  },
+  {
+    "fichier": "assets/images/hero-principal-1600.webp",
+    "octets": 183196,
+    "sha256": "5efbb570e98da125cbd98ebef2137ceaf99f4b8968d655d7fcf78cdeaa074d69"
+  },
+  {
+    "fichier": "assets/images/hero-principal-640.webp",
+    "octets": 47890,
+    "sha256": "b645d9495a536b09d7f8e598291b639fb2a36419eedc2d68439fc8a571f9a7d1"
+  },
+  {
+    "fichier": "assets/images/logomed-nav.png",
+    "octets": 16979,
+    "sha256": "16a5f59d8da8fe5acbb596a28466372eaaeb9fabff50543d4b989e948e957f80"
+  },
+  {
+    "fichier": "assets/images/logomed.png",
+    "octets": 69118,
+    "sha256": "7464bf5a5d5959436ae98e4a090fa50697373acb63cf1106e121b51af01bf582"
+  },
+  {
+    "fichier": "assets/images/og-accueil.jpg",
+    "octets": 209974,
+    "sha256": "4109b95a14647e71c7e68ba6733923fffb5106ec55ac0be00368be55c65965a0"
+  },
+  {
+    "fichier": "assets/images/rejoindre-1100.webp",
+    "octets": 120756,
+    "sha256": "9bf36544d8ec8b554b81490b00ca517cd63734274d9f674f86814e32d9fe892d"
+  },
+  {
+    "fichier": "assets/images/rejoindre-1600.webp",
+    "octets": 224492,
+    "sha256": "8a74ca7a240204f8c57abab9363927b3b86d0eb24f7dc85cca03f090fc62827d"
+  },
+  {
+    "fichier": "assets/images/rejoindre-640.webp",
+    "octets": 50454,
+    "sha256": "8ee10cd1dd1fc610f90073bb5dda490a9952fd65e6c2c802b8000344c2bea628"
+  },
+  {
+    "fichier": "assets/js/accueil.js",
+    "octets": 1548,
+    "sha256": "7a4d7223660c57feeef30ba1357043200d637afc1f11a7b9a2e2624300be48ef"
+  },
+  {
+    "fichier": "assets/js/lions.js",
+    "octets": 10977,
+    "sha256": "cac7acf74ec5dc1ce516112dd75ad540d86aba1e4d590309d2f224da671e4d5f"
+  },
+  {
+    "fichier": "assets/js/prive.js",
+    "octets": 7368,
+    "sha256": "d9952a9608153415adfe77f029db44125e0cff9e847ce0c770d7d302e937a703"
+  },
+  {
+    "fichier": "assets/sources/README.md",
+    "octets": 4894,
+    "sha256": "c26862319cca7adff45f862e7424996cde2f863a595d052d8d5ccb0d75466daa"
+  },
+  {
+    "fichier": "assets/sources/club-bloc-medical-original.jpg",
+    "octets": 2586034,
+    "sha256": "a8dc56e1a9e96764095cbee03cc97fdc6e3712cbd0fb2d1c657a8a422fbf86d9"
+  },
+  {
+    "fichier": "assets/sources/club-collectif-original.jpg",
+    "octets": 234133,
+    "sha256": "16ea524132dd53f77efb3830fd238e83401d82bb3515ab35a9c0414482011536"
+  },
+  {
+    "fichier": "assets/sources/club-distribution-original.jpg",
+    "octets": 3927416,
+    "sha256": "b11d2828127e51abffd478cb45633d5dffacf6121a959b3e17cb42dc788bdcaa"
+  },
+  {
+    "fichier": "assets/sources/club-exterieur-original.jpg",
+    "octets": 428971,
+    "sha256": "b9963b53beefcfde4685054d3c63d336e530ae71bda99b691c659980840f8650"
+  },
+  {
+    "fichier": "assets/sources/club-plage-original.jpg",
+    "octets": 1507246,
+    "sha256": "ac255a1664b38c9a11f8ab0530d67503916ff6451b92719e18df86d5f8960a06"
+  },
+  {
+    "fichier": "assets/sources/club-remise-materiel-original.jpg",
+    "octets": 572064,
+    "sha256": "d36d0d0a3c0ee4ad09098b05fc8d3a10d89a8682d852005152eb385f3cefef2a"
+  },
+  {
+    "fichier": "assets/sources/club-rencontre-original.jpg",
+    "octets": 317929,
+    "sha256": "baa329efc96fc63e7d678b6bc4efd23c2ad01b158100dd6fb193ca4d48467140"
+  },
+  {
+    "fichier": "assets/sources/club-soiree-original.jpg",
+    "octets": 3904840,
+    "sha256": "f8b0241067c970e45b8044c36b0a5fb1e91c70573de68f7ca31882d2b6008358"
+  },
+  {
+    "fichier": "assets/sources/club-tablee-original.jpg",
+    "octets": 161101,
+    "sha256": "b11329307eecb5451d5c8be7663f69bbb8cc17a98317a6b743f28000eca1f92f"
+  },
+  {
+    "fichier": "candidature.html",
+    "octets": 20414,
+    "sha256": "b132f5f1d83e46aebd4270c1367a62fb03d9c7c94ac514d91189bd37a872f4ac",
+    "h1": 1,
+    "tailwind": false,
+    "styles_inline": 0,
+    "liens_vides": 1,
+    "noindex": true,
+    "description": true,
+    "canonical": true,
+    "jsonld": true
+  },
+  {
+    "fichier": "confidentialite.html",
+    "octets": 12033,
+    "sha256": "9bd4c73eb5c056b0362fd0c046d70c9a439f86da8add308d85aa4cbc22bf74e6",
+    "h1": 1,
+    "tailwind": false,
+    "styles_inline": 7,
+    "liens_vides": 1,
+    "noindex": true,
+    "description": true,
+    "canonical": true,
+    "jsonld": false
+  },
+  {
+    "fichier": "connexion.html",
+    "octets": 15344,
+    "sha256": "a3c3d381f35995f6534294ab9db4d4b2019eb516cb149f78bbb409fdd4919452",
+    "h1": 1,
+    "tailwind": false,
+    "styles_inline": 0,
+    "liens_vides": 1,
+    "noindex": true,
+    "description": true,
+    "canonical": true,
+    "jsonld": false
+  },
+  {
+    "fichier": "contact.html",
+    "octets": 19892,
+    "sha256": "f3dc873b498e07e5d607f875abf0b9b4535b6c5f7433d3803f248beae8522fc1",
+    "h1": 1,
+    "tailwind": false,
+    "styles_inline": 0,
+    "liens_vides": 1,
+    "noindex": true,
+    "description": true,
+    "canonical": true,
+    "jsonld": true
+  },
+  {
+    "fichier": "emblem.png",
+    "octets": 57534,
+    "sha256": "fd2963eee548aa5cf913b2cb82f50a08339b286278b0b7d0674d76e824d5f7e2"
+  },
+  {
+    "fichier": "espace/tableau-de-bord.html",
+    "octets": 27266,
+    "sha256": "ba989a4f3024b000b7d3a9f2f8024e3717b30bc842f846199a16e1581e122db6",
+    "h1": 1,
+    "tailwind": false,
+    "styles_inline": 0,
+    "liens_vides": 17,
+    "noindex": true,
+    "description": true,
+    "canonical": false,
+    "jsonld": false
+  },
+  {
+    "fichier": "evenements.html",
+    "octets": 36534,
+    "sha256": "88d7292a113782c3a09334d11dcfdae667a2d4a71d6680456f2e7283c9e25f69",
+    "h1": 1,
+    "tailwind": true,
+    "styles_inline": 0,
+    "liens_vides": 0,
+    "noindex": false,
+    "description": false,
+    "canonical": false,
+    "jsonld": false
+  },
+  {
+    "fichier": "home.html",
+    "octets": 69471,
+    "sha256": "4f8480aea628b857f8f20f50851345481ca0f65b535387720a094467acb1f104",
+    "h1": 1,
+    "tailwind": true,
+    "styles_inline": 0,
+    "liens_vides": 7,
+    "noindex": false,
+    "description": false,
+    "canonical": false,
+    "jsonld": false
+  },
+  {
+    "fichier": "logomed.png",
+    "octets": 69118,
+    "sha256": "7464bf5a5d5959436ae98e4a090fa50697373acb63cf1106e121b51af01bf582"
+  },
+  {
+    "fichier": "mentions-legales.html",
+    "octets": 11799,
+    "sha256": "a560271d35e0d392968144ed9eebe43546c9b12221dd28236b5a15353c513550",
+    "h1": 1,
+    "tailwind": false,
+    "styles_inline": 7,
+    "liens_vides": 1,
+    "noindex": true,
+    "description": true,
+    "canonical": true,
+    "jsonld": false
+  },
+  {
+    "fichier": "mot-de-passe-oublie.html",
+    "octets": 13953,
+    "sha256": "c4e8f471bc28283fa661bd14b57febaf8a9d4c66c27b19c37e9d02cfb88b2d0b",
+    "h1": 1,
+    "tailwind": false,
+    "styles_inline": 0,
+    "liens_vides": 1,
+    "noindex": true,
+    "description": true,
+    "canonical": true,
+    "jsonld": false
+  },
+  {
+    "fichier": "nos-actions.html",
+    "octets": 51561,
+    "sha256": "2f168b9ab7b8b62342622a8af10e0128dffd9144c11123503690e9c15f6eba5d",
+    "h1": 1,
+    "tailwind": true,
+    "styles_inline": 0,
+    "liens_vides": 12,
+    "noindex": false,
+    "description": false,
+    "canonical": false,
+    "jsonld": false
+  },
+  {
+    "fichier": "notre-club.html",
+    "octets": 53396,
+    "sha256": "8eff12b16c9a0f486f1a3c1b001d1d3efdfd77cc8197440d10aba5d4ea96f5a5",
+    "h1": 1,
+    "tailwind": true,
+    "styles_inline": 0,
+    "liens_vides": 0,
+    "noindex": false,
+    "description": false,
+    "canonical": false,
+    "jsonld": false
+  },
+  {
+    "fichier": "plan-du-site.html",
+    "octets": 15839,
+    "sha256": "39d8df2144ab0da0d139d11ac563b9dac41f613eee945d36e91f03bf601c2203",
+    "h1": 1,
+    "tailwind": false,
+    "styles_inline": 0,
+    "liens_vides": 1,
+    "noindex": true,
+    "description": true,
+    "canonical": true,
+    "jsonld": true
+  },
+  {
+    "fichier": "rejoindre.html",
+    "octets": 21565,
+    "sha256": "0fa6678b254ec61ade9c900d3bbb26502b24376e3ced164ff0e241904b1afd7a",
+    "h1": 1,
+    "tailwind": false,
+    "styles_inline": 0,
+    "liens_vides": 1,
+    "noindex": true,
+    "description": true,
+    "canonical": true,
+    "jsonld": true
+  },
+  {
+    "fichier": "sitemap.xml",
+    "octets": 3360,
+    "sha256": "d59088b2f482798e4485baf55675db0f78a168673d4867e5476b876b535c9c21"
+  }
+]

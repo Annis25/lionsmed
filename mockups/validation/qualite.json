@@ -1,0 +1,1705 @@
+{
+  "contrasts": [
+    {
+      "page": "aaa.html",
+      "measured": 42,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "accueil.html",
+      "measured": 103,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "action-detail.html",
+      "measured": 53,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "actualites.html",
+      "measured": 59,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "article-detail.html",
+      "measured": 49,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "candidature.html",
+      "measured": 71,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "confidentialite.html",
+      "measured": 48,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "connexion.html",
+      "measured": 48,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "contact.html",
+      "measured": 62,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "evenement-detail.html",
+      "measured": 55,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "evenements.html",
+      "measured": 59,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "home.html",
+      "measured": 42,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "mentions-legales.html",
+      "measured": 47,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "mot-de-passe-oublie.html",
+      "measured": 42,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "nos-actions.html",
+      "measured": 77,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "notre-club.html",
+      "measured": 91,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "plan-du-site.html",
+      "measured": 59,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "rejoindre.html",
+      "measured": 85,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/annuaire.html",
+      "measured": 48,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/audit.html",
+      "measured": 48,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/calendrier.html",
+      "measured": 53,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/contenu-public.html",
+      "measured": 79,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/cotisations.html",
+      "measured": 68,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/document-detail.html",
+      "measured": 39,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/documents.html",
+      "measured": 74,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/membres.html",
+      "measured": 73,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/notifications.html",
+      "measured": 51,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/presences.html",
+      "measured": 61,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/profil-membre.html",
+      "measured": 49,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/profil.html",
+      "measured": 82,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/responsables.html",
+      "measured": 64,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/satisfaction-resultats.html",
+      "measured": 68,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/satisfaction.html",
+      "measured": 42,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/statistiques.html",
+      "measured": 52,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/tableau-de-bord.html",
+      "measured": 103,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/vote-creation.html",
+      "measured": 47,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/vote-resultats.html",
+      "measured": 66,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/vote-suivi.html",
+      "measured": 82,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/votes.html",
+      "measured": 44,
+      "failures": [],
+      "gaps": []
+    }
+  ],
+  "pixels": [
+    {
+      "width": 1440,
+      "selector": ".hero__titre",
+      "minContrast": 8.03,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1440,
+      "selector": ".hero__lede",
+      "minContrast": 6.43,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1440,
+      "selector": ".hero__valeurs li:nth-child(1)",
+      "minContrast": 10.82,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1440,
+      "selector": ".hero__valeurs li:nth-child(2)",
+      "minContrast": 11.28,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1440,
+      "selector": ".hero__valeurs li:nth-child(3)",
+      "minContrast": 10.2,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1440,
+      "selector": ".hero__lieu",
+      "minContrast": 8.54,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1440,
+      "selector": ".rejoindre__texte h2",
+      "minContrast": 13.37,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1440,
+      "selector": ".rejoindre__texte .lede",
+      "minContrast": 8.7,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1280,
+      "selector": ".hero__titre",
+      "minContrast": 8.06,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1280,
+      "selector": ".hero__lede",
+      "minContrast": 6.83,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1280,
+      "selector": ".hero__valeurs li:nth-child(1)",
+      "minContrast": 9.88,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1280,
+      "selector": ".hero__valeurs li:nth-child(2)",
+      "minContrast": 10.51,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1280,
+      "selector": ".hero__valeurs li:nth-child(3)",
+      "minContrast": 11.18,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1280,
+      "selector": ".hero__lieu",
+      "minContrast": 7.88,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1280,
+      "selector": ".rejoindre__texte h2",
+      "minContrast": 13.37,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1280,
+      "selector": ".rejoindre__texte .lede",
+      "minContrast": 8.7,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__titre",
+      "minContrast": 8.59,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__lede",
+      "minContrast": 6.57,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__valeurs li:nth-child(1)",
+      "hidden": true
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__valeurs li:nth-child(2)",
+      "hidden": true
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__valeurs li:nth-child(3)",
+      "hidden": true
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__lieu",
+      "minContrast": 8.98,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1024,
+      "selector": ".rejoindre__texte h2",
+      "minContrast": 13.37,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1024,
+      "selector": ".rejoindre__texte .lede",
+      "minContrast": 8.7,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 768,
+      "selector": ".hero__titre",
+      "minContrast": 9.1,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 768,
+      "selector": ".hero__lede",
+      "minContrast": 5.94,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 768,
+      "selector": ".hero__valeurs li:nth-child(1)",
+      "hidden": true
+    },
+    {
+      "width": 768,
+      "selector": ".hero__valeurs li:nth-child(2)",
+      "hidden": true
+    },
+    {
+      "width": 768,
+      "selector": ".hero__valeurs li:nth-child(3)",
+      "hidden": true
+    },
+    {
+      "width": 768,
+      "selector": ".hero__lieu",
+      "minContrast": 10.03,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 768,
+      "selector": ".rejoindre__texte h2",
+      "minContrast": 13.37,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 768,
+      "selector": ".rejoindre__texte .lede",
+      "minContrast": 8.7,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 430,
+      "selector": ".hero__titre",
+      "minContrast": 6.58,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 430,
+      "selector": ".hero__lede",
+      "minContrast": 5.18,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 430,
+      "selector": ".hero__valeurs li:nth-child(1)",
+      "hidden": true
+    },
+    {
+      "width": 430,
+      "selector": ".hero__valeurs li:nth-child(2)",
+      "hidden": true
+    },
+    {
+      "width": 430,
+      "selector": ".hero__valeurs li:nth-child(3)",
+      "hidden": true
+    },
+    {
+      "width": 430,
+      "selector": ".hero__lieu",
+      "minContrast": 14.13,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 430,
+      "selector": ".rejoindre__texte h2",
+      "minContrast": 13.37,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 430,
+      "selector": ".rejoindre__texte .lede",
+      "minContrast": 8.7,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 375,
+      "selector": ".hero__titre",
+      "minContrast": 7.13,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 375,
+      "selector": ".hero__lede",
+      "minContrast": 5.54,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 375,
+      "selector": ".hero__valeurs li:nth-child(1)",
+      "hidden": true
+    },
+    {
+      "width": 375,
+      "selector": ".hero__valeurs li:nth-child(2)",
+      "hidden": true
+    },
+    {
+      "width": 375,
+      "selector": ".hero__valeurs li:nth-child(3)",
+      "hidden": true
+    },
+    {
+      "width": 375,
+      "selector": ".hero__lieu",
+      "minContrast": 14.16,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 375,
+      "selector": ".rejoindre__texte h2",
+      "minContrast": 13.37,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 375,
+      "selector": ".rejoindre__texte .lede",
+      "minContrast": 8.7,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    }
+  ],
+  "roles": [
+    {
+      "page": "annuaire.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "annuaire.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "annuaire.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "annuaire.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "annuaire.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "annuaire.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "annuaire.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "audit.html",
+      "role": "MEMBRE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "audit.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "audit.html",
+      "role": "BUREAU",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "audit.html",
+      "role": "PRESIDENT",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "audit.html",
+      "role": "SECRETAIRE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "audit.html",
+      "role": "DIRECTEUR",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "audit.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "calendrier.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "calendrier.html",
+      "role": "INVITE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "calendrier.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "calendrier.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "calendrier.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "calendrier.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "calendrier.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "contenu-public.html",
+      "role": "MEMBRE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "contenu-public.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "contenu-public.html",
+      "role": "BUREAU",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "contenu-public.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "contenu-public.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "contenu-public.html",
+      "role": "DIRECTEUR",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "contenu-public.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "cotisations.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "cotisations.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "cotisations.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "cotisations.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "cotisations.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "cotisations.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "cotisations.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "document-detail.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "document-detail.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "document-detail.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "document-detail.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "document-detail.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "document-detail.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "document-detail.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "documents.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "documents.html",
+      "role": "INVITE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "documents.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "documents.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "documents.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "documents.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "documents.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "membres.html",
+      "role": "MEMBRE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "membres.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "membres.html",
+      "role": "BUREAU",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "membres.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "membres.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "membres.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "membres.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "notifications.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "notifications.html",
+      "role": "INVITE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "notifications.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "notifications.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "notifications.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "notifications.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "notifications.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "presences.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "presences.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "presences.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "presences.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "presences.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "presences.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "presences.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil-membre.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil-membre.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil-membre.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil-membre.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil-membre.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil-membre.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil-membre.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil.html",
+      "role": "INVITE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "profil.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "responsables.html",
+      "role": "MEMBRE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "responsables.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "responsables.html",
+      "role": "BUREAU",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "responsables.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "responsables.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "responsables.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "responsables.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction-resultats.html",
+      "role": "MEMBRE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction-resultats.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction-resultats.html",
+      "role": "BUREAU",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction-resultats.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction-resultats.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction-resultats.html",
+      "role": "DIRECTEUR",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction-resultats.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "satisfaction.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "statistiques.html",
+      "role": "MEMBRE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "statistiques.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "statistiques.html",
+      "role": "BUREAU",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "statistiques.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "statistiques.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "statistiques.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "statistiques.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "tableau-de-bord.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "tableau-de-bord.html",
+      "role": "INVITE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "tableau-de-bord.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "tableau-de-bord.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "tableau-de-bord.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "tableau-de-bord.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "tableau-de-bord.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-creation.html",
+      "role": "MEMBRE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-creation.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-creation.html",
+      "role": "BUREAU",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-creation.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-creation.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-creation.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-creation.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-resultats.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-resultats.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-resultats.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-resultats.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-resultats.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-resultats.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-resultats.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-suivi.html",
+      "role": "MEMBRE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-suivi.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-suivi.html",
+      "role": "BUREAU",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-suivi.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-suivi.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-suivi.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "vote-suivi.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "votes.html",
+      "role": "MEMBRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "votes.html",
+      "role": "INVITE",
+      "allowed": false,
+      "visible": false,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "votes.html",
+      "role": "BUREAU",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "votes.html",
+      "role": "PRESIDENT",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "votes.html",
+      "role": "SECRETAIRE",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "votes.html",
+      "role": "DIRECTEUR",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    },
+    {
+      "page": "votes.html",
+      "role": "SUPER_ADMIN",
+      "allowed": true,
+      "visible": true,
+      "forbiddenVisible": 0
+    }
+  ],
+  "spacing": [
+    {
+      "page": "aaa.html",
+      "gaps": []
+    },
+    {
+      "page": "accueil.html",
+      "gaps": []
+    },
+    {
+      "page": "action-detail.html",
+      "gaps": []
+    },
+    {
+      "page": "actualites.html",
+      "gaps": []
+    },
+    {
+      "page": "article-detail.html",
+      "gaps": []
+    },
+    {
+      "page": "candidature.html",
+      "gaps": []
+    },
+    {
+      "page": "confidentialite.html",
+      "gaps": []
+    },
+    {
+      "page": "connexion.html",
+      "gaps": []
+    },
+    {
+      "page": "contact.html",
+      "gaps": []
+    },
+    {
+      "page": "evenement-detail.html",
+      "gaps": []
+    },
+    {
+      "page": "evenements.html",
+      "gaps": []
+    },
+    {
+      "page": "home.html",
+      "gaps": []
+    },
+    {
+      "page": "mentions-legales.html",
+      "gaps": []
+    },
+    {
+      "page": "mot-de-passe-oublie.html",
+      "gaps": []
+    },
+    {
+      "page": "nos-actions.html",
+      "gaps": []
+    },
+    {
+      "page": "notre-club.html",
+      "gaps": []
+    },
+    {
+      "page": "plan-du-site.html",
+      "gaps": []
+    },
+    {
+      "page": "rejoindre.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/annuaire.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/audit.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/calendrier.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/contenu-public.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/cotisations.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/document-detail.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/documents.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/membres.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/notifications.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/presences.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/profil-membre.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/profil.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/responsables.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/satisfaction-resultats.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/satisfaction.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/statistiques.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/tableau-de-bord.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/vote-creation.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/vote-resultats.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/vote-suivi.html",
+      "gaps": []
+    },
+    {
+      "page": "espace/votes.html",
+      "gaps": []
+    }
+  ]
+}
