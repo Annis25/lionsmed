@@ -10,11 +10,11 @@
 
 | | |
 |---|---|
-| **Emplacements photographiques** | **13** — 12 dans la page + 1 image de partage |
-| **Servis par une photo réelle du club** | **9** |
+| **Emplacements photographiques** | **12** — 11 dans la page + 1 image de partage |
+| **Servis par une photo réelle du club** | **8** |
 | **En attente d'une image** | **4** — les quatre cartes d'axes |
 | **Fichiers `tmp-` réellement déposés** | **0** |
-| **Fichiers déposés / attendus** | **19 / 27** |
+| **Fichiers déposés / attendus** | **15 / 23** |
 
 Les quatre cartes d'axes affichent le **repère technique** décrit plus bas, et non une
 photo. C'est délibéré : aucune des neuf photographies disponibles ne documente le
@@ -84,24 +84,23 @@ température de lumière, même distance au sujet. Sinon la rangée se désagrè
 | 4 | `tmp-axe-humanitaire` | Remise de dons ou d'équipement : cartons, matériel médical, colis alimentaires. | *(à rédiger)* |
 | 5 | `tmp-axe-jeunesse` | Action auprès de jeunes : atelier scolaire, remise de fournitures, Leo Club. | *(à rédiger)* |
 
-### 6 à 8 — Cartes événements ✅ servies
+### 6 à 9 — Action à la une et dernières actions ✅ servies
 
 | | |
 |---|---|
-| **Variantes** | `-640` `-1100` · **Ratio** 16/10 · **Minimum** `1100×688` |
-| **Cadrage commun** | **Un badge date navy occupe le coin haut-gauche** : zone à laisser libre. Photo plutôt lumineuse, le badge est sombre. |
-| **Priorité** | Moyenne |
+L'action à la une utilise un format 16/10. Les trois dernières actions utilisent
+des vignettes carrées de 96 px. Les associations restent à confirmer par le club.
 
-| # | Nom de base | `alt` en place | Photo en place |
+| # | Emplacement | `alt` en place | Photo en place |
 |---|---|---|---|
-| 6 | `evenement-1` | Membres du club réunis autour d'une table lors d'une soirée en salle de réception. | `club-tablee-original.jpg` |
-| 7 | `evenement-2` | Membres du club en gilets jaunes sur la plage, le soir, avec la bannière Lions Sfax Med. | `club-plage-original.jpg` |
-| 8 | `evenement-3` | Groupe en blouses blanches et gilets Lions réuni en salle de réunion autour de matériel médical. | `club-remise-materiel-original.jpg` |
+| 6 | Action à la une · `evenement-3` | Groupe en blouses blanches et gilets Lions réuni en salle de réunion autour de matériel médical. | `club-remise-materiel-original.jpg` |
+| 7 | Plantation · `evenement-2` | Groupe en gilets Lions sur une plage, le soir, avec la bannière du club. | `club-plage-original.jpg` |
+| 8 | Bourses · `actualite-3` | Groupe réuni autour d'une table le soir, sous une pergola. | `club-soiree-original.jpg` |
+| 9 | Santé oculaire · `actualite-1` | Matériel médical présenté sur une table lors d'une remise d'équipement. | `club-rencontre-original.jpg` |
 
-### 9 à 11 — Vignettes actualités ✅ servies
+### 10 — Actualité du club ✅ servie
 
-Vignettes carrées de **112 px** de côté (84 px sous 520 px). Un plan large y devient
-illisible : **cadrage serré obligatoire**.
+Vignette carrée de **72 px** de côté dans le bandeau éditorial compact.
 
 | | |
 |---|---|
@@ -111,11 +110,9 @@ illisible : **cadrage serré obligatoire**.
 
 | # | Nom de base | `alt` en place | Photo en place |
 |---|---|---|---|
-| 9 | `actualite-1` | Matériel médical présenté sur une table lors d'une remise d'équipement. | `club-rencontre-original.jpg` |
 | 10 | `actualite-2` | Six personnes en casaques et charlottes chirurgicales devant un écran médical. | `club-bloc-medical-original.jpg` |
-| 11 | `actualite-3` | Membres du club réunis autour d'une table le soir, sous une pergola. | `club-soiree-original.jpg` |
 
-### 12 — Bloc « Nous rejoindre » ✅ servi
+### 11 — Bloc « Nous rejoindre » ✅ servi
 
 **Sert deux pages** : le bloc de conversion de `accueil.html` et celui de
 `rejoindre.html`. Même fichier, même arche, deux traitements différents — fondu vers le
@@ -132,7 +129,7 @@ ne convient à ce cadrage.
 | **Priorité** | Haute |
 | **Photo en place** | `club-distribution-original.jpg` |
 
-### 13 — Image de partage ✅ servie
+### 12 — Image de partage ✅ servie
 
 | | |
 |---|---|
@@ -146,19 +143,19 @@ ne convient à ce cadrage.
 
 ## Associations photo ↔ contenu à confirmer
 
-Six emplacements portent une **photographie authentique du club** rattachée à un
+Cinq emplacements portent une **photographie authentique du club** rattachée à un
 **contenu de démonstration** (titres, dates et lieux repris des tables `events_event` et
 `news_article`).
 
 **Le rattachement n'est documenté nulle part.** Une photo réelle placée sous un titre
-d'événement affirme implicitement que cet événement a eu lieu, à cette date, avec ces
+d'action affirme implicitement que cette action a eu lieu, à cette date, avec ces
 personnes. C'est la même réserve que celle qui a fait laisser les quatre cartes d'axes en
 repère technique, et elle est tracée au même niveau : chaque emplacement porte dans le
 HTML le commentaire
 
 ```html
 <!-- DONNÉE À VALIDER PAR LE CLUB : photographie authentique du club associée à un contenu
-     de démonstration. L'association photo ↔ événement n'est pas documentée. -->
+     de démonstration. L'association photo ↔ action n'est pas documentée. -->
 ```
 
 Les `alt` décrivent **strictement ce que montre la photographie**, jamais le contenu
@@ -167,12 +164,11 @@ normal, et voulu : il signale que le rattachement reste à établir.
 
 | Emplacement | Contenu affiché (démonstration) | Ce que montre réellement la photo | Source |
 |---|---|---|---|
-| `evenement-1` | Assemblée générale ordinaire — 12 juin, Maison des Associations, Sfax | Membres réunis autour d'une table lors d'une soirée en salle de réception | `club-tablee-original.jpg` |
-| `evenement-2` | Attribution des bourses scolaires — 14 juin, Salle de conférences, Sfax | Membres en gilets jaunes sur la plage, le soir, avec la bannière du club | `club-plage-original.jpg` |
-| `evenement-3` | Caravane de dépistage du diabète — 19 juin, Hôpital Hédi Chaker, Sfax | Groupe en blouses blanches et gilets Lions en salle de réunion, autour de matériel médical | `club-remise-materiel-original.jpg` |
-| `actualite-1` | Caravane de dépistage du diabète à Sfax — 27 mai 2026 | Matériel médical présenté sur une table lors d'une remise d'équipement | `club-rencontre-original.jpg` |
+| `evenement-2` | Plantation — 22 juin 2026, Aïn Draham, Jendouba | Membres en gilets Lions sur une plage, le soir, avec la bannière du club | `club-plage-original.jpg` |
+| `evenement-3` | Caravane de dépistage du diabète — Hôpital Hédi Chaker, Sfax | Groupe en blouses blanches et gilets Lions en salle de réunion, autour de matériel médical | `club-remise-materiel-original.jpg` |
+| `actualite-1` | Caravane ophtalmologique — 15 avril 2026, Jendouba | Matériel médical présenté sur une table lors d'une remise d'équipement | `club-rencontre-original.jpg` |
 | `actualite-2` | Passation de service : retour sur l'assemblée élective — 16 mai 2026 | Six personnes en casaques et charlottes chirurgicales devant un écran médical | `club-bloc-medical-original.jpg` |
-| `actualite-3` | Attribution des bourses scolaires 2025-2026 — 20 avril 2026 | Membres réunis autour d'une table le soir, sous une pergola | `club-soiree-original.jpg` |
+| `actualite-3` | Attribution des bourses scolaires — 14 juin 2026, Sfax | Membres réunis autour d'une table le soir, sous une pergola | `club-soiree-original.jpg` |
 
 **Deux façons de lever la réserve**, au choix du bureau :
 
@@ -195,8 +191,9 @@ Attributs déjà écrits dans `accueil.html`. Pour vérification à l'intégrati
 |---|---|---|
 | `hero-principal` | `100vw` | `fetchpriority="high"`, `<source media="(max-width:760px)">` vers `-640` |
 | `tmp-axe-*` | `(max-width:520px) 100vw, (max-width:1080px) 50vw, 282px` | `lazy` |
-| `evenement-*` | `(max-width:760px) 100vw, (max-width:1080px) 50vw, 210px` | `lazy` |
-| `actualite-*` | `(max-width:520px) 84px, 112px` | `lazy` |
+| `evenement-3` (action à la une) | `(max-width:1080px) 100vw, 60vw` | `lazy` |
+| Actions récentes | `96px` | `lazy` |
+| Actualité du club | `72px` | `lazy` |
 | `rejoindre` | `(max-width:1080px) 100vw, 38vw` | `lazy` |
 
 Chaque `<img>` porte `width` et `height` en dur, et son conteneur `.media` porte le ratio
@@ -300,9 +297,9 @@ ls mockups/assets/images/tmp-*                  # → aucun fichier ne doit subs
 
 Bonjour,
 
-Les neuf photographies que vous nous avez transmises sont en place sur la nouvelle page
-d'accueil : la photo d'ouverture, les trois événements, les trois actualités et le bloc
-d'adhésion. Merci.
+Sept des neuf photographies que vous nous avez transmises sont utilisées sur la nouvelle
+page d'accueil : la photo d'ouverture, quatre visuels d'actions, une actualité du club et
+le bloc d'adhésion. Les deux autres restent disponibles dans la photothèque. Merci.
 
 Il nous manque **quatre photographies**, et ce sont les plus visibles de la page : celles
 des quatre axes prioritaires. En attendant, ces quatre emplacements affichent un cadre
@@ -327,14 +324,14 @@ pictogramme rond s'y superpose.
 
 ### Trois améliorations possibles
 
-- **Vignettes d'actualités** : elles s'affichent en **petit carré de 112 pixels**. À cette
+- **Vignettes d'actions et d'actualité** : elles s'affichent en **petit carré de 72 à 96 pixels**. À cette
   taille, on doit voir **un visage ou un objet**, pas une salle entière. Si vous avez des
   **plans serrés** — un portrait, deux mains qui échangent quelque chose, un détail
   d'action — ils remplaceraient avantageusement les recadrages actuels.
 - **Photo d'ouverture** : la photo de groupe extérieure convient très bien. Si vous en
   avez une version **plus large que 1600 pixels**, elle serait bienvenue.
-- **Photos d'événements** : les trois photos utilisées sont des scènes de vie du club.
-  Dès que vous aurez des photos correspondant aux **événements réellement programmés**,
+- **Photos d'actions** : les photographies utilisées sont des scènes de vie du club.
+  Dès que vous aurez des photos correspondant aux **actions réellement réalisées**,
   elles les remplaceront.
 
 ### Consignes générales
@@ -410,13 +407,12 @@ derniers sont techniques et reviennent à l'intégrateur.*
       reconnaissables. Chacune a-t-elle accepté la publication sur le site public ?
       *Cette vérification n'a pas été faite.*
 
-- [ ] **Photos des événements.** Les trois photos illustrant « Assemblée générale
-      ordinaire », « Attribution des bourses scolaires » et « Caravane de dépistage du
-      diabète » correspondent-elles bien à ces événements ? Voir le tableau
+- [ ] **Photos des actions.** Les photographies illustrant la plantation, les bourses,
+      les caravanes diabète et ophtalmologique correspondent-elles bien à ces actions ? Voir le tableau
       « Associations photo ↔ contenu à confirmer ». Sinon : fournir la bonne photo, ou
       corriger l'intitulé.
 
-- [ ] **Photos des actualités.** Même question pour les trois vignettes d'actualités.
+- [ ] **Photo de l'actualité.** Même question pour la vignette de la passation de service.
 
 - [ ] **Adresse e-mail officielle.** La page affiche `secretariat@lionsmed.tn`, valeur
       déclarée par le club. Une adresse `contact@lionsmed.tn` a également été évoquée.
@@ -469,3 +465,21 @@ derniers sont techniques et reviennent à l'intégrateur.*
   de marque n’est nécessaire.
 - Le consentement des personnes reconnaissables, les associations photo/contenu des
   six extraits de l’accueil et l’adresse e-mail officielle restent à valider.
+
+---
+
+## Page « Notre Club »
+
+### Photo de présentation du club ✅ servie
+
+| | |
+|---|---|
+| **Fichiers servis** | `hero-principal-640.webp`, `hero-principal-1100.webp`, `hero-principal-1600.webp` |
+| **Ratio d’affichage** | **3/2**, dans l’arche structurelle de la page |
+| **Cadrage** | Groupe lisible au centre ; le recadrage conserve la bannière et ne rattache pas la scène à une action particulière. |
+| **`alt`** | Groupe réuni en extérieur, en gilets jaunes, autour de la bannière du club. |
+| **Source** | `club-exterieur-original.jpg` |
+| **Réserve** | Les droits de publication des personnes reconnaissables restent à vérifier par le bureau avant mise en ligne. |
+
+Cette photographie présente uniquement une présence collective : elle ne permet
+d’identifier ni de nommer les personnes visibles.

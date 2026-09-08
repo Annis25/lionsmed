@@ -234,6 +234,7 @@
     var root = bar.parentElement;
     var search = bar.querySelector('[data-search]');
     var filter = bar.querySelector('[data-filter]');
+    if (!search || !filter) return;
     var normal = function(t) { return t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); };
     var update = function() {
       var count = 0;

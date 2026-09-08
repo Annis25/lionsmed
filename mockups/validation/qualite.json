@@ -8,7 +8,7 @@
     },
     {
       "page": "accueil.html",
-      "measured": 103,
+      "measured": 99,
       "failures": [],
       "gaps": []
     },
@@ -92,7 +92,7 @@
     },
     {
       "page": "notre-club.html",
-      "measured": 91,
+      "measured": 100,
       "failures": [],
       "gaps": []
     },
@@ -110,127 +110,127 @@
     },
     {
       "page": "espace/annuaire.html",
-      "measured": 48,
+      "measured": 56,
       "failures": [],
       "gaps": []
     },
     {
       "page": "espace/audit.html",
-      "measured": 48,
+      "measured": 50,
       "failures": [],
       "gaps": []
     },
     {
       "page": "espace/calendrier.html",
-      "measured": 53,
-      "failures": [],
-      "gaps": []
-    },
-    {
-      "page": "espace/contenu-public.html",
-      "measured": 79,
-      "failures": [],
-      "gaps": []
-    },
-    {
-      "page": "espace/cotisations.html",
-      "measured": 68,
-      "failures": [],
-      "gaps": []
-    },
-    {
-      "page": "espace/document-detail.html",
-      "measured": 39,
-      "failures": [],
-      "gaps": []
-    },
-    {
-      "page": "espace/documents.html",
-      "measured": 74,
-      "failures": [],
-      "gaps": []
-    },
-    {
-      "page": "espace/membres.html",
-      "measured": 73,
-      "failures": [],
-      "gaps": []
-    },
-    {
-      "page": "espace/notifications.html",
-      "measured": 51,
-      "failures": [],
-      "gaps": []
-    },
-    {
-      "page": "espace/presences.html",
-      "measured": 61,
-      "failures": [],
-      "gaps": []
-    },
-    {
-      "page": "espace/profil-membre.html",
-      "measured": 49,
-      "failures": [],
-      "gaps": []
-    },
-    {
-      "page": "espace/profil.html",
-      "measured": 82,
-      "failures": [],
-      "gaps": []
-    },
-    {
-      "page": "espace/responsables.html",
       "measured": 64,
       "failures": [],
       "gaps": []
     },
     {
+      "page": "espace/contenu-public.html",
+      "measured": 81,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/cotisations.html",
+      "measured": 70,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/document-detail.html",
+      "measured": 41,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/documents.html",
+      "measured": 76,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/membres.html",
+      "measured": 75,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/notifications.html",
+      "measured": 53,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/presences.html",
+      "measured": 63,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/profil-membre.html",
+      "measured": 51,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/profil.html",
+      "measured": 87,
+      "failures": [],
+      "gaps": []
+    },
+    {
+      "page": "espace/responsables.html",
+      "measured": 72,
+      "failures": [],
+      "gaps": []
+    },
+    {
       "page": "espace/satisfaction-resultats.html",
-      "measured": 68,
+      "measured": 70,
       "failures": [],
       "gaps": []
     },
     {
       "page": "espace/satisfaction.html",
-      "measured": 42,
+      "measured": 44,
       "failures": [],
       "gaps": []
     },
     {
       "page": "espace/statistiques.html",
-      "measured": 52,
+      "measured": 54,
       "failures": [],
       "gaps": []
     },
     {
       "page": "espace/tableau-de-bord.html",
-      "measured": 103,
+      "measured": 105,
       "failures": [],
       "gaps": []
     },
     {
       "page": "espace/vote-creation.html",
-      "measured": 47,
+      "measured": 49,
       "failures": [],
       "gaps": []
     },
     {
       "page": "espace/vote-resultats.html",
-      "measured": 66,
+      "measured": 68,
       "failures": [],
       "gaps": []
     },
     {
       "page": "espace/vote-suivi.html",
-      "measured": 82,
+      "measured": 84,
       "failures": [],
       "gaps": []
     },
     {
       "page": "espace/votes.html",
-      "measured": 44,
+      "measured": 46,
       "failures": [],
       "gaps": []
     }
@@ -239,37 +239,34 @@
     {
       "width": 1440,
       "selector": ".hero__titre",
-      "minContrast": 8.03,
+      "minContrast": 9.32,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {
       "width": 1440,
       "selector": ".hero__lede",
-      "minContrast": 6.43,
+      "minContrast": 6.55,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {
       "width": 1440,
       "selector": ".hero__valeurs li:nth-child(1)",
-      "minContrast": 10.82,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+      "hidden": true
     },
     {
       "width": 1440,
       "selector": ".hero__valeurs li:nth-child(2)",
-      "minContrast": 11.28,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+      "hidden": true
     },
     {
       "width": 1440,
       "selector": ".hero__valeurs li:nth-child(3)",
-      "minContrast": 10.2,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+      "hidden": true
     },
     {
       "width": 1440,
       "selector": ".hero__lieu",
-      "minContrast": 8.54,
+      "minContrast": 9.41,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {
@@ -287,130 +284,127 @@
     {
       "width": 1280,
       "selector": ".hero__titre",
-      "minContrast": 8.06,
+      "minContrast": 8.81,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {
       "width": 1280,
       "selector": ".hero__lede",
-      "minContrast": 6.83,
+      "minContrast": 6.91,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {
       "width": 1280,
       "selector": ".hero__valeurs li:nth-child(1)",
+      "hidden": true
+    },
+    {
+      "width": 1280,
+      "selector": ".hero__valeurs li:nth-child(2)",
+      "hidden": true
+    },
+    {
+      "width": 1280,
+      "selector": ".hero__valeurs li:nth-child(3)",
+      "hidden": true
+    },
+    {
+      "width": 1280,
+      "selector": ".hero__lieu",
+      "minContrast": 9.04,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1280,
+      "selector": ".rejoindre__texte h2",
+      "minContrast": 13.37,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1280,
+      "selector": ".rejoindre__texte .lede",
+      "minContrast": 8.7,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__titre",
+      "minContrast": 10.19,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__lede",
+      "minContrast": 6.48,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__valeurs li:nth-child(1)",
+      "hidden": true
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__valeurs li:nth-child(2)",
+      "hidden": true
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__valeurs li:nth-child(3)",
+      "hidden": true
+    },
+    {
+      "width": 1024,
+      "selector": ".hero__lieu",
+      "minContrast": 8.05,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1024,
+      "selector": ".rejoindre__texte h2",
+      "minContrast": 13.37,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 1024,
+      "selector": ".rejoindre__texte .lede",
+      "minContrast": 8.7,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 768,
+      "selector": ".hero__titre",
+      "minContrast": 9.45,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 768,
+      "selector": ".hero__lede",
+      "minContrast": 5.96,
+      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
+    },
+    {
+      "width": 768,
+      "selector": ".hero__valeurs li:nth-child(1)",
+      "hidden": true
+    },
+    {
+      "width": 768,
+      "selector": ".hero__valeurs li:nth-child(2)",
+      "hidden": true
+    },
+    {
+      "width": 768,
+      "selector": ".hero__valeurs li:nth-child(3)",
+      "hidden": true
+    },
+    {
+      "width": 768,
+      "selector": ".hero__lieu",
       "minContrast": 9.88,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {
-      "width": 1280,
-      "selector": ".hero__valeurs li:nth-child(2)",
-      "minContrast": 10.51,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 1280,
-      "selector": ".hero__valeurs li:nth-child(3)",
-      "minContrast": 11.18,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 1280,
-      "selector": ".hero__lieu",
-      "minContrast": 7.88,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 1280,
-      "selector": ".rejoindre__texte h2",
-      "minContrast": 13.37,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 1280,
-      "selector": ".rejoindre__texte .lede",
-      "minContrast": 8.7,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 1024,
-      "selector": ".hero__titre",
-      "minContrast": 8.59,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 1024,
-      "selector": ".hero__lede",
-      "minContrast": 6.57,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 1024,
-      "selector": ".hero__valeurs li:nth-child(1)",
-      "hidden": true
-    },
-    {
-      "width": 1024,
-      "selector": ".hero__valeurs li:nth-child(2)",
-      "hidden": true
-    },
-    {
-      "width": 1024,
-      "selector": ".hero__valeurs li:nth-child(3)",
-      "hidden": true
-    },
-    {
-      "width": 1024,
-      "selector": ".hero__lieu",
-      "minContrast": 8.98,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 1024,
-      "selector": ".rejoindre__texte h2",
-      "minContrast": 13.37,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 1024,
-      "selector": ".rejoindre__texte .lede",
-      "minContrast": 8.7,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 768,
-      "selector": ".hero__titre",
-      "minContrast": 9.1,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 768,
-      "selector": ".hero__lede",
-      "minContrast": 5.94,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
-      "width": 768,
-      "selector": ".hero__valeurs li:nth-child(1)",
-      "hidden": true
-    },
-    {
-      "width": 768,
-      "selector": ".hero__valeurs li:nth-child(2)",
-      "hidden": true
-    },
-    {
-      "width": 768,
-      "selector": ".hero__valeurs li:nth-child(3)",
-      "hidden": true
-    },
-    {
-      "width": 768,
-      "selector": ".hero__lieu",
-      "minContrast": 10.03,
-      "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
-    },
-    {
       "width": 768,
       "selector": ".rejoindre__texte h2",
       "minContrast": 13.37,
@@ -425,13 +419,13 @@
     {
       "width": 430,
       "selector": ".hero__titre",
-      "minContrast": 6.58,
+      "minContrast": 6.51,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {
       "width": 430,
       "selector": ".hero__lede",
-      "minContrast": 5.18,
+      "minContrast": 5.16,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {
@@ -452,7 +446,7 @@
     {
       "width": 430,
       "selector": ".hero__lieu",
-      "minContrast": 14.13,
+      "minContrast": 10.64,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {
@@ -470,13 +464,13 @@
     {
       "width": 375,
       "selector": ".hero__titre",
-      "minContrast": 7.13,
+      "minContrast": 7.03,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {
       "width": 375,
       "selector": ".hero__lede",
-      "minContrast": 5.54,
+      "minContrast": 5.25,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {
@@ -497,7 +491,7 @@
     {
       "width": 375,
       "selector": ".hero__lieu",
-      "minContrast": 14.16,
+      "minContrast": 11.21,
       "method": "pixels du rendu sans glyphes, échantillonnage tous les 4 pixels"
     },
     {

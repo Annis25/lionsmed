@@ -10,12 +10,18 @@
 (function () {
   'use strict';
 
+  /* La bannière de développement reste visible par défaut. Les captures
+     finales peuvent la masquer sans modifier le HTML avec ?capture=final. */
+  if (new URLSearchParams(window.location.search).get('capture') === 'final') {
+    document.documentElement.classList.add('capture-finale');
+  }
+
   /* ─── 1 · SÉQUENCE D'OUVERTURE DU HERO ─────────────────────────────────── */
   /* Le seul moment orchestré de la page. Les décalages sont portés par
      data-seq dans le HTML ; la neutralisation sous prefers-reduced-motion est
      entièrement gérée en CSS, pour rester vraie même si ce script échoue. */
   var hero = document.querySelector('.hero');
   if (hero) {
-    requestAnimationFrame(function () { hero.classList.add('is-ready'); });
+    hero.classList.add('is-ready');
   }
 })();
