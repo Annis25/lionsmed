@@ -1,0 +1,431 @@
+@charset "UTF-8";
+/* ═══════════════════════════════════════════════════════════════════════════
+   PAGE D'ACCUEIL — composants spécifiques
+   ═══════════════════════════════════════════════════════════════════════════
+   Ne redéfinit AUCUNE variable : tous les jetons viennent de lions.css.
+
+   Rythme des sections — deux voisines ne partagent jamais fond ET structure :
+     hero      champ navy, composition asymétrique, arcs monumentaux
+     intro     blanc, deux colonnes déséquilibrées, texte dominant
+     axes      fond clair, grille de cartes
+     causes    bande basse fond-2, alignement horizontal, discret
+     chiffres  bandeau navy pleine largeur, chiffres énormes
+     agenda    blanc, deux colonnes de densités différentes
+     rejoindre split arche/navy, un seul appel à l'action
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── HERO ───────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: clamp(500px, 74vh, 640px);
+  padding-block: clamp(64px, 8vw, 96px);
+  background: var(--navy);
+  color: var(--sur-sombre);
+  overflow: hidden;
+}
+.hero__photo { position: absolute; inset: 0; }
+.hero__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 62% 42%; }
+
+/* Navy opaque à gauche, ouverture progressive sur la photo à droite.
+   Garantit le contraste AA du texte blanc sur toute la zone de lecture. */
+.hero__voile {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    var(--navy) 0%,
+    rgba(14,46,94,.985) 30%,
+    rgba(14,46,94,.88) 48%,
+    rgba(14,46,94,.58) 68%,
+    rgba(14,46,94,.34) 86%,
+    rgba(14,46,94,.26) 100%);
+}
+
+/* Voile bas — garantit le contraste AA de la mention de lieu, posée sur la
+   partie claire de la photographie. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 240px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(10,35,73,.88));
+}
+
+/* Emploi monumental de l'arc : le centre du motif tombe hors de l'écran,
+   on n'en voit qu'un fragment. C'est ce fragment qui rend la page mémorable. */
+.hero__arcs {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: min(880px, 74vw);
+  height: auto;
+  transform: translate(30%, -50%);
+  opacity: .55;
+  pointer-events: none;
+}
+
+.hero__grille {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--e8);
+}
+
+.hero__titre { color: var(--sur-sombre); }
+.hero__lede {
+  margin: var(--e5) 0 0;
+  font-size: var(--t-lede);
+  line-height: 1.6;
+  color: var(--sur-sombre-doux);
+  max-width: 46ch;
+}
+.hero__actions { display: flex; flex-wrap: wrap; gap: var(--e3); margin-top: var(--e7); }
+
+/* Colonne de valeurs — filet vertical dégradé puis libellés alignés à droite */
+.hero__valeurs {
+  display: flex;
+  align-items: center;
+  gap: var(--e5);
+}
+.hero__filet {
+  width: 1px;
+  align-self: stretch;
+  min-height: 180px;
+  background: linear-gradient(180deg, transparent, var(--or) 22%, var(--or) 78%, transparent);
+}
+.hero__valeurs ul { display: grid; gap: var(--e3); text-align: right; }
+.hero__valeurs li {
+  font-size: var(--t-eyebrow);
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--sur-sombre-doux);
+}
+
+/* Ancrage — la mention de lieu, en bas à droite */
+.hero__lieu {
+  position: absolute;
+  right: var(--gouttiere);
+  bottom: var(--e6);
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e2);
+  text-align: right;
+}
+.hero__lieu svg { color: var(--or); margin-top: 2px; }
+.hero__lieu strong { display: block; font-size: .9375rem; color: var(--sur-sombre); font-weight: 600; }
+.hero__lieu em { display: block; font-size: var(--t-meta); color: var(--sur-sombre-doux); font-style: italic; }
+
+/* ─── INTRO — deux colonnes déséquilibrées, le texte domine ──────────────── */
+.intro__grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e7);
+}
+@media (min-width: 1081px) {
+  .intro__grille { grid-template-columns: 1.35fr 1fr; gap: var(--e11); align-items: start; }
+}
+.intro__texte p { color: var(--gris); }
+.intro__texte p + p { margin-top: var(--e4); }
+.intro__reperes { display: grid; gap: var(--e5); }
+.intro__repere { padding-left: var(--e5); border-left: 2px solid var(--bord); }
+.intro__repere dt {
+  font-family: var(--police-titre);
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--bleu);
+  letter-spacing: -.02em;
+}
+.intro__repere dd { margin: var(--e2) 0 0; font-size: .9375rem; color: var(--gris); }
+
+/* ─── AXES — grille de cartes ────────────────────────────────────────────── */
+.axes__grille {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--e5);
+}
+.axe__media { border-radius: var(--r-carte) var(--r-carte) 0 0; }
+/* La pastille déborde sur le bas-gauche de la photo. Cette zone est réservée :
+   voir IMAGES.md, aucun visage ne doit y tomber. */
+.axe__pastille {
+  position: relative;
+  z-index: 2;
+  width: 52px;
+  height: 52px;
+  margin-top: -50px;
+  border-radius: 50%;
+  border: 3px solid var(--blanc);
+  display: grid;
+  place-items: center;
+  color: var(--blanc);
+  flex: none;
+}
+.axe__pastille--diabete     { background: #1A5FBF; }
+.axe__pastille--environnement { background: #2FA36B; }
+.axe__pastille--humanitaire { background: #E2445C; }
+.axe__pastille--jeunesse    { background: #F0A81E; }
+.axe h3 { margin-top: var(--e1); }
+
+/* ─── CAUSES — bande basse, alignement horizontal, traitement discret ────── */
+.causes__liste {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--e5);
+}
+.cause { text-align: center; display: grid; justify-items: center; gap: var(--e3); }
+.cause__rond {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--blanc);
+  box-shadow: var(--ombre-fine), 0 8px 20px rgba(14,46,94,.08);
+  display: grid;
+  place-items: center;
+}
+.cause span { font-size: .875rem; font-weight: 500; color: var(--gris); line-height: 1.45; max-width: 16ch; }
+
+/* ─── CHIFFRES — bandeau navy, chiffres énormes ──────────────────────────── */
+.chiffres {
+  position: relative;
+  background:
+    radial-gradient(120% 140% at 18% 0%, rgba(24,72,152,.55) 0%, transparent 62%),
+    var(--navy);
+  overflow: hidden;
+}
+.chiffres__grille {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--e8);
+}
+.chiffres__stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--e6) var(--e5); }
+.stat { display: grid; gap: var(--e2); }
+.stat svg { color: var(--or); }
+.stat__valeur {
+  font-family: var(--police-titre);
+  font-size: clamp(2.5rem, 4.4vw, 3.75rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--sur-sombre);
+  font-variant-numeric: tabular-nums;
+}
+.stat__label { font-size: .9375rem; color: var(--sur-sombre-faible); line-height: 1.45; }
+
+/* Emblème en filigrane surmontant « WE SERVE » — seconde et dernière
+   exception aux capitales, avec les surtitres. */
+.chiffres__sceau { display: grid; justify-items: center; gap: var(--e3); }
+.chiffres__sceau img {
+  width: 200px;
+  height: auto;
+  opacity: .17;
+  filter: brightness(0) invert(1);
+}
+.chiffres__sceau span {
+  font-family: var(--police-titre);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: .3em;
+  color: var(--or);
+}
+.chiffres__note { margin-top: var(--e6); }
+
+/* ─── AGENDA — deux colonnes de densités différentes ─────────────────────── */
+.agenda__grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e9);
+}
+@media (min-width: 1081px) {
+  .agenda__grille { grid-template-columns: 58fr 42fr; gap: var(--e8); }
+}
+/* Titre resserré pour que le lien tienne à sa droite, comme spécifié. */
+.agenda__col .section-head--split h2 { font-size: clamp(1.375rem, 1.9vw, 1.75rem); max-width: 11ch; }
+.agenda__col .section-head--split .link-arrow { font-size: var(--t-meta); }
+
+/* Événements — trois cartes côte à côte */
+.evenements { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--e4); }
+.evenement__media { border-radius: var(--r-carte) var(--r-carte) 0 0; }
+.evenement .card__body { padding: var(--e4); gap: var(--e2); }
+.evenement h3 { font-size: 1rem; line-height: 1.35; }
+/* Badge date — coin haut-gauche de la photo, zone réservée (voir IMAGES.md) */
+.evenement__date {
+  position: absolute;
+  top: var(--e3);
+  left: var(--e3);
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  padding: var(--e2) var(--e3);
+  border-radius: 6px;
+  background: var(--navy);
+  color: var(--sur-sombre);
+  line-height: 1;
+}
+.evenement__date b { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.evenement__date span {
+  margin-top: 3px;
+  font-size: .625rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--sur-sombre-doux);
+}
+.evenement .link-arrow { font-size: var(--t-meta); }
+
+/* Actualités — lignes horizontales, vignette carrée */
+.actualites { display: grid; }
+.actualite {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: var(--e4);
+  align-items: start;
+  padding-block: var(--e5);
+  border-top: 1px solid var(--bord);
+}
+.actualite:first-child { border-top: 0; padding-top: 0; }
+.actualite__media { border-radius: var(--r-carte); }
+.actualite h3 {
+  font-family: var(--police-titre);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -.01em;
+  transition: color var(--duree) var(--courbe);
+}
+.actualite a:hover h3 { color: var(--bleu); }
+/* Idem : une date publiée est un contenu, elle doit passer AA. */
+.actualite time { display: block; margin-top: var(--e2); font-size: var(--t-meta); color: var(--gris); }
+
+/* ─── REJOINDRE — emploi structurel de l'arc ─────────────────────────────── */
+.rejoindre { background: var(--navy); overflow: hidden; }
+.rejoindre__grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e7);
+  align-items: center;
+}
+@media (min-width: 1081px) {
+  .rejoindre__grille { grid-template-columns: 38fr 62fr; gap: var(--e9); }
+}
+/* L'arche vient du contour du sceau. Elle ne s'emploie nulle part ailleurs. */
+.rejoindre__media {
+  position: relative;
+  border-radius: var(--r-arche);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+.rejoindre__media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 34%; }
+/* Fondu vers le navy, sans coupure nette */
+.rejoindre__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 44%, rgba(14,46,94,.42) 78%, var(--navy) 100%);
+}
+.rejoindre__texte .lede { color: var(--sur-sombre-doux); margin: var(--e5) 0 var(--e7); }
+
+/* ─── SÉQUENCE D'OUVERTURE DU HERO ───────────────────────────────────────── */
+/* Le seul moment orchestré de la page. Décalage de 90 ms, 850 ms de durée. */
+/* `backwards` et non `both` : l'état FINAL est porté par la règle elle-même
+   (opacity:1), l'animation ne fait que jouer l'entrée. Si elle ne se déclenche
+   pas — moteur exotique, onglet en arrière-plan, bug —, le contenu est visible
+   immédiatement au lieu de rester bloqué à zéro. */
+.js .hero [data-seq] { opacity: 0; }
+.js .hero.is-ready [data-seq] { opacity: 1; animation: heroEntree .85s var(--courbe) backwards; }
+.js .hero.is-ready [data-seq="0"] { animation-delay:   0ms; }
+.js .hero.is-ready [data-seq="1"] { animation-delay:  90ms; }
+.js .hero.is-ready [data-seq="2"] { animation-delay: 180ms; }
+.js .hero.is-ready [data-seq="3"] { animation-delay: 270ms; }
+.js .hero.is-ready [data-seq="4"] { animation-delay: 360ms; }
+.js .hero.is-ready [data-seq="5"] { animation-delay: 450ms; }
+@keyframes heroEntree {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Les arcs se déploient : 1,1 s, léger retard. */
+.js .hero .hero__arcs { opacity: 0; }
+.js .hero.is-ready .hero__arcs {
+  opacity: .55;
+  animation: arcsEntree 1.1s var(--courbe) .18s backwards;
+}
+@keyframes arcsEntree {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to   { opacity: .55; clip-path: inset(0 0 0 0); }
+}
+
+/* ═══ RESPONSIVE ═══════════════════════════════════════════════════════════ */
+
+/* ─── ≤ 1080 px ──────────────────────────────────────────────────────────── */
+@media (max-width: 1080px) {
+  .hero__grille { grid-template-columns: 1fr; gap: var(--e7); }
+  .hero__valeurs { display: none; }
+  .axes__grille { grid-template-columns: repeat(2, 1fr); }
+  .causes__liste { grid-template-columns: repeat(3, 1fr); row-gap: var(--e6); }
+  .chiffres__grille { grid-template-columns: 1fr; gap: var(--e7); }
+  .chiffres__sceau { justify-self: start; }
+  .rejoindre__media { aspect-ratio: 16 / 10; border-radius: 160px 160px 3px 3px; }
+  .rejoindre__media::after { background: linear-gradient(180deg, transparent 46%, rgba(14,46,94,.5) 82%, var(--navy) 100%); }
+}
+
+/* ─── ≤ 760 px ───────────────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  /* Le dégradé devient vertical et couvrant : la lisibilité prime. */
+  .hero { min-height: 0; padding-block: var(--e8) var(--e9); }
+  .hero__photo img { object-position: 50% 40%; }
+  .hero__voile {
+    background: linear-gradient(180deg,
+      rgba(14,46,94,.86) 0%,
+      rgba(14,46,94,.93) 40%,
+      var(--navy) 78%,
+      var(--navy) 100%);
+  }
+  .hero__arcs { width: 130vw; transform: translate(30%, -50%); opacity: .3; }
+  .js .hero.is-ready .hero__arcs { opacity: .3; animation-name: arcsEntreeMobile; }
+  /* Le hero repasse en colonne : la mention de lieu se range sous le contenu
+     au lieu de flotter à sa droite. */
+  .hero { flex-direction: column; align-items: stretch; justify-content: center; }
+  .hero__lieu {
+    position: static;
+    z-index: 2;
+    margin: var(--e7) 0 0;
+    padding-inline: var(--gouttiere);
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .chiffres__stats { grid-template-columns: repeat(2, 1fr); }
+  .evenements { grid-template-columns: 1fr; }
+  .causes__liste { grid-template-columns: repeat(2, 1fr); }
+  .agenda__grille { gap: var(--e8); }
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
+}
+@keyframes arcsEntreeMobile {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to   { opacity: .3; clip-path: inset(0 0 0 0); }
+}
+
+/* ─── ≤ 520 px ───────────────────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .axes__grille { grid-template-columns: 1fr; }
+  .actualite { grid-template-columns: 84px 1fr; gap: var(--e3); }
+  .hero__actions .btn { width: 100%; }
+  .intro__repere { padding-left: var(--e4); }
+}
+
+/* ─── ANIMATIONS RÉDUITES ────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .js .hero [data-seq],
+  .js .hero.is-ready [data-seq] { opacity: 1 !important; animation: none !important; transform: none !important; }
+  .js .hero .hero__arcs,
+  .js .hero.is-ready .hero__arcs { opacity: .55 !important; animation: none !important; clip-path: none !important; }
+}
