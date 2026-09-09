@@ -21,6 +21,10 @@ def resolve_target(actor, notification):
             return reverse("documents:detail", args=[notification.target_id])
         if notification.target_kind == "dues":
             return reverse("dues:own")
+        if notification.target_kind == "vote":
+            return reverse("voting:member_list")
+        if notification.target_kind == "satisfaction":
+            return reverse("satisfaction:respond")
     except Exception:
         return None
     return None

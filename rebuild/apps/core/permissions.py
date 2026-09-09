@@ -35,6 +35,9 @@ CAPABILITIES = {
     "notification.view_own": PERSONAL, "notification.send": MANAGERS,
     "dues.view_own": PERSONAL, "dues.manage": MANAGERS,
     "statistics.view": MANAGERS,
+    # Votes et satisfaction (Phase B). INVITE jamais électeur ; DIRECTEUR/BUREAU sans gestion.
+    "vote.manage": MANAGERS, "vote.cast": MEMBERS, "vote.view_results": MEMBERS,
+    "satisfaction.respond": MEMBERS, "satisfaction.manage": MANAGERS, "satisfaction.view_results": MANAGERS,
     # Services présents, mais aucune délégation de mutation validée.
     "mandate.manage": frozenset(), "account.change_email": frozenset(),
 }
@@ -68,7 +71,8 @@ def can(user, capability, obj=None):
         return False
     if obj is not None:
         public_types = {"action": "service_actions.action", "news": "editorial.newsarticle", "event": "agenda.event",
-            "application":"members.membershipapplication", "contact":"communications.contactrequest"}
+            "application":"members.membershipapplication", "contact":"communications.contactrequest",
+            "vote": "voting.vote", "satisfaction": "satisfaction.satisfactionperiod"}
         if capability == "dues.view_own":
             from apps.dues.models import DuesRecord
             return isinstance(obj, DuesRecord) and obj.profile.user_id == user.pk

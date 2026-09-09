@@ -387,7 +387,9 @@ class AuthTests(TestCase):
         self.assertNotContains(response,'?role=')
         self.assertNotContains(response,'data-maquette')
         self.assertNotContains(response,'vote-resultats')
-        self.assertEqual(self.client.get('/espace/votes/').status_code,404)
+        # Phase B : /espace/votes/ existe désormais (MEMBRE peut consulter ses scrutins).
+        self.assertEqual(self.client.get('/espace/votes/').status_code,200)
+        self.assertEqual(self.client.get('/espace/audit/').status_code,404)
 
 
 class ConcurrentTests(TransactionTestCase):

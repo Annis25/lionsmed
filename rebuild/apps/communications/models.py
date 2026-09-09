@@ -23,7 +23,8 @@ class OutboxMessage(models.Model):
     id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     event_key=models.CharField(max_length=150,unique=True)
     kind=models.CharField(max_length=20,choices=[("APPLICATION","Accusé candidature"),("CONTACT","Avis contact interne"),
-        ("EVENT_REMINDER","Rappel de rendez-vous"),("IMPORTANT","Notification importante"),("DOCUMENT","Nouveau document")])
+        ("EVENT_REMINDER","Rappel de rendez-vous"),("IMPORTANT","Notification importante"),("DOCUMENT","Nouveau document"),
+        ("VOTE_OPENED","Ouverture d'un vote"),("VOTE_RESULTS","Résultats d'un vote"),("SATISFACTION_OPENED","Ouverture satisfaction")])
     recipient=models.EmailField()
     object_id=models.UUIDField()
     attempts=models.PositiveSmallIntegerField(default=0)
@@ -44,6 +45,8 @@ class Notification(models.Model):
         DOCUMENT="DOCUMENT","Document"
         DUES="DUES","Cotisation"
         IMPORTANT="IMPORTANT","Importante"
+        VOTE="VOTE","Vote"
+        SATISFACTION="SATISFACTION","Satisfaction"
     id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     recipient=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.PROTECT,related_name="notifications")
     event_key=models.CharField(max_length=150,unique=True)

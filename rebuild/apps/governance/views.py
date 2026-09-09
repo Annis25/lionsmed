@@ -28,13 +28,24 @@ def dashboard(request):
     from apps.dues.models import DuesRecord
     from apps.agenda.models import Event
     from apps.documents.models import Document
+    from apps.voting.models import Vote, Elector, Participation
+    from apps.satisfaction.selectors import current_period, period_results
     qs=scoped_profiles(request.user,management=True)
     club_state=ClubState.objects.select_related("active_year").first()
     to_regularize=DuesRecord.objects.filter(status="TO_REGULARIZE",lions_year=club_state.active_year).count() if club_state and club_state.active_year else 0
+    open_votes=[]
+    for vote in Vote.objects.filter(status="OPEN"):
+        elector_count=Elector.objects.filter(vote=vote).count()
+        participation_count=Participation.objects.filter(elector__vote=vote).count()
+        open_votes.append({"vote":vote,"elector_count":elector_count,"participation_count":participation_count,
+            "rate":round(participation_count*100/elector_count,1) if elector_count else 0})
+    satisfaction_period=current_period(request.user)
+    satisfaction_summary=period_results(request.user,satisfaction_period) if satisfaction_period else None
     return render(request,"espace/management_dashboard.html",{"member_count":qs.count(),"active_count":qs.filter(status="ACTIVE",user__is_active=True).count(),
         "mandate_count":Mandate.objects.count(),"club_state":club_state,"to_regularize":to_regularize,
         "upcoming_events_count":Event.objects.filter(status="PUBLISHED",starts_at__gte=timezone.now()).count(),
-        "document_count":Document.objects.filter(status="AVAILABLE").count()})
+        "document_count":Document.objects.filter(status="AVAILABLE").count(),
+        "open_votes":open_votes,"satisfaction_period":satisfaction_period,"satisfaction_summary":satisfaction_summary})
 
 
 @capability_required("statistics.view")

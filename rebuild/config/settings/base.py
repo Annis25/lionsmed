@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.admin", "django.contrib.auth", "django.contrib.contenttypes",
     "django.contrib.sessions", "django.contrib.messages", "django.contrib.staticfiles",
     "django.contrib.postgres", "django.contrib.sitemaps", "axes", "apps.editorial", "apps.service_actions", "apps.agenda", "apps.communications", "apps.accounts", "apps.members",
-    "apps.governance", "apps.documents", "apps.dues", "apps.core",
+    "apps.governance", "apps.documents", "apps.dues", "apps.voting", "apps.satisfaction", "apps.core",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -131,6 +131,11 @@ FILE_UPLOAD_HANDLERS = [
     "django.core.files.uploadhandler.MemoryFileUploadHandler",
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 ]
+
+# Heure de référence (Africa/Tunis, "HH:MM") pour l'ouverture/fermeture satisfaction.
+# Non définie par défaut : aucune heure de production n'est présentée comme officielle
+# tant que le club ne l'a pas confirmée ; sans elle, une période reste non activable.
+SATISFACTION_REFERENCE_HOUR = os.environ.get("LIONSMED_SATISFACTION_HOUR") or None
 
 PUBLIC_INDEXING_ENABLED = False
 CONTACT_RECIPIENT = os.environ.get("LIONSMED_CONTACT_RECIPIENT", "")

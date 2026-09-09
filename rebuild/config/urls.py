@@ -15,6 +15,8 @@ urlpatterns = [
     path("espace/", include("apps.documents.urls")),
     path("espace/", include("apps.dues.urls")),
     path("espace/", include("apps.communications.private_urls")),
+    path("espace/", include("apps.voting.urls")),
+    path("espace/", include("apps.satisfaction.urls")),
     path("", include(([path("", public_views.home, name="home"),
                        path("espace/", views.dashboard, name="dashboard"),
                        path("robots.txt", public_views.robots, name="robots")], "core"))),

@@ -19,6 +19,8 @@ def shell(request):
                 ("Mon parcours", "members:experiences", "experience.manage_own"),
                 ("Annuaire", "members:directory", "directory.view"),
                 ("Calendrier", "agenda_private:calendar", "event.register"),
+                ("Votes", "voting:member_list", "vote.cast"),
+                ("Satisfaction", "satisfaction:respond", "satisfaction.respond"),
                 ("Documents", "documents:list", "document.view"),
                 ("Notifications", "notifications:list", "notification.view_own"),
                 ("Cotisations", "dues:own", "dues.view_own"),
@@ -28,6 +30,9 @@ def shell(request):
                 ("Présences", "agenda_private:attendance_events", "attendance.record"),
                 ("Gestion des documents", "documents:manage_list", "document.manage"),
                 ("Gestion des cotisations", "dues:manage_list", "dues.manage"),
+                ("Créer un vote", "voting:manage_create", "vote.manage"),
+                ("Gestion des votes", "voting:manage_list", "vote.manage"),
+                ("Satisfaction agrégée", "satisfaction:manage_list", "satisfaction.manage"),
                 ("Statistiques", "governance:statistics", "statistics.view"),
             ] if can(request.user, capability)
         ],

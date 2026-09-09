@@ -43,11 +43,65 @@ Réutilisation confirmée : pas de deuxième queue email (extension de `OutboxMe
 - Capacités avancées DIRECTEUR/BUREAU : toujours refusées par défaut.
 - Ordonnancement de production de `send_event_reminders` et `deliver_outbox` (aucun scheduler installé, cohérent avec le Lot 5).
 
-## Vérifications finales
+## Vérifications finales — Phase A
 
 - `manage.py check` : aucun problème.
 - `manage.py makemigrations --check --dry-run` : aucune migration manquante.
 - `manage.py migrate --check` : aucune migration en attente.
 - `manage.py test --settings=config.settings.test --noinput` : **163 tests, OK (3 ignorés)**.
+- `git diff --check` : aucune erreur d'espace.
+- `git status` : uniquement des fichiers sous `rebuild/` et `docs/` ; aucun fichier du legacy ni de `mockups/` modifié ; aucun commit créé.
+
+# Phase B — Votes + Satisfaction
+
+## Terminé
+
+- **App `voting`** : `Vote` (DRAFT/OPEN/CLOSED, mode SINGLE/MULTIPLE/ELECTION, min/max_choices, blank_allowed, opens_at/closes_at, responsible, lions_year facultative), `VoteOption` (candidat facultatif via `candidate_profile`/`photo`), `Elector` (figé à l'ouverture), `Participation` (O2O Elector, **aucune FK vers Ballot**), `Ballot` (**aucune FK membre/IP/timestamp précis**), `BallotSelection`. Confidentialité = Option A de l'architecture : aucune correspondance durable Participation→Ballot, aucune UI SUPER_ADMIN « qui a voté quoi », y compris en usage normal.
+- **`cast_vote()`** : verrouille `Vote` puis `Elector` (ordre déterministe), revalide sous verrou statut/fenêtre temporelle/électorat/absence de Participation/cardinalité/exclusivité du blanc/appartenance des options au scrutin, puis crée Ballot + BallotSelection + Participation dans la même transaction. Fenêtre toujours revérifiée à l'instant du verrou (jamais la seule valeur `status`), donc aucun bulletin accepté après `closes_at` même si la clôture planifiée n'a pas encore tourné.
+- **`open_vote()`** fige `Elector` à partir des profils ACTIVE + rôle courant dans `MEMBERS` (INVITE exclu) à l'instant de l'ouverture — pas de recalcul implicite ensuite. **`close_vote()`** idempotent.
+- **Trigger PostgreSQL** `voting_ballotselection_vote_match` (migration `0002`) : rejette à l'INSERT toute `BallotSelection` dont l'option n'appartient pas au même vote que le bulletin, même en cas de bug ou d'écriture hors service — défense en profondeur, `cast_vote()` reste la validation de référence. La cardinalité/exclusivité du blanc reste volontairement uniquement au niveau service (verrou `Vote` + seul point d'écriture) : un trigger déclaratif correct pour un agrégat multi-lignes incluant les bulletins blancs à zéro sélection serait disproportionné tant qu'aucune autre voie d'écriture n'existe (Django Admin n'enregistre aucun modèle `voting`).
+- **Résultats** : accessibles uniquement après clôture, à l'électeur du scrutin ou au gestionnaire (`can_view_results`) — politique prudente, **audience finale À CONFIRMER HUMAINEMENT** (documenté dans le template). Dénominateur des pourcentages = bulletins exprimés (hors blancs) ; la somme peut dépasser 100 % en choix multiple. Blanc compté séparément, jamais classé.
+- **Suivi responsable** (`vote_suivi.html`) : Électeur + a voté/n'a pas voté uniquement — aucune sélection, testé explicitement (`assertNotContains(... option.label)`).
+- **App `satisfaction`** : `SatisfactionPeriod` (mois unique, `opens_at`/`closes_at` nuls tant que l'heure n'est pas configurée, seuil `threshold` configurable), `SatisfactionResponse` (échelle 1–5 exacte, commentaire facultatif, une réponse par profil+période). `apps/satisfaction/scheduling.py` : `third_saturday()` et `compute_window()` — ouverture le 1er du mois, fermeture 24 h avant le troisième samedi, à une **heure de référence explicitement configurée** (`SATISFACTION_REFERENCE_HOUR`, non définie par défaut) ; sans elle, `open_period()` refuse (`ValidationError`), aucune heure de production n'est présentée comme officielle.
+- **`submit_satisfaction()`** : verrouille la période, revalide fenêtre/note 1–5/absence de réponse existante, transactionnel. **`period_results()`** masque moyenne/distribution si l'effectif de réponses est sous `threshold` (valeur de test explicite dans les tests ; **valeur de production À CONFIRMER HUMAINEMENT**, jamais durcie en dur). Aucun commentaire ni note individuelle exposé aux gestionnaires.
+- **Intégration notifications/emails (réutilisation stricte)** : `Notification.Category` étendu (VOTE, SATISFACTION) et `OutboxMessage.kind` étendu (VOTE_OPENED, VOTE_RESULTS, SATISFACTION_OPENED) — aucune nouvelle file. `apps/voting/notifications.py` et `apps/satisfaction/notifications.py` notifient les électeurs/membres éligibles à l'ouverture/clôture, réutilisant `communications.services.notify()` et `deliver_outbox`. Emails HTML+texte dérivés des maquettes `ouverture-vote.html`, `resultats-vote.html`, `satisfaction.html` : jamais de choix, de relation identité/choix, ni de lien votant sans authentification (lien générique vers l'espace, pas de token).
+- **Permissions** : `vote.manage`/`satisfaction.manage` = SUPER_ADMIN/PRESIDENT/SECRETAIRE ; `vote.cast`/`satisfaction.respond` = tout rôle sauf INVITE (électorat réel vérifié en service, pas par rôle) ; `vote.view_results` = électeur ou gestionnaire après clôture ; `satisfaction.view_results` = gestionnaires seuls. DIRECTEUR et BUREAU explicitement testés refusés sur toutes les capacités de gestion. Aucun `if role == ...` dans les vues : uniquement `capability_required`/`can()`.
+- **Templates** : `votes.html`, `vote_confirm.html` (récapitulatif serveur avant envoi définitif, fonctionne sans JS), `vote_creation.html` (création + ajout de choix + ouverture), `vote_suivi.html`, `vote_resultats.html`, `votes_gestion.html`, `satisfaction.html`, `satisfaction_resultats.html`, `satisfaction_gestion.html` — composants privés existants réutilisés (`workspace-panel`, `lot2-timeline`, `tableau`, `metrics`), aucune nouvelle feuille CSS. Toutes `noindex`/`no-store` via `base/private.html` existant, hors sitemap.
+- **Dashboards** : membre affiche « À compléter » (vote ouvert non répondu, satisfaction ouverte non répondue) et masque la tâche dès qu'elle est faite/fermée/non éligible. Responsable affiche votes ouverts + taux de participation et satisfaction du mois (masquée sous le seuil), sans KPI fictif.
+- **Django Admin** : aucun modèle `voting`/`satisfaction` enregistré (cohérent avec le reste du projet, où seul `accounts.User` l'est) — élimine par construction tout contournement des invariants via l'admin.
+
+## Migrations créées
+
+- `communications/0003_alter_notification_category_alter_outboxmessage_kind.py`
+- `voting/0001_initial.py`
+- `voting/0002_ballotselection_vote_match_trigger.py` (RunSQL : fonction + trigger PostgreSQL)
+- `satisfaction/0001_initial.py`
+
+**Point technique** : le modèle `Vote` utilise `db_table = "app_voting_vote"` explicite — le nom par défaut `voting_vote` collisionnait avec l'entrée legacy du même nom dans la garde anti-legacy de `apps/core/management/commands/migrate.py`, qui aurait alors refusé toute migration future sur cette base pourtant neuve. Renommer la table est la correction correcte : la garde reste intacte et continue de protéger contre une vraie base legacy.
+
+## Tests ciblés (PostgreSQL, `config.settings.test`)
+
+- `apps.voting` (nouveau, 24 tests) : BUREAU et DIRECTEUR refusés en gestion, SECRETAIRE autorisé, ouverture fige les électeurs et exclut INVITE, INVITE et non-électeur refusés au dépôt, bulletin définitif (deuxième dépôt refusé), option d'un autre scrutin refusée (service **et** trigger PostgreSQL testés séparément, y compris un contournement direct du service), cardinalité et blanc+choix refusés, dépôt avant ouverture et après la fenêtre de clôture refusés (même si le statut n'a pas encore été basculé), résultats refusés avant clôture même au responsable, résultats accessibles à l'électeur après clôture et refusés à un non-électeur, clôture idempotente, suivi expose la participation sans jamais le choix, `Participation` sans champ `ballot` et `Ballot` sans référence membre vérifiés par introspection des champs, **concurrence PostgreSQL réelle** (`TransactionTestCase`, deux threads, connexions séparées : un seul bulletin accepté).
+- `apps.satisfaction` (nouveau, 15 tests) : troisième samedi calculé pour les 12 mois 2026 et vérifié sur une année bissextile (2028), fenêtre `None` tant que l'heure n'est pas configurée, fenêtre calculée en Africa/Tunis avec une heure de test explicitement synthétique, ouverture refusée sans capacité et sans heure configurée, note hors 1–5 refusée, INVITE refusé, période fermée refusée, une seule réponse (deuxième refusée), audit sans note ni commentaire, petits effectifs masqués sous le seuil configuré, effectif atteignant le seuil affiche la moyenne, MEMBRE ne peut pas consulter les résultats agrégés, **doublon concurrent réel** (`TransactionTestCase`, deux threads : une seule réponse créée).
+- Un test préexistant (`test_shell_templates_and_no_future_routes`) a été mis à jour : `/espace/votes/` n'est plus une route future (elle existe désormais) ; la vérification « aucune route future » a été déplacée sur `/espace/audit/`, toujours hors périmètre.
+- Suite complète (existant + nouveau) : **200 tests, 0 échec, 3 ignorés** (tests navigateur sans Playwright dans cet environnement).
+
+Réutilisation confirmée : `Notification`/`OutboxMessage`/`deliver_outbox` étendus, jamais dupliqués ; `capability_required`/`can()` centraux réutilisés sans branche par rôle dans les vues ; composants privés et `prive.css` existants réutilisés sans nouvelle feuille de style ; maquettes votes/satisfaction/emails transformées sans redesign.
+
+## Décisions encore bloquantes (héritées de l'architecture, non tranchées ici)
+
+- Audience finale des résultats de vote (électeurs seuls vs tous les membres vs votants seuls) — politique prudente « électeurs du scrutin » implémentée en attendant.
+- Heure de référence de production pour l'ouverture/fermeture satisfaction (`SATISFACTION_REFERENCE_HOUR`) — non définie, aucune période n'est activable en production tant qu'elle ne l'est pas.
+- Seuil `k` de confidentialité satisfaction en production (mécanique de masquage prête, valeur par défaut du modèle = 5 à titre indicatif seulement).
+- Règles d'entrée/sortie tardive des électeurs, radiations, procurations : refusées par défaut, aucune n'a été inventée.
+- Réidentification exceptionnelle (vote ou satisfaction) : non développée, conforme à l'Option A ; resterait une décision humaine séparée si jamais demandée.
+- Délégation de gestion des votes/satisfaction à DIRECTEUR/BUREAU : toujours refusée par défaut.
+
+## Vérifications finales — Phase B
+
+- `manage.py check` : aucun problème.
+- `manage.py makemigrations --check --dry-run` : aucune migration manquante.
+- `manage.py migrate --check` : aucune migration en attente.
+- `manage.py test --settings=config.settings.test --noinput` : **200 tests, OK (3 ignorés)**.
 - `git diff --check` : aucune erreur d'espace.
 - `git status` : uniquement des fichiers sous `rebuild/` et `docs/` ; aucun fichier du legacy ni de `mockups/` modifié ; aucun commit créé.

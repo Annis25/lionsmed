@@ -32,14 +32,14 @@ def change_state(*,actor,obj,state):
     return obj
 
 @transaction.atomic
-def notify(*,recipient,category,title,event_key,excerpt="",target_kind="",target_id="",email=False):
+def notify(*,recipient,category,title,event_key,excerpt="",target_kind="",target_id="",email=False,outbox_kind=None):
     """Intention in-app idempotente ; e-mail facultatif réutilisant l'outbox existante, jamais une file séparée."""
     if category not in Notification.Category.values:raise ValidationError("Catégorie de notification invalide.")
     notification,created=Notification.objects.get_or_create(event_key=event_key,defaults={
         "recipient":recipient,"category":category,"title":title[:180],"excerpt":excerpt[:300],
         "target_kind":target_kind[:20],"target_id":str(target_id)[:64]})
     if created and email and recipient.email:
-        kind={"IMPORTANT":"IMPORTANT","EVENT":"EVENT_REMINDER","DOCUMENT":"DOCUMENT"}.get(category)
+        kind=outbox_kind or {"IMPORTANT":"IMPORTANT","EVENT":"EVENT_REMINDER","DOCUMENT":"DOCUMENT"}.get(category)
         if kind:OutboxMessage.objects.get_or_create(event_key="outbox:"+event_key,defaults={
             "kind":kind,"recipient":recipient.email,"object_id":notification.pk})
     return notification

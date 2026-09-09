@@ -27,6 +27,22 @@ def dashboard(request):
     current_dues = None
     if state and state.active_year:
         current_dues = DuesRecord.objects.filter(profile__user_id=request.user.pk, lions_year=state.active_year).first()
+    votes_to_complete = []
+    try:
+        from apps.voting.selectors import votes_for_member, own_participation
+        for vote in votes_for_member(request.user).filter(status="OPEN"):
+            if not own_participation(request.user, vote):
+                votes_to_complete.append(vote)
+    except PermissionDenied:
+        pass  # INVITE : jamais électeur.
+    satisfaction_to_complete = None
+    try:
+        from apps.satisfaction.selectors import current_period, own_response
+        period = current_period(request.user)
+        if period and not own_response(request.user, period):
+            satisfaction_to_complete = period
+    except PermissionDenied:
+        pass
     return render(request, "espace/dashboard.html", {
         "effective_role_label": Role(role).label,
         "member": profile_data(request.user, own_profile(request.user), own=True),
@@ -34,6 +50,8 @@ def dashboard(request):
         "upcoming_events": upcoming,
         "unread_notifications": Notification.objects.filter(recipient=request.user, read_at__isnull=True).count(),
         "current_dues": current_dues,
+        "votes_to_complete": votes_to_complete,
+        "satisfaction_to_complete": satisfaction_to_complete,
     })
 
 
