@@ -5,14 +5,19 @@ from django.views.decorators.http import require_http_methods, require_safe
 from apps.core.permissions import capability_required, can
 from apps.governance.models import Role
 from .selectors import own_profile, profile_data, directory_page, member_profile, own_experience
-from .forms import ProfileForm, ExperienceForm, VISIBILITY
+from .forms import ProfileForm, ExperienceForm
 from .services import update_profile, save_experience, delete_experience
 from .uploads import photo_storage
+from .public_profile import public_profile_url, qr_png_bytes
 
 @capability_required("profile.view_own")
 @require_safe
 def profile(request):
-    return render(request,"espace/profile.html",{"member":profile_data(request.user,own_profile(request.user),own=True),"own":True})
+    p = own_profile(request.user)
+    context = {"member":profile_data(request.user,p,own=True),"own":True}
+    if p.public_profile_enabled and p.public_slug:
+        context["public_profile_url"] = public_profile_url(p)
+    return render(request,"espace/profile.html",context)
 
 @capability_required("profile.edit_own")
 @require_http_methods(["GET","POST"])
@@ -23,7 +28,7 @@ def edit_profile(request):
         if form is None:
             messages.success(request,"Votre profil a été enregistré."); return redirect("members:profile")
     else:
-        initial = {key:getattr(p,key) for key in ["phone","profession","bio",*VISIBILITY]}
+        initial = {key:getattr(p,key) for key in ["phone","profession","bio","public_profile_enabled"]}
         initial.update(first_name=p.user.first_name,last_name=p.user.last_name)
         form = ProfileForm(actor=request.user,profile=p,initial=initial)
     return render(request,"espace/profile_edit.html",{"form":form,"member":profile_data(request.user,p,own=True)})
@@ -77,3 +82,14 @@ def experience_delete(request,experience_id):
 @require_safe
 def email_information(request):
     return render(request,"espace/email_information.html")
+
+@capability_required("profile.view_own")
+@require_safe
+def public_profile_qr(request):
+    from django.http import HttpResponse
+    p = own_profile(request.user)
+    if not p.public_profile_enabled or not p.public_slug: raise Http404
+    response = HttpResponse(qr_png_bytes(public_profile_url(p)), content_type="image/png")
+    response["Content-Disposition"] = 'attachment; filename="profil-public-qr.png"'
+    response["Cache-Control"] = "private, no-store"
+    return response

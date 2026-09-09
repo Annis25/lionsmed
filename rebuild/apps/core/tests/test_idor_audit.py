@@ -57,7 +57,7 @@ class CrossAccountObjectAccessTests(TestCase):
 
     def test_experience_of_another_member_not_editable(self):
         experience = AssociationExperience.objects.create(profile=self.owner.member_profile, network="LIONS",
-            club="Club", function="Fonction", starts_on=timezone.localdate().replace(day=1))
+            club="Club", function="Fonction", start_year=timezone.localdate().year)
         self.client.force_login(self.other)
         self.assertEqual(self.client.get(reverse("members:experience_edit", args=[experience.pk])).status_code, 404)
         self.assertEqual(self.client.post(reverse("members:experience_delete", args=[experience.pk])).status_code, 404)

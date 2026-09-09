@@ -19,7 +19,6 @@ CAPABILITIES = {
     "account.change_own_password": PERSONAL,
     "public_content.access_management": MANAGERS,
     "action.create": MANAGERS, "action.edit": MANAGERS, "action.publish": MANAGERS,
-    "news.create": MANAGERS, "news.edit": MANAGERS, "news.publish": MANAGERS,
     "event.create": MANAGERS, "event.edit": MANAGERS, "event.publish": MANAGERS,
     "editorial.manage": MANAGERS, "image.manage": MANAGERS,
     "application.view": MANAGERS, "application.manage": MANAGERS,
@@ -72,7 +71,7 @@ def can(user, capability, obj=None):
     if capability in {"directory.view", "member.view"} and status != MemberProfile.Status.ACTIVE:
         return False
     if obj is not None:
-        public_types = {"action": "service_actions.action", "news": "editorial.newsarticle", "event": "agenda.event",
+        public_types = {"action": "service_actions.action", "event": "agenda.event",
             "application":"members.membershipapplication", "contact":"communications.contactrequest",
             "vote": "voting.vote", "satisfaction": "satisfaction.satisfactionperiod"}
         if capability == "dues.view_own":

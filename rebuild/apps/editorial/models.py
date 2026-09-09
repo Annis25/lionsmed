@@ -35,11 +35,6 @@ class Publication(models.Model):
         ordering=["-published_at","id"]
         constraints=[models.CheckConstraint(condition=models.Q(status__in=["DRAFT","REVIEW","PUBLISHED","ARCHIVED"]),name="%(app_label)s_%(class)s_status"),models.CheckConstraint(condition=~models.Q(status="PUBLISHED")|models.Q(published_at__isnull=False),name="%(app_label)s_%(class)s_pub_date")]
 
-class NewsArticle(Publication):
-    category=models.CharField(max_length=20,choices=[("VIE","Vie du club"),("PASSATION","Passation"),("PARTENARIAT","Partenariat"),("DISTINCTION","Distinction"),("COMMUNIQUE","Communiqué")],default="VIE")
-    author_name=models.CharField(max_length=150,blank=True,help_text="Signature publique validée seulement")
-    def get_absolute_url(self):return reverse("editorial:news_detail",args=[self.slug])
-
 class EditorialSection(models.Model):
     KEYS=[("club_intro","Présentation du club"),("club_history","Histoire documentée"),("club_values","Valeurs"),("club_movement","Mouvement Lions"),("join_service","Rejoindre : servir"),("join_belonging","Rejoindre : appartenir"),("join_growth","Rejoindre : progresser"),("legal","Mentions légales"),("privacy","Confidentialité"),("axis_diabete","Axe Diabète"),("axis_environnement","Axe Environnement"),("axis_humanitaire","Axe Humanitaire"),("axis_jeunesse","Axe Jeunesse")]
     key=models.CharField(primary_key=True,max_length=32,choices=KEYS)

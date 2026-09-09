@@ -11,13 +11,12 @@ from apps.service_actions.models import Action,ActionPhoto
 from apps.service_actions.forms import ActionForm
 from apps.agenda.models import Event
 from apps.agenda.forms import EventForm
-from .models import NewsArticle,EditorialSection,ClubIdentity,ImpactMetric
-from .forms import NewsArticleForm
+from .models import EditorialSection,ClubIdentity,ImpactMetric
 from .management_forms import ImageForm,SectionForm,IdentityForm,MetricForm
 from .publication import require,save_content,publish_content,withdraw_content,audit
 from .images import upload_image
 
-TYPES={"action":(Action,ActionForm,"Actions"),"news":(NewsArticle,NewsArticleForm,"Actualités"),"event":(Event,EventForm,"Événements")}
+TYPES={"action":(Action,ActionForm,"Actions"),"event":(Event,EventForm,"Événements")}
 
 @capability_required("public_content.access_management")
 @require_safe

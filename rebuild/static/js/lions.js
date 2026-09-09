@@ -64,6 +64,22 @@
       else if (!event.shiftKey && (i === items.length - 1 || i < 0)) { event.preventDefault(); items[0].focus(); }
     }
   });
+  var reveals = document.querySelectorAll('.reveal');
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (reveals.length) {
+    if (!('IntersectionObserver' in window) || reducedMotion.matches) {
+      reveals.forEach(function (element) { element.classList.add('is-visible'); });
+    } else {
+      var revealObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+      reveals.forEach(function (element) { revealObserver.observe(element); });
+    }
+  }
   var errors = document.querySelector('.form-errors');
   if (errors) errors.focus();
 })();

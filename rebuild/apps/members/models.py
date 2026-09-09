@@ -20,6 +20,10 @@ class MemberProfile(models.Model):
     share_photo = models.BooleanField(default=False)
     share_experiences = models.BooleanField(default=False)
     share_mandates = models.BooleanField(default=False)
+    # Profil public (recette V1) : opt-in strictement indépendant des permissions de
+    # l'annuaire privé ci-dessus. Jamais activé par défaut, jamais de coordonnées exposées.
+    public_profile_enabled = models.BooleanField(default=False)
+    public_slug = models.SlugField(max_length=160, null=True, blank=True, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -35,19 +39,18 @@ class AssociationExperience(models.Model):
     club = models.CharField(max_length=150)
     function = models.CharField(max_length=150)
     district = models.CharField(max_length=100, blank=True)
-    starts_on = models.DateField(help_text="Mois de début, enregistré au premier jour")
-    ends_on = models.DateField(null=True, blank=True, help_text="Mois de fin inclus")
+    start_year = models.PositiveSmallIntegerField(help_text="Année de début")
+    end_year = models.PositiveSmallIntegerField(null=True, blank=True, help_text="Année de fin, vide si poste actuel")
     description = models.TextField(max_length=1500, blank=True)
     achievements = models.TextField(max_length=1500, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-starts_on", "id"]
+        ordering = ["-start_year", "id"]
         constraints = [
             models.CheckConstraint(condition=models.Q(network__in=["LIONS", "LEO"]), name="experience_network_valid"),
-            models.CheckConstraint(condition=models.Q(ends_on__isnull=True) | models.Q(ends_on__gte=models.F("starts_on")), name="experience_dates_ordered"),
-            models.CheckConstraint(condition=models.Q(starts_on__day=1) & (models.Q(ends_on__isnull=True) | models.Q(ends_on__day=1)), name="experience_month_precision"),
+            models.CheckConstraint(condition=models.Q(end_year__isnull=True) | models.Q(end_year__gte=models.F("start_year")), name="experience_years_ordered"),
         ]
 
 
@@ -58,7 +61,7 @@ class MembershipApplication(models.Model):
     first_name=models.CharField(max_length=150)
     last_name=models.CharField(max_length=150)
     email=models.EmailField()
-    phone=models.CharField(max_length=32,blank=True)
+    phone=models.CharField(max_length=32,help_text="Obligatoire pour vous recontacter au sujet de votre candidature.")
     profession=models.CharField(max_length=150,blank=True)
     motivation=models.TextField(max_length=5000)
     origin=models.CharField(max_length=40,blank=True)

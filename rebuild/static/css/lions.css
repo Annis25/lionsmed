@@ -505,10 +505,14 @@ p:last-child { margin-bottom: 0; }
   background: transparent;
   cursor: pointer;
 }
+/* Contraste du bouton menu garanti quelle que soit la page publique : la
+   déclaration est portée directement sur le composant, sans dépendre d'une
+   feuille de page qui pourrait, par erreur, redéfinir la couleur du header. */
+.site-header .nav-burger span,
 .nav-burger span {
   display: block;
   height: 2px;
-  background: var(--encre);
+  background-color: var(--encre);
   border-radius: 2px;
   transition: transform var(--duree) var(--courbe), opacity var(--duree) var(--courbe);
 }
@@ -567,6 +571,16 @@ p:last-child { margin-bottom: 0; }
 }
 @media (min-width: 640px)  { .footer-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1081px) { .footer-grid { grid-template-columns: 1.7fr 1fr 1fr 1fr; } }
+/* < 640 px : identité compacte puis deux colonnes de liens groupées, plutôt
+   que quatre blocs empilés verticalement — le mobile n'est pas une version
+   compressée du desktop, mais l'empilement pur du footer y est trop long. */
+@media (max-width: 639px) {
+  .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e5) var(--e5); padding-bottom: var(--e6); }
+  .footer-brand { grid-column: 1 / -1; max-width: none; }
+  .footer-title { margin-bottom: var(--e3); }
+  .footer-list { gap: var(--e2); }
+  .site-footer div[aria-labelledby="footer-contact"] { grid-column: 1 / -1; }
+}
 
 .footer-brand { max-width: 34ch; }
 .footer-brand__logo { height: 54px; width: auto; margin-bottom: var(--e4); }
@@ -1695,6 +1709,8 @@ details[open] { padding-bottom: var(--e4); }
 .axis-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--e6) var(--e7); }
 .axis-list article { display: grid; grid-template-columns: 64px minmax(0,1fr); gap: var(--e5); padding-block: var(--e5); border-top: 1px solid var(--bord); }
 .axis-list .grand-repere { color: var(--bleu); margin: 0; }
+.axis-list a { display: inline-flex; margin-top: var(--e4); color: var(--bleu); font-weight: 600; text-decoration-line: underline; text-decoration-color: var(--or); text-decoration-thickness: 2px; text-underline-offset: var(--e1); }
+.axis-list a:hover { color: var(--navy); text-decoration-color: var(--bleu); }
 .timeline { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--e6); }
 .timeline article { border-left: 2px solid var(--bleu); padding-left: var(--e5); }
 .notice-demo { max-width: none; margin: 0; padding: var(--e3) var(--e5); background: var(--fond-2); color: var(--encre); font-size: var(--t-meta); border-left: 3px solid var(--bleu); }
@@ -1861,7 +1877,23 @@ dialog h2 { font-size: var(--t-h3); }
 .form-errors { margin-bottom: var(--e4); padding: var(--e4); border: 1px solid var(--bleu); border-radius: var(--r-carte); }
 .errorlist { color: var(--encre); font-size: var(--t-meta); }
 .shell-account { position: relative; margin-left: auto; }
-.shell-account summary { font-size: .875rem; }
+/* Identité compacte sur une seule ligne : avatar rond + prénom nom, sans rôle
+   ni second niveau de lecture, et sans le triangle de repli natif de <summary>. */
+.shell-account summary {
+  display: flex;
+  align-items: center;
+  gap: var(--e2);
+  font-size: .875rem;
+  font-weight: 600;
+  color: var(--encre);
+  list-style: none;
+  cursor: pointer;
+}
+.shell-account summary::-webkit-details-marker,
+.shell-account summary::marker { display: none; content: ""; }
+.shell-account .identite-avatar { width: 32px; height: 32px; }
+.shell-account .identite-avatar svg { width: 18px; height: 18px; }
+.shell-account__nom { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 22ch; }
 .shell-account > div { position: absolute; right: 0; z-index: 20; min-width: 240px; padding: var(--e4); background: var(--blanc); border: 1px solid var(--bord); border-radius: var(--r-carte); box-shadow: var(--ombre); }
 .shell-account a { display: flex; align-items: center; min-height: 44px; }
 [aria-disabled="true"] { cursor: default; }
@@ -1877,7 +1909,7 @@ html:not(.js) .nav-burger, html:not(.js) .app-bascule, html:not(.js) .champ__oei
 @media(max-width:760px) {
  html:not(.js) .app-nav { position: static; visibility: visible; transform: none; width: auto; }
  html:not(.js) .app-shell { display: block; }
- .shell-account summary { max-width: 18ch; overflow-wrap: anywhere; }
+ .shell-account__nom { max-width: 12ch; }
  .app-nav__marque { min-height: 64px; }
 }
 .shell-menu-open { overflow: hidden; }
@@ -1889,6 +1921,54 @@ html:not(.js) .nav-burger, html:not(.js) .app-bascule, html:not(.js) .champ__oei
 .lot3-cover { margin: 0 0 var(--e5); }
 .lot3-cover img, .lot3-card-image img { width: 100%; height: auto; border-radius: var(--r-carte); }
 .lot3-prose p { margin-block: var(--e4); }
+
+/* Profil public membre : une fiche professionnelle, distincte des pages éditoriales. */
+.member-profile-page { padding-block: var(--e6) var(--section-y); background: var(--fond); }
+.member-profile-page__container { max-width: 1040px; }
+.member-profile-page .lot3-breadcrumb { margin-bottom: var(--e4); }
+.member-profile-card { overflow: hidden; background: var(--blanc); border: 1px solid var(--bord); border-radius: var(--r-carte); box-shadow: var(--ombre); }
+.member-profile-card__cover { height: 112px; background: var(--navy); }
+.member-profile-card__body { padding: 0 var(--e6) var(--e6); }
+.member-profile-card__identity { display: flex; align-items: end; gap: var(--e4); margin-top: -48px; }
+.member-profile-card__identity > div { padding-top: var(--e7); }
+.member-profile-card__photo, .member-profile-card__avatar { width: 144px; height: 144px; flex: none; border: 4px solid var(--blanc); border-radius: 50%; background: var(--fond-2); color: var(--bleu); }
+.member-profile-card__photo { display: block; object-fit: cover; object-position: center; }
+.member-profile-card__avatar { display: grid; place-items: center; }
+.member-profile-card h1 { max-width: none; margin: 0; font-size: clamp(2rem,4vw,3.25rem); }
+.member-profile-card__membership { margin: var(--e1) 0 0; font-size: var(--t-lede); font-weight: 600; color: var(--encre); }
+.member-profile-card__location { margin: var(--e1) 0 0; color: var(--gris); }
+.member-profile-card__intro { max-width: 62ch; margin-top: var(--e5); padding-top: var(--e5); border-top: 1px solid var(--bord); }
+.member-profile-card__intro p { margin: 0; }
+.member-profile-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; align-items: start; gap: var(--e5); margin-top: var(--e5); }
+.member-profile-main { display: grid; gap: var(--e5); }
+.member-profile-section, .member-profile-aside { background: var(--blanc); border: 1px solid var(--bord); border-radius: var(--r-carte); }
+.member-profile-section { padding: var(--e6); }
+.member-profile-section h2, .member-profile-aside h2 { font-size: 1.25rem; max-width: none; }
+.member-profile-timeline, .member-profile-mandates { margin: var(--e5) 0 0; padding: 0; list-style: none; }
+.member-profile-timeline li { position: relative; padding: 0 0 var(--e5) var(--e5); border-left: 1px solid var(--bord); }
+.member-profile-timeline li:last-child { padding-bottom: 0; }
+.member-profile-timeline li::before { content: ""; position: absolute; top: .35rem; left: -5px; width: 9px; height: 9px; border-radius: 50%; background: var(--bleu); }
+.member-profile-timeline h3 { margin: 0; font-size: 1rem; }
+.member-profile-timeline__club { margin: var(--e1) 0 0; font-weight: 600; color: var(--encre); }
+.member-profile-timeline__date { margin: var(--e1) 0 0; color: var(--gris); font-size: var(--t-meta); }
+.member-profile-mandates { display: grid; gap: var(--e2); }
+.member-profile-mandates li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--e3); padding: var(--e3) 0; border-top: 1px solid var(--bord); }
+.member-profile-mandates li:first-child { border-top: 0; padding-top: 0; }
+.member-profile-mandates span { color: var(--gris); font-size: var(--t-meta); }
+.member-profile-aside { padding: var(--e5); }
+.member-profile-aside img { display: block; width: 64px; height: auto; margin-bottom: var(--e4); }
+.member-profile-aside p { margin: var(--e3) 0 var(--e4); font-size: .9375rem; color: var(--gris); }
+.member-profile-aside .link-arrow { gap: var(--e2); }
+.member-profile-aside .link-arrow svg { flex: none; }
+@media (max-width: 760px) {
+  .member-profile-page { padding-block: var(--e5) var(--e7); }
+  .member-profile-card__body { padding-inline: var(--e4); padding-bottom: var(--e5); }
+  .member-profile-card__identity { align-items: flex-start; flex-direction: column; margin-top: -56px; gap: var(--e3); }
+  .member-profile-card__identity > div { padding-top: 0; }
+  .member-profile-card__photo, .member-profile-card__avatar { width: 112px; height: 112px; }
+  .member-profile-layout { grid-template-columns: minmax(0,1fr); gap: var(--e4); margin-top: var(--e4); }
+  .member-profile-section, .member-profile-aside { padding: var(--e4); }
+}
 .lot3-pagination, .lot3-filters { display: flex; flex-wrap: wrap; align-items: end; gap: var(--e4); margin-block: var(--e5); }
 .lot3-filters .champ { flex: 1 1 160px; }
 .lot3-pagination a, .lot3-site-links a { display: inline-flex; align-items: center; min-height: 44px; }
@@ -1900,6 +1980,14 @@ html:not(.js) .nav-burger, html:not(.js) .app-bascule, html:not(.js) .champ__oei
 .public-dense .editorial-card h2 { font-family: var(--police); font-size: var(--t-h3); }
 .editorial-card h2 a { color: inherit; }
 @media(max-width:760px) { .lot3-form-grid { grid-template-columns: minmax(0,1fr); } }
+
+/* La note sous le téléphone ne doit pas repousser « Profession » dans la
+   colonne voisine. Elle reste dans le flux sur mobile, où les champs sont
+   volontairement empilés. */
+@media (min-width: 761px) {
+  .lot3-form-grid > div:has(input[name="phone"]) .champ { position: relative; }
+  .lot3-form-grid > div:has(input[name="phone"]) .champ__aide { position: absolute; top: calc(100% + var(--e2)); left: 0; }
+}
 
 .lot3-form .champ--choix { display: grid; grid-template-columns: auto minmax(0,1fr); gap: var(--e3); align-items: start; }
 .lot3-form .champ--choix input { grid-column: 1; grid-row: 1; width: 24px; height: 24px; }

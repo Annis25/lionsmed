@@ -18,10 +18,21 @@
 .club-histoire__attente { max-width: 760px; padding: var(--e7); background: var(--fond); border-left: 3px solid var(--or); }
 .club-histoire__attente > p:not(.demo-note) { font-family: var(--police-titre); font-size: clamp(1.35rem, 2vw, 1.75rem); line-height: 1.35; color: var(--encre); max-width: 29ch; }
 .club-histoire__ligne { display: block; width: min(100%, 420px); height: 1px; margin-block: var(--e5); background: var(--bord); }
-.club-valeurs__grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--bord); border-left: 1px solid var(--bord); }
-.club-valeurs__grille article { min-height: 176px; padding: var(--e5); background: var(--blanc); border-right: 1px solid var(--bord); border-bottom: 1px solid var(--bord); }
-.club-valeurs__grille h3 { margin-bottom: var(--e3); font-size: var(--t-h3); }
-.club-valeurs__grille p { margin: 0; font-size: .9375rem; }
+.club-valeurs__grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e1); background: var(--blanc); }
+.club-valeurs__grille.reveal { opacity: 1; transform: none; }
+.club-valeurs__grille article { position: relative; min-height: 240px; padding: var(--e5); display: flex; flex-direction: column; justify-content: flex-end; background: var(--bleu); color: var(--sur-sombre); overflow: hidden; }
+.club-valeurs__grille article:nth-child(3n+1) { background: var(--navy); }
+.club-valeurs__grille article:nth-child(3n+2) { background: var(--fond-2); color: var(--encre); }
+.club-valeurs__grille article::before { position: absolute; top: var(--e4); right: var(--e2); color: var(--sur-sombre); opacity: .18; font-family: var(--police); font-size: var(--t-meta); font-weight: 700; letter-spacing: .02em; writing-mode: vertical-rl; transform: rotate(180deg); }
+.club-valeurs__grille article:nth-child(1)::before { content: "Service"; }
+.club-valeurs__grille article:nth-child(2)::before { content: "Excellence"; color: var(--bleu); }
+.club-valeurs__grille article:nth-child(3)::before { content: "Diversité"; }
+.club-valeurs__grille article:nth-child(4)::before { content: "Collaboration"; }
+.club-valeurs__grille article:nth-child(5)::before { content: "Intégrité"; color: var(--bleu); }
+.club-valeurs__grille article:nth-child(6)::before { content: "Innovation"; }
+.club-valeurs__repere { display: none; }
+.club-valeurs__grille h3 { position: relative; margin-bottom: var(--e3); color: inherit; font-size: var(--t-h3); }
+.club-valeurs__grille p { position: relative; margin: 0; font-size: .9375rem; color: inherit; }
 .club-priorites__entete { display: grid; gap: var(--e5); margin-bottom: var(--e6); }
 .club-priorites__entete > p { margin: 0; color: var(--gris); }
 .club-priorites__lien { margin-top: var(--e7); }
@@ -35,5 +46,5 @@
 .club-mandats { margin-top: var(--e7); padding-top: var(--e5); border-top: 1px solid var(--bord); }
 .club-mandats p { margin-top: var(--e3); }
 @media (min-width: 761px) { .club-mouvement__grille, .club-priorites__entete, .club-bureau__entete { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1081px) { .club-intro__grille { grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr); align-items: center; column-gap: var(--e9); } .club-intro__texte { grid-column: 1; grid-row: 1; } .club-intro__visuel { grid-column: 2; grid-row: 1 / span 2; } .club-devise { grid-column: 1; grid-row: 2; max-width: 420px; } .club-valeurs__grille { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1081px) { .club-intro__grille { grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr); align-items: center; column-gap: var(--e9); } .club-intro__texte { grid-column: 1; grid-row: 1; } .club-intro__visuel { grid-column: 2; grid-row: 1 / span 2; } .club-devise { grid-column: 1; grid-row: 2; max-width: 420px; } .club-valeurs__grille { grid-template-columns: repeat(6, minmax(0, 1fr)); } .club-valeurs__grille article { min-height: 360px; } }
 @media (max-width: 520px) { .club-valeurs__grille, .club-bureau__grille { grid-template-columns: minmax(0, 1fr); } .club-valeurs__grille article { min-height: 0; } .club-histoire__attente { padding: var(--e5); } }

@@ -4,11 +4,13 @@ from apps.accounts.forms import StyledFields
 from apps.core.permissions import can
 from .models import AssociationExperience
 
+# Les cases granulaires de partage vers l'annuaire privé (profession, présentation,
+# contacts, photo, parcours, mandats) et l'apparition dans l'annuaire ne sont plus
+# éditables depuis ce formulaire (recette V1) : elles restent figées à leur valeur
+# actuelle, la plus prudente, tant qu'une décision explicite ne les rouvre pas.
 VISIBILITY = {
-    "directory_visible": "Apparaître dans l’annuaire (nom et rôle)",
-    "share_profession": "Partager ma profession", "share_bio": "Partager ma présentation",
-    "share_contacts": "Partager mon email et mon téléphone", "share_photo": "Partager ma photo",
-    "share_experiences": "Partager mon parcours Lions / LEO", "share_mandates": "Partager mes mandats validés",
+    "directory_visible", "share_profession", "share_bio",
+    "share_contacts", "share_photo", "share_experiences", "share_mandates",
 }
 
 class ProfileForm(StyledFields, forms.Form):
@@ -19,9 +21,10 @@ class ProfileForm(StyledFields, forms.Form):
     bio = forms.CharField(label="Présentation", required=False, max_length=1000, widget=forms.Textarea(attrs={"rows":3}))
     photo = forms.FileField(label="Photo privée", required=False, widget=forms.FileInput(attrs={"accept":"image/jpeg,image/png,image/webp"}), help_text="JPEG, PNG ou WebP · 5 Mo · 16 millions de pixels maximum.")
     remove_photo = forms.BooleanField(label="Supprimer ma photo actuelle", required=False)
-    for key, label in VISIBILITY.items():
-        locals()[key] = forms.BooleanField(label=label, required=False)
-    del key, label
+    public_profile_enabled = forms.BooleanField(label="Rendre mon profil public", required=False,
+        help_text="En activant cette option, une page publique Lionsmed sera créée à votre nom. Elle "
+            "pourra être consultée sur Internet et apparaître dans les moteurs de recherche. Votre "
+            "adresse e-mail et votre numéro de téléphone ne seront jamais affichés.")
 
     def __init__(self, *args, actor, profile, **kwargs):
         if not can(actor, "profile.edit_own", profile): raise PermissionDenied
@@ -34,13 +37,16 @@ class ProfileForm(StyledFields, forms.Form):
         return data
 
 class ExperienceForm(StyledFields, forms.ModelForm):
-    starts_on = forms.DateField(label="Mois de début", input_formats=["%Y-%m"], widget=forms.DateInput(format="%Y-%m", attrs={"type":"month"}))
-    ends_on = forms.DateField(label="Mois de fin", required=False, input_formats=["%Y-%m"], widget=forms.DateInput(format="%Y-%m", attrs={"type":"month"}))
     class Meta:
         model = AssociationExperience
-        fields = ["network", "club", "function", "district", "starts_on", "ends_on", "description", "achievements"]
-        labels = {"network":"Réseau", "club":"Club", "function":"Fonction", "district":"District", "description":"Description", "achievements":"Réalisations"}
-        widgets = {"description":forms.Textarea(attrs={"rows":3}), "achievements":forms.Textarea(attrs={"rows":3})}
+        fields = ["network", "club", "function", "district", "start_year", "end_year", "description", "achievements"]
+        labels = {"network":"Réseau", "club":"Club", "function":"Poste", "district":"District",
+            "start_year":"Année de début", "end_year":"Année de fin",
+            "description":"Description", "achievements":"Réalisations"}
+        help_texts = {"end_year":"Laisser vide si le poste est toujours actuel."}
+        widgets = {"description":forms.Textarea(attrs={"rows":3}), "achievements":forms.Textarea(attrs={"rows":3}),
+            "start_year":forms.NumberInput(attrs={"inputmode":"numeric","min":"1917","max":"2100"}),
+            "end_year":forms.NumberInput(attrs={"inputmode":"numeric","min":"1917","max":"2100"})}
 
     def __init__(self, *args, actor, profile, **kwargs):
         instance = kwargs.get("instance")

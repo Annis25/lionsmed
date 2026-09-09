@@ -1,0 +1,25 @@
+{% load static %}
+<section class="section rejoindre on-dark" aria-labelledby="titre-rejoindre">
+  <div class="container">
+    <div class="rejoindre__grille">
+      <div class="rejoindre__media media media--arche">
+        <picture>
+          <source media="(max-width: 760px)" srcset="{% static 'images/rejoindre-640.webp' %}">
+          <img src="{% static 'images/rejoindre-1100.webp' %}"
+               srcset="{% static 'images/rejoindre-640.webp' %} 640w, {% static 'images/rejoindre-1100.webp' %} 1100w, {% static 'images/rejoindre-1600.webp' %} 1600w"
+               sizes="(max-width: 1080px) 100vw, 38vw"
+               width="1100" height="733" loading="lazy" decoding="async"
+               alt="Huit personnes en gilets Lions, souriants, réunies en extérieur devant des cartons.">
+        </picture>
+      </div>
+      <div class="rejoindre__texte">
+        <div class="section-head">
+          <span class="eyebrow">Rejoignez-nous</span>
+          <h2 id="titre-rejoindre">Et si vous serviez avec nous&nbsp;?</h2>
+        </div>
+        <p class="lede">Mettez votre temps, vos compétences et votre énergie au service de nos actions.</p>
+        <a class="btn btn--primary" href="{% url 'editorial:join' %}">Nous rejoindre</a>
+      </div>
+    </div>
+  </div>
+</section>

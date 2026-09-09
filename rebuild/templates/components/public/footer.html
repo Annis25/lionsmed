@@ -19,8 +19,7 @@
 <li><a href="{% url 'core:home' %}">Accueil</a></li>
 <li><a href="{% url 'editorial:club' %}">Notre Club</a></li>
 <li><a href="{% url 'actions:list' %}">Nos Actions</a></li>
-<li><a href="{% url 'agenda:list' %}">Événements</a></li>
-<li><a href="{% url 'editorial:news' %}">Actualités</a></li>
+{% if has_public_events %}<li><a href="{% url 'agenda:list' %}">Événements</a></li>{% endif %}
 <li><a href="{% url 'editorial:join' %}">Nous rejoindre</a></li>
 <li><a href="{% url 'communications:contact' %}">Contact</a></li>
 </ul>

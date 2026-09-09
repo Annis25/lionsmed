@@ -20,7 +20,6 @@ from django.utils import timezone
 from apps.core.models import LegacyImportRecord
 from apps.accounts.models import normalize_email
 from apps.members.models import MemberProfile, MembershipApplication
-from apps.editorial.models import NewsArticle
 from apps.service_actions.models import Action
 from apps.agenda.models import Event
 from apps.dues import services as dues_services
@@ -140,10 +139,12 @@ def import_applications(con, *, batch, apply):
             report.add("SKIPPED")
             continue
         email = normalize_email(row["email"] or "")
-        if not email or not row["motivation"]:
-            report.add("REJECTED", "champ obligatoire manquant (email/motivation)")
+        if not email or not row["motivation"] or not (row["phone"] or "").strip():
+            # Le téléphone est désormais obligatoire côté candidature (recette V1) : une
+            # candidature legacy qui en est dépourvue n'est jamais complétée artificiellement.
+            report.add("REJECTED", "champ obligatoire manquant (email/téléphone/motivation)")
             if apply:
-                _record(batch=batch, table="accounts_membershiprequest", legacy_pk=legacy_pk, state="REJECTED", reason="champ obligatoire manquant")
+                _record(batch=batch, table="accounts_membershiprequest", legacy_pk=legacy_pk, state="REJECTED", reason="champ obligatoire manquant (email/téléphone/motivation)")
             continue
         if not apply:
             report.add("IMPORTED")
@@ -168,35 +169,16 @@ def import_applications(con, *, batch, apply):
 # ---------------------------------------------------------------------------
 
 def import_news(con, *, batch, apply, operator):
+    """La fonctionnalité Actualités est supprimée du nouveau produit (recette V1) :
+    les actualités legacy ne sont jamais importées, seulement déclarées SKIPPED."""
     report = Report("news_article")
-    categories = {row["id"]: row["name"] for row in con.execute("SELECT id, name FROM news_category")}
     for row in con.execute("SELECT * FROM news_article ORDER BY id"):
         report.total += 1
         legacy_pk = row["id"]
-        if _already_imported("news_article", legacy_pk):
-            report.add("SKIPPED")
-            continue
-        if not row["title"] or not row["content"]:
-            report.add("REJECTED", "titre ou contenu manquant")
-            if apply:
-                _record(batch=batch, table="news_article", legacy_pk=legacy_pk, state="REJECTED", reason="titre ou contenu manquant")
-            continue
-        if not apply:
-            report.add("IMPORTED")
-            continue
-        slug = row["slug"] or f"legacy-{legacy_pk}"
-        if NewsArticle.objects.filter(slug=slug).exists():
-            slug = f"{slug}-legacy-{legacy_pk}"
-        with transaction.atomic():
-            article = NewsArticle(title=row["title"][:180], slug=slug[:200], summary=(row["excerpt"] or row["content"][:500])[:500],
-                body=row["content"][:20000], status="DRAFT", category="VIE", created_by=operator, updated_by=operator)
-            article.full_clean()
-            article.save()
-            original_category = categories.get(row["category_id"], "")
-            _record(batch=batch, table="news_article", legacy_pk=legacy_pk, state="IMPORTED",
-                reason=f"brouillon à reclasser ; catégorie legacy : {original_category!r}",
-                target_type="editorial.NewsArticle", target_id=article.pk, source_hash=_hash_row(row))
-        report.add("IMPORTED")
+        report.add("SKIPPED")
+        if apply and not _already_imported("news_article", legacy_pk):
+            _record(batch=batch, table="news_article", legacy_pk=legacy_pk, state="REJECTED",
+                reason="fonctionnalité Actualités supprimée du nouveau produit")
     return report
 
 

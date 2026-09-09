@@ -8,7 +8,6 @@ from apps.core.models import LegacyImportRecord
 from apps.core import legacy_pipeline
 from apps.governance.models import Role, LionsYear
 from apps.members.models import MembershipApplication
-from apps.editorial.models import NewsArticle
 from apps.agenda.models import Event
 from apps.dues.models import DuesRecord
 
@@ -36,7 +35,7 @@ def build_source(tmp_path):
         (3, "comite@example.invalid", "C", "C", "COMITE", "", "", "", 1),  # rôle inconnu : identité importée, aucun grant
     ])
     con.executemany("INSERT INTO accounts_membershiprequest VALUES (?,?,?,?,?,?,?,?)", [
-        (1, "App", "Licant", "applicant@example.invalid", "", "", "Motivation réelle", "PENDING"),
+        (1, "App", "Licant", "applicant@example.invalid", "20000001", "", "Motivation réelle", "PENDING"),
     ])
     con.execute("INSERT INTO news_category VALUES (1, 'Vie du club')")
     con.executemany("INSERT INTO news_article VALUES (?,?,?,?,?,?,?)", [
@@ -78,9 +77,6 @@ class LegacyPipelineTests(TestCase):
         self.assertEqual(by_table["accounts_user"].rejected, 1)
         self.assertEqual(by_table["accounts_membershiprequest"].imported, 1)
         self.assertEqual(MembershipApplication.objects.count(), 1)
-        self.assertEqual(by_table["news_article"].imported, 1)
-        article = NewsArticle.objects.get()
-        self.assertEqual(article.status, "DRAFT")  # jamais publié automatiquement
         self.assertEqual(by_table["events_event"].imported, 1)  # seule la REUNION
         self.assertEqual(by_table["events_event"].quarantined, 1)  # l'ACTION, axe non inventé
         event = Event.objects.get()
@@ -124,15 +120,31 @@ class LegacyPipelineTests(TestCase):
 
     def test_rerun_is_idempotent_no_duplicates(self):
         legacy_pipeline.run(self.source, apply=True, operator=self.operator)
-        first_articles = NewsArticle.objects.count()
         first_events = Event.objects.count()
         first_applications = MembershipApplication.objects.count()
         batch, reports = legacy_pipeline.run(self.source, apply=True, operator=self.operator, batch="rerun")
         by_table = {r.table: r for r in reports}
         self.assertEqual(by_table["accounts_user"].skipped_already_imported, 2)
-        self.assertEqual(NewsArticle.objects.count(), first_articles)
         self.assertEqual(Event.objects.count(), first_events)
         self.assertEqual(MembershipApplication.objects.count(), first_applications)
+
+    def test_legacy_application_without_phone_is_rejected_not_completed(self):
+        con = sqlite3.connect(self.source)
+        con.execute("INSERT INTO accounts_membershiprequest VALUES (2,'Sans','Tel','sanstel@example.invalid','','','Motivation réelle','PENDING')")
+        con.commit();con.close()
+        batch, reports = legacy_pipeline.run(self.source, apply=True, operator=self.operator)
+        by_table = {r.table: r for r in reports}
+        self.assertEqual(by_table["accounts_membershiprequest"].imported, 1)
+        self.assertEqual(by_table["accounts_membershiprequest"].rejected, 1)
+        self.assertFalse(MembershipApplication.objects.filter(email="sanstel@example.invalid").exists())
+
+    def test_legacy_news_never_imported(self):
+        batch, reports = legacy_pipeline.run(self.source, apply=True, operator=self.operator)
+        by_table = {r.table: r for r in reports}
+        self.assertEqual(by_table["news_article"].imported, 0)
+        self.assertEqual(by_table["news_article"].skipped_already_imported, 1)
+        record = LegacyImportRecord.objects.get(table="news_article", legacy_pk="1")
+        self.assertIn("supprimée", record.reason)
 
     def test_no_email_sent_during_import(self):
         from apps.communications.models import OutboxMessage

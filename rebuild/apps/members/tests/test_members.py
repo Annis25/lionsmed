@@ -23,7 +23,7 @@ from apps.governance.mandates import save_mandate
 from apps.accounts.email_changes import validate_new_email, request_email_change
 
 PROFILE={"first_name":"Prénom synthétique","last_name":"Nom synthétique","phone":"00000","profession":"Profession privée","bio":"Bio privée"}
-EXPERIENCE={"network":"LEO","club":"Club synthétique","function":"Président historique","district":"District synthétique","starts_on":"2020-01","ends_on":"2021-02","description":"Description privée","achievements":"Réalisations privées"}
+EXPERIENCE={"network":"LEO","club":"Club synthétique","function":"Président historique","district":"District synthétique","start_year":"2020","end_year":"2021","description":"Description privée","achievements":"Réalisations privées"}
 
 def picture(name="portrait.png", kind="PNG", mime="image/png", size=(80,80)):
     out=BytesIO();Image.new("RGB",size,"blue").save(out,format=kind)
@@ -192,11 +192,13 @@ class ExperienceTests(TestCase):
         self.assertEqual(self.actor.member_profile.experiences.count(),1)
         self.assertEqual(self.other.member_profile.experiences.count(),0)
 
-    def test_dates_and_month_precision(self):
-        response=self.client.post(reverse("members:experience_add"),{**EXPERIENCE,"ends_on":"2019-01"})
+    def test_years_ordered_and_end_optional(self):
+        response=self.client.post(reverse("members:experience_add"),{**EXPERIENCE,"end_year":"2019"})
         self.assertEqual(response.status_code,200);self.assertEqual(AssociationExperience.objects.count(),0)
-        response=self.client.post(reverse("members:experience_add"),{**EXPERIENCE,"starts_on":"2020-01-15"})
-        self.assertEqual(response.status_code,200);self.assertEqual(AssociationExperience.objects.count(),0)
+        response=self.client.post(reverse("members:experience_add"),{**EXPERIENCE,"end_year":""})
+        self.assertEqual(response.status_code,302)
+        exp=AssociationExperience.objects.get()
+        self.assertIsNone(exp.end_year)
 
 class UploadTests(TestCase):
     def setUp(self):

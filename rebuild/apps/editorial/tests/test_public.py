@@ -22,7 +22,7 @@ from apps.governance.models import Role
 from apps.service_actions.models import Action, Axis
 from apps.service_actions.forms import ActionForm
 from apps.agenda.models import Event
-from apps.editorial.models import NewsArticle, Redirect, EditorialSection, ImpactMetric
+from apps.editorial.models import Redirect, EditorialSection, ImpactMetric
 from apps.editorial.publication import save_content, publish_content, withdraw_content
 from apps.editorial.images import upload_image
 from apps.communications.models import ContactRequest, OutboxMessage
@@ -37,19 +37,19 @@ def content(user, kind='action', slug='synthetic', **kwargs):
     if kind=='action':data.update(axis='DIABETE',performed_on=timezone.localdate(),location='Lieu synthétique')
     if kind=='event':data.update(starts_at=timezone.now()+timedelta(days=1),ends_at=timezone.now()+timedelta(days=1,hours=2),location='Lieu synthétique',visibility='PUBLIC')
     data.update(kwargs)
-    return {'action':Action,'news':NewsArticle,'event':Event}[kind].objects.create(**data)
+    return {'action':Action,'event':Event}[kind].objects.create(**data)
 
 
 def submission(kind='application', **changes):
     data=dict(email='synthetic@example.invalid',submission_token=signing.dumps({'id':str(uuid4()),'kind':kind},salt='public-submission'))
-    data.update(dict(first_name='Prénom',last_name='Nom',motivation='Motivation synthétique',consent='on') if kind=='application' else dict(name='Nom synthétique',subject='GENERAL',message='Message synthétique'))
+    data.update(dict(first_name='Prénom',last_name='Nom',phone='+21620000000',motivation='Motivation synthétique',consent='on') if kind=='application' else dict(name='Nom synthétique',subject='GENERAL',message='Message synthétique'))
     data.update(changes)
     return data
 
 class PublicationTests(TestCase):
     def setUp(self):self.actor=account(role=Role.PRESIDENT)
     def test_drafts_and_publication_all_domains(self):
-        for kind in ['action','news','event']:
+        for kind in ['action','event']:
             with self.subTest(kind=kind):
                 obj=content(self.actor,kind)
                 self.assertEqual(self.client.get(obj.get_absolute_url()).status_code,404)
@@ -58,7 +58,7 @@ class PublicationTests(TestCase):
                 self.assertTrue(obj.meta_title);self.assertTrue(obj.meta_description)
                 withdraw_content(actor=self.actor,obj=obj,kind=kind)
                 self.assertEqual(self.client.get(obj.get_absolute_url()).status_code,404)
-        self.assertEqual(AuditEvent.objects.filter(action__endswith='.published').count(),3)
+        self.assertEqual(AuditEvent.objects.filter(action__endswith='.published').count(),2)
     def test_exact_axes(self):self.assertEqual(set(Axis.values),{'DIABETE','ENVIRONNEMENT','HUMANITAIRE','JEUNESSE'})
     def test_invalid_publication_data(self):
         for changes in [dict(performed_on=timezone.localdate()+timedelta(days=1)),dict(location=''),dict(beneficiaries=1),dict(partners='Sans source')]:
@@ -110,8 +110,8 @@ class PublicationTests(TestCase):
         r=self.client.get('/nos-actions/');self.assertEqual(len(r.context['page_obj']),9)
         self.assertEqual(len(self.client.get('/nos-actions/?page=2').context['page_obj']),2)
         self.assertEqual(len(self.client.get('/nos-actions/?axis=JEUNESSE').context['page_obj']),1)
-        for i in range(10):publish_content(actor=self.actor,obj=content(self.actor,'news',slug=f'news-{i}'),kind='news')
-        self.assertEqual(len(self.client.get('/actualites/?page=2').context['page_obj']),1)
+        self.assertEqual(self.client.get('/actualites/').status_code,404)
+        self.assertEqual(self.client.get('/actualites/inconnu/').status_code,404)
         past=content(self.actor,'event',starts_at=timezone.now()-timedelta(days=2),ends_at=timezone.now()-timedelta(days=1))
         publish_content(actor=self.actor,obj=past,kind='event')
         self.assertEqual(len(self.client.get('/evenements/').context['page_obj']),0)
@@ -120,7 +120,7 @@ class PublicationTests(TestCase):
         for role in Role.values:
             user=account(email=role+'@example.invalid',role=role);self.client.force_login(user)
             allowed=role in {Role.SUPER_ADMIN,Role.PRESIDENT,Role.SECRETAIRE}
-            for kind in ['action','news','event']:
+            for kind in ['action','event']:
                 self.assertEqual(self.client.get(reverse('editorial_management:add',kwargs={'kind':kind})).status_code,200 if allowed else 403)
                 obj=content(self.actor,kind,slug=str(uuid4()))
                 if allowed:publish_content(actor=user,obj=obj,kind=kind)
@@ -149,7 +149,7 @@ class SeoTests(TestCase):
     def setUp(self):self.actor=account(role=Role.SECRETAIRE)
     def test_all_empty_pages_metadata(self):
         titles=[]
-        for path in ['/','/notre-club/','/nos-actions/','/actualites/','/evenements/','/rejoindre/','/candidature/','/contact/','/mentions-legales/','/confidentialite/','/plan-du-site/']:
+        for path in ['/','/notre-club/','/nos-actions/','/rejoindre/','/candidature/','/contact/','/mentions-legales/','/confidentialite/','/plan-du-site/']:
             r=self.client.get(path);self.assertEqual(r.status_code,200,path);html=r.content.decode()
             self.assertEqual(len(re.findall(r'<h1[ >]',html)),1,path)
             self.assertIn('name="description"',html);self.assertIn('property="og:title"',html)
@@ -170,7 +170,7 @@ class SeoTests(TestCase):
         with override_settings(PUBLIC_INDEXING_ENABLED=False):
             self.assertIn('noindex',self.client.get('/')['X-Robots-Tag']);self.assertNotContains(self.client.get('/sitemap.xml'),'<url>');self.assertContains(self.client.get('/robots.txt'),'Disallow: /')
     def test_schema_types_and_script_escaping(self):
-        for kind,expected in [('action',None),('news','NewsArticle'),('event','Event')]:
+        for kind,expected in [('action',None),('event','Event')]:
             obj=content(self.actor,kind,title='Test </script><script>alert(1)</script>')
             publish_content(actor=self.actor,obj=obj,kind=kind)
             html=self.client.get(obj.get_absolute_url()).content.decode()
@@ -220,6 +220,12 @@ class SubmissionTests(TestCase):
             data=submission(kind)
             with patch('django.core.signing.time.time',return_value=timezone.now().timestamp()+4000):self.assertFalse(Form(data).is_valid())
         response=self.client.post('/candidature/',submission(first_name=''));self.assertContains(response,'aria-invalid="true"')
+    def test_application_phone_required_server_side(self):
+        self.assertFalse(ApplicationForm(submission('application',phone='')).is_valid())
+        self.assertTrue(ApplicationForm(submission('application')).is_valid())
+        response=self.client.post('/candidature/',submission('application',phone=''))
+        self.assertContains(response,'obligatoire')
+        self.assertEqual(MembershipApplication.objects.count(),0)
     def test_csrf_and_limits(self):
         for path,kind in [('/candidature/','application'),('/contact/','contact')]:
             self.assertEqual(Client(enforce_csrf_checks=True).post(path,submission(kind)).status_code,403)

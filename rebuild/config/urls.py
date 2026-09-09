@@ -9,6 +9,7 @@ urlpatterns = [
     path("", include("apps.service_actions.urls")),
     path("", include("apps.agenda.urls")),
     path("", include("apps.communications.urls")),
+    path("", include("apps.members.public_urls")),
     path("espace/", include("apps.members.urls")),
     path("espace/", include("apps.governance.urls")),
     path("espace/", include("apps.agenda.private_urls")),

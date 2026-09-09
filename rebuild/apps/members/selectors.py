@@ -43,7 +43,7 @@ def profile_data(actor, profile, *, own=False, management=False):
     if profile.photo_key and (own or (visible and profile.share_photo)):
         dto["photo_url"] = reverse("members:photo", args=[profile.user_id])
     if own or (visible and profile.share_experiences):
-        dto["experiences"] = list(profile.experiences.values("id","network","club","function","district","starts_on","ends_on","description","achievements"))
+        dto["experiences"] = list(profile.experiences.values("id","network","club","function","district","start_year","end_year","description","achievements"))
     if own or management or (visible and profile.share_mandates):
         mandates = profile.mandates.select_related("lions_year")
         if not own and not management: mandates = mandates.filter(validated_at__isnull=False)

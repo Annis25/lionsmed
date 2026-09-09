@@ -16,7 +16,7 @@ class PublicBrowserTests(StaticLiveServerTestCase):
     def test_public_responsive(self):
         actor=account('browser-public@example.invalid',role=Role.PRESIDENT)
         password=secrets.token_urlsafe(24);actor.set_password(password);actor.save()
-        for kind in ['action','news','event']:publish_content(actor=actor,obj=content(actor,kind),kind=kind)
+        for kind in ['action','event']:publish_content(actor=actor,obj=content(actor,kind),kind=kind)
         env={**os.environ,'LIONSMED_BROWSER_URL':self.live_server_url,'LIONSMED_BROWSER_EMAIL':actor.email,'LIONSMED_BROWSER_PASSWORD':password}
         result=subprocess.run(['node',str(Path(settings.BASE_DIR)/'tools/browser_public.cjs')],env=env,capture_output=True,text=True,timeout=180)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)

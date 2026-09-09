@@ -4,10 +4,11 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from apps.core.permissions import can
 from .models import MemberProfile, AssociationExperience
-from .forms import ProfileForm, ExperienceForm, VISIBILITY
+from .forms import ProfileForm, ExperienceForm
 from .uploads import encode_photo, photo_storage
+from .public_profile import ensure_public_slug
 
-PROFILE_FIELDS = {"phone", "profession", "bio", *VISIBILITY}
+PROFILE_FIELDS = {"phone", "profession", "bio", "public_profile_enabled"}
 
 def update_profile(*, actor, profile, data, files=None):
     if not can(actor, "profile.edit_own", profile): raise PermissionDenied
@@ -29,6 +30,7 @@ def update_profile(*, actor, profile, data, files=None):
             user.first_name = clean["first_name"]; user.last_name = clean["last_name"]
             user.save(update_fields=["first_name", "last_name", "updated_at"])
             for field in PROFILE_FIELDS: setattr(current, field, clean[field])
+            if current.public_profile_enabled: ensure_public_slug(current)
             old_key = current.photo_key
             if encoded is not None:
                 new_key = storage.save("portraits/" + uuid4().hex + ".jpg", encoded)

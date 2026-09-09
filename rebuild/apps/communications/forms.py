@@ -33,9 +33,9 @@ class ContactForm(SubmissionForm):
     kind="contact"
     class Meta:
         model=ContactRequest
-        fields=["name","email","subject","message"]
-        labels={"name":"Votre nom","email":"Adresse e-mail","subject":"Objet de votre message","message":"Votre message"}
-        widgets={"name":forms.TextInput(attrs={"autocomplete":"name"}),"email":forms.EmailInput(attrs={"autocomplete":"email","inputmode":"email"}),"message":forms.Textarea(attrs={"rows":6})}
+        fields=["name","email","phone","subject","message"]
+        labels={"name":"Votre nom","email":"Adresse e-mail","phone":"Téléphone","subject":"Objet de votre message","message":"Votre message"}
+        widgets={"name":forms.TextInput(attrs={"autocomplete":"name"}),"email":forms.EmailInput(attrs={"autocomplete":"email","inputmode":"email"}),"phone":forms.TextInput(attrs={"autocomplete":"tel","inputmode":"tel"}),"message":forms.Textarea(attrs={"rows":6})}
 
 class ImportantNotificationForm(StyledFields,forms.Form):
     email=forms.EmailField(label="Adresse email du destinataire")

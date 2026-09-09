@@ -1,0 +1,72 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="member-profile-page">
+  <div class="container member-profile-page__container">
+    <nav aria-label="Fil d’Ariane">
+      <ol class="lot3-breadcrumb">
+        {% for crumb in breadcrumbs %}
+          <li>{% if not forloop.last %}<a href="{{ crumb.url }}">{{ crumb.name }}</a>{% else %}<span aria-current="page">{{ crumb.name }}</span>{% endif %}</li>
+        {% endfor %}
+      </ol>
+    </nav>
+
+    <article class="member-profile-card">
+      <div class="member-profile-card__cover" aria-hidden="true"></div>
+      <div class="member-profile-card__body">
+        <div class="member-profile-card__identity">
+          {% if photo_url %}
+            <img class="member-profile-card__photo" src="{{ photo_url }}" width="160" height="160" alt="Photo de {{ name }}." fetchpriority="high">
+          {% else %}
+            <span class="member-profile-card__avatar" aria-hidden="true"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 21v-2a7 7 0 0 1 14 0v2"></path></svg></span>
+          {% endif %}
+          <div>
+            <h1>{{ name }}</h1>
+            <p class="member-profile-card__membership">Membre du Lions Club Sfax-Méditerranée</p>
+            <p class="member-profile-card__location">Sfax, Tunisie · District 414 Tunisie</p>
+          </div>
+        </div>
+        {% if member.bio %}<div class="member-profile-card__intro">{{ member.bio|linebreaks }}</div>{% endif %}
+      </div>
+    </article>
+
+    <div class="member-profile-layout">
+      <div class="member-profile-main">
+        {% if experiences %}
+        <section class="member-profile-section" aria-labelledby="parcours-title">
+          <h2 id="parcours-title">Parcours Lions / LEO</h2>
+          <ol class="member-profile-timeline">
+            {% for exp in experiences %}
+            <li>
+              <h3>{{ exp.function }}</h3>
+              <p class="member-profile-timeline__club">{{ exp.club }}</p>
+              <p class="member-profile-timeline__date">{% if exp.end_year %}{{ exp.start_year }}–{{ exp.end_year }}{% else %}Depuis {{ exp.start_year }}{% endif %}</p>
+            </li>
+            {% endfor %}
+          </ol>
+        </section>
+        {% endif %}
+
+        {% if mandates %}
+        <section class="member-profile-section" aria-labelledby="mandats-title">
+          <h2 id="mandats-title">Mandats</h2>
+          <ul class="member-profile-mandates">
+            {% for mandate in mandates %}
+            <li><strong>{{ mandate.function }}</strong><span>{{ mandate.lions_year.label }}</span></li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+      </div>
+
+      <aside class="member-profile-aside" aria-label="À propos du club">
+        <img src="{% static 'images/emblem-256.png' %}" width="64" height="61" alt="">
+        <h2>Lions Club Sfax-Méditerranée</h2>
+        <p>Nous servons à Sfax, en Tunisie, au sein du District 414 Tunisie.</p>
+        <a class="link-arrow" href="{% url 'editorial:club' %}">Découvrir notre club <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+      </aside>
+    </div>
+  </div>
+</section>
+{% endblock %}

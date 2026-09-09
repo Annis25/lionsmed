@@ -5,6 +5,7 @@ urlpatterns=[
     path("profil/",views.profile,name="profile"),
     path("profil/modifier/",views.edit_profile,name="profile_edit"),
     path("profil/email/",views.email_information,name="email_information"),
+    path("profil/public/qr/",views.public_profile_qr,name="public_profile_qr"),
     path("annuaire/",views.directory,name="directory"),
     path("membres/<uuid:user_id>/",views.detail,name="detail"),
     path("membres/<uuid:user_id>/photo/",views.photo,name="photo"),

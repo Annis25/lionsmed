@@ -7,8 +7,14 @@ def shell(request):
     navigation=[("Accueil",reverse("core:home")),("Notre Club",reverse("editorial:club")),("Nos Actions",reverse("actions:list")),("Nous rejoindre",reverse("editorial:join")),("Contact",reverse("communications:contact"))]
     if not request.path.startswith("/espace/"):
         from apps.editorial.selectors import institution
-        return {"public_navigation":navigation,"institution":institution(),"canonical_url":settings.SITE_ORIGIN+(reverse("accounts:reset") if request.path.startswith("/reinitialiser/") else request.path)}
+        from apps.agenda.models import Event
+        return {"public_navigation":navigation,"institution":institution(),
+            "has_public_events":Event.objects.public().exists(),
+            "canonical_url":settings.SITE_ORIGIN+(reverse("accounts:reset") if request.path.startswith("/reinitialiser/") else request.path)}
+    from apps.members.models import MemberProfile
+    photo_key = MemberProfile.objects.filter(user_id=request.user.pk).values_list("photo_key", flat=True).first()
     return {
+        "header_photo_url": reverse("members:photo", args=[request.user.pk]) if photo_key else None,
         "can_directory": can(request.user, "directory.view"),
         "can_management": can(request.user, "management.access"),
         "private_navigation": [

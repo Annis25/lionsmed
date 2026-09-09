@@ -2,7 +2,7 @@ from django.utils import timezone
 from apps.core.models import PublicImage
 from apps.service_actions.models import Action
 from apps.agenda.models import Event
-from .models import NewsArticle,EditorialSection,ClubIdentity
+from .models import EditorialSection,ClubIdentity
 from . import identity
 
 def public_qs(model):return model.objects.public().select_related("cover","social_image")
@@ -17,6 +17,6 @@ def sections():return {s.key:s for s in EditorialSection.objects.filter(validate
 def image_is_public(image):
     if not image.approved_at:return False
     from django.db.models import Q
-    for model in [Action,NewsArticle,Event]:
+    for model in [Action,Event]:
         if model.objects.public().filter(Q(cover=image)|Q(social_image=image)).exists():return True
     return Action.objects.public().filter(photos__image=image).exists()

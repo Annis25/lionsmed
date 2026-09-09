@@ -9,6 +9,7 @@ class ContactRequest(models.Model):
     submission_key=models.UUIDField(unique=True)
     name=models.CharField(max_length=150)
     email=models.EmailField()
+    phone=models.CharField(max_length=32,blank=True)
     subject=models.CharField(max_length=20,choices=SUBJECTS)
     message=models.TextField(max_length=5000)
     state=models.CharField(max_length=12,choices=STATES,default="RECEIVED")
