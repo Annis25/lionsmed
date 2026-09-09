@@ -14,6 +14,14 @@ MAX_BYTES = 5 * 1024 * 1024
 MAX_PIXELS = 16_000_000
 FORMATS = {".jpg": "JPEG", ".jpeg": "JPEG", ".png": "PNG", ".webp": "WEBP"}
 HEIF_FORMATS = {".heic", ".heif"}
+MIME_TYPES = {
+    ".jpg": {"image/jpeg"},
+    ".jpeg": {"image/jpeg"},
+    ".png": {"image/png"},
+    ".webp": {"image/webp"},
+    ".heic": {"image/heic"},
+    ".heif": {"image/heif"},
+}
 
 
 def _convert_heif(raw, suffix):
@@ -47,6 +55,12 @@ def encode_photo(upload):
     expected = FORMATS.get(suffix)
     if not expected and suffix not in HEIF_FORMATS:
         raise ValidationError("Photo JPEG, PNG, WebP ou HEIC requise.")
+    # Le type fourni par le navigateur n'est pas une preuve suffisante à lui seul,
+    # mais il doit être cohérent avec l'extension avant toute conversion. Le format
+    # réellement décodé est contrôlé ci-dessous par Pillow (ou heif-convert pour HEIF).
+    declared_type = (getattr(upload, "content_type", "") or "").split(";", 1)[0].strip().lower()
+    if declared_type not in MIME_TYPES[suffix]:
+        raise ValidationError("Le type déclaré ne correspond pas au format de la photo.")
     if upload.size > MAX_BYTES:
         raise ValidationError("La photo doit peser au maximum 5 Mo.")
     raw = upload.read(MAX_BYTES + 1)

@@ -12,7 +12,7 @@ se rediscute pas à chaque page.
 
 ## 0. Cadre non négociable
 
-**Lions Club Sfax-Méditerranée** — Sfax, Tunisie, District 414-B. Membre de Lions Clubs
+**Lions Club Sfax-Méditerranée** — Sfax, Tunisie, District 414 Tunisie. Membre de Lions Clubs
 International. Devise : « Nous servons ». Domaine : `lionsmed.tn`.
 Le nom institutionnel complet est employé dans tous les textes, titres, SEO et JSON-LD.
 Le logo conserve son wording propre (« Lions Sfax Med »).
@@ -392,11 +392,11 @@ comme pour les moteurs de réponse et les assistants IA. Reprise **telle quelle,
 reformulation** :
 
 > Le Lions Club Sfax-Méditerranée est un club Lions basé à Sfax, en Tunisie, rattaché au
-> District 414-B. Ses quatre axes prioritaires sont le diabète, l'environnement,
+> District 414 Tunisie. Ses quatre axes prioritaires sont le diabète, l'environnement,
 > l'humanitaire et la jeunesse.
 
 **Ancrage local** — le contenu doit permettre de comprendre naturellement, sans bourrage
-de mots-clés, que le club agit à **Sfax**, en **Tunisie**, au sein du **District 414-B**.
+de mots-clés, que le club agit à **Sfax**, en **Tunisie**, au sein du **District 414 Tunisie**.
 
 **Aucun lien mort.** Un lien sans cible pointe vers `#` avec un commentaire
 `<!-- LIEN À CRÉER -->`.

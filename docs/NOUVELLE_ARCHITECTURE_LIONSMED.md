@@ -126,7 +126,7 @@ Aucune URL publique de prévisualisation en production. Les vues mentionnées so
 
 ### Écarts et besoins non dessinés
 
-1. **District** : accueil/notre-club utilisent « District 414 Tunisie » ; le skill et d’autres pages « District 414-B ». Le skill prime pour la cible documentaire ; appellation officielle **À CONFIRMER HUMAINEMENT** avant publication des métadonnées centralisées. Aucun HTML modifié ici.
+1. **District** : l’appellation validée est « District 414 Tunisie » ; le skill et les pages du runtime doivent utiliser cette forme.
 2. **Axe/cause** : l’accueil montre une action « Santé oculaire » alors que quatre axes seulement sont autorisés. Conserver une cause mondiale secondaire possible, sans créer un cinquième axe ; classement de cette action dans un axe à confirmer.
 3. **Actions** : détail encore générique avec « modalités de participation ». Adapter plus tard le contenu validé au bilan d’une réalisation sans imposer un événement préalable.
 4. **DIRECTEUR** : certaines pages lui accordent gestion/supervision, mais la décision actuelle demande confirmation de ses droits. Les marqueurs de maquette sont des indices UX, pas une délégation définitive.
@@ -793,7 +793,7 @@ Chaque point ci-dessous est **À CONFIRMER HUMAINEMENT**. Les blocages sont loca
 
 | Décision | Proposition / état observé | Bloque |
 |---|---|---|
-| Appellation exacte du District | Skill 414-B ; certaines maquettes 414 Tunisie | Identité publique, métadonnées et emails réels |
+| Appellation exacte du District | District 414 Tunisie | Identité publique, métadonnées et emails réels |
 | Date de charte/fondation, histoire | Ne pas reprendre 2025 du défaut legacy | Publication historique |
 | Bureau, mandats, fonctions et portraits | Aucun nom/fonction déduit d’une photo | Bureau public et grants initiaux |
 | Année Lions / bornes | Proposition juillet → juillet, fin exclusive | Fondation calendrier annuel |

@@ -8,7 +8,7 @@ Lecture du skill `.claude/skills/lionsmed-design/SKILL.md`, de l’architecture 
 
 État initial : branche `main`, HEAD `9ca9ae4` ; seul `mockups.zip` était non suivi. `check` vert ; 101 tests existants, 99 réussis et 2 suites navigateur désactivées par défaut. Empreintes initiales conservées pour vérifier le périmètre.
 
-L’instruction humaine du Lot 3 impose **District 414 Tunisie**, malgré le 414-B documentaire historique. Le skill et les maquettes restent intacts.
+L’appellation validée est **District 414 Tunisie**. Le skill applique désormais cette référence ; les mockups historiques restent inchangés.
 
 ## Pages et navigation
 

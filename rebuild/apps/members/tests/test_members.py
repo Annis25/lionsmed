@@ -219,6 +219,12 @@ class UploadTests(TestCase):
         response=self.client.get(reverse("members:photo",args=[self.actor.pk]))
         self.assertEqual(response.status_code,200);self.assertEqual(response["Cache-Control"],"private, no-store");b"".join(response.streaming_content)
 
+    def test_valid_jpeg_is_normalized(self):
+        self.assertEqual(self.upload(picture(name="portrait.jpg",kind="JPEG",mime="image/jpeg")).status_code,302)
+        self.actor.member_profile.refresh_from_db()
+        with photo_storage().open(self.actor.member_profile.photo_key) as file:
+            with Image.open(file) as image:self.assertEqual(image.format,"JPEG")
+
     def test_svg_invalid_and_mime_extension_mismatch(self):
         files=[SimpleUploadedFile("bad.svg",b"<svg></svg>",content_type="image/svg+xml"),SimpleUploadedFile("bad.png",b"bad",content_type="image/png"),picture(name="lie.jpg"),picture(mime="image/jpeg")]
         for file in files:

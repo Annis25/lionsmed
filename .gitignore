@@ -16,5 +16,7 @@ staticfiles/
 
 # Runtime du redéveloppement isolé
 rebuild/.env
+# Ancienne configuration locale, non requise par le runtime ni les tests.
+rebuild/.env.before-recipe
 rebuild/.venv/
 rebuild/runtime/
