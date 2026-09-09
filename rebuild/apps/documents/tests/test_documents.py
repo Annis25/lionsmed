@@ -92,3 +92,28 @@ class DocumentAclTests(TestCase):
         self.client.force_login(self.other_member)
         self.assertEqual(self.client.get(reverse("documents:manage_detail", args=[document.pk])).status_code, 403)
         self.assertEqual(self.client.get(reverse("documents:manage_list")).status_code, 403)
+
+
+class UploadSizeLimitTests(TestCase):
+    def setUp(self):
+        self.president = account("president2@example.invalid", role=Role.PRESIDENT)
+        patcher = patch("apps.documents.services.scan_bytes", return_value=ScanResult(clean=True, detail="stream: OK"))
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_max_bytes_is_fifty_megabytes(self):
+        self.assertEqual(services.MAX_BYTES, 50 * 1024 * 1024)
+
+    def test_file_over_old_fifteen_mo_limit_now_accepted(self):
+        payload = b"%PDF-1.4\n" + b"0" * (20 * 1024 * 1024)  # 20 Mo : refusé avant, accepté maintenant
+        upload = SimpleUploadedFile("gros.pdf", payload, content_type="application/pdf")
+        document = services.upload_document(actor=self.president, upload=upload, title="Gros fichier", description="",
+            category=Document.Category.GENERAL, visibility=Document.Visibility.MEMBERS)
+        self.assertIsNotNone(document.pk)
+
+    def test_file_over_fifty_mo_still_refused(self):
+        payload = b"%PDF-1.4\n" + b"0" * (51 * 1024 * 1024)
+        upload = SimpleUploadedFile("trop-gros.pdf", payload, content_type="application/pdf")
+        with self.assertRaises(ValidationError):
+            services.upload_document(actor=self.president, upload=upload, title="Trop gros", description="",
+                category=Document.Category.GENERAL, visibility=Document.Visibility.MEMBERS)

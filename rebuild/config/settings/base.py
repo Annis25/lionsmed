@@ -127,7 +127,8 @@ LOGGING = {"version": 1, "disable_existing_loggers": False,
 
 # Limites du corps non fichier et du nombre de fichiers ; limite photo au service.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
-DATA_UPLOAD_MAX_NUMBER_FILES = 1
+# Une action accepte une image principale et jusqu’à neuf images complémentaires.
+DATA_UPLOAD_MAX_NUMBER_FILES = 10
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 FILE_UPLOAD_HANDLERS = [
     "apps.members.upload_handlers.PhotoSizeLimitHandler",

@@ -7,26 +7,10 @@ from .models import Vote, VoteOption
 class VoteForm(StyledFields, forms.ModelForm):
     class Meta:
         model = Vote
-        fields = ["title", "description", "mode", "opens_at", "closes_at", "min_choices", "max_choices", "blank_allowed"]
+        fields = ["title", "description", "mode", "blank_allowed"]
         labels = {"title": "Titre", "description": "Description", "mode": "Type de scrutin",
-            "opens_at": "Ouverture — heure de Tunis", "closes_at": "Clôture — heure de Tunis",
-            "min_choices": "Nombre minimal de choix", "max_choices": "Nombre maximal de choix",
             "blank_allowed": "Vote blanc autorisé"}
-        widgets = {
-            "description": forms.Textarea(attrs={"rows": 4}),
-            "opens_at": forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
-            "closes_at": forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"),
-        }
-
-    def clean(self):
-        data = super().clean()
-        opens_at, closes_at = data.get("opens_at"), data.get("closes_at")
-        if opens_at and closes_at and closes_at <= opens_at:
-            raise forms.ValidationError("La clôture doit être postérieure à l'ouverture.")
-        min_choices, max_choices = data.get("min_choices"), data.get("max_choices")
-        if min_choices and max_choices and max_choices < min_choices:
-            raise forms.ValidationError("Le nombre maximal de choix doit être au moins égal au minimum.")
-        return data
+        widgets = {"description": forms.Textarea(attrs={"rows": 4})}
 
 
 class VoteOptionForm(StyledFields, forms.Form):

@@ -1,3 +1,23 @@
 {% extends 'base/private.html' %}
+
 {% block title %}Annuaire — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>Annuaire</h1></div><section class="workspace-panel">{% include 'components/private/search.html' %}<p class="app-note">Seuls les profils et les informations partagés par les membres sont affichés.</p></section><div class="lot2-card-grid">{% for member in page_obj %}<article class="workspace-panel">{% include 'components/private/identity.html' %}<a class="btn btn--ghost btn--sm" href="{% url 'members:detail' member.id %}">Voir le profil <span class="visually-hidden">de {{ member.name }}</span></a></article>{% empty %}<p class="etat-vide">Aucun membre accessible ne correspond à ces critères.</p>{% endfor %}</div>{% include 'components/private/pagination.html' %}{% endblock %}
+
+{% block content %}
+<div class="app-titre"><h1>Annuaire</h1></div>
+<section class="workspace-panel">
+  {% include 'components/private/search.html' %}
+  <p class="app-note">Tous les membres actifs, du bureau et de la présidence sont affichés avec leur fiche complète. Ces informations restent réservées à l’espace privé.</p>
+</section>
+<div class="lot2-card-grid">
+  {% for member in page_obj %}
+  <article class="workspace-panel">
+    {% include 'components/private/identity.html' %}
+    {% if member.dues_badge %}<p><span class="badge {% if member.dues_badge.status == 'PAID' %}badge--paye{% elif member.dues_badge.status == 'PARTIAL' %}badge--en-cours{% else %}badge--a-regulariser{% endif %}">Cotisation : {{ member.dues_badge.label }}</span></p>{% endif %}
+    <a class="btn btn--ghost btn--sm" href="{% url 'members:detail' member.id %}">Voir le profil <span class="visually-hidden">de {{ member.name }}</span></a>
+  </article>
+  {% empty %}
+  <p class="etat-vide">Aucun membre accessible ne correspond à ces critères.</p>
+  {% endfor %}
+</div>
+{% include 'components/private/pagination.html' %}
+{% endblock %}

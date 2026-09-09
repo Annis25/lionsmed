@@ -15,6 +15,19 @@ def visible_events(actor):
 def upcoming_events(actor):
     return visible_events(actor).filter(ends_at__gte=timezone.now()).order_by("starts_at")
 
+def events_in_range(actor, start, end):
+    """Tout événement chevauchant [start, end) — utilisé par les vues Mois/Semaine/Jour
+    et par le flux iCalendar (mêmes règles de visibilité que le calendrier HTML)."""
+    return visible_events(actor).filter(starts_at__lt=end, ends_at__gte=start).order_by("starts_at")
+
+def calendar_feed_events(profile_user):
+    """Événements exposés dans le flux iCalendar d'un membre, sans levée d'exception si
+    ses droits ont changé depuis la génération du lien — l'appelant décide alors du 404."""
+    try:
+        return list(visible_events(profile_user).order_by("starts_at"))
+    except PermissionDenied:
+        return None
+
 def event_by_id(actor,event_id):
     try:return visible_events(actor).get(pk=event_id)
     except Event.DoesNotExist:raise Http404

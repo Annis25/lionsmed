@@ -1,1 +1,17 @@
-{% extends 'base/private.html' %}{% block body_class %}prive-dense lot3-management{% endblock %}{% block title %}Demandes reçues — Lions Club Sfax-Méditerranée{% endblock %}{% block content %}<div class="app-titre"><h1>Demandes reçues</h1></div><section class="workspace-panel"><ul class="lot2-timeline">{% for item in page_obj %}<li><a href="{% url 'communications:request' kind item.pk %}">{% if item.name %}{{ item.name }}{% else %}{{ item.first_name }} {{ item.last_name }}{% endif %}</a> · {{ item.get_state_display }} · {{ item.created_at|date:'d/m/Y' }}</li>{% empty %}<li>Aucune demande reçue.</li>{% endfor %}</ul>{% include 'components/private/pagination.html' %}</section>{% endblock %}
+{% extends 'base/private.html' %}
+{% block body_class %}prive-dense lot3-management{% endblock %}
+{% block title %}{% if kind == 'application' %}Candidatures reçues{% else %}Messages de contact{% endif %} — Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>{% if kind == 'application' %}Candidatures reçues{% else %}Messages de contact{% endif %}</h1></div>
+<section class="workspace-panel">
+  <p class="app-note">{% if kind == 'application' %}Toutes les candidatures envoyées depuis le formulaire « Nous rejoindre » sont listées ici.{% else %}Tous les messages envoyés depuis le formulaire de contact sont listés ici.{% endif %}</p>
+  <ul class="lot2-timeline">
+    {% for item in page_obj %}
+      <li><a href="{% url 'communications:request' kind item.pk %}">{% if item.name %}{{ item.name }}{% else %}{{ item.first_name }} {{ item.last_name }}{% endif %}</a> · {{ item.get_state_display }} · {{ item.created_at|date:'d/m/Y' }}</li>
+    {% empty %}
+      <li>{% if kind == 'application' %}Aucune candidature reçue.{% else %}Aucun message de contact reçu.{% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% include 'components/private/pagination.html' %}
+</section>
+{% endblock %}

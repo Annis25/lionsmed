@@ -116,7 +116,8 @@ class LegacyPipelineTests(TestCase):
         self.assertEqual(by_table["members_cotisation"].imported, 1)  # le membre valide, une fois l'année confirmée
         self.assertEqual(DuesRecord.objects.count(), 1)
         record = DuesRecord.objects.get()
-        self.assertEqual(float(record.amount), 120.0)  # montant réel repris, jamais inventé
+        self.assertTrue(record.tranche1_paid and record.tranche2_paid)  # legacy PAID -> les deux tranches
+        self.assertIn("120.0", record.note)  # montant historique réel conservé en texte, jamais inventé comme barème
 
     def test_rerun_is_idempotent_no_duplicates(self):
         legacy_pipeline.run(self.source, apply=True, operator=self.operator)

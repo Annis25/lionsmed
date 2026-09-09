@@ -14,7 +14,7 @@ def audit(actor,action,obj):
     AuditEvent.objects.create(actor=actor,action=action,object_type=obj._meta.object_name,object_id=str(obj.pk))
 
 @transaction.atomic
-def save_content(*,actor,form,kind):
+def save_content(*,actor,form,kind,keep_published=False):
     actor=get_user_model().objects.select_for_update().get(pk=actor.pk)
     new=form.instance._state.adding
     require(actor,kind+(".create" if new else ".edit"))
@@ -29,14 +29,14 @@ def save_content(*,actor,form,kind):
         if Redirect.objects.filter(old_path=obj.get_absolute_url()).exists():raise ValidationError("Ce chemin est réservé par une ancienne URL.")
     obj.created_by=previous.created_by if previous else actor
     obj.updated_by=actor
-    obj.status="DRAFT"  # Une correction exige une nouvelle publication explicite.
+    obj.status="PUBLISHED" if previous and previous.status=="PUBLISHED" and keep_published else "DRAFT"
     obj.published_at=previous.published_at if previous else None
     obj.full_clean();obj.save()
     if previous and previous.slug!=obj.slug:
         Redirect.objects.filter(new_path=old_path).update(new_path=obj.get_absolute_url())
         redirection=Redirect(old_path=old_path,new_path=obj.get_absolute_url());redirection.full_clean();redirection.save()
         audit(actor,"public.slug_changed",obj)
-    if previous and previous.status=="PUBLISHED":audit(actor,"public.withdrawn_for_edit",obj)
+    if previous and previous.status=="PUBLISHED" and not keep_published:audit(actor,"public.withdrawn_for_edit",obj)
     audit(actor,kind+".saved",obj)
     return obj
 
@@ -50,7 +50,6 @@ def publish_content(*,actor,obj,kind):
         if image and (not image.approved_at or not image.alt):raise ValidationError("Image non autorisée à publication.")
     if kind=="action":
         if not obj.performed_on or obj.performed_on>timezone.localdate() or not obj.location:raise ValidationError("Une réalisation exige une date passée ou actuelle et un lieu.")
-        if (obj.beneficiaries is not None or obj.partners) and not obj.evidence:raise ValidationError("Le bilan et les partenaires exigent une source validée.")
         if obj.photos.filter(image__approved_at__isnull=True).exists():raise ValidationError("La galerie contient une image non autorisée.")
     if kind=="event":
         # Visibilité PRIVATE incluse : un rendez-vous interne doit pouvoir alimenter le calendrier privé.

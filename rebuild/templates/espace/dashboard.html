@@ -23,7 +23,7 @@
   </dl>
 </section>
 
-{% if votes_to_complete or satisfaction_to_complete or current_dues.status == 'TO_REGULARIZE' %}
+{% if votes_to_complete or satisfaction_to_complete or current_dues.status != 'PAID' %}
 <section class="app-section" aria-labelledby="titre-actions">
   <div class="bloc-titre"><h2 id="titre-actions">À faire</h2></div>
   <div class="grille-actions">
@@ -45,7 +45,7 @@
       <a class="btn btn--solid btn--sm" href="{% url 'satisfaction:respond' %}">Répondre</a>
     </article>
     {% endif %}
-    {% if current_dues.status == 'TO_REGULARIZE' %}
+    {% if current_dues.status != 'PAID' %}
     <article class="carte-action">
       <div class="carte-action__haut">
         <span class="carte-action__icone" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 10h18"></path></svg></span>
@@ -94,9 +94,42 @@
       <div class="button-row"><a class="btn btn--solid btn--sm" href="{% url 'members:profile' %}">Mon profil</a><a class="btn btn--outline btn--sm" href="{% url 'members:experiences' %}">Mon parcours</a></div>
     </article>
     <article class="carte-info">
-      <div class="carte-info__haut"><span class="carte-info__icone" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 10h18"></path></svg></span><div><h3>Cotisation</h3>{% if current_dues %}<p><span class="badge {% if current_dues.status == 'PAID' %}badge--paye{% else %}badge--a-regulariser{% endif %}">{{ current_dues.get_status_display }}</span></p>{% else %}<p>Aucune cotisation enregistrée pour l’année active.</p>{% endif %}</div></div>
+      <div class="carte-info__haut"><span class="carte-info__icone" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 10h18"></path></svg></span><div><h3>Cotisation</h3>{% if current_dues %}<p><span class="badge {% if current_dues.status == 'PAID' %}badge--paye{% elif current_dues.status == 'PARTIAL' %}badge--en-cours{% else %}badge--a-regulariser{% endif %}">{{ current_dues.status_label }}</span></p>{% else %}<p>Aucune cotisation enregistrée pour l’année active.</p>{% endif %}</div></div>
       <a class="link-arrow" href="{% url 'dues:own' %}">Mes cotisations <span aria-hidden="true">→</span></a>
     </article>
   </div>
 </section>
+
+{% if can_management %}
+<section class="app-section" aria-labelledby="titre-pilotage">
+  <div class="bloc-titre"><h2 id="titre-pilotage">Pilotage</h2></div>
+  <div class="lot2-card-grid">
+    <section class="workspace-panel"><h2>Comptes personnels</h2><p class="lot2-number">{{ member_count }}</p></section>
+    <section class="workspace-panel"><h2>Membres actifs</h2><p class="lot2-number">{{ active_count }}</p></section>
+    <section class="workspace-panel"><h2>Mandats enregistrés</h2><p class="lot2-number">{{ mandate_count }}</p></section>
+    <section class="workspace-panel"><h2>Rendez-vous à venir</h2><p class="lot2-number">{{ upcoming_events_count }}</p></section>
+    <section class="workspace-panel"><h2>Cotisations à régulariser</h2><p class="lot2-number">{{ to_regularize }}</p></section>
+    <section class="workspace-panel"><h2>Documents disponibles</h2><p class="lot2-number">{{ document_count }}</p></section>
+  </div>
+  <div class="grille-blocs grille-blocs--60-40">
+    <article class="carte-info">
+      <h3>Votes ouverts</h3>
+      <ul class="lot2-timeline">{% for row in open_votes %}<li><a href="{% url 'voting:manage_track' row.vote.pk %}">{{ row.vote.title }}</a> — {{ row.rate }} % ({{ row.participation_count }} / {{ row.elector_count }})</li>{% empty %}<li>Aucun vote ouvert.</li>{% endfor %}</ul>
+    </article>
+    <article class="carte-info">
+      <h3>Satisfaction du mois</h3>
+      {% if not satisfaction_period %}<p class="app-note">Aucune période ouverte.</p>{% elif satisfaction_summary.hidden %}<p>Résultats masqués : effectif ({{ satisfaction_summary.count }}) sous le seuil ({{ satisfaction_summary.threshold }}).</p>{% else %}<p>{{ satisfaction_summary.average }} / 5 — {{ satisfaction_summary.count }} réponse{{ satisfaction_summary.count|pluralize }}.</p>{% endif %}
+      <a class="link-arrow" href="{% url 'satisfaction:manage_list' %}">Gestion satisfaction <span aria-hidden="true">→</span></a>
+    </article>
+  </div>
+  <div class="lot2-actions">
+    <a class="btn btn--solid btn--sm" href="{% url 'governance:members' %}">Membres et mandats</a>
+    <a class="btn btn--outline btn--sm" href="{% url 'governance:years' %}">Années Lions</a>
+    <a class="btn btn--outline btn--sm" href="{% url 'documents:manage_list' %}">Gérer les documents</a>
+    <a class="btn btn--outline btn--sm" href="{% url 'dues:manage_list' %}">Gérer les cotisations</a>
+    <a class="btn btn--outline btn--sm" href="{% url 'voting:manage_list' %}">Gérer les votes</a>
+    <a class="btn btn--outline btn--sm" href="{% url 'notifications:send' %}">Envoyer une notification</a>
+  </div>
+</section>
+{% endif %}
 {% endblock %}

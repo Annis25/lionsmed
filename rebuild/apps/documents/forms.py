@@ -8,7 +8,7 @@ class DocumentForm(StyledFields, forms.Form):
     description = forms.CharField(max_length=2000, required=False, widget=forms.Textarea(attrs={"rows": 3}), label="Description")
     category = forms.ChoiceField(choices=Document.Category.choices, label="Catégorie")
     visibility = forms.ChoiceField(choices=Document.Visibility.choices, label="Visibilité")
-    file = forms.FileField(label="Fichier", help_text="PDF, DOCX, XLSX, PNG ou JPEG · 15 Mo maximum.")
+    file = forms.FileField(label="Fichier", help_text="PDF, DOCX, XLSX, PNG ou JPEG · 50 Mo maximum.")
 
 
 class DocumentGrantForm(StyledFields, forms.Form):

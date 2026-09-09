@@ -59,9 +59,9 @@ class PublicationTests(TestCase):
                 withdraw_content(actor=self.actor,obj=obj,kind=kind)
                 self.assertEqual(self.client.get(obj.get_absolute_url()).status_code,404)
         self.assertEqual(AuditEvent.objects.filter(action__endswith='.published').count(),2)
-    def test_exact_axes(self):self.assertEqual(set(Axis.values),{'DIABETE','ENVIRONNEMENT','HUMANITAIRE','JEUNESSE'})
+    def test_action_axes_include_all_and_the_four_priorities(self):self.assertEqual(set(Axis.values),{'TOUT','DIABETE','ENVIRONNEMENT','HUMANITAIRE','JEUNESSE'})
     def test_invalid_publication_data(self):
-        for changes in [dict(performed_on=timezone.localdate()+timedelta(days=1)),dict(location=''),dict(beneficiaries=1),dict(partners='Sans source')]:
+        for changes in [dict(performed_on=timezone.localdate()+timedelta(days=1)),dict(location='')]:
             obj=content(self.actor,slug=str(uuid4()),**changes)
             with self.assertRaises(ValidationError):publish_content(actor=self.actor,obj=obj,kind='action')
         obj=content(self.actor,'event',location='')
@@ -76,7 +76,14 @@ class PublicationTests(TestCase):
         obj=publish_content(actor=self.actor,obj=content(self.actor),kind='action')
         response=self.client.get(obj.get_absolute_url())
         self.assertNotContains(response,'Bénéficiaires');self.assertIsNone(obj.cover);self.assertIsNone(obj.beneficiaries)
-    def test_slug_stable_and_redirects_flatten(self):
+    def test_action_form_accepts_only_instagram_links(self):
+        data=dict(title='Action Instagram',axis='DIABETE',summary='Résumé',body='Récit',performed_on=str(timezone.localdate()),location='Lieu',instagram_url='https://www.instagram.com/p/exemple/')
+        self.assertTrue(ActionForm(data,actor=self.actor).is_valid())
+        data['instagram_url']='https://example.invalid/publication'
+        form=ActionForm(data,actor=self.actor)
+        self.assertFalse(form.is_valid())
+        self.assertIn('instagram_url',form.errors)
+    def test_slug_stays_stable_when_an_action_is_edited(self):
         obj=content(self.actor)
         def edit(slug,title='Titre changé'):
             nonlocal obj
@@ -87,9 +94,8 @@ class PublicationTests(TestCase):
             return publish_content(actor=self.actor,obj=obj,kind='action')
         edit(obj.slug);self.assertEqual(obj.slug,'synthetic')
         edit('second');edit('third')
-        for slug in ['synthetic','second']:
-            response=self.client.get('/nos-actions/'+slug+'/');self.assertEqual(response.status_code,301);self.assertEqual(response.url,obj.get_absolute_url())
-        self.assertEqual(set(Redirect.objects.values_list('new_path',flat=True)),{obj.get_absolute_url()})
+        self.assertEqual(self.client.get('/nos-actions/synthetic/').status_code,200)
+        self.assertFalse(Redirect.objects.exists())
     def test_slug_generation_collision_and_edit_withdrawal(self):
         data=dict(title='Titre nouveau',axis='DIABETE',summary='Résumé',body='Récit',performed_on=str(timezone.localdate()),location='Lieu')
         form=ActionForm(data,actor=self.actor);self.assertTrue(form.is_valid(),form.errors)
@@ -126,9 +132,14 @@ class PublicationTests(TestCase):
                 if allowed:publish_content(actor=user,obj=obj,kind=kind)
                 else:
                     with self.assertRaises(PermissionDenied):publish_content(actor=user,obj=obj,kind=kind)
-            for kind in ['application','contact']:
-                self.assertEqual(self.client.get(reverse('communications:inbox',kwargs={'kind':kind})).status_code,200 if allowed else 403)
-                self.assertEqual(can(user,kind+'.manage'),allowed)
+            for kind, allowed_roles in [
+                ('application', {Role.PRESIDENT, Role.GMT}),
+                ('contact', {Role.PRESIDENT, Role.SECRETAIRE}),
+            ]:
+                request_access = role in allowed_roles
+                self.assertEqual(self.client.get(reverse('communications:inbox',kwargs={'kind':kind})).status_code,200 if request_access else 403)
+                self.assertEqual(can(user,kind+'.view'), request_access)
+                self.assertEqual(can(user,kind+'.manage'), request_access)
         self.client.logout()
         self.assertEqual(self.client.get('/espace/contenu/').status_code,302)
     def test_management_post_and_csrf(self):
@@ -189,6 +200,22 @@ class SeoTests(TestCase):
         self.assertEqual(count(),small)
 
 class PublicImageTests(TestCase):
+    def test_action_form_uploads_the_main_image_and_renders_it_publicly(self):
+        actor=account(role=Role.PRESIDENT);self.client.force_login(actor)
+        buf=BytesIO();Image.new('RGB',(1200,600),'blue').save(buf,'JPEG')
+        photo=SimpleUploadedFile('action.jpg',buf.getvalue(),content_type='image/jpeg')
+        with tempfile.TemporaryDirectory() as root,override_settings(PUBLIC_IMAGE_ROOT=root):
+            response=self.client.post(reverse('editorial_management:add',kwargs={'kind':'action'}),{
+                'title':'Action avec image','axis':'DIABETE','summary':'Résumé','body':'Récit',
+                'performed_on':str(timezone.localdate()),'location':'Lieu','main_image_upload':photo,'intent':'publish',
+            })
+            self.assertEqual(response.status_code,302)
+            obj=Action.objects.get(title='Action avec image')
+            self.assertIsNotNone(obj.cover)
+            self.assertEqual(obj.status,'PUBLISHED')
+            self.assertContains(self.client.get('/nos-actions/'),obj.cover.get_absolute_url())
+            self.assertContains(self.client.get(obj.get_absolute_url()),obj.cover.get_absolute_url())
+
     def test_approval_derivatives_and_public_boundary(self):
         actor=account(role=Role.PRESIDENT)
         def photo():

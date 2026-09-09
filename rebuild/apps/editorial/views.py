@@ -19,9 +19,10 @@ PAGE_INFO={"club":("Notre Club","Ancrés à Sfax, unis par une même volonté : 
 
 def public_context(request,title,description,**kwargs):
     axis_content=sections()
-    context={"institution":institution(),"page_title":title,"lede":description,"axes":Axis.choices,
+    public_axes=[choice for choice in Axis.choices if choice[0] != Axis.TOUT]
+    context={"institution":institution(),"page_title":title,"lede":description,"axes":public_axes,
         "axis_sections":[{"value":value,"label":label,"section":axis_content.get("axis_"+value.lower()),
-            "default_body":identity.AXES_DEFAULT_BODY.get(value)} for value,label in Axis.choices],
+            "default_body":identity.AXES_DEFAULT_BODY.get(value)} for value,label in public_axes],
         "axes_intro":identity.AXES_INTRO,"causes_lions":identity.CAUSES_LIONS}
     context.update(metadata(request,title=title,description=description,**kwargs));return context
 
@@ -50,7 +51,7 @@ def page(request,page):
 def listing(request,kind):
     model,title,description,route={"action":(Action,"Nos Actions","Le service prend tout son sens lorsqu’il devient action.","actions:list"),"event":(Event,"Événements","Nos rendez-vous et rencontres publics.","agenda:list")}[kind]
     if kind=="event" and not public_qs(model).exists():raise Http404
-    qs=public_qs(model)
+    qs=public_qs(model).select_related("cover") if kind=="action" else public_qs(model)
     if kind=="action":
         if request.GET.get("axis") in Axis.values:qs=qs.filter(axis=request.GET["axis"])
         qs=qs.order_by("-performed_on","id")
@@ -66,7 +67,7 @@ def listing(request,kind):
 @require_safe
 def detail(request,slug,kind):
     model,title,route={"action":(Action,"Nos Actions","actions:list"),"event":(Event,"Événements","agenda:list")}[kind]
-    obj=public_qs(model).filter(slug=slug).first()
+    obj=(public_qs(model).select_related("cover") if kind=="action" else public_qs(model)).filter(slug=slug).first()
     if not obj:
         redirection=Redirect.objects.filter(old_path=request.path).first()
         if redirection:
@@ -83,7 +84,11 @@ def detail(request,slug,kind):
     if schema and obj.cover and obj.cover.approved_at:schema["image"]=settings.SITE_ORIGIN+obj.cover.get_absolute_url()
     context=public_context(request,obj.meta_title or obj.title,obj.meta_description or obj.summary,schema=schema,image=obj.social_image or obj.cover,parents=({"name":title,"url":reverse(route)},))
     context.update(item=obj,page_title=obj.title,lede=obj.summary,kind=kind,list_url=reverse(route))
-    if kind=="action":context["photos"]=obj.photos.filter(image__approved_at__isnull=False).select_related("image")
+    context["page_css"]="css/nos-actions.css" if kind=="action" else None
+    if kind=="action":
+        photos=list(obj.photos.filter(image__approved_at__isnull=False).select_related("image"))
+        context["photos"]=photos
+        context["gallery_images"]=[image for image in [obj.cover] if image and image.approved_at]+[photo.image for photo in photos]
     return render(request,"public/detail.html",context)
 
 @require_safe

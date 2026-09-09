@@ -82,4 +82,53 @@
   }
   var errors = document.querySelector('.form-errors');
   if (errors) errors.focus();
+
+  document.querySelectorAll('[data-action-gallery]').forEach(function (gallery) {
+    var main = gallery.querySelector('[data-gallery-main]');
+    var frame = gallery.querySelector('.action-lightbox__frame');
+    var photos = Array.from(gallery.querySelectorAll('[data-gallery-open]'));
+    var dialog = gallery.querySelector('[data-action-lightbox]');
+    if (!main || !photos.length || !dialog) return;
+    var index = 0;
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function apply(position) {
+      index = (position + photos.length) % photos.length;
+      var photo = photos[index];
+      main.src = photo.dataset.large;
+      main.width = photo.dataset.width;
+      main.height = photo.dataset.height;
+      main.alt = photo.dataset.alt;
+      gallery.querySelector('[data-gallery-count]').textContent = (index + 1) + ' / ' + photos.length;
+    }
+    function show(position) {
+      if (!frame || reduceMotion) { apply(position); return; }
+      frame.classList.add('is-changing');
+      window.setTimeout(function () {
+        apply(position);
+        window.requestAnimationFrame(function () { frame.classList.remove('is-changing'); });
+      }, 140);
+    }
+    photos.forEach(function (photo, position) { photo.addEventListener('click', function () { apply(position); dialog.showModal(); }); });
+    var previous = gallery.querySelector('[data-gallery-previous]');
+    var next = gallery.querySelector('[data-gallery-next]');
+    if (previous) previous.addEventListener('click', function () { show(index - 1); });
+    if (next) next.addEventListener('click', function () { show(index + 1); });
+    gallery.querySelector('[data-gallery-close]').addEventListener('click', function () { dialog.close(); });
+    dialog.addEventListener('click', function (event) { if (event.target === dialog) dialog.close(); });
+    dialog.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowLeft') { event.preventDefault(); show(index - 1); }
+      if (event.key === 'ArrowRight') { event.preventDefault(); show(index + 1); }
+    });
+    if (frame && photos.length > 1) {
+      var touchStartX = null;
+      frame.addEventListener('touchstart', function (event) { touchStartX = event.changedTouches[0].clientX; }, { passive: true });
+      frame.addEventListener('touchend', function (event) {
+        if (touchStartX === null) return;
+        var delta = event.changedTouches[0].clientX - touchStartX;
+        touchStartX = null;
+        if (Math.abs(delta) < 40) return;
+        show(delta > 0 ? index - 1 : index + 1);
+      }, { passive: true });
+    }
+  });
 })();

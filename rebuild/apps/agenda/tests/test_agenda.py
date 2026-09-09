@@ -12,6 +12,7 @@ from apps.editorial.publication import publish_content
 from .. import services
 from ..models import Event, Registration, Attendance
 from ..selectors import upcoming_events, own_registration
+from apps.members.models import MemberProfile
 
 
 def event(actor, **kwargs):
@@ -113,3 +114,126 @@ class CapacityConcurrencyTests(TransactionTestCase):
             results = list(pool.map(attempt, [first, second]))
         self.assertEqual(sum(results), 1)
         self.assertEqual(Registration.objects.filter(event=rendezvous, status=Registration.Status.CONFIRMED).count(), 1)
+
+
+class CalendarQuickAddTests(TestCase):
+    def setUp(self):
+        self.president = account("president-cal@example.invalid", role=Role.PRESIDENT)
+        self.member = account("member-cal@example.invalid", role=Role.MEMBRE)
+        self.bureau = account("bureau-cal@example.invalid", role=Role.BUREAU)
+
+    def test_authorized_member_can_create_event(self):
+        created = services.create_calendar_event(actor=self.president, title="Réunion mensuelle",
+            description="Ordre du jour", starts_at=timezone.now()+timedelta(days=1),
+            ends_at=timezone.now()+timedelta(days=1, hours=2), all_day=False, location="Local", meeting_link="")
+        self.assertEqual(created.status, "PUBLISHED")
+        self.assertEqual(created.visibility, "PRIVATE")  # jamais public par défaut
+
+    def test_unauthorized_member_cannot_create_event(self):
+        for actor in [self.member, self.bureau]:
+            with self.subTest(actor=actor.email):
+                with self.assertRaises(PermissionDenied):
+                    services.create_calendar_event(actor=actor, title="x", description="", starts_at=timezone.now(),
+                        ends_at=None, all_day=False, location="", meeting_link="")
+
+    def test_view_requires_event_create_capability(self):
+        self.client.force_login(self.member)
+        response = self.client.post(reverse("agenda_private:calendar_event_add"), {
+            "title": "Interdit", "description": "", "starts_at": "2030-01-01T10:00", "all_day": "",
+        })
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(Event.objects.filter(title="Interdit").exists())
+
+    def test_missing_title_or_start_rejected(self):
+        with self.assertRaises(ValidationError):
+            services.create_calendar_event(actor=self.president, title="", description="", starts_at=timezone.now(),
+                ends_at=None, all_day=False, location="", meeting_link="")
+        with self.assertRaises(ValidationError):
+            services.create_calendar_event(actor=self.president, title="Sans date", description="", starts_at=None,
+                ends_at=None, all_day=False, location="", meeting_link="")
+
+    def test_created_event_visible_in_shared_calendar_for_other_member(self):
+        created = services.create_calendar_event(actor=self.president, title="Assemblée générale",
+            description="", starts_at=timezone.now()+timedelta(days=2),
+            ends_at=timezone.now()+timedelta(days=2, hours=1), all_day=False, location="Salle A", meeting_link="")
+        self.assertIn(created, list(upcoming_events(self.member)))
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("agenda_private:calendar"))
+        self.assertContains(response, "Assemblée générale")
+
+    def test_view_created_via_http_appears_for_everyone(self):
+        self.client.force_login(self.president)
+        response = self.client.post(reverse("agenda_private:calendar_event_add"), {
+            "title": "Formation secourisme", "description": "Premiers secours", "all_day": "",
+            "starts_at": (timezone.now()+timedelta(days=5)).strftime("%Y-%m-%dT%H:%M"),
+            "ends_at": (timezone.now()+timedelta(days=5, hours=3)).strftime("%Y-%m-%dT%H:%M"),
+            "location": "Siège du club",
+        })
+        self.assertRedirects(response, reverse("agenda_private:calendar"))
+        self.assertTrue(Event.objects.filter(title="Formation secourisme", status="PUBLISHED").exists())
+
+
+class CalendarIcsTests(TestCase):
+    def setUp(self):
+        self.president = account("president-ics@example.invalid", role=Role.PRESIDENT)
+        self.member = account("member-ics@example.invalid", role=Role.MEMBRE)
+        self.member.first_name = "Secret"; self.member.last_name = "Membre"; self.member.save()
+        self.event = event(self.president, title="Réunion privée ICS")
+
+    def test_token_required_for_subscription(self):
+        self.assertEqual(self.client.get("/espace/calendrier/abonnement/inconnu.ics").status_code, 404)
+
+    def test_token_generated_on_first_calendar_view(self):
+        self.client.force_login(self.member)
+        self.client.get(reverse("agenda_private:calendar"))
+        self.member.member_profile.refresh_from_db()
+        self.assertIsNotNone(self.member.member_profile.calendar_token)
+        self.assertGreaterEqual(len(self.member.member_profile.calendar_token), 32)
+
+    def test_ics_feed_contains_authorized_event(self):
+        self.client.force_login(self.member)
+        self.client.get(reverse("agenda_private:calendar"))  # provisionne le jeton
+        token = MemberProfile.objects.get(user=self.member).calendar_token
+        response = self.client.get(f"/espace/calendrier/abonnement/{token}.ics")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/calendar; charset=utf-8")
+        content = response.content.decode()
+        self.assertIn("BEGIN:VCALENDAR", content)
+        self.assertIn("Réunion privée ICS", content)
+        self.assertIn("X-Robots-Tag", response)
+        self.assertIn("noindex", response["X-Robots-Tag"])
+        self.assertIn("no-store", response["Cache-Control"])
+
+    def test_old_token_invalid_after_regeneration(self):
+        self.client.force_login(self.member)
+        self.client.get(reverse("agenda_private:calendar"))
+        old_token = MemberProfile.objects.get(user=self.member).calendar_token
+        self.client.post(reverse("agenda_private:calendar_token_regenerate"))
+        new_token = MemberProfile.objects.get(user=self.member).calendar_token
+        self.assertNotEqual(old_token, new_token)
+        self.assertEqual(self.client.get(f"/espace/calendrier/abonnement/{old_token}.ics").status_code, 404)
+        self.assertEqual(self.client.get(f"/espace/calendrier/abonnement/{new_token}.ics").status_code, 200)
+
+    def test_ics_feed_never_leaks_email_or_name_of_subscriber(self):
+        self.client.force_login(self.member)
+        self.client.get(reverse("agenda_private:calendar"))
+        token = MemberProfile.objects.get(user=self.member).calendar_token
+        content = self.client.get(f"/espace/calendrier/abonnement/{token}.ics").content.decode()
+        self.assertNotIn(self.member.email, content)
+        self.assertNotIn("Secret", content)
+        self.assertNotIn(str(self.member.pk), content)
+
+    def test_authenticated_download_returns_valid_ics(self):
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("agenda_private:calendar_download"))
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertTrue(content.startswith("BEGIN:VCALENDAR"))
+        self.assertTrue(content.rstrip().endswith("END:VCALENDAR"))
+        self.assertIn("Réunion privée ICS", content)
+        self.assertEqual(response["Content-Disposition"], 'attachment; filename="lionsmed-calendrier.ics"')
+
+    def test_regenerate_requires_login(self):
+        response = self.client.post(reverse("agenda_private:calendar_token_regenerate"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/connexion/", response.url)

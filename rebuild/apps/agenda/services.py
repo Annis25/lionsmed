@@ -1,5 +1,8 @@
+import secrets
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
+from django.utils import timezone
+from django.utils.text import slugify
 from apps.core.permissions import can
 from apps.core.models import AuditEvent
 from apps.editorial.publication import publish_content
@@ -42,3 +45,47 @@ def record_attendance(*,actor,event,profile,status,note=""):
     attendance.full_clean();attendance.save()
     audit(actor,"attendance.recorded",attendance)
     return attendance
+
+@transaction.atomic
+def create_calendar_event(*, actor, title, description, starts_at, ends_at, all_day, location, meeting_link):
+    """Ajout rapide depuis le calendrier interne : jamais public par défaut (`visibility`
+    reste PRIVATE — la publication publique passe par le workflow éditorial existant,
+    /espace/contenu/, jamais automatique)."""
+    require(actor, "event.create")
+    if not title or not title.strip():
+        raise ValidationError("Le titre est obligatoire.")
+    if not starts_at:
+        raise ValidationError("La date et l'heure de début sont obligatoires.")
+    if ends_at and ends_at <= starts_at:
+        raise ValidationError("La fin doit être postérieure au début.")
+    base = slugify(title)[:150] or "evenement"
+    slug = f"{base}-{secrets.token_hex(4)}"
+    event = Event(title=title[:180], slug=slug, summary=(description or "")[:500], body=description or "",
+        starts_at=starts_at, ends_at=ends_at or starts_at, all_day=all_day, location=location[:200],
+        meeting_link=meeting_link or "", visibility="PRIVATE",
+        status="PUBLISHED", published_at=timezone.now(), created_by=actor, updated_by=actor)
+    event.meta_title = event.title
+    event.meta_description = event.summary[:300]
+    event.full_clean()
+    event.save()
+    audit(actor, "event.created_from_calendar", event)
+    return event
+
+
+@transaction.atomic
+def ensure_calendar_token(profile):
+    if not profile.calendar_token:
+        profile.calendar_token = secrets.token_urlsafe(32)
+        profile.save(update_fields=["calendar_token"])
+    return profile.calendar_token
+
+
+@transaction.atomic
+def regenerate_calendar_token(*, actor, profile):
+    require(actor, "event.register", None)
+    if profile.user_id != actor.pk:
+        raise PermissionDenied("Vous ne pouvez régénérer que votre propre lien.")
+    profile.calendar_token = secrets.token_urlsafe(32)
+    profile.save(update_fields=["calendar_token"])
+    audit(actor, "calendar.token_regenerated", profile)
+    return profile.calendar_token

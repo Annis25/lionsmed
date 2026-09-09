@@ -77,6 +77,34 @@
 .prive-dense .paire-liste dd, .prive-dense .paire-liste dt { font-size: .8125rem; }
 .prive-dense .app-note { font-size: .75rem; padding-top: var(--e3); }
 
+/* Bibliothèque des actions : image principale, impact et accès à la fiche. */
+.action-library { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--e4); }
+.action-library__title { align-items: end; }
+.action-library__title .app-titre { margin-bottom: 0; }
+.action-card { display: grid; grid-template-rows: auto 1fr; overflow: hidden; border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--blanc); }
+.action-card__image { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-bottom: 1px solid var(--bord); }
+.action-card__image--empty { display: grid; place-items: center; padding: var(--e4); background: #EDF1F7; border: 1px dashed #C3D0E2; color: var(--gris); font-size: .75rem; text-align: center; }
+.action-card__body { display: grid; align-content: start; gap: var(--e3); padding: var(--e4); }
+.action-card__heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--e2); align-items: center; }
+.action-card h2 { margin: 0; max-width: none; }
+.action-card h2 a { color: var(--encre); text-decoration: none; }
+.action-card h2 a:hover { color: var(--bleu); text-decoration: underline; text-underline-offset: .15em; }
+.action-card p { margin: 0; font-size: .8125rem; line-height: 1.6; }
+.action-card__metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e2) var(--e3); margin: 0; padding-top: var(--e3); border-top: 1px solid var(--bord); }
+.action-card__metrics dt { color: var(--gris); font-size: .75rem; }
+.action-card__metrics dd { margin: 0; font-size: .8125rem; font-weight: 600; overflow-wrap: anywhere; }
+.action-card__links { display: flex; flex-wrap: wrap; gap: var(--e2); align-items: center; }
+.action-edit-form > fieldset { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e3) var(--e4); margin: 0; padding: var(--e4); border: 1px solid var(--bord); border-radius: var(--r-carte); }
+.action-edit-form > fieldset > legend { grid-column: 1 / -1; padding: 0 var(--e1); font-weight: 600; }
+.action-edit-form > fieldset > .champ:has(textarea), .action-edit-form > fieldset > .champ--choix { grid-column: 1 / -1; }
+.action-gallery { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--e3); }
+.action-gallery figure { margin: 0; }
+.action-gallery img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--bord); border-radius: var(--r-carte); }
+.action-gallery figcaption { display: flex; justify-content: space-between; gap: var(--e2); padding-top: var(--e2); font-size: .75rem; }
+
+@media (max-width: 1080px) { .action-library { grid-template-columns: repeat(2, minmax(0, 1fr)); } .action-gallery { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .action-library { grid-template-columns: minmax(0, 1fr); } .action-library__title { align-items: start; } .action-edit-form > fieldset { grid-template-columns: minmax(0, 1fr); } .action-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
 /* Formulaires : deux colonnes sur desktop, mêmes champs et même comportement. */
 .prive-dense .formulaire { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--e3) var(--e4); }
 .prive-dense .workspace-panel > .formulaire { max-width: 960px; }
@@ -285,3 +313,52 @@
 .lot2-form-grid .champ--choix .champ__aide { grid-column: 2; max-width: 62ch; }
 .profil-photo__texte > .badge { align-self: flex-start; }
 .lot2-card-grid .profil-photo { background: transparent; border: 0; padding: 0; }
+
+/* Vote — ajout dynamique de choix (recette V1) */
+.options-list__ligne { display: flex; align-items: center; gap: var(--e2); margin-bottom: var(--e2); }
+.options-list__ligne .champ__input { flex: 1; }
+
+/* Calendrier — vues Mois/Semaine/Jour (recette V2) */
+.calendrier-barre { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); margin-bottom: var(--e5); }
+.calendrier-barre__nav { display: flex; align-items: center; gap: var(--e2); }
+.calendrier-fleche { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid var(--bord); border-radius: 50%; font-size: 1.125rem; line-height: 1; color: var(--encre); }
+.calendrier-fleche:hover { background: var(--fond); color: var(--bleu); }
+.calendrier-label { min-width: 12ch; text-align: center; text-transform: capitalize; }
+.calendrier-barre__vues { display: flex; gap: var(--e1); }
+
+.calendrier-mois__entetes { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: var(--e1); margin-bottom: var(--e1); font-size: .75rem; font-weight: 600; color: var(--gris); text-align: center; }
+.calendrier-mois__semaine { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: var(--e1); margin-bottom: var(--e1); }
+.calendrier-jour { min-height: 96px; padding: var(--e2); background: var(--blanc); border: 1px solid var(--bord); border-radius: 8px; display: flex; flex-direction: column; gap: var(--e1); overflow: hidden; }
+.calendrier-jour--hors { background: var(--fond); color: var(--gris); }
+.calendrier-jour--aujourdhui { border-color: var(--bleu); box-shadow: inset 0 0 0 1px var(--bleu); }
+.calendrier-jour__num { font-size: .8125rem; font-weight: 600; }
+.calendrier-puce { display: block; padding: 2px var(--e1); background: var(--fond-2); border-radius: 4px; font-size: .75rem; line-height: 1.3; color: var(--bleu); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calendrier-puce:hover { background: var(--bleu); color: var(--blanc); }
+.calendrier-plus { font-size: .6875rem; color: var(--gris); }
+
+.calendrier-semaine { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: var(--e2); margin-bottom: var(--e5); }
+.calendrier-jour--large { min-height: 220px; }
+.calendrier-jour--large h3 { font-size: .8125rem; margin-bottom: var(--e2); text-transform: capitalize; }
+.calendrier-jour-vue { display: grid; gap: var(--e3); margin-bottom: var(--e5); }
+
+.calendrier-details { position: relative; }
+.calendrier-detail { display: none; position: fixed; inset: 0; z-index: 200; align-items: center; justify-content: center; padding: var(--e4); background: rgba(14,46,94,.45); }
+.calendrier-detail:target { display: flex; }
+.calendrier-detail__carte { position: relative; width: min(480px, 100%); max-height: 80vh; overflow-y: auto; padding: var(--e5); background: var(--blanc); border-radius: var(--r-carte); box-shadow: var(--ombre); }
+.calendrier-detail__fermer { position: absolute; top: var(--e3); right: var(--e3); font-size: 1.5rem; line-height: 1; color: var(--gris); }
+.calendrier-detail__fermer:hover { color: var(--encre); }
+
+.calendrier-sync { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); margin-bottom: var(--e3); }
+.calendrier-sync .champ__input { flex: 1; min-width: 220px; font-size: .8125rem; }
+.calendrier-aide { margin-top: var(--e3); font-size: .875rem; }
+.calendrier-aide summary { cursor: pointer; color: var(--bleu); font-weight: 600; }
+.calendrier-aide ul { margin-top: var(--e2); display: grid; gap: var(--e2); padding-left: var(--e4); list-style: disc; }
+
+@media (max-width: 760px) {
+  .calendrier-mois__entetes { display: none; }
+  .calendrier-mois__semaine { grid-template-columns: 1fr; }
+  .calendrier-jour { min-height: 0; flex-direction: row; align-items: center; flex-wrap: wrap; }
+  .calendrier-jour__num { flex: none; width: 28px; }
+  .calendrier-jour--hors { display: none; }
+  .calendrier-semaine { grid-template-columns: 1fr; }
+}

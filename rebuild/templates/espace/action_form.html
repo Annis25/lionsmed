@@ -1,0 +1,17 @@
+{% extends 'base/private.html' %}
+{% block body_class %}prive-dense lot3-management{% endblock %}
+{% block title %}{{ page_title }} — Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>{{ page_title }}</h1><p class="app-titre__contexte">Le titre et le résumé servent automatiquement au référencement du site.</p><a class="btn btn--ghost btn--sm" href="{% url 'editorial_management:list' 'action' %}">← Retour aux actions</a></div>
+<form method="post" class="formulaire action-edit-form" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}{% include 'components/forms/errors.html' %}
+  <fieldset><legend>Présentation</legend>{% include 'components/forms/field.html' with field=form.title %}{% include 'components/forms/field.html' with field=form.axis %}{% include 'components/forms/field.html' with field=form.summary %}{% include 'components/forms/field.html' with field=form.body %}</fieldset>
+  <fieldset><legend>Réalisation et impact</legend>{% include 'components/forms/field.html' with field=form.performed_on %}{% include 'components/forms/field.html' with field=form.location %}{% include 'components/forms/field.html' with field=form.city %}{% include 'components/forms/field.html' with field=form.country %}{% include 'components/forms/field.html' with field=form.beneficiaries %}{% include 'components/forms/field.html' with field=form.hours_worked %}{% include 'components/forms/field.html' with field=form.partners %}{% include 'components/forms/field.html' with field=form.instagram_url %}</fieldset>
+  <fieldset><legend>Images</legend><p class="app-note">Déposez une image principale et jusqu’à neuf autres images.</p>{% include 'components/forms/field.html' with field=form.main_image_upload %}{% include 'components/forms/field.html' with field=form.gallery_uploads %}</fieldset>
+  {% if item and item.status == 'PUBLISHED' %}<button class="btn btn--solid" type="submit" name="intent" value="update">Modifier</button>{% else %}<div class="lot2-actions"><button class="btn btn--solid" type="submit" name="intent" value="publish">Publier</button><button class="btn btn--ghost" type="submit" name="intent" value="draft">Enregistrer comme brouillon</button></div>{% endif %}
+</form>
+{% if item %}
+  <section class="workspace-panel"><h2>Images ajoutées</h2><div class="action-gallery">{% if item.cover %}<figure><img src="{{ item.cover.get_absolute_url }}" width="{{ item.cover.width }}" height="{{ item.cover.height }}" alt="{{ item.cover.alt }}"><figcaption>Image principale</figcaption></figure>{% endif %}{% for photo in gallery %}<figure><img src="{{ photo.image.get_absolute_url }}" width="{{ photo.image.width }}" height="{{ photo.image.height }}" alt="{{ photo.image.alt }}"><figcaption><form method="post" action="{% url 'editorial_management:gallery' item.pk %}">{% csrf_token %}<button class="btn btn--ghost btn--sm" type="submit" name="remove" value="{{ photo.pk }}">Retirer</button></form></figcaption></figure>{% endfor %}</div></section>
+  <section class="workspace-panel"><h2>Publication</h2><p>État : {{ item.get_status_display }}.</p><div class="lot2-actions">{% if item.status == 'PUBLISHED' %}<form method="post" action="{% url 'editorial_management:draft' item.pk %}">{% csrf_token %}<button class="btn btn--ghost" type="submit">Remettre en brouillon</button></form>{% endif %}<form method="post" action="{% url 'editorial_management:delete' item.pk %}">{% csrf_token %}<button class="btn btn--ghost" type="submit">Supprimer</button></form></div></section>
+{% endif %}
+{% endblock %}

@@ -1,3 +1,49 @@
 {% extends 'base/private.html' %}
+
 {% block title %}Fiche de gestion — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>Fiche de gestion</h1></div><section class="workspace-panel lot2-reading"><h2>{{ member.name }}</h2><dl class="paire-liste"><div><dt>Statut</dt><dd>{{ member.status }}</dd></div><div><dt>Compte</dt><dd>{% if member.account_active %}Actif{% else %}Désactivé{% endif %}</dd></div><div><dt>Rôle actuel</dt><dd>{{ member.role }}</dd></div></dl><p class="app-note">Lecture seule : aucune attribution de droits ni modification d’email depuis cette fiche.</p></section><div class="lot2-reading">{% include 'components/private/mandates.html' %}</div><a href="{% url 'governance:members' %}">Retour aux membres</a>{% endblock %}
+
+{% block content %}
+<div class="app-titre"><h1>Fiche de gestion</h1></div>
+
+<section class="workspace-panel">
+  <h2>{{ member.name }}</h2>
+  <dl class="paire-liste">
+    <div><dt>Adresse e-mail</dt><dd>{{ member.email }}</dd></div>
+    <div><dt>Statut</dt><dd>{{ member.status }}</dd></div>
+    <div><dt>Compte</dt><dd>{% if member.account_active %}Actif{% else %}Désactivé{% endif %}</dd></div>
+    <div><dt>Rôle actuel</dt><dd>{{ member.role }}</dd></div>
+  </dl>
+  {% if not role_form %}<p class="app-note">{% if can_manage %}Le compte Super administrateur ne se modifie pas depuis cette page.{% else %}Lecture seule : aucune attribution de droits ni modification d’email depuis cette fiche.{% endif %}</p>{% endif %}
+</section>
+
+{% if role_form %}
+<div class="grille-actions">
+  <section class="workspace-panel">
+    <h2>Modifier le rôle</h2>
+    <form method="post" action="{% url 'governance:member_set_role' member.id %}" class="formulaire" novalidate>
+      {% csrf_token %}{% for field in role_form %}{% include 'components/forms/field.html' %}{% endfor %}
+      <button class="btn btn--solid" type="submit">Enregistrer le rôle</button>
+    </form>
+  </section>
+  <section class="workspace-panel">
+    <h2>Modifier le statut</h2>
+    <form method="post" action="{% url 'governance:member_set_status' member.id %}" class="formulaire" novalidate>
+      {% csrf_token %}{% for field in status_form %}{% include 'components/forms/field.html' %}{% endfor %}
+      <button class="btn btn--solid" type="submit">Enregistrer le statut</button>
+    </form>
+  </section>
+</div>
+
+<section class="workspace-panel">
+  <h2>Modifier l’adresse e-mail</h2>
+  <p class="app-note">Cette modification change l’identifiant de connexion de la personne.</p>
+  <form method="post" action="{% url 'governance:member_set_email' member.id %}" class="formulaire" novalidate>
+    {% csrf_token %}{% for field in email_form %}{% include 'components/forms/field.html' %}{% endfor %}
+    <button class="btn btn--solid" type="submit">Enregistrer l’adresse</button>
+  </form>
+</section>
+{% endif %}
+
+{% include 'components/private/mandates.html' %}
+<a class="link-arrow" href="{% url 'governance:members' %}">Retour aux membres</a>
+{% endblock %}

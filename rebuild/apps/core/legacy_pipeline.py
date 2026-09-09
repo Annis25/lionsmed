@@ -276,10 +276,18 @@ def import_dues(con, *, batch, apply, operator, preview_user_pks=frozenset()):
             continue
         with transaction.atomic():
             profile = MemberProfile.objects.get(user_id=user_record.target_id)
-            status = "PAID" if row["status"] == "PAID" else "TO_REGULARIZE"
+            # Le legacy suivait un paiement annuel unique, sans distinction de tranche :
+            # traduit fidèlement en « les deux tranches réglées » si payé, aucune des deux
+            # sinon. Le montant historique n'est plus un champ structuré (barème par
+            # tranche, commun à tous les membres) : conservé tel quel en texte, jamais
+            # réinventé comme barème rétroactif.
+            paid = row["status"] == "PAID"
             record = dues_services.ensure_record(actor=operator, profile=profile, lions_year=lions_year)
-            dues_services.record_dues_status(actor=operator, record=record, status=status, amount=row["amount"],
-                paid_on=row["payment_date"] or None, motif="Import legacy (donnée historique réelle).")
+            note = f"Import legacy : montant historique {row['amount']} {row['status']!r} (non structuré dans le nouveau modèle à deux tranches)."
+            dues_services.set_tranche_paid(actor=operator, record=record, tranche=1, paid=paid,
+                paid_on=row["payment_date"] or None, motif=note)
+            dues_services.set_tranche_paid(actor=operator, record=record, tranche=2, paid=paid,
+                paid_on=row["payment_date"] or None, motif=note)
             _record(batch=batch, table="members_cotisation", legacy_pk=legacy_pk, state="IMPORTED",
                 target_type="dues.DuesRecord", target_id=record.pk, source_hash=_hash_row(row))
         report.add("IMPORTED")

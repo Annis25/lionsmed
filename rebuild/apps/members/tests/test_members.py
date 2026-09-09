@@ -99,43 +99,44 @@ class DirectoryTests(TestCase):
         for k,v in flags.items():setattr(self.p,k,v)
         self.p.save()
 
-    def test_hidden_profile_is_not_listed_or_readable(self):
-        self.assertNotContains(self.client.get(reverse("members:directory")),str(self.other.pk))
-        self.assertEqual(self.client.get(reverse("members:detail",args=[self.other.pk])).status_code,404)
-
-    def test_private_fields_absent_from_html_and_context(self):
-        self.publish()
+    def test_active_profile_is_listed_with_private_fields_in_private_space(self):
+        self.assertContains(self.client.get(reverse("members:directory")),self.other.get_full_name())
         response=self.client.get(reverse("members:detail",args=[self.other.pk]))
-        for value in [self.other.email,self.p.phone,self.p.bio,self.p.profession]:self.assertNotContains(response,value)
-        for key in ["email","phone","bio","profession","photo_key","user"]:self.assertNotIn(key,response.context["member"])
+        self.assertEqual(response.status_code,200)
+        for value in [self.other.email,self.p.phone,self.p.bio,self.p.profession]:self.assertContains(response,value)
 
-    def test_opt_in_exposes_only_selected_fields(self):
-        self.publish(share_profession=True)
+    def test_super_administrator_is_excluded_from_directory(self):
+        admin=account("admin-directory@example.invalid",role=Role.SUPER_ADMIN)
+        response=self.client.get(reverse("members:directory"))
+        self.assertNotIn(admin.pk,[member["id"] for member in response.context["page_obj"].object_list])
+
+    def test_private_fields_are_available_in_private_space(self):
         response=self.client.get(reverse("members:detail",args=[self.other.pk]))
-        self.assertContains(response,self.p.profession);self.assertNotContains(response,self.other.email)
-        self.publish(share_contacts=True)
-        self.assertContains(self.client.get(reverse("members:detail",args=[self.other.pk])),self.other.email)
+        for value in [self.other.email,self.p.phone,self.p.bio,self.p.profession]:self.assertContains(response,value)
+        for key in ["email","phone","bio","profession"]:self.assertIn(key,response.context["member"])
+        for key in ["photo_key","user"]:self.assertNotIn(key,response.context["member"])
 
-    def test_search_does_not_probe_hidden_profession(self):
-        self.publish()
+    def test_private_fields_do_not_depend_on_sharing_flags(self):
+        response=self.client.get(reverse("members:detail",args=[self.other.pk]))
+        self.assertContains(response,self.p.profession);self.assertContains(response,self.other.email)
+
+    def test_search_includes_private_profession_in_private_space(self):
         response=self.client.get(reverse("members:directory"),{"q":"secret-profession"})
-        self.assertEqual(response.context["page_obj"].paginator.count,0)
-        self.publish(share_profession=True)
-        self.assertEqual(self.client.get(reverse("members:directory"),{"q":"secret-profession"}).context["page_obj"].paginator.count,1)
+        self.assertEqual(response.context["page_obj"].paginator.count,1)
 
     def test_role_filter_and_name_search(self):
         self.publish()
-        self.assertEqual(self.client.get(reverse("members:directory"),{"role":"MEMBRE","q":"Synthétique"}).context["page_obj"].paginator.count,1)
+        self.assertEqual(self.client.get(reverse("members:directory"),{"role":"MEMBRE","q":"Synthétique"}).context["page_obj"].paginator.count,2)
         self.assertEqual(self.client.get(reverse("members:directory"),{"role":"PRESIDENT"}).context["page_obj"].paginator.count,0)
 
     def test_inactive_suspended_expired_revoked_excluded(self):
         self.publish()
         for field,value in [("status","SUSPENDED")]:
             setattr(self.p,field,value);self.p.save()
-            self.assertEqual(scoped_profiles(self.actor).count(),0)
+            self.assertNotIn(self.other.member_profile,scoped_profiles(self.actor))
         self.p.status="ACTIVE";self.p.save()
         self.other.role_grants.update(ends_at=timezone.now()-timedelta(minutes=1))
-        self.assertEqual(scoped_profiles(self.actor).count(),0)
+        self.assertNotIn(self.other.member_profile,scoped_profiles(self.actor))
 
     def test_guest_denied_even_if_opted_in(self):
         guest=account("guest@example.invalid",role=Role.INVITE)
@@ -143,17 +144,17 @@ class DirectoryTests(TestCase):
         self.assertEqual(self.client.get(reverse("members:directory")).status_code,403)
         self.assertEqual(self.client.get(reverse("members:detail",args=[self.other.pk])).status_code,403)
 
-    def test_management_has_no_private_contact_bypass(self):
+    def test_management_has_private_contact_access(self):
         manager=account("manager@example.invalid",role=Role.PRESIDENT)
         dto=profile_data(manager,self.p,management=True)
-        self.assertNotIn("email",dto);self.assertNotIn("phone",dto)
+        self.assertIn("email",dto);self.assertIn("phone",dto)
         self.assertIn("status",dto)
 
     def test_pagination(self):
         for i in range(14):
             u=account(f"page{i}@example.invalid");MemberProfile.objects.filter(user=u).update(directory_visible=True)
         page=self.client.get(reverse("members:directory"),{"page":2}).context["page_obj"]
-        self.assertEqual(len(page),2)
+        self.assertEqual(len(page),4)
 
 class ExperienceTests(TestCase):
     def setUp(self):
@@ -228,14 +229,10 @@ class UploadTests(TestCase):
         with self.assertRaises(ValidationError):encode_photo(SimpleUploadedFile("big.png",b"x"*(MAX_BYTES+1),content_type="image/png"))
         with self.assertRaises(ValidationError):encode_photo(picture(size=(4100,4100)))
 
-    def test_other_photo_denied_then_opt_in_and_revocation(self):
+    def test_other_photo_is_available_in_private_space(self):
         self.upload(picture());self.client.force_login(self.other)
         url=reverse("members:photo",args=[self.actor.pk])
-        self.assertEqual(self.client.get(url).status_code,404)
-        MemberProfile.objects.filter(user=self.actor).update(directory_visible=True,share_photo=True)
         response=self.client.get(url);self.assertEqual(response.status_code,200);b"".join(response.streaming_content)
-        MemberProfile.objects.filter(user=self.actor).update(share_photo=False)
-        self.assertEqual(self.client.head(url).status_code,404)
         self.assertEqual(self.client.get("/media/portraits/anything.jpg").status_code,404)
 
     def test_replacement_and_deletion_remove_old_file_after_commit(self):
@@ -314,7 +311,7 @@ class GovernanceTests(TestCase):
 
     def test_full_view_matrix_seven_roles(self):
         own=["members:profile","members:profile_edit","members:experiences","members:experience_add","members:email_information"]
-        management=["governance:dashboard","governance:members","governance:years"]
+        management=["governance:members","governance:years"]
         for role in Role.values:
             u=account(role.lower()+"@example.invalid",role=role);self.client.force_login(u)
             for route in own+management+["members:directory"]:

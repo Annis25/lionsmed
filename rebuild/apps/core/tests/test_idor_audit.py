@@ -26,7 +26,7 @@ from apps.voting.models import Vote
 
 PRIVATE_URLS = [
     "core:dashboard", "members:profile", "members:profile_edit", "members:experiences",
-    "members:directory", "governance:dashboard", "governance:members", "governance:years",
+    "members:directory", "governance:members", "governance:years",
     "governance:statistics", "agenda_private:calendar", "agenda_private:attendance_events",
     "documents:list", "documents:manage_list", "notifications:list", "dues:own", "dues:manage_list",
     "voting:member_list", "voting:manage_list", "satisfaction:respond", "satisfaction:manage_list",
@@ -43,7 +43,7 @@ class AnonymousAlwaysRedirectedTests(TestCase):
                 self.assertIn("/connexion/", response.url)
 
     def test_query_string_role_never_grants_access(self):
-        response = self.client.get(reverse("governance:dashboard") + "?role=SUPER_ADMIN")
+        response = self.client.get(reverse("governance:members") + "?role=SUPER_ADMIN")
         self.assertEqual(response.status_code, 302)
 
 
@@ -62,9 +62,11 @@ class CrossAccountObjectAccessTests(TestCase):
         self.assertEqual(self.client.get(reverse("members:experience_edit", args=[experience.pk])).status_code, 404)
         self.assertEqual(self.client.post(reverse("members:experience_delete", args=[experience.pk])).status_code, 404)
 
-    def test_member_detail_of_hidden_profile_not_exposed(self):
+    def test_member_detail_of_active_profile_exposes_private_fields_in_private_space(self):
         self.client.force_login(self.other)
-        self.assertEqual(self.client.get(reverse("members:detail", args=[self.owner.pk])).status_code, 404)
+        response=self.client.get(reverse("members:detail", args=[self.owner.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.owner.email)
 
     def test_photo_of_another_member_requires_sharing(self):
         self.client.force_login(self.other)
@@ -90,9 +92,10 @@ class CrossAccountObjectAccessTests(TestCase):
         self.assertEqual(self.client.post(reverse("notifications:mark_read", args=[notification.pk])).status_code, 404)
 
     def test_dues_record_of_another_member_not_visible_in_own_list_or_manageable(self):
+        tresorier = account("tresorier-idor@example.invalid", role=Role.TRESORIER)
         year = LionsYear.objects.create(starts_on=timezone.localdate().replace(month=7, day=1),
             ends_on=timezone.localdate().replace(year=timezone.localdate().year + 1, month=7, day=1))
-        record = dues_services.ensure_record(actor=self.president, profile=self.owner.member_profile, lions_year=year)
+        record = dues_services.ensure_record(actor=tresorier, profile=self.owner.member_profile, lions_year=year)
         self.client.force_login(self.other)
         self.assertEqual(self.client.get(reverse("dues:manage_detail", args=[record.pk])).status_code, 403)
         response = self.client.get(reverse("dues:own"))

@@ -8,7 +8,9 @@ class EventQuerySet(PublicationQuerySet):
 class Event(Publication):
     starts_at=models.DateTimeField(null=True,blank=True)
     ends_at=models.DateTimeField(null=True,blank=True)
+    all_day=models.BooleanField(default=False,help_text="Événement journée entière — heures ignorées à l'affichage.")
     location=models.CharField(max_length=200,blank=True)
+    meeting_link=models.URLField(max_length=300,blank=True,help_text="Lien de réunion (visioconférence), facultatif.")
     category=models.CharField(max_length=20,choices=[("RENCONTRE","Rencontre"),("REUNION","Réunion"),("FORMATION","Formation"),("AUTRE","Autre")],default="RENCONTRE")
     visibility=models.CharField(max_length=8,choices=[("PUBLIC","Public"),("PRIVATE","Privé")],default="PRIVATE")
     capacity=models.PositiveIntegerField(null=True,blank=True,help_text="Places disponibles pour l'inscription, si limitée")

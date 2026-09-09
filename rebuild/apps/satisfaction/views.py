@@ -31,7 +31,9 @@ def manage_list(request):
     form = PeriodOpenForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         try:
-            period = open_period(actor=request.user, year=form.cleaned_data["year"], month=form.cleaned_data["month"], threshold=form.cleaned_data["threshold"])
+            period = open_period(actor=request.user, year=form.cleaned_data["year"], month=form.cleaned_data["month"],
+                threshold=form.cleaned_data["threshold"], auto_schedule=form.cleaned_data["auto_schedule"],
+                opens_at=form.cleaned_data["opens_at"], closes_at=form.cleaned_data["closes_at"])
             from .notifications import notify_period_opened
             notify_period_opened(period)
             messages.success(request, "Période configurée.")

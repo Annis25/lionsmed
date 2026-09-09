@@ -1189,6 +1189,26 @@ select.champ__input {
 .app-nav__lien:hover { background: var(--fond); color: var(--bleu); }
 .app-nav__lien:hover svg { color: var(--bleu); }
 
+/* Item de navigation dépliable (ex. « Votes ») : même style que les liens simples,
+   marqueur natif de <summary> retiré au profit d'un chevron dessiné et animé. */
+.app-nav__groupe > summary.app-nav__lien { cursor: pointer; list-style: none; }
+.app-nav__groupe > summary.app-nav__lien::-webkit-details-marker,
+.app-nav__groupe > summary.app-nav__lien::marker { display: none; content: ""; }
+.app-nav__groupe > summary.app-nav__lien::after {
+  content: "";
+  margin-left: auto;
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-right: 2px solid var(--gris);
+  border-bottom: 2px solid var(--gris);
+  transform: rotate(45deg);
+  transition: transform var(--duree) var(--courbe);
+}
+.app-nav__groupe[open] > summary.app-nav__lien::after { transform: rotate(-135deg); }
+.app-nav__sous-liste { display: grid; gap: var(--e1); margin: var(--e1) 0 var(--e2); padding-left: var(--e6); }
+.app-nav__lien--enfant { font-size: .875rem; min-height: 40px; }
+
 /* L'état actif n'est jamais porté par la seule couleur : fond + barre bleue. */
 .app-nav__lien[aria-current="page"],
 .app-nav__lien.actif {

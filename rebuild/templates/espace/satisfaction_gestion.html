@@ -1,3 +1,12 @@
 {% extends 'base/private.html' %}
 {% block title %}Satisfaction — Gestion — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>Satisfaction — Gestion</h1></div><section class="workspace-panel lot2-reading"><h2>Configurer une période</h2><form method="post" class="formulaire" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}<div class="lot2-form-grid">{% for field in form %}<div>{% include 'components/forms/field.html' %}</div>{% endfor %}</div><button class="btn btn--solid" type="submit">Configurer et ouvrir</button></form></section><section class="workspace-panel"><h2>Périodes</h2><ul class="lot2-timeline">{% for period in periods %}<li>{{ period.month|date:"F Y" }}{% if period.opens_at %} — configurée{% else %} — non activable (heure de référence absente){% endif %}{% if period.opens_at %}<br><a href="{% url 'satisfaction:results' period.pk %}">Résultats</a>{% endif %}</li>{% empty %}<li>Aucune période créée.</li>{% endfor %}</ul></section>{% endblock %}
+{% block content %}<div class="app-titre"><h1>Satisfaction — Gestion</h1></div><section class="workspace-panel lot2-reading"><h2>Configurer une période</h2><form method="post" class="formulaire" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}<div class="lot2-form-grid">{% for field in form %}<div{% if field.name == 'opens_at' or field.name == 'closes_at' %} id="champ-{{ field.name }}"{% endif %}>{% include 'components/forms/field.html' %}</div>{% endfor %}</div><button class="btn btn--solid" type="submit">Configurer et ouvrir</button></form></section><section class="workspace-panel"><h2>Périodes</h2><ul class="lot2-timeline">{% for period in periods %}<li>{{ period.month|date:"F Y" }}{% if period.opens_at %} — configurée{% else %} — non activable (heure de référence absente){% endif %}{% if period.opens_at %}<br><a href="{% url 'satisfaction:results' period.pk %}">Résultats</a>{% endif %}</li>{% empty %}<li>Aucune période créée.</li>{% endfor %}</ul></section><script>
+(function(){
+  var auto=document.getElementById('id_auto_schedule');
+  var opens=document.getElementById('champ-opens_at');
+  var closes=document.getElementById('champ-closes_at');
+  if(!auto||!opens||!closes)return;
+  function sync(){opens.hidden=auto.checked;closes.hidden=auto.checked;}
+  auto.addEventListener('change',sync);sync();
+})();
+</script>{% endblock %}

@@ -5,9 +5,10 @@ from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods, require_safe
 from apps.core.permissions import capability_required
+from apps.members.selectors import directory_page, member_profile
 from .models import Vote, VoteOption
 from .selectors import votes_for_member, vote_for_member, own_participation, votes_for_manager, vote_for_manager, tracking_rows, vote_results, can_view_results, require
-from .services import add_option, remove_option, open_vote, close_vote, cast_vote
+from .services import add_option, remove_option, open_vote, close_vote, cast_vote, create_and_open_vote, set_vote_manager
 from .forms import VoteForm, VoteOptionForm
 
 
@@ -82,14 +83,17 @@ def manage_list(request):
 @require_http_methods(["GET", "POST"])
 def manage_create(request):
     form = VoteForm(request.POST or None)
+    option_labels = request.POST.getlist("options") if request.method == "POST" else ["", ""]
     if request.method == "POST" and form.is_valid():
-        vote = form.save(commit=False)
-        vote.responsible = request.user
-        vote.full_clean()
-        vote.save()
-        messages.success(request, "Scrutin créé en brouillon. Ajoutez les choix avant de l'ouvrir.")
-        return redirect("voting:manage_detail", vote_id=vote.pk)
-    return render(request, "espace/vote_creation.html", {"form": form})
+        try:
+            vote = create_and_open_vote(actor=request.user, option_labels=option_labels, **form.cleaned_data)
+            messages.success(request, "Scrutin créé et ouvert : il est immédiatement partagé avec tous les électeurs.")
+            from .notifications import notify_vote_opened
+            notify_vote_opened(vote)
+            return redirect("voting:manage_track", vote_id=vote.pk)
+        except ValidationError as error:
+            form.add_error(None, error)
+    return render(request, "espace/vote_creation.html", {"form": form, "option_labels": option_labels})
 
 
 @capability_required("vote.manage")
@@ -138,6 +142,32 @@ def manage_open(request, vote_id):
 def manage_track(request, vote_id):
     vote = vote_for_manager(request.user, vote_id)
     return render(request, "espace/vote_suivi.html", {"vote": vote, "rows": tracking_rows(request.user, vote)})
+
+
+@capability_required("management.access")
+@require_safe
+def manage_responsibles(request):
+    from apps.members.models import MemberProfile
+    from apps.governance.models import Role
+    page = directory_page(request.user, request.GET, management=True)
+    designated_ids = set(MemberProfile.objects.filter(is_vote_manager=True).values_list("user_id", flat=True))
+    for row in page.object_list:
+        row["is_vote_manager"] = row["id"] in designated_ids
+    current = MemberProfile.objects.filter(is_vote_manager=True).select_related("user").order_by("user__last_name", "user__first_name")
+    return render(request, "espace/vote_responsables.html", {"page_obj": page, "current": current, "roles": Role.choices})
+
+
+@capability_required("management.access")
+@require_http_methods(["POST"])
+def manage_responsible_toggle(request, user_id):
+    profile = member_profile(request.user, user_id, management=True)
+    enabled = request.POST.get("action") == "designer"
+    try:
+        set_vote_manager(actor=request.user, profile=profile, enabled=enabled)
+        messages.success(request, "Responsable de vote désigné." if enabled else "Responsabilité de vote retirée.")
+    except ValidationError as error:
+        messages.error(request, " ".join(error.messages))
+    return redirect("voting:manage_responsibles")
 
 
 @capability_required("vote.manage")

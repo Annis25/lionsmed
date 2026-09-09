@@ -3,6 +3,7 @@ from django.urls import reverse
 from apps.editorial.models import Publication
 
 class Axis(models.TextChoices):
+    TOUT="TOUT","Tous les axes"
     DIABETE="DIABETE","Diabète"
     ENVIRONNEMENT="ENVIRONNEMENT","Environnement"
     HUMANITAIRE="HUMANITAIRE","Humanitaire"
@@ -15,8 +16,10 @@ class Action(Publication):
     city=models.CharField(max_length=100,blank=True)
     country=models.CharField(max_length=100,blank=True)
     beneficiaries=models.PositiveIntegerField(null=True,blank=True)
+    hours_worked=models.PositiveIntegerField(null=True,blank=True)
     partners=models.TextField(max_length=1000,blank=True)
     evidence=models.CharField(max_length=300,blank=True,help_text="Source du bilan, bénéficiaires ou partenaires")
+    instagram_url=models.URLField(max_length=500,blank=True)
     def get_absolute_url(self):return reverse("actions:detail",args=[self.slug])
     class Meta(Publication.Meta):
         constraints=Publication.Meta.constraints+[models.CheckConstraint(condition=models.Q(axis__in=Axis.values),name="action_axis_valid")]

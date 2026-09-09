@@ -2,7 +2,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from apps.core.permissions import can
 from apps.core.models import AuditEvent
-from .models import DuesRecord, DuesChange
+from .models import DuesRecord, DuesChange, DuesSchedule
 
 
 def require(actor, capability, obj=None):
@@ -18,21 +18,39 @@ def ensure_record(*, actor, profile, lions_year):
 
 
 @transaction.atomic
-def record_dues_status(*, actor, record, status, amount, paid_on, motif):
+def set_dues_schedule(*, actor, lions_year, tranche1_amount, tranche2_amount):
+    """Barème unique pour tous les membres d'une Année Lions — jamais de montant par
+    membre. Protégé côté vue par une action explicite « Modifier les montants »."""
     require(actor, "dues.manage")
-    if status not in DuesRecord.Status.values:
-        raise ValidationError("Statut invalide.")
-    if not motif or not motif.strip():
-        raise ValidationError("Un motif est requis pour toute correction.")
+    for amount in (tranche1_amount, tranche2_amount):
+        if amount is not None and amount < 0:
+            raise ValidationError("Un montant ne peut pas être négatif.")
+    schedule, _ = DuesSchedule.objects.select_for_update().get_or_create(lions_year=lions_year)
+    schedule.tranche1_amount = tranche1_amount
+    schedule.tranche2_amount = tranche2_amount
+    schedule.updated_by = actor
+    schedule.full_clean()
+    schedule.save()
+    AuditEvent.objects.create(actor=actor, action="dues.schedule_updated", object_type="DuesSchedule", object_id=str(schedule.pk))
+    return schedule
+
+
+@transaction.atomic
+def set_tranche_paid(*, actor, record, tranche, paid, paid_on=None, motif=""):
+    require(actor, "dues.manage")
+    if tranche not in (1, 2):
+        raise ValidationError("Tranche invalide.")
     record = DuesRecord.objects.select_for_update().get(pk=record.pk)
-    old_status, old_amount = record.status, record.amount
-    record.status = status
-    record.amount = amount
-    record.paid_on = paid_on
-    record.note = motif[:300]
+    field = f"tranche{tranche}_paid"
+    date_field = f"tranche{tranche}_paid_on"
+    old_paid = getattr(record, field)
+    setattr(record, field, paid)
+    setattr(record, date_field, paid_on if paid else None)
+    if motif:
+        record.note = motif[:300]
     record.full_clean()
     record.save()
-    DuesChange.objects.create(record=record, actor=actor, old_status=old_status, new_status=status,
-        old_amount=old_amount, new_amount=amount, motif=motif[:300])
-    AuditEvent.objects.create(actor=actor, action="dues.status_changed", object_type="DuesRecord", object_id=str(record.pk))
+    if old_paid != paid:
+        DuesChange.objects.create(record=record, actor=actor, tranche=tranche, old_paid=old_paid, new_paid=paid, motif=motif[:300])
+        AuditEvent.objects.create(actor=actor, action="dues.tranche_changed", object_type="DuesRecord", object_id=str(record.pk))
     return record

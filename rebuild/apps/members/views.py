@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import FileResponse, Http404
 from django.views.decorators.http import require_http_methods, require_safe
-from apps.core.permissions import capability_required, can
+from apps.core.permissions import capability_required, DIRECTORY_ROLES
 from apps.governance.models import Role
 from .selectors import own_profile, profile_data, directory_page, member_profile, own_experience
 from .forms import ProfileForm, ExperienceForm
@@ -36,7 +36,14 @@ def edit_profile(request):
 @capability_required("directory.view")
 @require_safe
 def directory(request):
-    return render(request,"espace/directory.html",{"page_obj":directory_page(request.user,request.GET),"roles":[r for r in Role.choices if r[0]!="INVITE"]})
+    from apps.governance.models import ClubState
+    from apps.dues.selectors import dues_badges
+    page_obj=directory_page(request.user,request.GET)
+    state=ClubState.objects.select_related("active_year").first()
+    badges=dues_badges([m["id"] for m in page_obj.object_list], state.active_year if state else None)
+    for member in page_obj.object_list:
+        member["dues_badge"]=badges.get(member["id"])
+    return render(request,"espace/directory.html",{"page_obj":page_obj,"roles":[r for r in Role.choices if r[0] in DIRECTORY_ROLES]})
 
 @capability_required("member.view")
 @require_safe
@@ -47,7 +54,7 @@ def detail(request,user_id):
 @require_safe
 def photo(request,user_id):
     p = own_profile(request.user) if request.user.pk == user_id else member_profile(request.user,user_id)
-    if not p.photo_key or (request.user.pk != user_id and not p.share_photo): raise Http404
+    if not p.photo_key: raise Http404
     try: handle = photo_storage().open(p.photo_key,"rb")
     except FileNotFoundError: raise Http404
     response = FileResponse(handle,content_type="image/jpeg",filename="portrait.jpg")

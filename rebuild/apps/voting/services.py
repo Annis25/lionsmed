@@ -69,6 +69,43 @@ def open_vote(*, actor, vote):
 
 
 @transaction.atomic
+def set_vote_manager(*, actor, profile, enabled):
+    """Désignation nominative d'un responsable de vote, indépendante du rôle.
+    Réservé au bureau (management.access) : un responsable désigné ne peut pas
+    désigner quelqu'un d'autre à son tour."""
+    require(actor, "management.access")
+    profile = MemberProfile.objects.select_for_update().get(pk=profile.pk)
+    if profile.is_vote_manager == enabled:
+        return profile
+    profile.is_vote_manager = enabled
+    profile.full_clean()
+    profile.save(update_fields=["is_vote_manager", "updated_at"])
+    audit(actor, "vote.manager_designated" if enabled else "vote.manager_revoked", profile)
+    return profile
+
+
+@transaction.atomic
+def create_and_open_vote(*, actor, title, description, mode, blank_allowed, option_labels):
+    """Création en un seul geste (recette V1) : le scrutin est actif dès la création,
+    partagé avec tous les électeurs, fermeture uniquement manuelle (`closes_at` vide).
+    Choix unique par défaut (`min_choices`/`max_choices` = 1, non éditable ici)."""
+    require(actor, "vote.manage")
+    labels = [label.strip()[:180] for label in option_labels if label and label.strip()]
+    if len(labels) < 1:
+        raise ValidationError("Au moins un choix est requis.")
+    now = timezone.now()
+    vote = Vote(title=title[:180], description=(description or "")[:5000], mode=mode,
+        opens_at=now, closes_at=None, min_choices=1, max_choices=1,
+        blank_allowed=blank_allowed, responsible=actor)
+    vote.full_clean()
+    vote.save()
+    audit(actor, "vote.created", vote)
+    for label in labels:
+        add_option(actor=actor, vote=vote, label=label)
+    return open_vote(actor=actor, vote=vote)
+
+
+@transaction.atomic
 def close_vote(*, actor, vote):
     """Idempotent : clôturer un scrutin déjà clos ne fait rien de plus."""
     require(actor, "vote.manage")
@@ -93,7 +130,7 @@ def cast_vote(*, actor, vote, option_ids, is_blank=False):
     # Verrou déterministe : Vote d'abord.
     vote = Vote.objects.select_for_update().get(pk=vote.pk)
     now = timezone.now()
-    if vote.status != Vote.Status.OPEN or not (vote.opens_at <= now < vote.closes_at):
+    if vote.status != Vote.Status.OPEN or vote.opens_at > now or (vote.closes_at and now >= vote.closes_at):
         raise ValidationError("Ce scrutin n'est pas ouvert.")
     try:
         profile = actor.member_profile

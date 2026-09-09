@@ -10,7 +10,7 @@ from .storage import document_storage
 from .office_validation import validate_structure
 from .scanning import scan_bytes, ScannerUnavailable
 
-MAX_BYTES = 15 * 1024 * 1024
+MAX_BYTES = 50 * 1024 * 1024
 # Extension et MIME annoncé doivent concorder ; complété par la signature/structure (office_validation)
 # puis par l'analyse antivirus (scanning) avant toute disponibilité — échec fermé sur chaque étage.
 ALLOWED = {
@@ -43,10 +43,10 @@ def upload_document(*, actor, upload, title, description, category, visibility, 
     if not expected or upload.content_type != expected:
         raise ValidationError("Format de document non autorisé (PDF, DOCX, XLSX, PNG ou JPEG attendu).")
     if upload.size > MAX_BYTES:
-        raise ValidationError("Le document doit peser au maximum 15 Mo.")
+        raise ValidationError("Le document doit peser au maximum 50 Mo.")
     raw = upload.read(MAX_BYTES + 1)
     if len(raw) > MAX_BYTES:
-        raise ValidationError("Le document doit peser au maximum 15 Mo.")
+        raise ValidationError("Le document doit peser au maximum 50 Mo.")
     validate_structure(raw, suffix)
     try:
         result = scan_bytes(raw)

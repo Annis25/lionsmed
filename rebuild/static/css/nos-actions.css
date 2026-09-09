@@ -7,3 +7,75 @@
 .actions-cta { margin-top: var(--e7); }
 @media (min-width:761px) { .editorial-grid .action-card:first-child { grid-column: span 2; display: grid; grid-template-columns: 1.2fr 1fr; align-items: start; } .editorial-grid .action-card:first-child .media { width: 100%; height: 100%; margin: 0; border-radius: var(--r-carte) 0 0 var(--r-carte); } .editorial-grid .action-card:first-child > :not(.media) { margin-left: var(--e5); margin-right: var(--e5); } .editorial-grid .action-card:first-child > .eyebrow { margin-top: var(--e5); } }
 @media (max-width:760px) { .action-card .media { width: calc(100% + var(--e8)); margin: calc(var(--e4) * -1) calc(var(--e4) * -1) var(--e4); } }
+
+/* Fiche action : galerie manuelle, sans défilement automatique.
+   La mosaïque s'adapte au nombre réel de photos (data-count) pour ne jamais
+   laisser de case vide — un cas fréquent avec 1 à 3 photos déposées. */
+.action-detail__container { max-width: 1040px; }
+.action-viewer { margin-bottom: var(--e7); }
+.action-viewer__mosaic { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); grid-auto-rows: 180px; gap: var(--e3); }
+.action-viewer__tile { position: relative; display: block; min-width: 0; padding: 0; overflow: hidden; border: 0; border-radius: var(--r-carte); background: var(--navy); box-shadow: var(--ombre); cursor: zoom-in; transition: transform 200ms, box-shadow 200ms; }
+.action-viewer__tile:first-child { grid-column: span 2; grid-row: span 2; }
+.action-viewer__tile img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 300ms; }
+.action-viewer__tile:hover, .action-viewer__tile:focus-visible { transform: translateY(-4px); box-shadow: var(--ombre-survol); }
+.action-viewer__tile:hover img, .action-viewer__tile:focus-visible img { transform: scale(1.05); }
+.action-viewer__zoom { position: absolute; right: var(--e3); bottom: var(--e3); display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--r-pilule); background: rgba(10,35,73,.72); color: var(--blanc); opacity: 0; transform: translateY(6px); transition: opacity 200ms, transform 200ms; }
+.action-viewer__zoom svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+.action-viewer__tile:hover .action-viewer__zoom, .action-viewer__tile:focus-visible .action-viewer__zoom { opacity: 1; transform: translateY(0); }
+.action-viewer__more { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(10,35,73,.68); color: var(--blanc); font-family: var(--police-titre); font-size: var(--t-h2); }
+
+/* Motifs par nombre de photos : jamais de case orpheline. */
+.action-viewer__mosaic[data-count="1"] { grid-template-columns: 1fr; grid-auto-rows: 460px; }
+.action-viewer__mosaic[data-count="1"] .action-viewer__tile:first-child { grid-column: span 1; grid-row: span 1; }
+.action-viewer__mosaic[data-count="2"] { grid-template-columns: repeat(2,minmax(0,1fr)); grid-auto-rows: 360px; }
+.action-viewer__mosaic[data-count="2"] .action-viewer__tile:first-child { grid-column: span 1; grid-row: span 1; }
+.action-viewer__mosaic[data-count="3"] { grid-template-columns: 2fr 1fr; grid-auto-rows: 180px; }
+.action-viewer__mosaic[data-count="3"] .action-viewer__tile:first-child { grid-column: 1; grid-row: span 2; }
+.action-viewer__mosaic[data-count="3"] .action-viewer__tile:nth-child(2) { grid-column: 2; grid-row: 1; }
+.action-viewer__mosaic[data-count="3"] .action-viewer__tile:nth-child(3) { grid-column: 2; grid-row: 2; }
+.action-viewer__mosaic[data-count="4"] { grid-template-columns: repeat(2,minmax(0,1fr)); grid-auto-rows: 240px; }
+.action-viewer__mosaic[data-count="4"] .action-viewer__tile:first-child { grid-column: span 1; grid-row: span 1; }
+
+.action-lightbox { width: 100vw; max-width: none; height: 100vh; max-height: none; padding: 0; border: 0; border-radius: 0; background: rgba(10,35,73,.96); color: var(--blanc); }
+.action-lightbox::backdrop { background: rgba(10,35,73,.8); }
+.action-lightbox__bar { display: flex; justify-content: space-between; align-items: center; min-height: 64px; padding: 0 var(--e5); }
+.action-lightbox__bar p { margin: 0; font-variant-numeric: tabular-nums; }
+.action-lightbox__close, .action-lightbox__nav { display: grid; place-items: center; padding: 0; border: 0; background: transparent; color: var(--blanc); cursor: pointer; border-radius: var(--r-pilule); transition: background 200ms, color 200ms; }
+.action-lightbox__close { width: 44px; height: 44px; }
+.action-lightbox__close svg { width: 28px; height: 28px; }
+.action-lightbox__body { display: grid; grid-template-columns: 64px minmax(0,1fr) 64px; align-items: center; height: calc(100vh - 64px); }
+.action-lightbox__frame { margin: 0; height: 100%; display: grid; place-items: center; overflow: hidden; }
+.action-lightbox__body img { display: block; max-width: 100%; max-height: calc(100vh - 96px); width: auto; height: auto; object-fit: contain; opacity: 1; transition: opacity 180ms, transform 180ms; }
+.action-lightbox__frame.is-changing img { opacity: 0; transform: scale(.98); }
+.action-lightbox__nav { width: 64px; height: 64px; }
+.action-lightbox svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+.action-lightbox__nav svg { width: 32px; height: 32px; }
+.action-lightbox__close:hover, .action-lightbox__nav:hover { color: var(--or); background: rgba(255,255,255,.08); }
+.action-detail__layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(220px,280px); gap: var(--e7); align-items: start; }
+.action-detail__reading .meta-ligne { margin-top: 0; }
+.action-detail__partners { margin-top: var(--e6); padding-top: var(--e5); border-top: 1px solid var(--bord); }
+.action-detail__impact { display: grid; gap: var(--e4); margin: 0; padding: var(--e5); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); }
+.action-detail__impact > p { margin: 0; }
+.action-detail__impact > p:not(.eyebrow) { display: grid; gap: var(--e1); padding-top: var(--e4); border-top: 1px solid var(--bord); }
+.action-detail__impact strong { font-family: var(--police-titre); font-size: var(--t-h2); line-height: 1; color: var(--navy); font-variant-numeric: tabular-nums; }
+.action-detail__impact span { color: var(--gris); font-size: var(--t-meta); }
+.action-detail > .action-detail__container > .link-arrow { display: inline-flex; margin-top: var(--e7); }
+@media (max-width:760px) {
+  .action-viewer { margin-inline: calc(var(--gouttiere) * -1); }
+  .action-viewer__mosaic { grid-auto-rows: 120px; gap: var(--e1); }
+  .action-viewer__mosaic[data-count="1"] { grid-auto-rows: 280px; }
+  .action-viewer__mosaic[data-count="2"] { grid-auto-rows: 200px; }
+  .action-viewer__mosaic[data-count="3"] { grid-auto-rows: 120px; }
+  .action-viewer__tile { border-radius: 0; box-shadow: none; }
+  .action-viewer__zoom { display: none; }
+  .action-lightbox__bar { padding-inline: var(--e3); }
+  .action-lightbox__body { grid-template-columns: 44px minmax(0,1fr) 44px; }
+  .action-lightbox__nav { width: 44px; height: 56px; }
+  .action-lightbox__nav svg { width: 24px; height: 24px; }
+  .action-detail__layout { grid-template-columns: minmax(0,1fr); gap: var(--e5); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .action-viewer__tile, .action-viewer__tile img, .action-viewer__zoom, .action-lightbox__body img { transition: none; }
+  .action-viewer__tile:hover, .action-viewer__tile:focus-visible { transform: none; }
+  .action-viewer__tile:hover img, .action-viewer__tile:focus-visible img { transform: none; }
+}

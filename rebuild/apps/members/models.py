@@ -24,6 +24,12 @@ class MemberProfile(models.Model):
     # l'annuaire privé ci-dessus. Jamais activé par défaut, jamais de coordonnées exposées.
     public_profile_enabled = models.BooleanField(default=False)
     public_slug = models.SlugField(max_length=160, null=True, blank=True, unique=True)
+    # Désignation individuelle (indépendante du rôle) : un membre peut être nommé
+    # responsable des votes sans devenir PRESIDENT/SECRETAIRE/SUPER_ADMIN pour autant.
+    is_vote_manager = models.BooleanField(default=False)
+    # Abonnement calendrier (iCalendar) : jeton opaque, aléatoire, jamais l'UUID du
+    # compte ni l'email. Régénérer écrase l'ancien, qui devient aussitôt invalide.
+    calendar_token = models.CharField(max_length=43, null=True, blank=True, unique=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

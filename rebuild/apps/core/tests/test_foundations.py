@@ -445,3 +445,27 @@ class IsolationTests(TestCase):
         lazy_user = SimpleLazyObject(lambda: user)
         self.assertTrue(can(lazy_user, "account.change_own_password", obj=user))
         self.assertFalse(can(lazy_user, "account.change_own_password", obj=account("other@example.invalid")))
+
+
+class PrivateNavigationGroupingTests(TestCase):
+    def test_manager_sees_documents_and_cotisations_as_expandable_groups(self):
+        president = account("president5@example.invalid", role=Role.PRESIDENT)
+        self.client.force_login(president)
+        response = self.client.get(reverse("core:dashboard"))
+        nav = {item["label"]: item for item in response.context["private_navigation"]}
+        self.assertIn("children", nav["Documents"])
+        self.assertEqual({c["label"] for c in nav["Documents"]["children"]}, {"Mes documents", "Gestion"})
+        self.assertIn("children", nav["Cotisations"])
+        self.assertEqual({c["label"] for c in nav["Cotisations"]["children"]}, {"Mes cotisations", "Gestion"})
+        self.assertNotIn("Gestion des documents", nav)
+        self.assertNotIn("Gestion des cotisations", nav)
+
+    def test_plain_member_sees_documents_and_cotisations_as_flat_links(self):
+        member = account("member5@example.invalid", role=Role.MEMBRE)
+        self.client.force_login(member)
+        response = self.client.get(reverse("core:dashboard"))
+        nav = {item["label"]: item for item in response.context["private_navigation"]}
+        self.assertNotIn("children", nav["Documents"])
+        self.assertNotIn("children", nav["Cotisations"])
+        self.assertEqual(nav["Documents"]["url"], reverse("documents:list"))
+        self.assertEqual(nav["Cotisations"]["url"], reverse("dues:own"))

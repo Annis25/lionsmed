@@ -21,7 +21,12 @@ TYPES={"action":(Action,ActionForm,"Actions"),"event":(Event,EventForm,"Événem
 @capability_required("public_content.access_management")
 @require_safe
 def dashboard(request):
-    return render(request,"espace/public_content.html",{"sections":EditorialSection.objects.all(),"metrics":ImpactMetric.objects.all(),"can_requests":can(request.user,"application.view") or can(request.user,"contact.view")})
+    return render(request,"espace/public_content.html",{
+        "sections": EditorialSection.objects.all(),
+        "metrics": ImpactMetric.objects.all(),
+        "can_application_requests": can(request.user, "application.view"),
+        "can_contact_requests": can(request.user, "contact.view"),
+    })
 
 @capability_required("public_content.access_management")
 @require_safe
@@ -29,7 +34,9 @@ def content_list(request,kind):
     from django.http import Http404
     if kind not in TYPES:raise Http404
     Model,Form,title=TYPES[kind];require(request.user,kind+".edit")
-    return render(request,"espace/content_list.html",{"page_obj":Paginator(Model.objects.all(),20).get_page(request.GET.get("page")),"kind":kind,"page_title":title})
+    queryset=Model.objects.select_related("cover") if kind=="action" else Model.objects.all()
+    template="espace/action_management_list.html" if kind=="action" else "espace/content_list.html"
+    return render(request,template,{"page_obj":Paginator(queryset,20).get_page(request.GET.get("page")),"kind":kind,"page_title":title})
 
 @capability_required("public_content.access_management")
 @require_http_methods(["GET","POST"])
@@ -38,15 +45,39 @@ def content_edit(request,kind,object_id=None):
     if kind not in TYPES:raise Http404
     Model,Form,title=TYPES[kind];obj=get_object_or_404(Model,pk=object_id) if object_id else None
     require(request.user,kind+(".edit" if obj else ".create"),obj)
-    form=Form(request.POST if request.method=="POST" else None,actor=request.user,instance=obj)
+    was_published=bool(obj and obj.status=="PUBLISHED")
+    form=Form(
+        request.POST if request.method=="POST" else None,
+        request.FILES if request.method=="POST" else None,
+        actor=request.user,
+        instance=obj,
+    )
     if request.method=="POST":
         try:
             if form.is_valid():
-                obj=save_content(actor=request.user,form=form,kind=kind)
+                intent=request.POST.get("intent","draft")
+                obj=save_content(actor=request.user,form=form,kind=kind,keep_published=kind=="action" and was_published and intent=="update")
+                if kind == "action":
+                    source = "Photo fournie par le Lions Club Sfax-Méditerranée"
+                    uploaded_images = 0
+                    if form.cleaned_data.get("main_image_upload"):
+                        image = upload_image(actor=request.user, upload=form.cleaned_data["main_image_upload"], alt="Image de l’action : "+obj.title, source=source, approved=True)
+                        obj.cover = image
+                        obj.save(update_fields=["cover", "updated_at"])
+                        uploaded_images += 1
+                    for upload in form.cleaned_data.get("gallery_uploads", []):
+                        image = upload_image(actor=request.user, upload=upload, alt="Image de l’action : "+obj.title, source=source, approved=True)
+                        position = (obj.photos.order_by("-position").values_list("position", flat=True).first() or 0) + 1
+                        ActionPhoto.objects.create(action=obj, image=image, position=position)
+                        uploaded_images += 1
+                    if intent=="publish":
+                        publish_content(actor=request.user,obj=obj,kind=kind)
+                    messages.success(request, ("Action publiée." if intent=="publish" else "Action enregistrée.") + (f" {uploaded_images} image(s) ajoutée(s)." if uploaded_images else ""))
                 return redirect("editorial_management:edit",kind=kind,object_id=obj.pk)
         except (ValidationError,IntegrityError) as error:
             form.add_error(None,error if isinstance(error,ValidationError) else "Ce contenu entre en conflit avec une autre modification.")
-    return render(request,"espace/content_form.html",{"form":form,"kind":kind,"item":obj,"page_title":"Préparer : "+title,"gallery":obj.photos.select_related("image") if kind=="action" and obj else [],"images":PublicImage.objects.filter(approved_at__isnull=False) if kind=="action" else []})
+    template = "espace/action_form.html" if kind == "action" else "espace/content_form.html"
+    return render(request,template,{"form":form,"kind":kind,"item":obj,"page_title":"Préparer : "+title,"gallery":obj.photos.select_related("image") if kind=="action" and obj else []})
 
 @capability_required("public_content.access_management")
 @require_http_methods(["POST"])
@@ -56,10 +87,21 @@ def transition(request,kind,object_id,operation):
     obj=get_object_or_404(TYPES[kind][0],pk=object_id)
     try:
         if operation=="publish":publish_content(actor=request.user,obj=obj,kind=kind)
+        elif operation=="draft":
+            require(request.user,kind+".publish",obj);obj.status="DRAFT";obj.save(update_fields=["status","updated_at"]);audit(request.user,kind+".drafted",obj)
         else:withdraw_content(actor=request.user,obj=obj,kind=kind)
         messages.success(request,"État de publication enregistré.")
     except ValidationError as error:messages.error(request," ".join(error.messages))
     return redirect("editorial_management:edit",kind=kind,object_id=obj.pk)
+
+@capability_required("action.edit")
+@require_http_methods(["POST"])
+def action_delete(request,object_id):
+    with transaction.atomic():
+        obj=get_object_or_404(Action.objects.select_for_update(),pk=object_id);require(request.user,"action.edit",obj)
+        obj.photos.all().delete();audit(request.user,"action.deleted",obj);obj.delete()
+    messages.success(request,"Action supprimée.")
+    return redirect("editorial_management:list",kind="action")
 
 @capability_required("image.manage")
 @require_http_methods(["GET","POST"])
@@ -86,6 +128,9 @@ def gallery(request,object_id):
         if request.POST.get("remove"):
             get_object_or_404(ActionPhoto,pk=request.POST["remove"],action=obj).delete()
         else:
+            if obj.photos.count() >= 9:
+                messages.error(request, "Une action peut avoir au plus neuf images supplémentaires, en plus de l’image principale.")
+                return redirect("editorial_management:edit",kind="action",object_id=obj.pk)
             image=get_object_or_404(PublicImage,pk=request.POST.get("image"),approved_at__isnull=False)
             from django.db.models import Max
             position=(obj.photos.aggregate(p=Max("position"))["p"] or 0)+1

@@ -10,10 +10,18 @@ from apps.members.models import MemberProfile, AssociationExperience
 # Seulement les deux capacités des vues privées effectivement livrées.
 PERSONAL = frozenset(Role.values)
 MEMBERS = PERSONAL - {Role.INVITE}
+DIRECTORY_ROLES = MEMBERS - {Role.SUPER_ADMIN}
 MANAGERS = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.SECRETAIRE})
+CONTACT_INBOX_ROLES = frozenset({Role.PRESIDENT, Role.SECRETAIRE})
+APPLICATION_INBOX_ROLES = frozenset({Role.PRESIDENT, Role.GMT})
 # Palier « bureau » des documents : BUREAU/PRESIDENT/SECRETAIRE/SUPER_ADMIN. DIRECTEUR en est
 # exclu tant que ses capacités avancées ne sont pas confirmées humainement.
 BUREAU_LEVEL = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.SECRETAIRE, Role.BUREAU})
+# Cotisations (recette V2) : seul le Trésorier (+ Super Admin) modifie ; le reste du
+# bureau (PRESIDENT/SECRETAIRE/BUREAU) consulte sans modifier — décision explicite du
+# club, qui retire ce droit de modification à PRESIDENT/SECRETAIRE.
+DUES_MANAGERS = frozenset({Role.SUPER_ADMIN, Role.TRESORIER})
+DUES_VIEWERS = BUREAU_LEVEL | {Role.TRESORIER}
 CAPABILITIES = {
     "account.access_private_area": PERSONAL,
     "account.change_own_password": PERSONAL,
@@ -21,18 +29,18 @@ CAPABILITIES = {
     "action.create": MANAGERS, "action.edit": MANAGERS, "action.publish": MANAGERS,
     "event.create": MANAGERS, "event.edit": MANAGERS, "event.publish": MANAGERS,
     "editorial.manage": MANAGERS, "image.manage": MANAGERS,
-    "application.view": MANAGERS, "application.manage": MANAGERS,
-    "contact.view": MANAGERS, "contact.manage": MANAGERS,
+    "application.view": APPLICATION_INBOX_ROLES, "application.manage": APPLICATION_INBOX_ROLES,
+    "contact.view": CONTACT_INBOX_ROLES, "contact.manage": CONTACT_INBOX_ROLES,
     "profile.view_own": PERSONAL, "profile.edit_own": PERSONAL,
     "experience.manage_own": PERSONAL,
     "directory.view": MEMBERS, "member.view": MEMBERS,
-    "members.view_management": MANAGERS, "management.access": MANAGERS,
-    "year.view": MANAGERS,
+    "members.view_management": MANAGERS, "members.manage": MANAGERS, "management.access": MANAGERS,
+    "year.view": MANAGERS, "year.manage": MANAGERS,
     # Calendrier, présences, documents, cotisations et notifications (phase fonctionnement quotidien).
     "event.register": MEMBERS, "attendance.record": MANAGERS,
     "document.view": PERSONAL, "document.manage": MANAGERS,
     "notification.view_own": PERSONAL, "notification.send": MANAGERS,
-    "dues.view_own": PERSONAL, "dues.manage": MANAGERS,
+    "dues.view_own": PERSONAL, "dues.manage": DUES_MANAGERS, "dues.view_management": DUES_VIEWERS,
     "statistics.view": MANAGERS,
     # Votes et satisfaction (Phase B). INVITE jamais électeur ; DIRECTEUR/BUREAU sans gestion.
     "vote.manage": MANAGERS, "vote.cast": MEMBERS, "vote.view_results": MEMBERS,
@@ -56,12 +64,19 @@ def effective_role(user, *, at=None):
     return roles[0] if len(roles) == 1 and roles[0] in Role.values else None
 
 
+def _is_designated_vote_manager(user):
+    return MemberProfile.objects.filter(user_id=user.pk, is_vote_manager=True).exists()
+
+
 def can(user, capability, obj=None):
     allowed = CAPABILITIES.get(capability)
     if not allowed:
         return False
     role = effective_role(user)
-    if role not in allowed:
+    # « vote.manage » peut aussi être accordé individuellement (désignation nominative,
+    # indépendante du rôle) — voir apps.voting.services.set_vote_manager. Seul un
+    # PRESIDENT/SECRETAIRE/SUPER_ADMIN peut faire cette désignation (management.access).
+    if role not in allowed and not (capability == "vote.manage" and role is not None and _is_designated_vote_manager(user)):
         return False
     status = MemberProfile.objects.filter(user_id=user.pk).values_list("status", flat=True).first()
     if status is None or status == MemberProfile.Status.SUSPENDED:
@@ -89,8 +104,8 @@ def can(user, capability, obj=None):
             owner_id = obj.user_id if isinstance(obj, MemberProfile) else (obj.profile.user_id if isinstance(obj, AssociationExperience) else None)
             return owner_id == user.pk
         if capability == "member.view":
-            return (isinstance(obj, MemberProfile) and obj.directory_visible and obj.status == MemberProfile.Status.ACTIVE
-                    and obj.user.is_active and effective_role(obj.user) in MEMBERS)
+            return (isinstance(obj, MemberProfile) and obj.status == MemberProfile.Status.ACTIVE
+                    and obj.user.is_active and effective_role(obj.user) in DIRECTORY_ROLES)
         if capability == "members.view_management":
             return isinstance(obj, MemberProfile)
         return False

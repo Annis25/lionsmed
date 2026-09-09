@@ -1,0 +1,41 @@
+{% extends 'base/private.html' %}
+{% block body_class %}prive-dense lot3-management{% endblock %}
+{% block title %}Actions réalisées — Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="bloc-titre action-library__title">
+  <div class="app-titre"><h1>Actions réalisées</h1><p class="app-titre__contexte">Préparez, illustrez et publiez les actions du club.</p></div>
+  <a class="btn btn--solid" href="{% url 'editorial_management:add' 'action' %}">Créer une action</a>
+</div>
+
+{% if page_obj %}
+  <div class="action-library" aria-label="Liste des actions réalisées">
+    {% for item in page_obj %}
+      <article class="action-card">
+        {% if item.cover %}
+          <img class="action-card__image" src="{{ item.cover.get_absolute_url }}" width="{{ item.cover.width }}" height="{{ item.cover.height }}" alt="{{ item.cover.alt }}" loading="lazy">
+        {% else %}
+          <div class="action-card__image action-card__image--empty">Image principale à choisir</div>
+        {% endif %}
+        <div class="action-card__body">
+          <div class="action-card__heading"><span class="badge">{{ item.get_status_display }}</span><span class="text-meta">{{ item.get_axis_display }}</span></div>
+          <h2><a href="{% url 'editorial_management:edit' 'action' item.pk %}">{{ item.title }}</a></h2>
+          {% if item.summary %}<p>{{ item.summary }}</p>{% endif %}
+          <dl class="action-card__metrics">
+            {% if item.performed_on %}<div><dt>Date</dt><dd>{{ item.performed_on|date:'d/m/Y' }}</dd></div>{% endif %}
+            {% if item.location %}<div><dt>Lieu</dt><dd>{{ item.location }}</dd></div>{% endif %}
+            {% if item.beneficiaries is not None %}<div><dt>Bénéficiaires</dt><dd>{{ item.beneficiaries }}</dd></div>{% endif %}
+            {% if item.hours_worked is not None %}<div><dt>Heures</dt><dd>{{ item.hours_worked }} h</dd></div>{% endif %}
+          </dl>
+          <div class="action-card__links">
+            <a class="btn btn--outline btn--sm" href="{% url 'editorial_management:edit' 'action' item.pk %}">Modifier l’action</a>
+            {% if item.instagram_url %}<a class="link-arrow" href="{{ item.instagram_url }}" target="_blank" rel="noopener noreferrer">Publication Instagram</a>{% endif %}
+          </div>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+  {% include 'components/private/pagination.html' %}
+{% else %}
+  <section class="workspace-panel etat-vide"><p>Aucune action enregistrée pour le moment.</p><a class="btn btn--solid" href="{% url 'editorial_management:add' 'action' %}">Créer la première action</a></section>
+{% endif %}
+{% endblock %}

@@ -31,6 +31,18 @@ class ResetForm(StyledFields, PasswordResetForm):
     def clean_email(self):
         return normalize_email(self.cleaned_data["email"])
 
+    def get_users(self, email):
+        # Django exclut par défaut les comptes à mot de passe inutilisable (pensé pour les
+        # intégrations SSO). Ici, un mot de passe inutilisable signifie seulement « compte
+        # créé par le bureau ou repris du legacy, jamais encore activé » — il doit pouvoir
+        # recevoir ce lien, sans quoi il ne devient jamais utilisable.
+        from django.contrib.auth import get_user_model
+        from django.contrib.auth.forms import _unicode_ci_compare
+        email_field_name = get_user_model().get_email_field_name()
+        active_users = get_user_model()._default_manager.filter(**{
+            "%s__iexact" % email_field_name: email, "is_active": True})
+        return (u for u in active_users if _unicode_ci_compare(email, getattr(u, email_field_name)))
+
     def send_mail(self, subject_template_name, email_template_name, context,
                   from_email, to_email, html_email_template_name=None):
         # Les jetons et le contexte restent ceux de PasswordResetForm Django.

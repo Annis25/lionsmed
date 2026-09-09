@@ -5,7 +5,7 @@ from django.utils import timezone
 from apps.core.permissions import can
 from apps.core.models import AuditEvent
 from .models import SatisfactionPeriod, SatisfactionResponse
-from .scheduling import compute_window
+from .scheduling import compute_auto_window
 
 RULE_VERSION = "phase-b-v1"
 
@@ -21,11 +21,17 @@ def audit(actor, action, obj):
 
 
 @transaction.atomic
-def open_period(*, actor, year, month, threshold=None):
+def open_period(*, actor, year, month, threshold, auto_schedule=False, opens_at=None, closes_at=None):
     require(actor, "satisfaction.manage")
-    opens_at, closes_at = compute_window(year, month)
-    if opens_at is None:
-        raise ValidationError("Heure de référence non configurée : période non activable.")
+    if auto_schedule:
+        opens_at, closes_at = compute_auto_window(year, month)
+        if opens_at is None:
+            raise ValidationError("Heure de référence non configurée : activation automatique impossible.")
+    else:
+        if not opens_at or not closes_at:
+            raise ValidationError("Date et heure de lancement et de fermeture requises hors activation automatique.")
+        if closes_at <= opens_at:
+            raise ValidationError("La fermeture doit être postérieure au lancement.")
     period, created = SatisfactionPeriod.objects.get_or_create(
         month=date(year, month, 1), defaults={"created_by": actor, "rule_version": RULE_VERSION})
     if not created:
@@ -33,8 +39,7 @@ def open_period(*, actor, year, month, threshold=None):
     period.rule_version = RULE_VERSION
     period.opens_at = opens_at
     period.closes_at = closes_at
-    if threshold is not None:
-        period.threshold = threshold
+    period.threshold = threshold
     period.full_clean()
     period.save()
     audit(actor, "satisfaction.period_configured", period)

@@ -205,3 +205,126 @@ class VoteConcurrencyTests(TransactionTestCase):
         self.assertEqual(sum(results), 1)
         self.assertEqual(Ballot.objects.filter(vote=vote).count(), 1)
         self.assertEqual(Participation.objects.filter(elector__vote=vote).count(), 1)
+
+
+class CreateAndOpenVoteTests(TestCase):
+    def setUp(self):
+        self.president = account("president2@example.invalid", role=Role.PRESIDENT)
+        self.member = account("member2@example.invalid", role=Role.MEMBRE)  # avant création : figé électeur
+
+    def test_service_creates_open_vote_single_choice_no_scheduled_close(self):
+        vote = services.create_and_open_vote(actor=self.president, title="Bureau 2026", description="",
+            mode=Vote.Mode.SINGLE, blank_allowed=False, option_labels=["A", "B", ""])
+        self.assertEqual(vote.status, Vote.Status.OPEN)
+        self.assertEqual(vote.min_choices, 1)
+        self.assertEqual(vote.max_choices, 1)
+        self.assertIsNone(vote.closes_at)
+        self.assertEqual(vote.options.count(), 2)  # le libellé vide est ignoré
+        self.assertTrue(Elector.objects.filter(vote=vote, profile=self.member.member_profile).exists())
+
+    def test_service_rejects_vote_with_no_real_option(self):
+        with self.assertRaises(ValidationError):
+            services.create_and_open_vote(actor=self.president, title="Vide", description="",
+                mode=Vote.Mode.SINGLE, blank_allowed=False, option_labels=["", "  "])
+        self.assertEqual(Vote.objects.count(), 0)
+
+    def test_open_vote_never_closes_automatically_without_closes_at(self):
+        vote = services.create_and_open_vote(actor=self.president, title="Sans échéance", description="",
+            mode=Vote.Mode.SINGLE, blank_allowed=False, option_labels=["A"])
+        option = vote.options.get()
+        services.cast_vote(actor=self.member, vote=vote, option_ids=[option.pk])
+        self.assertEqual(Participation.objects.filter(elector__vote=vote).count(), 1)
+
+    def test_manage_create_view_one_shot_redirects_to_tracking(self):
+        self.client.force_login(self.president)
+        response = self.client.post(reverse("voting:manage_create"), {
+            "title": "Nouveau bureau", "description": "", "mode": "SINGLE",
+            "options": ["Candidat A", "Candidat B"],
+        })
+        vote = Vote.objects.get(title="Nouveau bureau")
+        self.assertRedirects(response, reverse("voting:manage_track", args=[vote.pk]))
+        self.assertEqual(vote.status, Vote.Status.OPEN)
+
+    def test_manage_create_view_rejects_empty_option_list(self):
+        self.client.force_login(self.president)
+        response = self.client.post(reverse("voting:manage_create"), {
+            "title": "Sans choix", "description": "", "mode": "SINGLE", "options": ["", ""],
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Vote.objects.count(), 0)
+
+
+class VotesNavigationTests(TestCase):
+    def test_manager_sees_votes_as_expandable_group_with_children(self):
+        president = account("president3@example.invalid", role=Role.PRESIDENT)
+        self.client.force_login(president)
+        response = self.client.get(reverse("core:dashboard"))
+        nav = {item["label"]: item for item in response.context["private_navigation"]}
+        self.assertIn("children", nav["Votes"])
+        child_labels = {c["label"] for c in nav["Votes"]["children"]}
+        self.assertEqual(child_labels, {"Voter", "Créer un vote", "Gestion des votes", "Responsables de vote"})
+        self.assertNotIn("Créer un vote", nav)
+        self.assertNotIn("Gestion des votes", nav)
+
+    def test_plain_member_sees_votes_as_flat_link(self):
+        member = account("member3@example.invalid", role=Role.MEMBRE)
+        self.client.force_login(member)
+        response = self.client.get(reverse("core:dashboard"))
+        nav = {item["label"]: item for item in response.context["private_navigation"]}
+        self.assertNotIn("children", nav["Votes"])
+        self.assertEqual(nav["Votes"]["url"], reverse("voting:member_list"))
+
+
+class VoteManagerDesignationTests(TestCase):
+    def setUp(self):
+        self.president = account("president4@example.invalid", role=Role.PRESIDENT)
+        self.member = account("member4@example.invalid", role=Role.MEMBRE)
+
+    def test_plain_member_cannot_manage_votes(self):
+        self.assertFalse(can(self.member, "vote.manage"))
+
+    def test_designated_member_gains_vote_manage_without_role_change(self):
+        services.set_vote_manager(actor=self.president, profile=self.member.member_profile, enabled=True)
+        self.assertTrue(can(self.member, "vote.manage"))
+        from apps.core.permissions import effective_role
+        self.assertEqual(effective_role(self.member), Role.MEMBRE)  # rôle inchangé
+
+    def test_revoked_member_loses_vote_manage(self):
+        services.set_vote_manager(actor=self.president, profile=self.member.member_profile, enabled=True)
+        services.set_vote_manager(actor=self.president, profile=self.member.member_profile, enabled=False)
+        self.assertFalse(can(self.member, "vote.manage"))
+
+    def test_designated_manager_cannot_designate_others(self):
+        services.set_vote_manager(actor=self.president, profile=self.member.member_profile, enabled=True)
+        other = account("other4@example.invalid", role=Role.MEMBRE)
+        with self.assertRaises(PermissionDenied):
+            services.set_vote_manager(actor=self.member, profile=other.member_profile, enabled=True)
+
+    def test_designated_manager_can_create_and_open_a_vote(self):
+        services.set_vote_manager(actor=self.president, profile=self.member.member_profile, enabled=True)
+        vote = services.create_and_open_vote(actor=self.member, title="Scrutin délégué", description="",
+            mode=Vote.Mode.SINGLE, blank_allowed=False, option_labels=["A", "B"])
+        self.assertEqual(vote.status, Vote.Status.OPEN)
+        self.assertEqual(vote.responsible, self.member)
+
+    def test_page_requires_management_access_not_just_vote_manage(self):
+        services.set_vote_manager(actor=self.president, profile=self.member.member_profile, enabled=True)
+        self.client.force_login(self.member)  # responsable désigné, pas du bureau
+        self.assertEqual(self.client.get(reverse("voting:manage_responsibles")).status_code, 403)
+        self.client.force_login(self.president)
+        self.assertEqual(self.client.get(reverse("voting:manage_responsibles")).status_code, 200)
+
+    def test_designate_via_page_then_revoke(self):
+        self.client.force_login(self.president)
+        url = reverse("voting:manage_responsible_toggle", args=[self.member.pk])
+        self.client.post(url, {"action": "designer"})
+        self.member.member_profile.refresh_from_db()
+        self.assertTrue(self.member.member_profile.is_vote_manager)
+        self.client.post(url, {"action": "retirer"})
+        self.member.member_profile.refresh_from_db()
+        self.assertFalse(self.member.member_profile.is_vote_manager)
+
+    def test_audit_events_recorded_without_leaking_who_did_what_vote(self):
+        services.set_vote_manager(actor=self.president, profile=self.member.member_profile, enabled=True)
+        from apps.core.models import AuditEvent
+        self.assertTrue(AuditEvent.objects.filter(action="vote.manager_designated").exists())

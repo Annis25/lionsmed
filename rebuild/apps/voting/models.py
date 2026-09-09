@@ -20,7 +20,7 @@ class Vote(models.Model):
     status = models.CharField(max_length=8, choices=Status.choices, default=Status.DRAFT)
     mode = models.CharField(max_length=10, choices=Mode.choices, default=Mode.SINGLE)
     opens_at = models.DateTimeField()
-    closes_at = models.DateTimeField()
+    closes_at = models.DateTimeField(null=True, blank=True, help_text="Vide : le scrutin ne se ferme que manuellement.")
     min_choices = models.PositiveSmallIntegerField(default=1)
     max_choices = models.PositiveSmallIntegerField(default=1)
     blank_allowed = models.BooleanField(default=False)
@@ -38,7 +38,7 @@ class Vote(models.Model):
         db_table = "app_voting_vote"
         ordering = ["-created_at"]
         constraints = [
-            models.CheckConstraint(condition=models.Q(closes_at__gt=models.F("opens_at")), name="vote_dates_ordered"),
+            models.CheckConstraint(condition=models.Q(closes_at__isnull=True) | models.Q(closes_at__gt=models.F("opens_at")), name="vote_dates_ordered"),
             models.CheckConstraint(condition=models.Q(min_choices__gte=1) & models.Q(max_choices__gte=models.F("min_choices")), name="vote_cardinality_valid"),
             models.CheckConstraint(condition=models.Q(status__in=["DRAFT", "OPEN", "CLOSED"]), name="vote_status_valid"),
             models.CheckConstraint(condition=models.Q(mode__in=["SINGLE", "MULTIPLE", "ELECTION"]), name="vote_mode_valid"),

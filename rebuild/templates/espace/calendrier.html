@@ -1,3 +1,57 @@
 {% extends 'base/private.html' %}
 {% block title %}Calendrier — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>Calendrier</h1></div><section class="workspace-panel"><ul class="lot2-timeline">{% for row in events %}<li><strong>{{ row.event.title }}</strong> — {{ row.event.starts_at|date:"d/m/Y H:i" }}{% if row.event.location %} · {{ row.event.location }}{% endif %}<br><span class="badge">{{ row.event.get_category_display }}</span>{% if row.event.registration_enabled %}<p>{% if row.remaining is not None %}{{ row.remaining }} place{{ row.remaining|pluralize }} restante{{ row.remaining|pluralize }}.{% endif %} {% if row.registration and row.registration.status == 'CONFIRMED' %}Vous êtes inscrit.<form method="post" action="{% url 'agenda_private:rsvp' row.event.pk %}">{% csrf_token %}<input type="hidden" name="action" value="cancel"><button class="btn btn--ghost btn--sm" type="submit">Annuler mon inscription</button></form>{% else %}<form method="post" action="{% url 'agenda_private:rsvp' row.event.pk %}">{% csrf_token %}<input type="hidden" name="action" value="confirm"><button class="btn btn--solid btn--sm" type="submit">Confirmer ma présence</button></form>{% endif %}</p>{% endif %}</li>{% empty %}<li>Aucun rendez-vous à venir.</li>{% endfor %}</ul></section>{% endblock %}
+{% block content %}<div class="app-titre"><h1>Calendrier</h1></div>
+
+<section class="calendrier-barre" aria-label="Navigation du calendrier">
+  <div class="calendrier-barre__nav">
+    <a class="btn btn--outline btn--sm" href="?view={{ view }}">Aujourd’hui</a>
+    <a class="calendrier-fleche" href="?view={{ view }}&date={{ prev_date|date:'Y-m-d' }}" aria-label="Période précédente">‹</a>
+    <strong class="calendrier-label">{{ label }}</strong>
+    <a class="calendrier-fleche" href="?view={{ view }}&date={{ next_date|date:'Y-m-d' }}" aria-label="Période suivante">›</a>
+  </div>
+  <div class="calendrier-barre__vues" role="group" aria-label="Choisir la vue">
+    <a class="btn btn--sm {% if view == 'month' %}btn--solid{% else %}btn--outline{% endif %}" href="?view=month&date={{ ref_date|date:'Y-m-d' }}">Mois</a>
+    <a class="btn btn--sm {% if view == 'week' %}btn--solid{% else %}btn--outline{% endif %}" href="?view=week&date={{ ref_date|date:'Y-m-d' }}">Semaine</a>
+    <a class="btn btn--sm {% if view == 'day' %}btn--solid{% else %}btn--outline{% endif %}" href="?view=day&date={{ ref_date|date:'Y-m-d' }}">Jour</a>
+  </div>
+  {% if can_create %}<a class="btn btn--solid" href="#ajouter-evenement">+ Ajouter un événement</a>{% endif %}
+</section>
+
+{% if view == 'month' %}
+<section class="calendrier-mois" aria-label="Vue mensuelle">
+  <div class="calendrier-mois__entetes"><span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span></div>
+  {% for week in weeks %}<div class="calendrier-mois__semaine">{% for day in week %}<div class="calendrier-jour{% if not day.in_month %} calendrier-jour--hors{% endif %}{% if day.is_today %} calendrier-jour--aujourdhui{% endif %}"><span class="calendrier-jour__num">{{ day.date|date:"j" }}</span>{% for e in day.events|slice:":3" %}<a class="calendrier-puce" href="#evt-{{ e.pk }}">{% if not e.all_day %}{{ e.starts_at|date:"H:i" }} {% endif %}{{ e.title }}</a>{% endfor %}{% if day.events|length > 3 %}<span class="calendrier-plus">+{{ day.events|length|add:"-3" }}</span>{% endif %}</div>{% endfor %}</div>{% endfor %}
+</section>
+{% elif view == 'week' %}
+<section class="calendrier-semaine" aria-label="Vue hebdomadaire">
+  {% for day in week_days %}<div class="calendrier-jour calendrier-jour--large{% if day.is_today %} calendrier-jour--aujourdhui{% endif %}"><h3>{{ day.date|date:"D j M" }}</h3>{% for e in day.events %}<a class="calendrier-puce" href="#evt-{{ e.pk }}">{% if not e.all_day %}{{ e.starts_at|date:"H:i" }} {% endif %}{{ e.title }}</a>{% empty %}<p class="app-note">Rien de prévu.</p>{% endfor %}</div>{% endfor %}
+</section>
+{% else %}
+<section class="calendrier-jour-vue" aria-label="Vue journalière">
+  {% for row in day_rows %}<article class="carte-info"><div class="carte-info__haut"><span class="carte-info__icone" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path></svg></span><div><h3><a href="#evt-{{ row.event.pk }}">{{ row.event.title }}</a></h3><p>{% if row.event.all_day %}Journée entière{% else %}{{ row.event.starts_at|date:"H:i" }} – {{ row.event.ends_at|date:"H:i" }}{% endif %}{% if row.event.location %} · {{ row.event.location }}{% endif %}</p></div></div></article>{% empty %}<p class="etat-vide">Aucun rendez-vous ce jour-là.</p>{% endfor %}
+</section>
+{% endif %}
+
+<div class="calendrier-details">{% for row in detail_rows %}
+  <div class="calendrier-detail" id="evt-{{ row.event.pk }}" role="dialog" aria-label="{{ row.event.title }}"><div class="calendrier-detail__carte"><a class="calendrier-detail__fermer" href="#" aria-label="Fermer">×</a><h3>{{ row.event.title }}</h3><p class="app-note">{% if row.event.all_day %}Journée entière — {{ row.event.starts_at|date:"d/m/Y" }}{% else %}{{ row.event.starts_at|date:"d/m/Y H:i" }} – {{ row.event.ends_at|date:"H:i" }}{% endif %}{% if row.event.location %} · {{ row.event.location }}{% endif %}</p>{% if row.event.summary %}<p>{{ row.event.summary }}</p>{% endif %}{% if row.event.meeting_link %}<p><a href="{{ row.event.meeting_link }}" target="_blank" rel="noopener noreferrer">Rejoindre la réunion</a></p>{% endif %}<span class="badge">{{ row.event.get_category_display }}</span>{% if row.event.registration_enabled %}<p>{% if row.remaining is not None %}{{ row.remaining }} place{{ row.remaining|pluralize }} restante{{ row.remaining|pluralize }}.{% endif %}</p>{% if row.registration and row.registration.status == 'CONFIRMED' %}<p>Vous êtes inscrit.</p><form method="post" action="{% url 'agenda_private:rsvp' row.event.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><input type="hidden" name="action" value="cancel"><button class="btn btn--ghost btn--sm" type="submit">Annuler mon inscription</button></form>{% else %}<form method="post" action="{% url 'agenda_private:rsvp' row.event.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><input type="hidden" name="action" value="confirm"><button class="btn btn--solid btn--sm" type="submit">Confirmer ma présence</button></form>{% endif %}{% endif %}</div></div>
+{% endfor %}</div>
+
+{% if can_create %}
+<section class="workspace-panel lot2-reading" id="ajouter-evenement"><h2>Ajouter un événement</h2><p class="app-note">Événement interne, visible uniquement des membres du calendrier partagé. Sa publication publique reste une action séparée depuis « Contenu public ».</p><form method="post" action="{% url 'agenda_private:calendar_event_add' %}" class="formulaire" novalidate>{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">{% include 'components/forms/errors.html' %}<div class="lot2-form-grid">{% for field in quick_form %}<div>{% include 'components/forms/field.html' %}</div>{% endfor %}</div><button class="btn btn--solid" type="submit">Ajouter au calendrier</button></form></section>
+{% endif %}
+
+<section class="workspace-panel lot2-reading"><h2>Synchroniser avec mon calendrier</h2><p class="app-note">Ce lien est personnel et privé : ne le partagez pas. Il permet à votre application de calendrier de recevoir automatiquement les nouveaux événements et leurs modifications.</p><div class="calendrier-sync"><input class="champ__input" type="text" id="lien-abonnement" value="{{ subscribe_url }}" readonly aria-label="Lien d’abonnement iCalendar"><button class="btn btn--outline btn--sm" type="button" id="copier-lien">Copier le lien</button><a class="btn btn--outline btn--sm" href="{% url 'agenda_private:calendar_download' %}">Télécharger .ics</a></div><form method="post" action="{% url 'agenda_private:calendar_token_regenerate' %}" class="lot2-actions"><input type="hidden" name="next" value="{{ request.get_full_path }}">{% csrf_token %}<button class="btn btn--ghost btn--sm" type="submit">Régénérer mon lien de synchronisation</button></form><details class="calendrier-aide"><summary>Comment l’ajouter à Google Calendar / iPhone / Outlook ?</summary><ul><li><strong>Google Calendar</strong> (ordinateur) : « Autres agendas » → « + » → « À partir de l’URL » → coller le lien copié.</li><li><strong>iPhone / iPad</strong> : Réglages → Calendrier → Comptes → Ajouter un compte → Autre → Ajouter abonn. calendrier → coller le lien.</li><li><strong>Outlook</strong> : Ajouter un calendrier → S’abonner à partir du web → coller le lien.</li><li><strong>Android</strong> (selon l’application) : dans Google Calendar via un navigateur, utiliser la même procédure « À partir de l’URL ».</li></ul></details></section>
+<script>
+(function(){
+  var btn=document.getElementById('copier-lien');
+  var input=document.getElementById('lien-abonnement');
+  if(!btn||!input)return;
+  btn.addEventListener('click',function(){
+    input.select();input.setSelectionRange(0,99999);
+    if(navigator.clipboard){navigator.clipboard.writeText(input.value).catch(function(){});}
+    else{document.execCommand('copy');}
+    btn.textContent='Lien copié';setTimeout(function(){btn.textContent='Copier le lien';},2000);
+  });
+})();
+</script>
+{% endblock %}
