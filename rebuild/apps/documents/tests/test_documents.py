@@ -1,0 +1,86 @@
+from io import BytesIO
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase
+from django.urls import reverse
+from django.utils import timezone
+from datetime import timedelta
+from apps.core.tests.test_foundations import account
+from apps.governance.models import Role
+from .. import services
+from ..models import Document, DocumentGrant
+from ..selectors import scope_documents, document_for_actor
+
+
+def pdf(name="doc.pdf"):
+    return SimpleUploadedFile(name, b"%PDF-1.4 synthetic", content_type="application/pdf")
+
+
+class DocumentAclTests(TestCase):
+    def setUp(self):
+        self.president = account("president@example.invalid", role=Role.PRESIDENT)
+        self.member = account("member@example.invalid", role=Role.MEMBRE)
+        self.bureau = account("bureau@example.invalid", role=Role.BUREAU)
+        self.invite = account("guest@example.invalid", role=Role.INVITE)
+        self.other_member = account("other@example.invalid", role=Role.MEMBRE)
+
+    def upload(self, visibility):
+        return services.upload_document(actor=self.president, upload=pdf(), title="Titre", description="",
+            category=Document.Category.GENERAL, visibility=visibility)
+
+    def test_member_visibility_document_is_visible_to_member_not_invite(self):
+        document = self.upload(Document.Visibility.MEMBERS)
+        self.assertTrue(scope_documents(self.member).filter(pk=document.pk).exists())
+        self.assertFalse(scope_documents(self.invite).filter(pk=document.pk).exists())
+
+    def test_bureau_visibility_excludes_plain_member(self):
+        document = self.upload(Document.Visibility.BUREAU)
+        self.assertTrue(scope_documents(self.bureau).filter(pk=document.pk).exists())
+        self.assertFalse(scope_documents(self.member).filter(pk=document.pk).exists())
+
+    def test_responsables_visibility_excludes_bureau(self):
+        document = self.upload(Document.Visibility.RESPONSABLES)
+        self.assertTrue(scope_documents(self.president).filter(pk=document.pk).exists())
+        self.assertFalse(scope_documents(self.bureau).filter(pk=document.pk).exists())
+
+    def test_explicit_grant_authorizes_invite(self):
+        document = self.upload(Document.Visibility.RESPONSABLES)
+        self.assertFalse(scope_documents(self.invite).filter(pk=document.pk).exists())
+        services.grant_access(actor=self.president, document=document, user=self.invite)
+        self.assertTrue(scope_documents(self.invite).filter(pk=document.pk).exists())
+
+    def test_expired_grant_does_not_authorize(self):
+        document = self.upload(Document.Visibility.RESPONSABLES)
+        services.grant_access(actor=self.president, document=document, user=self.invite, expires_at=timezone.now()-timedelta(days=1))
+        self.assertFalse(scope_documents(self.invite).filter(pk=document.pk).exists())
+
+    def test_list_detail_head_download_share_the_same_acl(self):
+        document = self.upload(Document.Visibility.RESPONSABLES)
+        self.client.force_login(self.member)
+        list_response = self.client.get(reverse("documents:list"))
+        self.assertNotContains(list_response, document.title)
+        self.assertEqual(self.client.get(reverse("documents:detail", args=[document.pk])).status_code, 404)
+        self.assertEqual(self.client.head(reverse("documents:download", args=[document.pk])).status_code, 404)
+        self.assertEqual(self.client.get(reverse("documents:download", args=[document.pk])).status_code, 404)
+        self.client.force_login(self.president)
+        self.assertContains(self.client.get(reverse("documents:list")), document.title)
+        self.assertEqual(self.client.get(reverse("documents:detail", args=[document.pk])).status_code, 200)
+        self.assertEqual(self.client.head(reverse("documents:download", args=[document.pk])).status_code, 200)
+        self.assertEqual(self.client.get(reverse("documents:download", args=[document.pk])).status_code, 200)
+
+    def test_bureau_cannot_manage_documents(self):
+        with self.assertRaises(PermissionDenied):
+            services.upload_document(actor=self.bureau, upload=pdf(), title="x", description="",
+                category=Document.Category.GENERAL, visibility=Document.Visibility.MEMBERS)
+
+    def test_rejects_disguised_extension(self):
+        fake = SimpleUploadedFile("doc.pdf", b"not really a pdf", content_type="application/zip")
+        with self.assertRaises(ValidationError):
+            services.upload_document(actor=self.president, upload=fake, title="x", description="",
+                category=Document.Category.GENERAL, visibility=Document.Visibility.MEMBERS)
+
+    def test_other_member_cannot_use_management_urls(self):
+        document = self.upload(Document.Visibility.MEMBERS)
+        self.client.force_login(self.other_member)
+        self.assertEqual(self.client.get(reverse("documents:manage_detail", args=[document.pk])).status_code, 403)
+        self.assertEqual(self.client.get(reverse("documents:manage_list")).status_code, 403)

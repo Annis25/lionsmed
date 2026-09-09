@@ -11,6 +11,9 @@ from apps.members.models import MemberProfile, AssociationExperience
 PERSONAL = frozenset(Role.values)
 MEMBERS = PERSONAL - {Role.INVITE}
 MANAGERS = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.SECRETAIRE})
+# Palier « bureau » des documents : BUREAU/PRESIDENT/SECRETAIRE/SUPER_ADMIN. DIRECTEUR en est
+# exclu tant que ses capacités avancées ne sont pas confirmées humainement.
+BUREAU_LEVEL = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.SECRETAIRE, Role.BUREAU})
 CAPABILITIES = {
     "account.access_private_area": PERSONAL,
     "account.change_own_password": PERSONAL,
@@ -26,6 +29,12 @@ CAPABILITIES = {
     "directory.view": MEMBERS, "member.view": MEMBERS,
     "members.view_management": MANAGERS, "management.access": MANAGERS,
     "year.view": MANAGERS,
+    # Calendrier, présences, documents, cotisations et notifications (phase fonctionnement quotidien).
+    "event.register": MEMBERS, "attendance.record": MANAGERS,
+    "document.view": PERSONAL, "document.manage": MANAGERS,
+    "notification.view_own": PERSONAL, "notification.send": MANAGERS,
+    "dues.view_own": PERSONAL, "dues.manage": MANAGERS,
+    "statistics.view": MANAGERS,
     # Services présents, mais aucune délégation de mutation validée.
     "mandate.manage": frozenset(), "account.change_email": frozenset(),
 }
@@ -60,6 +69,12 @@ def can(user, capability, obj=None):
     if obj is not None:
         public_types = {"action": "service_actions.action", "news": "editorial.newsarticle", "event": "agenda.event",
             "application":"members.membershipapplication", "contact":"communications.contactrequest"}
+        if capability == "dues.view_own":
+            from apps.dues.models import DuesRecord
+            return isinstance(obj, DuesRecord) and obj.profile.user_id == user.pk
+        if capability == "notification.view_own":
+            from apps.communications.models import Notification
+            return isinstance(obj, Notification) and obj.recipient_id == user.pk
         prefix = capability.split(".")[0]
         if prefix in public_types:
             return getattr(getattr(obj, "_meta", None), "label_lower", None) == public_types[prefix]

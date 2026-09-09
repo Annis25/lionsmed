@@ -1,4 +1,5 @@
 import uuid
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 class ContactRequest(models.Model):
@@ -21,7 +22,8 @@ class ContactRequest(models.Model):
 class OutboxMessage(models.Model):
     id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     event_key=models.CharField(max_length=150,unique=True)
-    kind=models.CharField(max_length=20,choices=[("APPLICATION","Accusé candidature"),("CONTACT","Avis contact interne")])
+    kind=models.CharField(max_length=20,choices=[("APPLICATION","Accusé candidature"),("CONTACT","Avis contact interne"),
+        ("EVENT_REMINDER","Rappel de rendez-vous"),("IMPORTANT","Notification importante"),("DOCUMENT","Nouveau document")])
     recipient=models.EmailField()
     object_id=models.UUIDField()
     attempts=models.PositiveSmallIntegerField(default=0)
@@ -34,3 +36,24 @@ class OutboxMessage(models.Model):
     error_code=models.CharField(max_length=32,blank=True)
     class Meta:
         indexes=[models.Index(fields=["state","available_at"],name="outbox_ready_idx")]
+
+
+class Notification(models.Model):
+    class Category(models.TextChoices):
+        EVENT="EVENT","Rendez-vous"
+        DOCUMENT="DOCUMENT","Document"
+        DUES="DUES","Cotisation"
+        IMPORTANT="IMPORTANT","Importante"
+    id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+    recipient=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.PROTECT,related_name="notifications")
+    event_key=models.CharField(max_length=150,unique=True)
+    category=models.CharField(max_length=12,choices=Category.choices)
+    title=models.CharField(max_length=180)
+    excerpt=models.CharField(max_length=300,blank=True)
+    target_kind=models.CharField(max_length=20,blank=True)
+    target_id=models.CharField(max_length=64,blank=True)
+    created_at=models.DateTimeField(auto_now_add=True)
+    read_at=models.DateTimeField(null=True,blank=True)
+    class Meta:
+        ordering=["-created_at"]
+        indexes=[models.Index(fields=["recipient","read_at","created_at"],name="notification_recipient_idx")]

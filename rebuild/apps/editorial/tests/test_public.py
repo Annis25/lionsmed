@@ -64,8 +64,14 @@ class PublicationTests(TestCase):
         for changes in [dict(performed_on=timezone.localdate()+timedelta(days=1)),dict(location=''),dict(beneficiaries=1),dict(partners='Sans source')]:
             obj=content(self.actor,slug=str(uuid4()),**changes)
             with self.assertRaises(ValidationError):publish_content(actor=self.actor,obj=obj,kind='action')
-        obj=content(self.actor,'event',visibility='PRIVATE')
+        obj=content(self.actor,'event',location='')
         with self.assertRaises(ValidationError):publish_content(actor=self.actor,obj=obj,kind='event')
+        # Lot présences/calendrier privé : un événement PRIVATE se publie aussi (calendrier interne),
+        # sans jamais apparaître dans EventQuerySet.public() qui reste filtré sur PUBLIC.
+        private_obj=content(self.actor,'event',slug=str(uuid4()),visibility='PRIVATE')
+        published=publish_content(actor=self.actor,obj=private_obj,kind='event')
+        self.assertEqual(published.status,'PUBLISHED')
+        self.assertFalse(Event.objects.public().filter(pk=published.pk).exists())
     def test_optional_action_fields(self):
         obj=publish_content(actor=self.actor,obj=content(self.actor),kind='action')
         response=self.client.get(obj.get_absolute_url())

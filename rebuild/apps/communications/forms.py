@@ -36,3 +36,8 @@ class ContactForm(SubmissionForm):
         fields=["name","email","subject","message"]
         labels={"name":"Votre nom","email":"Adresse e-mail","subject":"Objet de votre message","message":"Votre message"}
         widgets={"name":forms.TextInput(attrs={"autocomplete":"name"}),"email":forms.EmailInput(attrs={"autocomplete":"email","inputmode":"email"}),"message":forms.Textarea(attrs={"rows":6})}
+
+class ImportantNotificationForm(StyledFields,forms.Form):
+    email=forms.EmailField(label="Adresse email du destinataire")
+    title=forms.CharField(max_length=180,label="Titre")
+    excerpt=forms.CharField(max_length=300,widget=forms.Textarea(attrs={"rows":3}),label="Extrait",required=False)

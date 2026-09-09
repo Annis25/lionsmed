@@ -26,8 +26,13 @@ def deliver_batch(limit=20):
         ok=False
         try:
             context={"origin":settings.SITE_ORIGIN,"reference":str(item.object_id)}
-            stem="application_receipt" if item.kind=="APPLICATION" else "contact_notice"
-            subject="Candidature reçue — Lions Club Sfax-Méditerranée" if item.kind=="APPLICATION" else "Nouveau message de contact — Lions Club Sfax-Méditerranée"
+            stem={"APPLICATION":"application_receipt","CONTACT":"contact_notice","EVENT_REMINDER":"event_reminder",
+                "IMPORTANT":"notification_important","DOCUMENT":"notification_document"}[item.kind]
+            subject={"APPLICATION":"Candidature reçue — Lions Club Sfax-Méditerranée",
+                "CONTACT":"Nouveau message de contact — Lions Club Sfax-Méditerranée",
+                "EVENT_REMINDER":"Rappel de rendez-vous — Lions Club Sfax-Méditerranée",
+                "IMPORTANT":"Notification importante — Lions Club Sfax-Méditerranée",
+                "DOCUMENT":"Nouveau document — Lions Club Sfax-Méditerranée"}[item.kind]
             message=EmailMultiAlternatives(subject,render_to_string("emails/"+stem+".txt",context),settings.DEFAULT_FROM_EMAIL,[item.recipient],headers={"Message-ID":f"<{item.pk}@lionsmed-outbox.invalid>"})
             message.attach_alternative(render_to_string("emails/"+stem+".html",context),"text/html")
             ok=message.send()==1

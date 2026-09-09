@@ -53,7 +53,8 @@ def publish_content(*,actor,obj,kind):
         if (obj.beneficiaries is not None or obj.partners) and not obj.evidence:raise ValidationError("Le bilan et les partenaires exigent une source validée.")
         if obj.photos.filter(image__approved_at__isnull=True).exists():raise ValidationError("La galerie contient une image non autorisée.")
     if kind=="event":
-        if not obj.starts_at or not obj.ends_at or obj.ends_at<=obj.starts_at or not obj.location or obj.visibility!="PUBLIC":raise ValidationError("Dates, lieu et visibilité publique requis.")
+        # Visibilité PRIVATE incluse : un rendez-vous interne doit pouvoir alimenter le calendrier privé.
+        if not obj.starts_at or not obj.ends_at or obj.ends_at<=obj.starts_at or not obj.location:raise ValidationError("Dates et lieu requis.")
     obj.meta_title=obj.meta_title or obj.title
     obj.meta_description=obj.meta_description or obj.summary[:300]
     obj.status="PUBLISHED";obj.published_at=obj.published_at or timezone.now();obj.updated_by=actor

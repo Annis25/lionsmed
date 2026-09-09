@@ -1,0 +1,3 @@
+{% extends 'base/private.html' %}
+{% block title %}Présences — Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}<div class="app-titre"><h1>Présences</h1></div><section class="workspace-panel"><ul class="lot2-timeline">{% for event in events %}<li><a href="{% url 'agenda_private:attendance_sheet' event.pk %}">{{ event.title }}</a> — {{ event.starts_at|date:"d/m/Y H:i" }}</li>{% empty %}<li>Aucun rendez-vous publié.</li>{% endfor %}</ul></section>{% endblock %}
