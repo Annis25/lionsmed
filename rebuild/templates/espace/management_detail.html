@@ -1,0 +1,3 @@
+{% extends 'base/private.html' %}
+{% block title %}Fiche de gestion — Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}<div class="app-titre"><h1>Fiche de gestion</h1></div><section class="workspace-panel lot2-reading"><h2>{{ member.name }}</h2><dl class="paire-liste"><div><dt>Statut</dt><dd>{{ member.status }}</dd></div><div><dt>Compte</dt><dd>{% if member.account_active %}Actif{% else %}Désactivé{% endif %}</dd></div><div><dt>Rôle actuel</dt><dd>{{ member.role }}</dd></div></dl><p class="app-note">Lecture seule : aucune attribution de droits ni modification d’email depuis cette fiche.</p></section><div class="lot2-reading">{% include 'components/private/mandates.html' %}</div><a href="{% url 'governance:members' %}">Retour aux membres</a>{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Se connecter — Lions Club Sfax-Méditerranée{% endblock %}
+{% block account_content %}<h1>Se connecter</h1><p class="carte-acces__intro">Accédez à votre espace membre.</p>
+<form class="formulaire" method="post" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}
+{% include 'components/forms/field.html' with field=form.username %}{% include 'components/forms/field.html' with field=form.password %}
+<div class="carte-acces__ligne"><label class="choix" for="{{ form.remember.id_for_label }}">{{ form.remember }}<span>Rester connecté</span></label><a class="link-arrow" href="{% url 'accounts:reset' %}">Mot de passe oublié ?</a></div>
+{% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}<button class="btn btn--solid btn--block" type="submit">Se connecter</button></form>
+<p class="carte-acces__pied">La connexion est réservée aux comptes personnels autorisés.</p>{% endblock %}

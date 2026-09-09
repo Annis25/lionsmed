@@ -13,3 +13,8 @@ private_media/
 logs/
 staticfiles/
 .claude/settings.local.json
+
+# Runtime du redéveloppement isolé
+rebuild/.env
+rebuild/.venv/
+rebuild/runtime/

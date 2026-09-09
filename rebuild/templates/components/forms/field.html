@@ -1,0 +1,5 @@
+<div class="champ{% if field.field.widget.input_type == 'checkbox' %} champ--choix{% endif %}{% if field.errors %} champ--erreur{% endif %}">
+<label class="champ__label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="champ__requis">(obligatoire)</span>{% endif %}</label>
+{% if field.field.widget.input_type == 'password' %}<div class="champ__mdp">{{ field }}<button class="champ__oeil" type="button" data-oeil="{{ field.id_for_label }}" aria-pressed="false" aria-label="Afficher le mot de passe"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path><circle cx="12" cy="12" r="2.8"></circle></svg></button></div>{% else %}{{ field }}{% endif %}
+{% if field.help_text %}<div class="champ__aide" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</div>{% endif %}
+{{ field.errors }}</div>

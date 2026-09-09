@@ -1,0 +1,9 @@
+{% extends 'base/public.html' %}
+{% block content %}<section class="page-hero"><svg class="page-hero__arcs" viewBox="0 0 1100 1100" fill="none" aria-hidden="true" focusable="false">
+    <circle cx="550" cy="550" r="150" stroke="#F8C800" stroke-width="1.2"/>
+    <circle cx="550" cy="550" r="230" stroke="#9CC0EE" stroke-width="1.2"/>
+    <circle cx="550" cy="550" r="310" stroke="#F8C800" stroke-width="1.2"/>
+    <circle cx="550" cy="550" r="390" stroke="#9CC0EE" stroke-width="1.2"/>
+    <circle cx="550" cy="550" r="470" stroke="#F8C800" stroke-width="1.2"/>
+    <circle cx="550" cy="550" r="550" stroke="#9CC0EE" stroke-width="1.2"/>
+  </svg><div class="container page-hero__contenu"><p class="eyebrow">Lions Club Sfax-Méditerranée</p><h1>Nous servons.</h1><p class="lede">Basés à Sfax, en Tunisie, unis par une même volonté : servir.</p></div></section><section class="section"><div class="container"><div class="section-head"><h2>Espace membre</h2></div><a class="btn btn--solid" href="{% url 'accounts:login' %}">Se connecter</a></div></section>{% endblock %}

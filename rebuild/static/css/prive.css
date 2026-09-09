@@ -1,0 +1,278 @@
+@charset "UTF-8";
+/* Espace privé — proportions inspirées du commit 8e63540, sans restauration.
+   Passe UI isolée à la demande du propriétaire : aucune règle métier ou permission.
+   Les composants de base et jetons restent dans lions.css, inchangé.
+   Exceptions du skill : pas d'arc ; Playfair au h1 et aux chiffres ; espacements
+   exclusivement --e* ; or réservé aux actions attendues et au focus accessible. */
+
+/* Échelle et coquille */
+.prive-dense .app-shell { grid-template-columns: 240px minmax(0,1fr); font-size: .875rem; line-height: 1.6; }
+.prive-dense .app-shell.est-replie { grid-template-columns: var(--nav-rail) minmax(0,1fr); }
+.prive-dense .app-contenu { width: 100%; max-width: 1280px; margin-inline: auto; padding: var(--e5) var(--e6) var(--e6); }
+.prive-dense .app-titre { margin: 0 0 var(--e4); }
+.prive-dense .app-titre h1 { font-size: 1.75rem; line-height: 1.1; max-width: 13ch; }
+.prive-dense .app-titre__contexte { margin: var(--e1) 0 0; font-size: .8125rem; line-height: 1.5; color: var(--gris); }
+.prive-dense .app-shell h2 { font-size: 1.0625rem; line-height: 1.4; }
+.prive-dense .app-shell h3 { font-size: .9375rem; line-height: 1.4; }
+.prive-dense .app-shell p { margin-block: var(--e2); max-width: 62ch; }
+.prive-dense .app-section { margin-bottom: var(--e5); }
+.prive-dense .bloc-titre { margin-bottom: var(--e3); gap: var(--e2); }
+.prive-dense .app-header { min-height: 64px; padding-inline: var(--e6); gap: var(--e3); }
+.prive-dense .app-bascule { width: 44px; height: 44px; }
+
+/* Navigation fine, icônes distinctes et identité du compte */
+.prive-dense .app-nav__marque { padding-inline: var(--e4); gap: var(--e2); }
+.prive-dense .app-nav__liste { padding: var(--e3) var(--e2); gap: 0; }
+.prive-dense .app-nav__lien { min-height: 44px; padding: var(--e2) var(--e3); gap: var(--e3); font-size: .8125rem; }
+.prive-dense .app-nav__lien svg { width: 18px; height: 18px; }
+.prive-dense .app-nav__pied { padding: var(--e2); }
+.prive-dense .compte-identite { display: flex; align-items: center; gap: var(--e2); padding: 0 var(--e2); min-height: 44px; }
+.compte-identite__texte { display: grid; text-align: left; line-height: 1.4; font-size: .75rem; }
+.compte-identite__texte strong { font-size: .8125rem; font-weight: 600; }
+.compte-identite__texte > span { color: var(--gris); }
+.identite-avatar { width: 48px; height: 48px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--fond-2); color: var(--bleu); border: 1px solid var(--bord); }
+.identite-avatar svg { width: 24px; height: 24px; }
+.identite-avatar--petit { width: 32px; height: 32px; }
+.identite-avatar--petit svg { width: 18px; height: 18px; }
+.identite-titre { display: flex; align-items: center; gap: var(--e3); margin-bottom: var(--e4); }
+.prive-dense .identite-titre .app-titre { margin: 0; }
+
+/* Les informations de maquette occupent une barre, sans disparaître. */
+.atelier-barre { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: var(--e4); align-items: start; margin-bottom: var(--e5); padding: var(--e3) var(--e4); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--blanc); }
+.prive-dense .role-preview { display: grid; grid-template-columns: auto minmax(0,1fr); gap: var(--e1) var(--e2); margin: 0; align-items: center; }
+.prive-dense .role-preview label { font-size: .75rem; }
+.prive-dense .role-preview p { grid-column: 1/-1; margin: 0; font-size: .75rem; line-height: 1.5; }
+.prive-dense .atelier-barre .notice-demo { padding: 0 0 0 var(--e4); margin: 0; background: transparent; border-left: 1px solid var(--bord); font-size: .75rem; line-height: 1.6; color: var(--gris); }
+
+/* Panneaux, listes et cartes : densité de la référence. */
+.prive-dense .workspace-panel { padding: var(--e4); margin-block: var(--e4); }
+.prive-dense .workspace-panel > h2 { margin-bottom: var(--e3); }
+.prive-dense .workspace-panel > p:first-of-type { margin-top: 0; }
+.prive-dense .carte-action, .prive-dense .carte-info { padding: var(--e4); gap: var(--e3); }
+.prive-dense .carte-action p, .prive-dense .carte-info p { font-size: .8125rem; margin: 0; }
+.prive-dense .carte-action h3, .prive-dense .carte-info h3 { font-size: .9375rem; }
+.prive-dense .carte-action__icone, .prive-dense .carte-info__icone { width: 32px; height: 32px; }
+.prive-dense .grille-actions, .prive-dense .grille-blocs { gap: var(--e3); }
+.prive-dense .carte-action__echeance { font-size: .75rem; }
+.prive-dense .jauge__ligne { margin: 0 0 var(--e1); font-size: .75rem; }
+.prive-dense .jauge { gap: var(--e1); }
+.prive-dense .btn { min-height: 44px; padding: var(--e2) var(--e4); font-size: .8125rem; line-height: 1.4; }
+.prive-dense .link-arrow { font-size: .8125rem; min-height: 44px; }
+.prive-dense .button-row { gap: var(--e2); }
+.prive-dense .editorial-grid { gap: var(--e3); }
+.prive-dense .editorial-card { padding: var(--e4); gap: var(--e2); }
+.prive-dense .editorial-card p { margin: 0; font-size: .8125rem; }
+.prive-dense .editorial-card h3 { font-size: .9375rem; }
+.prive-dense .editorial-card .eyebrow { margin: 0; font-size: .6875rem; }
+.prive-dense .raccourci-mandat { display: grid; grid-template-columns: minmax(0,1fr) auto; column-gap: var(--e4); row-gap: var(--e1); align-items: center; }
+.prive-dense .raccourci-mandat h2 { font-size: .9375rem; margin: 0; }
+.prive-dense .raccourci-mandat p { margin: 0; font-size: .8125rem; }
+.prive-dense .raccourci-mandat > a { grid-column: 2; grid-row: 1 / span 2; }
+.prive-dense .etat-vide { padding: var(--e5) var(--e4); gap: var(--e2); }
+.prive-dense .etat-vide p { font-size: .8125rem; margin: 0; }
+.prive-dense .bloc-date { gap: var(--e3); }
+.prive-dense .bloc-date__jour { width: 56px; padding-block: var(--e2); }
+.prive-dense .bloc-date__jour b { font-size: 1.5rem; }
+.prive-dense .paire-liste { gap: var(--e2); }
+.prive-dense .paire-liste dd, .prive-dense .paire-liste dt { font-size: .8125rem; }
+.prive-dense .app-note { font-size: .75rem; padding-top: var(--e3); }
+
+/* Formulaires : deux colonnes sur desktop, mêmes champs et même comportement. */
+.prive-dense .formulaire { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--e3) var(--e4); }
+.prive-dense .workspace-panel > .formulaire { max-width: 960px; }
+.prive-dense .formulaire > :is(p,fieldset,.duo,button,[data-form-status],.profil-photo,[data-election-preview]) { grid-column: 1/-1; }
+.prive-dense .formulaire > button { justify-self: start; margin: 0; }
+.prive-dense .formulaire > .champ:has(textarea) { grid-column: 1/-1; }
+.prive-dense .formulaire > p { margin: 0; }
+.prive-dense .champ { gap: var(--e1); }
+.prive-dense .champ__label, .prive-dense .champ > label { font-size: .8125rem; line-height: 1.5; }
+.prive-dense .champ__requis { font-size: .75rem; }
+.prive-dense .champ__input { min-height: 44px; height: 44px; padding: var(--e2) var(--e3); font-size: .875rem; line-height: 1.5; }
+.prive-dense select.champ__input { padding-right: var(--e6); background-position: right var(--e3) center; }
+.prive-dense textarea.champ__input { min-height: 96px; height: 96px; }
+.prive-dense input[type="file"] { height: auto; font-size: .8125rem; padding: var(--e2); }
+.prive-dense .champ__aide { font-size: .75rem; }
+.prive-dense .duo { gap: var(--e3) var(--e4); }
+.prive-dense .groupe + .groupe { margin-top: var(--e4); padding-top: var(--e4); }
+.prive-dense .groupe__champs { gap: var(--e3); }
+.prive-dense legend { font-size: .875rem; margin-bottom: var(--e2); }
+.prive-dense .choix { min-height: 44px; align-items: center; gap: var(--e3); padding: var(--e2) var(--e3); border: 1px solid var(--bord); border-radius: var(--r-carte); margin-bottom: var(--e2); }
+.prive-dense .choix span { font-size: .875rem; }
+.prive-dense .choix:has(input:checked) { border-color: var(--bleu); background: var(--fond-2); }
+.prive-dense .choix input { margin: 0; }
+.prive-dense [data-state-selector], .prive-dense [data-ballot-type] { max-width: 400px; }
+.prive-dense details { margin-top: var(--e3); }
+.prive-dense summary { font-size: .8125rem; padding-block: var(--e2); }
+.prive-dense dialog { padding: var(--e5); }
+
+/* Profil : photo à côté de la fiche ; parcours et mandats structurés. */
+.profil-photo { display: flex; align-items: center; gap: var(--e4); padding: var(--e3); background: var(--fond); border: 1px solid var(--bord); border-radius: var(--r-carte); }
+.profil-photo__visuel { position: relative; flex: none; width: 80px; height: 80px; }
+.identite-avatar--photo { width: 80px; height: 80px; }
+.identite-avatar--photo svg { width: 40px; height: 40px; }
+.profil-photo .portrait-preview { position: absolute; inset: 0; width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
+.profil-photo__texte { display: grid; gap: var(--e1); min-width: 0; flex: 1; }
+.profil-photo__texte > strong { font-size: .9375rem; }
+.meta-ligne { color: var(--gris); font-size: .75rem; }
+.prive-dense .profil-photo input { max-width: 360px; }
+.prive-dense .champ-verrouille > label { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); }
+.prive-dense .champ-verrouille input { background: var(--fond); border-style: dashed; }
+.prive-dense .profil-parcours .experience-form { padding-left: var(--e4); border-left: 2px solid var(--bord); }
+.prive-dense .mandats-timeline { border: 0; border-left: 2px solid var(--bleu); border-radius: 0; padding-left: var(--e3); }
+.prive-dense .mandats-timeline td { vertical-align: top; }
+
+/* Annuaire : avatars et métadonnées plutôt que grandes cartes de texte. */
+.prive-dense .membre-compact { display: grid; grid-template-columns: 48px minmax(0,1fr); align-content: start; column-gap: var(--e3); row-gap: var(--e1); }
+.membre-compact > .identite-avatar { grid-column: 1; grid-row: 1 / span 3; }
+.prive-dense .membre-compact > :not(.identite-avatar) { grid-column: 2; }
+.prive-dense .membre-compact .eyebrow { text-transform: none; letter-spacing: normal; color: var(--bleu); font-size: .75rem; }
+.prive-dense .membre-metadonnees { display: grid; font-size: .75rem; color: var(--gris); }
+.prive-dense .membre-compact .link-arrow { min-height: 44px; margin-top: 0; }
+
+/* Calendrier : les mêmes lignes deviennent un agenda avec repères de date. */
+.prive-dense .agenda-cadre { border: 0; }
+.prive-dense .agenda-compact { display: block; }
+.prive-dense .agenda-compact caption { display: block; text-align: left; padding: 0 0 var(--e3); font-size: .8125rem; }
+.prive-dense .agenda-compact thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.prive-dense .agenda-compact tbody { display: grid; gap: var(--e2); }
+.prive-dense .agenda-compact tr { display: grid; grid-template-columns: 200px minmax(0,1fr) 112px; align-items: center; gap: var(--e3); padding: var(--e3); border: 1px solid var(--bord); border-radius: var(--r-carte); margin: 0; }
+.prive-dense .agenda-compact td { padding: 0; border: 0; }
+.prive-dense .agenda-compact td:first-child { grid-column: 2; grid-row: 1; font-weight: 600; }
+.prive-dense .agenda-compact td:nth-child(2) { grid-column: 1; grid-row: 1; display: flex; align-items: center; gap: var(--e3); }
+.prive-dense .agenda-compact td:last-child { grid-column: 3; grid-row: 1; font-size: .75rem; color: var(--gris); }
+.prive-dense .agenda-compact td::before { display: none; }
+.agenda-date { display: grid; justify-items: center; min-width: 44px; padding: var(--e2); background: var(--fond-2); color: var(--bleu); border-radius: var(--r-carte); line-height: 1.1; }
+.agenda-date b { font-family: var(--police-titre); font-size: 1.375rem; font-weight: 600; }
+.agenda-date > span { font-size: .6875rem; }
+.agenda-horaire { display: grid; gap: var(--e1); font-size: .75rem; color: var(--gris); }
+.agenda-horaire strong { color: var(--encre); font-weight: 600; }
+
+/* Échelle émotionnelle compacte : cinq choix dans une seule bande. */
+.prive-dense .emotion-scale { grid-template-columns: repeat(5,minmax(0,1fr)); gap: var(--e1); margin-block: var(--e3); padding: var(--e2); background: var(--fond); border: 1px solid var(--bord); border-radius: var(--r-carte); }
+.prive-dense .emotion { display: flex; flex-direction: column; align-items: center; gap: var(--e2); padding: var(--e3) var(--e2); min-height: 44px; border: 1px solid transparent; border-radius: var(--r-carte); background: transparent; }
+.prive-dense .emotion svg { width: 32px; height: 32px; }
+.prive-dense .emotion span { font-size: .75rem; line-height: 1.3; min-height: var(--e6); }
+.prive-dense .emotion input { width: 16px; height: 16px; order: 3; }
+.prive-dense .emotion:has(input:checked) { background: var(--blanc); border: 1px solid var(--bleu); }
+.prive-dense .page-satisfaction { max-width: 960px; }
+.prive-dense.page-satisfaction [data-page-permissions], .prive-dense.page-votes [data-page-permissions] { max-width: 960px; }
+
+/* Documents, notifications, cotisations, présences : lignes et indicateurs. */
+.prive-dense .filter-bar { grid-template-columns: minmax(0,1fr) minmax(160px,240px) auto; gap: var(--e3); margin-block: var(--e3); }
+.prive-dense .filter-bar [data-count] { grid-column: auto; padding-bottom: var(--e3); font-size: .75rem; white-space: nowrap; }
+.prive-dense .tableau { font-size: .8125rem; }
+.prive-dense .tableau caption { padding: var(--e3); font-size: .75rem; }
+.prive-dense .tableau th, .prive-dense .tableau td { padding: var(--e2) var(--e3); line-height: 1.5; }
+.prive-dense .tableau td a { display: inline-flex; align-items: center; min-height: 44px; }
+.prive-dense .tableau th { font-size: .75rem; }
+.statut-compact { display: inline-block; padding: var(--e1) var(--e2); background: var(--fond-2); color: var(--encre); border-radius: var(--r-pilule); font-size: .75rem; line-height: 1.4; }
+.prive-dense .notification-row { padding-block: var(--e3); gap: var(--e3); align-items: center; }
+.prive-dense .notification-row h3 { margin-top: var(--e1); }
+.prive-dense .notification-row time { font-size: .75rem; }
+.prive-dense .notification-row .link-arrow { min-height: 44px; }
+.prive-dense .liste-notifs li { padding-block: var(--e3); }
+.prive-dense .liste-notifs h3 { font-size: .875rem; }
+.prive-dense .liste-notifs p, .prive-dense .liste-notifs time { font-size: .75rem; }
+.prive-dense .metrics { margin-block: var(--e3); gap: var(--e4); }
+.prive-dense .metric { padding-left: var(--e3); gap: var(--e1); }
+.prive-dense .metric strong { font-size: 1.75rem; line-height: 1.15; }
+.prive-dense .metric span { font-size: .75rem; }
+.prive-dense .distribution { margin-block: var(--e4); gap: var(--e2); max-width: 800px; }
+.prive-dense .distribution figcaption { font-size: .8125rem; margin-bottom: var(--e1); }
+.prive-dense .distribution-row { font-size: .8125rem; }
+.prive-dense meter { height: 16px; }
+
+/* Pilotage : indicateurs sobres et accès courts conservant les permissions. */
+.pilotage-kpis { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--e4); padding-block: var(--e3); }
+.prive-dense .pilotage-outils .editorial-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.prive-dense .outil-compact { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 0 var(--e3); padding: var(--e3); border-radius: var(--r-carte); background: var(--fond); }
+.prive-dense .outil-compact h3 { grid-column: 1; }
+.prive-dense .outil-compact p { grid-column: 1; font-size: .75rem; }
+.prive-dense .outil-compact a { grid-column: 2; grid-row: 1 / span 2; align-self: center; max-width: 18ch; }
+
+@media (min-width:1081px) {
+ .prive-dense .duo { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .prive-dense .profil-securite .formulaire { grid-template-columns: repeat(3,minmax(0,1fr)); }
+ .prive-dense .experience-form > .champ:has(textarea) { grid-column: auto; }
+}
+@media (max-width:1080px) {
+ .prive-dense .app-contenu { padding: var(--e5); }
+ .prive-dense .app-header { padding-inline: var(--e5); }
+ .prive-dense .formulaire { grid-template-columns: minmax(0,1fr); }
+ .prive-dense .atelier-barre { grid-template-columns: minmax(0,1fr); gap: var(--e2); padding: var(--e3); }
+ .prive-dense .atelier-barre .notice-demo { padding: 0; border: 0; }
+ .prive-dense .filter-bar { grid-template-columns: minmax(0,1fr) minmax(160px,1fr); }
+ .prive-dense .filter-bar [data-count] { grid-column: 1/-1; padding: 0; }
+ .prive-dense .pilotage-outils .editorial-grid { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width:760px) {
+ .prive-dense .app-shell, .prive-dense .app-shell.est-replie { grid-template-columns: minmax(0,1fr); }
+ .prive-dense .app-contenu { padding: var(--e4); }
+ .prive-dense .app-header { padding-inline: var(--e4); gap: var(--e2); }
+ .prive-dense .app-titre h1 { font-size: 1.5rem; }
+ .compte-identite__texte { display: none; }
+ .prive-dense .atelier-barre { margin-bottom: var(--e4); }
+ .prive-dense .role-preview { grid-template-columns: auto minmax(0,1fr); }
+ .prive-dense .workspace-panel { padding: var(--e3); }
+ .prive-dense .raccourci-mandat { grid-template-columns: minmax(0,1fr); gap: var(--e2); }
+ .prive-dense .raccourci-mandat > a { grid-row: auto; grid-column: 1; justify-self: start; }
+ .prive-dense .tableau tr { margin-bottom: var(--e2); padding: var(--e3); }
+ .prive-dense .tableau td { padding: var(--e1) 0; gap: var(--e2); }
+ .prive-dense .tableau td a { min-height: 44px; }
+ .prive-dense .notification-row { flex-direction: row; align-items: start; }
+ .prive-dense .notification-row > div { min-width: 0; flex: 1; }
+ .prive-dense .notification-row button { max-width: 112px; padding-inline: var(--e2); }
+ .prive-dense .agenda-compact tr { grid-template-columns: 64px minmax(0,1fr); padding: var(--e3); gap: var(--e2); }
+ .prive-dense .agenda-compact td:first-child { grid-row: 1; grid-column: 2; }
+ .prive-dense .agenda-compact td:nth-child(2) { grid-row: 1 / span 2; grid-column: 1; display: grid; grid-template-columns: minmax(0,1fr); justify-items: center; gap: var(--e1); }
+ .prive-dense .agenda-compact td:last-child { grid-row: 2; grid-column: 2; }
+ .agenda-horaire > span { font-size: .6875rem; }
+ .prive-dense .agenda-compact td { padding: 0; }
+ .prive-dense .agenda-date { width: 44px; }
+ .prive-dense .emotion-scale { gap: 0; padding: var(--e1); }
+ .prive-dense .emotion { padding: var(--e2) var(--e1); gap: var(--e2); text-align: center; }
+ .prive-dense .emotion svg { width: 28px; height: 28px; }
+ .prive-dense .emotion span { font-size: .6875rem; overflow-wrap: normal; hyphens: auto; }
+ .prive-dense .emotion input { width: 16px; height: 16px; }
+ .profil-photo { gap: var(--e3); }
+ .profil-photo__visuel, .identite-avatar--photo, .profil-photo .portrait-preview { width: 64px; height: 64px; }
+ .prive-dense .profil-photo input { width: 100%; }
+ .prive-dense .pilotage-kpis { gap: var(--e2); }
+ .prive-dense .pilotage-kpis .metric { padding-left: var(--e2); }
+ .prive-dense .pilotage-kpis .metric strong { font-size: 1.5rem; }
+ .prive-dense .outil-compact { grid-template-columns: minmax(0,1fr); }
+ .prive-dense .outil-compact a { grid-column: 1; grid-row: auto; max-width: none; }
+}
+@media(max-width:520px) {
+ .prive-dense .filter-bar { grid-template-columns: minmax(0,1fr); gap: var(--e2); }
+ .prive-dense .bloc-date { flex-direction: row; }
+ .prive-dense .carte-action .btn, .prive-dense .carte-info .btn { width: auto; }
+ .prive-dense .notification-row { flex-wrap: wrap; }
+}
+
+/* Intégration Lot 2 : disposition, mêmes composants et jetons validés. */
+.lot2-reading { max-width: 864px; }
+.lot2-form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--e4); }
+.lot2-wide { grid-column: 1/-1; }
+.lot2-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e4); margin-block: var(--e4); }
+.lot2-actions a { display: inline-flex; align-items: center; min-height: 44px; }
+.lot2-card-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--e4); }
+.lot2-filters { display: flex; flex-wrap: wrap; align-items: end; gap: var(--e4); }
+.lot2-filters .champ { flex: 1 1 160px; min-width: 0; }
+.lot2-timeline { list-style: none; padding: 0; }
+.lot2-timeline > li { padding-block: var(--e4); border-bottom: 1px solid var(--bord); overflow-wrap: anywhere; }
+.lot2-timeline > li:last-child { border-bottom: 0; }
+.lot2-number { font-family: var(--police-titre); font-size: 2rem; font-variant-numeric: tabular-nums; }
+.identite-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.profil-photo__texte, .paire-liste dd { min-width: 0; overflow-wrap: anywhere; }
+.lot2-card-grid .workspace-panel { margin: 0; }
+.lot2-form-grid input[type=checkbox] { width: 24px; height: 24px; }
+@media(max-width:1080px) { .lot2-card-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:760px) { .lot2-form-grid, .lot2-card-grid { grid-template-columns: minmax(0,1fr); } }
+
+.lot2-reading > .formulaire { display: flex; flex-direction: column; width: 100%; max-width: none; gap: var(--e4); }
+.lot2-form-grid .champ--choix { display: grid; grid-template-columns: 24px minmax(0,1fr); align-items: center; gap: var(--e2); }
+.lot2-form-grid .champ--choix label { grid-column: 2; grid-row: 1; display: flex; align-items: center; min-height: 44px; margin: 0; }
+.lot2-form-grid .champ--choix input { grid-column: 1; grid-row: 1; margin: 0; }
+.profil-photo__texte > .badge { align-self: flex-start; }
+.lot2-card-grid .profil-photo { background: transparent; border: 0; padding: 0; }

@@ -1,0 +1,11 @@
+{% load static %}
+<header class="site-header"><div class="container"><div class="nav-bar">
+<a class="brand" href="{% url 'core:home' %}" aria-label="Lions Club Sfax-Méditerranée — accueil"><img class="brand__logo" src="{% static 'images/emblem-256.png' %}" width="256" height="243" alt=""><span class="brand__name"><span>Lions Club</span><span>Sfax-Méditerranée</span></span></a>
+<nav class="nav-main" aria-label="Navigation principale"><ul class="nav-list">
+{% for label, href in public_navigation %}<li class="nav-item">{% if href %}<a class="nav-link{% if request.path == href %} actif{% endif %}" href="{{ href }}"{% if request.path == href %} aria-current="page"{% endif %}>{{ label }}</a>{% else %}<span class="nav-link" aria-disabled="true">{{ label }}</span>{% endif %}</li>{% endfor %}
+</ul></nav>
+<div class="nav-actions"><a class="btn btn--solid btn--sm nav-login{% if request.resolver_match.url_name == 'login' %} actif{% endif %}" href="{% url 'accounts:login' %}"{% if request.resolver_match.url_name == 'login' %} aria-current="page"{% endif %}>Se connecter</a><button class="nav-burger" type="button" aria-expanded="false" aria-controls="menu-mobile" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button></div>
+</div></div>
+<nav class="nav-mobile" id="menu-mobile" aria-label="Navigation mobile"><ul class="nav-mobile__list">
+{% for label, href in public_navigation %}<li>{% if href %}<a class="nav-mobile__link{% if request.path == href %} actif{% endif %}" href="{{ href }}"{% if request.path == href %} aria-current="page"{% endif %}>{{ label }}</a>{% else %}<span class="nav-mobile__link" aria-disabled="true">{{ label }}</span>{% endif %}</li>{% endfor %}
+</ul><div class="nav-mobile__cta"><a class="btn btn--solid btn--block" href="{% url 'accounts:login' %}">Se connecter</a></div></nav></header>

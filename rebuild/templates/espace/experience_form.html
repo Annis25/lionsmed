@@ -1,0 +1,3 @@
+{% extends 'base/private.html' %}
+{% block title %}Expérience Lions / LEO — Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}<div class="app-titre"><h1>Expérience Lions / LEO</h1></div><section class="workspace-panel lot2-reading"><form method="post" class="formulaire" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}<div class="lot2-form-grid">{% for field in form %}<div>{% include 'components/forms/field.html' %}</div>{% endfor %}</div><div class="lot2-actions"><button class="btn btn--solid" type="submit">{% if editing %}Enregistrer{% else %}Ajouter au parcours{% endif %}</button><a href="{% url 'members:experiences' %}">Annuler</a></div></form></section>{% endblock %}

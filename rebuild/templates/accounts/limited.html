@@ -1,0 +1,3 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Veuillez patienter — Lions Club Sfax-Méditerranée{% endblock %}
+{% block account_content %}<h1>Veuillez patienter</h1><p class="carte-acces__intro">Trop de tentatives ont été effectuées. Réessayez dans quinze minutes.</p><p class="carte-acces__pied"><a href="{% url 'accounts:login' %}">Retour à la connexion</a></p>{% endblock %}

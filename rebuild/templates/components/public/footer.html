@@ -1,0 +1,72 @@
+{% load static %}
+<footer class="site-footer">
+<div class="container">
+<div class="footer-grid">
+<div class="footer-brand">
+<img alt="" class="footer-brand__logo" height="243" loading="lazy" src="{% static 'images/emblem-256.png' %}" width="256"/>
+<span class="footer-brand__name">Lions Club<br/>Sfax-Méditerranée</span>
+<span class="footer-brand__place">Sfax, Tunisie</span>
+<p class="footer-brand__text">
+          Membre de Lions International<br/>
+          District 414 Tunisie<br/>
+          Notre ancrage : Sfax, Tunisie.
+        </p>
+
+</div>
+<nav aria-labelledby="footer-liens">
+<h2 class="footer-title" id="footer-liens">Liens rapides</h2>
+<ul class="footer-list">
+<li><a href="{% url 'core:home' %}">Accueil</a></li>
+<li><span aria-disabled="true">Notre Club</span></li>
+<li><span aria-disabled="true">Nos Actions</span></li>
+<li><span aria-disabled="true">Événements</span></li>
+<li><span aria-disabled="true">Actualités</span></li>
+<li><span aria-disabled="true">Nous rejoindre</span></li>
+<li><span aria-disabled="true">Contact</span></li>
+</ul>
+</nav>
+<nav aria-labelledby="footer-club">
+<h2 class="footer-title" id="footer-club">Notre club</h2>
+<ul class="footer-list">
+<li><span aria-disabled="true">Qui sommes-nous</span></li>
+<li><span aria-disabled="true">Notre histoire</span></li>
+<li><span aria-disabled="true">Nos valeurs</span></li>
+<li><span aria-disabled="true">Notre bureau</span></li>
+<li><a href="https://www.lionsclubs.org/fr" rel="noopener noreferrer" target="_blank">Lions Clubs International</a></li>
+<li><span aria-disabled="true">District 414 Tunisie</span></li>
+</ul>
+</nav>
+<div>
+<h2 class="footer-title" id="footer-contact">Contact</h2>
+<ul aria-labelledby="footer-contact" class="footer-list">
+<li>
+<span>
+<svg aria-hidden="true" fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24" width="15">
+<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle>
+</svg>
+              Sfax, Tunisie
+            </span>
+</li>
+<li>
+
+<!-- DONNÉE À VALIDER PAR LE CLUB : adresse reprise de la maquette, délivrabilité à confirmer. -->
+<a href="mailto:secretariat@lionsmed.tn">
+<svg aria-hidden="true" fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24" width="15">
+<rect height="14" rx="2" width="18" x="3" y="5"></rect><path d="m3.5 7 8.5 6 8.5-6"></path>
+</svg>
+              secretariat@lionsmed.tn
+            </a>
+</li>
+</ul>
+</div>
+</div>
+<div class="footer-bottom">
+<p>© <span data-annee="">2026</span> Lions Club Sfax-Méditerranée. Tous droits réservés.</p>
+<nav aria-label="Liens légaux">
+<span aria-disabled="true">Mentions légales</span>
+<span aria-disabled="true">Politique de confidentialité</span>
+<span aria-disabled="true">Plan du site</span>
+</nav>
+</div>
+</div>
+</footer>

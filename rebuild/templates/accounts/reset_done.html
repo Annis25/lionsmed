@@ -1,0 +1,3 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Demande reçue — Lions Club Sfax-Méditerranée{% endblock %}
+{% block account_content %}<h1>Demande reçue</h1><p class="carte-acces__intro">Si cette adresse correspond à un compte actif, un lien de réinitialisation lui sera adressé. Consultez également vos courriers indésirables.</p><p class="carte-acces__pied"><a href="{% url 'accounts:login' %}">Retour à la connexion</a></p>{% endblock %}

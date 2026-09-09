@@ -1,0 +1,13 @@
+{% load static %}<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Lions Club Sfax-Méditerranée{% endblock %}</title>
+<meta name="description" content="{% block meta_description %}Lions Club Sfax-Méditerranée, basé à Sfax en Tunisie. Nous servons.{% endblock %}">
+<meta name="robots" content="{% block robots %}noindex, nofollow{% endblock %}">
+{% block canonical %}<link rel="canonical" href="{{ canonical_url }}">{% endblock %}
+<meta name="theme-color" content="#0E2E5E"><link rel="icon" href="{% static 'images/emblem-256.png' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap">
+<link rel="stylesheet" href="{% static 'css/lions.css' %}">{% block extra_css %}{% endblock %}
+{% block structured_data %}{% endblock %}
+<script src="{% static 'js/lions.js' %}" defer></script></head>
+<body class="{% block body_class %}public-dense{% endblock %}"><a class="skip-link" href="#contenu">Aller au contenu principal</a>{% block shell %}{% endblock %}</body></html>
