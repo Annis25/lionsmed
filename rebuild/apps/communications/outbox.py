@@ -18,6 +18,19 @@ def _mail_parts(item):
         if user is None:
             return None
         return render_broadcast(campaign, user=user)
+    if item.kind == "ACTIVATION":
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.encoding import force_bytes
+        from django.utils.http import urlsafe_base64_encode
+        from django.contrib.auth import get_user_model
+        user = get_user_model().objects.get(pk=item.object_id, is_active=True)
+        if user.has_usable_password():
+            return None
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        return render_transactional(item.kind, user=user,
+            uid=uid, token=token,
+            activation_url=f"{settings.SITE_ORIGIN}/reinitialiser/{uid}/{token}/")
     if item.kind == "APPLICATION":
         from apps.members.models import MembershipApplication
         application = MembershipApplication.objects.get(pk=item.object_id)

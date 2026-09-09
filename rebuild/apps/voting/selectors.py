@@ -78,6 +78,8 @@ def vote_results(actor, vote):
         "votes": row["votes"],
         # Convention : dénominateur = bulletins exprimés (non blancs). En choix multiple, la somme peut dépasser 100 %.
         "percentage": round(row["votes"] * 100 / expressed, 1) if expressed else 0,
+        # Chaîne non localisée pour l'attribut CSS width (les chiffres visibles restent localisés).
+        "percentage_width": f"{row['votes'] * 100 / expressed:.1f}" if expressed else "0",
     } for row in tallies]
     return {
         "elector_count": elector_count,

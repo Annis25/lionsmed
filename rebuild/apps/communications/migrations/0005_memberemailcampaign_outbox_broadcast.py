@@ -32,6 +32,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="outboxmessage",
             name="kind",
-            field=models.CharField(choices=[("APPLICATION", "Accusé candidature"), ("CONTACT", "Avis contact interne"), ("EVENT_REMINDER", "Rappel de rendez-vous"), ("IMPORTANT", "Notification importante"), ("DOCUMENT", "Nouveau document"), ("VOTE_OPENED", "Ouverture d'un vote"), ("VOTE_RESULTS", "Résultats d'un vote"), ("SATISFACTION_OPENED", "Ouverture satisfaction"), ("MEMBER_BROADCAST", "Communication aux membres")], max_length=20),
+            field=models.CharField(choices=[("APPLICATION", "Accusé candidature"), ("CONTACT", "Avis contact interne"), ("EVENT_REMINDER", "Rappel de rendez-vous"), ("IMPORTANT", "Notification importante"), ("DOCUMENT", "Nouveau document"), ("VOTE_OPENED", "Ouverture d'un vote"), ("VOTE_RESULTS", "Résultats d'un vote"), ("SATISFACTION_OPENED", "Ouverture satisfaction"), ("MEMBER_BROADCAST", "Communication aux membres"), ("ACTIVATION", "Invitation membre")], max_length=20),
         ),
     ]

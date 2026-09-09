@@ -9,21 +9,7 @@ from apps.members.selectors import directory_page, member_profile, profile_data
 from apps.members.models import MemberProfile
 from .models import Role, LionsYear, ClubState
 from .forms import MemberCreateForm, RoleChangeForm, StatusChangeForm, EmailChangeForm, LionsYearForm
-from .services import create_member, set_role, set_member_status, set_member_email, create_lions_year, set_active_year, set_year_archived
-from apps.accounts.forms import ResetForm
-
-def _send_activation_link(request, user):
-    # Action déclenchée par un responsable authentifié, pas une soumission publique :
-    # le throttle anti-abus du formulaire public ne s'applique pas ici.
-    from urllib.parse import urlsplit
-    from django.conf import settings
-    form = ResetForm({"email": user.email})
-    if form.is_valid():
-        origin = urlsplit(settings.SITE_ORIGIN)
-        form.save(use_https=origin.scheme == "https", domain_override=origin.netloc, request=request,
-            from_email=settings.DEFAULT_FROM_EMAIL, email_template_name="emails/password_reset.txt",
-            html_email_template_name="emails/password_reset.html", subject_template_name="emails/password_reset_subject.txt",
-            extra_email_context={"site_origin": settings.SITE_ORIGIN})
+from .services import create_member, resend_member_invitation, set_role, set_member_status, set_member_email, create_lions_year, set_active_year, set_year_archived
 
 @capability_required("members.view_management")
 @require_safe
@@ -43,8 +29,7 @@ def member_add(request):
     if request.method == "POST" and form.is_valid():
         try:
             user = create_member(actor=request.user, **form.cleaned_data)
-            _send_activation_link(request, user)
-            messages.success(request, "Compte créé. Un lien de réinitialisation vient d’être envoyé à la personne pour qu’elle choisisse son mot de passe.")
+            messages.success(request, "Compte créé. Une invitation sécurisée a été placée dans la file d’envoi pour que la personne choisisse son mot de passe.")
             return redirect("governance:member", user_id=user.pk)
         except ValidationError as error:
             form.add_error(None, error)
@@ -54,7 +39,11 @@ def member_add(request):
 @require_safe
 def member(request,user_id):
     target = member_profile(request.user,user_id,management=True)
-    context = {"member":profile_data(request.user,target,management=True), "can_manage": can(request.user,"members.manage")}
+    context = {
+        "member": profile_data(request.user, target, management=True),
+        "can_manage": can(request.user, "members.manage"),
+        "can_resend_invitation": can(request.user, "members.manage") and not target.user.has_usable_password(),
+    }
     if context["can_manage"] and effective_role(target.user) != Role.SUPER_ADMIN:
         context.update(
             role_form=RoleChangeForm(initial={"role": effective_role(target.user)}),
@@ -100,6 +89,21 @@ def member_set_email(request,user_id):
             messages.success(request, "Adresse e-mail mise à jour.")
         except (ValidationError, PermissionDenied) as error:
             messages.error(request, " ".join(error.messages) if hasattr(error,"messages") else str(error))
+    return redirect("governance:member", user_id=user_id)
+
+
+@capability_required("members.manage")
+@require_http_methods(["POST"])
+def member_resend_invitation(request, user_id):
+    target = member_profile(request.user, user_id, management=True)
+    if request.POST.get("confirmed") != "yes":
+        messages.error(request, "Veuillez confirmer le renvoi de l’invitation.")
+        return redirect("governance:member", user_id=user_id)
+    try:
+        resend_member_invitation(actor=request.user, target_user=target.user)
+        messages.success(request, "Une nouvelle invitation sécurisée a été placée dans la file d’envoi.")
+    except (ValidationError, PermissionDenied) as error:
+        messages.error(request, " ".join(error.messages) if hasattr(error, "messages") else str(error))
     return redirect("governance:member", user_id=user_id)
 
 @capability_required("year.view")

@@ -15,6 +15,7 @@
   </dl>
   {% if not role_form %}<p class="app-note">{% if can_manage %}Le compte Super administrateur ne se modifie pas depuis cette page.{% else %}Lecture seule : aucune attribution de droits ni modification d’email depuis cette fiche.{% endif %}</p>{% endif %}
 </section>
+{% if can_resend_invitation %}<section class="workspace-panel"><h2>Invitation</h2><p class="app-note">Ce compte n’a pas encore défini de mot de passe. Confirmez ci-dessous pour placer une nouvelle invitation sécurisée dans la file d’envoi.</p><form method="post" action="{% url 'governance:member_resend_invitation' member.id %}">{% csrf_token %}<label><input type="checkbox" name="confirmed" value="yes" required> Je confirme le renvoi de l’invitation.</label><div class="button-row"><button class="btn btn--outline" type="submit">Renvoyer l’invitation</button></div></form></section>{% endif %}
 
 {% if role_form %}
 <div class="grille-actions">

@@ -26,7 +26,7 @@ class OutboxMessage(models.Model):
     kind=models.CharField(max_length=20,choices=[("APPLICATION","Accusé candidature"),("CONTACT","Avis contact interne"),
         ("EVENT_REMINDER","Rappel de rendez-vous"),("IMPORTANT","Notification importante"),("DOCUMENT","Nouveau document"),
         ("VOTE_OPENED","Ouverture d'un vote"),("VOTE_RESULTS","Résultats d'un vote"),("SATISFACTION_OPENED","Ouverture satisfaction"),
-        ("MEMBER_BROADCAST", "Communication aux membres")])
+        ("MEMBER_BROADCAST", "Communication aux membres"), ("ACTIVATION", "Invitation membre")])
     recipient=models.EmailField()
     object_id=models.UUIDField()
     attempts=models.PositiveSmallIntegerField(default=0)

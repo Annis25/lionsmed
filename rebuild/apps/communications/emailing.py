@@ -21,6 +21,7 @@ SUBJECTS = {
     "VOTE_OPENED": "Ouverture d’un vote — Lions Club Sfax-Méditerranée",
     "VOTE_RESULTS": "Résultats du vote — Lions Club Sfax-Méditerranée",
     "SATISFACTION_OPENED": "Satisfaction du mois — Lions Club Sfax-Méditerranée",
+    "ACTIVATION": "Bienvenue au Lions Club Sfax-Méditerranée",
 }
 
 STEMS = {
@@ -28,6 +29,7 @@ STEMS = {
     "EVENT_REMINDER": "event_reminder", "IMPORTANT": "notification_important",
     "DOCUMENT": "notification_document", "VOTE_OPENED": "ouverture_vote",
     "VOTE_RESULTS": "resultats_vote", "SATISFACTION_OPENED": "satisfaction",
+    "ACTIVATION": "member_activation",
 }
 
 

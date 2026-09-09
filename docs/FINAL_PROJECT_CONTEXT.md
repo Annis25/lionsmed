@@ -48,4 +48,10 @@ La source unique est `rebuild/apps/core/permissions.py`.
 - Avant production : configurer secrets/SMTP/ClamAV/HTTPS, sauvegardes automatisées, recette des rôles et décisions humaines restantes.
 - Hygiène Git : `rebuild/.env.before-recipe` est local et ignoré, jamais livré ; `DJANGO_SECRET_KEY` doit être renouvelée avant la mise à jour production.
 
+## E-mails et communication membres
+
+- Les e-mails transactionnels utilisent une base HTML Lionsmed commune, avec version texte, logo absolu depuis `SITE_ORIGIN` et salutation au prénom.
+- Les rôles Bureau autorisés disposent de la capability `communication.send_member_broadcast` pour préparer, prévisualiser, tester et mettre en file une campagne individuelle via l’outbox.
+- Les campagnes conservent un historique d’audit et des compteurs d’envoi, sans stocker de copie personnalisée par destinataire.
+
 Le détail, les priorités et la checklist sont dans `docs/AUDIT_FINAL_AVANT_PRODUCTION.md`.

@@ -33,7 +33,7 @@ DATABASES = {"default": {
 }}
 DEBUG = False
 ALLOWED_HOSTS = [x.strip() for x in os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",") if x.strip()]
-SITE_ORIGIN = os.environ.get("DJANGO_SITE_ORIGIN") or "http://localhost:8000"
+SITE_ORIGIN = os.environ.get("DJANGO_SITE_ORIGIN") or "https://lionsmed.tn"
 _origin = urlsplit(SITE_ORIGIN)
 if _origin.scheme not in {"http", "https"} or not _origin.netloc or _origin.path not in {"", "/"} or _origin.query or _origin.fragment or _origin.username:
     raise ImproperlyConfigured("DJANGO_SITE_ORIGIN doit être une origine HTTP(S) sans chemin ni credentials.")

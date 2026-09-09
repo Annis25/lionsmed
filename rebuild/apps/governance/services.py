@@ -41,9 +41,28 @@ def create_member(*, actor, first_name, last_name, email, role):
     grant = RoleGrant(user=user, role=role, starts_at=timezone.now(), granted_by=actor)
     grant.full_clean()
     grant.save()
+    from apps.communications.models import OutboxMessage
+    # Invitation individuelle via l'outbox : aucun mot de passe n'est généré ni connu du gestionnaire.
+    OutboxMessage.objects.create(event_key=f"activation:{user.pk}", kind="ACTIVATION", recipient=user.email, object_id=user.pk)
     audit(actor, "member.created", user)
     audit(actor, "role.granted", grant)
     return user
+
+
+@transaction.atomic
+def resend_member_invitation(*, actor, target_user):
+    require(actor, "members.manage")
+    target_user = get_user_model().objects.select_for_update().get(pk=target_user.pk)
+    _guard_not_super_admin(target_user)
+    if target_user.has_usable_password():
+        raise ValidationError("L’invitation ne peut être renvoyée qu’à un compte non encore activé.")
+    from apps.communications.models import OutboxMessage
+    slot = int(timezone.now().timestamp() // 300)
+    OutboxMessage.objects.get_or_create(event_key=f"activation:{target_user.pk}:{slot}", defaults={
+        "kind": "ACTIVATION", "recipient": target_user.email, "object_id": target_user.pk,
+    })
+    audit(actor, "member.invitation_resent", target_user)
+    return target_user
 
 
 @transaction.atomic

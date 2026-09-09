@@ -9,7 +9,7 @@
   </span>
   <div class="app-titre">
     <h1>Tableau de bord</h1>
-    <p class="app-titre__contexte">Année Lions {{ active_year.label|default:'non définie' }} · {{ effective_role_label }}</p>
+    <p class="app-titre__contexte">{% if active_year %}Année Lions {{ active_year.label }}{% else %}Aucune année active définie{% endif %} · {{ effective_role_label }}</p>
   </div>
 </div>
 

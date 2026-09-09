@@ -412,6 +412,27 @@
 
 /* ─── ≤ 760 px ───────────────────────────────────────────────────────────── */
 @media (max-width: 760px) {
+  /* Sur l'accueil, le hero sombre ne doit jamais influencer le menu placé
+     dans l'en-tête blanc : les trois traits restent bleu marine. */
+  .site-header .nav-burger {
+    display: inline-grid;
+    place-items: center;
+    background: transparent;
+    border: 0;
+  }
+  /* Le pictogramme est porté par le bouton, pas par des barres flexibles :
+     certains navigateurs mobiles calculaient leurs trois spans à largeur zéro. */
+  .site-header .nav-burger::before {
+    content: "☰";
+    color: var(--navy) !important;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1;
+  }
+  .site-header .nav-burger[aria-expanded="true"]::before { content: "×"; font-size: 30px; }
+  .site-header .nav-burger span {
+    display: none;
+  }
   /* Le dégradé devient vertical et couvrant : la lisibilité prime. */
   .hero { min-height: 0; padding-block: var(--e8) var(--e9); }
   .hero__photo img { object-position: 50% 40%; }

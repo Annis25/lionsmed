@@ -113,3 +113,22 @@ class EmailCampaignTests(TestCase):
         self.assertIn("24 votes exprimés", html_body)
         self.assertNotIn(str(elector.pk), html_body + text_body)
         self.assertNotIn(str(ballots[0].pk), html_body + text_body)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend", SITE_ORIGIN="https://lionsmed.example")
+    def test_activation_email_is_personalized_and_uses_an_absolute_secure_logo(self):
+        newcomer = account("nouveau@example.invalid", role=Role.MEMBRE)
+        newcomer.first_name = "Sana"
+        newcomer.set_unusable_password()
+        newcomer.save(update_fields=["first_name", "password"])
+        OutboxMessage.objects.create(
+            event_key=f"activation-test:{newcomer.pk}", kind="ACTIVATION",
+            recipient=newcomer.email, object_id=newcomer.pk,
+        )
+        report = deliver_batch(limit=1)
+        self.assertEqual(report, {"sent": 1, "failed": 0, "disabled": False})
+        self.assertEqual(mail.outbox[0].to, [newcomer.email])
+        html = mail.outbox[0].alternatives[0].content
+        self.assertIn("Bonjour Sana", strip_tags(html))
+        self.assertIn("https://lionsmed.example/static/images/emblem-256.png", html)
+        self.assertIn("Activer mon espace membre", html)
+        self.assertIn("District 414 Tunisie", html)

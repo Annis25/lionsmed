@@ -1,0 +1,15 @@
+Bonjour{% if first_name %} {{ first_name }}{% endif %},
+
+Bienvenue au Lions Club Sfax-Méditerranée.
+
+Votre espace membre est prêt. Choisissez un mot de passe sécurisé pour l’activer :
+{{ site_origin }}/reinitialiser/{{ uid }}/{{ token }}/
+
+Ce lien est personnel et sécurisé. S’il ne fonctionne plus, demandez une nouvelle invitation au club.
+
+Au plaisir de vous compter parmi nous,
+L’équipe du Lions Club Sfax-Méditerranée
+
+Lions Club Sfax-Méditerranée
+Sfax, Tunisie · District 414 Tunisie
+Nous servons.
