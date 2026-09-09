@@ -12,4 +12,6 @@ class SatisfactionForm(StyledFields, forms.Form):
 class PeriodOpenForm(StyledFields, forms.Form):
     year = forms.IntegerField(min_value=2020, max_value=2100, label="Année")
     month = forms.IntegerField(min_value=1, max_value=12, label="Mois")
-    threshold = forms.IntegerField(min_value=1, required=False, label="Effectif minimal avant résultats (facultatif)")
+    # Obligatoire et sans valeur pré-remplie : le seuil de confidentialité est une décision
+    # explicite du responsable à chaque ouverture, jamais un défaut institutionnel silencieux.
+    threshold = forms.IntegerField(min_value=1, required=True, label="Effectif minimal avant affichage des résultats (obligatoire)")

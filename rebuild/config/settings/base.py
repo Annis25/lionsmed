@@ -41,7 +41,9 @@ SITE_ORIGIN = SITE_ORIGIN.rstrip("/")
 INSTALLED_APPS = [
     "django.contrib.admin", "django.contrib.auth", "django.contrib.contenttypes",
     "django.contrib.sessions", "django.contrib.messages", "django.contrib.staticfiles",
-    "django.contrib.postgres", "django.contrib.sitemaps", "axes", "apps.editorial", "apps.service_actions", "apps.agenda", "apps.communications", "apps.accounts", "apps.members",
+    "django.contrib.postgres", "django.contrib.sitemaps", "axes",
+    "django_otp", "django_otp.plugins.otp_totp", "django_otp.plugins.otp_static",
+    "apps.editorial", "apps.service_actions", "apps.agenda", "apps.communications", "apps.accounts", "apps.members",
     "apps.governance", "apps.documents", "apps.dues", "apps.voting", "apps.satisfaction", "apps.core",
 ]
 MIDDLEWARE = [
@@ -53,6 +55,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.core.middleware.PrivateHeadersMiddleware",
+    "django_otp.middleware.OTPMiddleware",
     "axes.middleware.AxesMiddleware",
 ]
 ROOT_URLCONF = "config.urls"
@@ -131,6 +134,13 @@ FILE_UPLOAD_HANDLERS = [
     "django.core.files.uploadhandler.MemoryFileUploadHandler",
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 ]
+
+# Scanner antivirus des documents privés (clamd, protocole INSTREAM). Non configuré par
+# défaut : tant qu'aucun socket n'est renseigné, aucun document ne peut devenir disponible
+# (échec fermé), y compris en production, jusqu'à ce que ClamAV soit réellement déployé.
+CLAMD_SOCKET = os.environ.get("LIONSMED_CLAMD_SOCKET") or None
+CLAMD_HOST = os.environ.get("LIONSMED_CLAMD_HOST") or None
+CLAMD_PORT = os.environ.get("LIONSMED_CLAMD_PORT") or None
 
 # Heure de référence (Africa/Tunis, "HH:MM") pour l'ouverture/fermeture satisfaction.
 # Non définie par défaut : aucune heure de production n'est présentée comme officielle

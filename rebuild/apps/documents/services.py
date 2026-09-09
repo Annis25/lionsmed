@@ -7,9 +7,12 @@ from apps.core.permissions import can
 from apps.core.models import AuditEvent
 from .models import Document, DocumentGrant
 from .storage import document_storage
+from .office_validation import validate_structure
+from .scanning import scan_bytes, ScannerUnavailable
 
 MAX_BYTES = 15 * 1024 * 1024
-# Extension et MIME annoncé doivent concorder ; contrôle basique, aucun antivirus externe branché.
+# Extension et MIME annoncé doivent concorder ; complété par la signature/structure (office_validation)
+# puis par l'analyse antivirus (scanning) avant toute disponibilité — échec fermé sur chaque étage.
 ALLOWED = {
     ".pdf": "application/pdf",
     ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -29,8 +32,9 @@ def audit(actor, action, obj):
     AuditEvent.objects.create(actor=actor, action=action, object_type=obj._meta.object_name, object_id=str(obj.pk))
 
 
-@transaction.atomic
 def upload_document(*, actor, upload, title, description, category, visibility, lions_year=None):
+    # Validation, structure et antivirus se font hors transaction : un rejet (y compris
+    # infecté) doit laisser une trace auditée durable, jamais annulée par un rollback.
     require(actor, "document.manage")
     if category not in Document.Category.values or visibility not in Document.Visibility.values:
         raise ValidationError("Catégorie ou visibilité invalide.")
@@ -43,10 +47,25 @@ def upload_document(*, actor, upload, title, description, category, visibility, 
     raw = upload.read(MAX_BYTES + 1)
     if len(raw) > MAX_BYTES:
         raise ValidationError("Le document doit peser au maximum 15 Mo.")
+    validate_structure(raw, suffix)
+    try:
+        result = scan_bytes(raw)
+    except ScannerUnavailable as error:
+        # Échec fermé : sans scanner joignable, aucun document ne devient disponible.
+        raise ValidationError("Analyse antivirus indisponible : dépôt refusé, réessayez plus tard.") from error
+    if not result.clean:
+        AuditEvent.objects.create(actor=actor, action="document.upload_rejected_infected", object_type="Document", object_id="")
+        raise ValidationError("Document rejeté par l'analyse antivirus.")
+    return _store_document(actor=actor, raw=raw, suffix=suffix, expected=expected, upload_name=upload.name,
+        title=title, description=description, category=category, visibility=visibility, lions_year=lions_year)
+
+
+@transaction.atomic
+def _store_document(*, actor, raw, suffix, expected, upload_name, title, description, category, visibility, lions_year):
     key = f"{uuid.uuid4()}{suffix}"
     document_storage().save(key, ContentFile(raw))
     document = Document(title=title[:180], description=description[:2000], category=category, visibility=visibility,
-        status=Document.Status.AVAILABLE, storage_key=key, original_filename=Path(upload.name).name[:255],
+        status=Document.Status.AVAILABLE, storage_key=key, original_filename=Path(upload_name).name[:255],
         content_type=expected, size=len(raw), author=actor, lions_year=lions_year)
     document.full_clean()
     document.save()

@@ -1,4 +1,5 @@
 from io import BytesIO
+from unittest.mock import patch
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -10,6 +11,7 @@ from apps.governance.models import Role
 from .. import services
 from ..models import Document, DocumentGrant
 from ..selectors import scope_documents, document_for_actor
+from ..scanning import ScanResult, ScannerUnavailable
 
 
 def pdf(name="doc.pdf"):
@@ -23,6 +25,12 @@ class DocumentAclTests(TestCase):
         self.bureau = account("bureau@example.invalid", role=Role.BUREAU)
         self.invite = account("guest@example.invalid", role=Role.INVITE)
         self.other_member = account("other@example.invalid", role=Role.MEMBRE)
+        # Le scanner antivirus réel (clamd) n'est pas disponible dans cet environnement de
+        # test ; on simule un résultat "sain" pour tester l'ACL indépendamment du scanner
+        # (dont le comportement fail-closed est testé séparément, voir ScanningTests).
+        patcher = patch("apps.documents.services.scan_bytes", return_value=ScanResult(clean=True, detail="stream: OK"))
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def upload(self, visibility):
         return services.upload_document(actor=self.president, upload=pdf(), title="Titre", description="",

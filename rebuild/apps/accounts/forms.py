@@ -52,3 +52,27 @@ class NewPasswordForm(StyledFields, SetPasswordForm):
 
 class ChangePasswordForm(StyledFields, PasswordChangeForm):
     pass
+
+
+class MfaVerifyForm(StyledFields, forms.Form):
+    token = forms.CharField(label="Code de vérification ou code de récupération", max_length=32,
+        widget=forms.TextInput(attrs={"autocomplete": "one-time-code", "inputmode": "numeric", "autofocus": True}))
+
+
+class MfaConfirmForm(StyledFields, forms.Form):
+    token = forms.CharField(label="Code affiché par votre application d'authentification", max_length=10,
+        widget=forms.TextInput(attrs={"autocomplete": "one-time-code", "inputmode": "numeric"}))
+
+
+class MfaDisableForm(StyledFields, forms.Form):
+    password = forms.CharField(label="Votre mot de passe actuel", widget=forms.PasswordInput)
+
+    def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        if not self.user.check_password(password):
+            raise forms.ValidationError("Mot de passe incorrect.")
+        return password

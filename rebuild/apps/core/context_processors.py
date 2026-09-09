@@ -34,6 +34,7 @@ def shell(request):
                 ("Gestion des votes", "voting:manage_list", "vote.manage"),
                 ("Satisfaction agrégée", "satisfaction:manage_list", "satisfaction.manage"),
                 ("Statistiques", "governance:statistics", "statistics.view"),
+                ("Authentification forte", "accounts:mfa_setup", "mfa.manage_own"),
             ] if can(request.user, capability)
         ],
         "can_private": can(request.user, "account.access_private_area"),

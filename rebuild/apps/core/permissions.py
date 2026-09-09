@@ -38,6 +38,8 @@ CAPABILITIES = {
     # Votes et satisfaction (Phase B). INVITE jamais électeur ; DIRECTEUR/BUREAU sans gestion.
     "vote.manage": MANAGERS, "vote.cast": MEMBERS, "vote.view_results": MEMBERS,
     "satisfaction.respond": MEMBERS, "satisfaction.manage": MANAGERS, "satisfaction.view_results": MANAGERS,
+    # MFA (Phase C) : mêmes comptes que les capacités de gestion sensibles.
+    "mfa.manage_own": MANAGERS,
     # Services présents, mais aucune délégation de mutation validée.
     "mandate.manage": frozenset(), "account.change_email": frozenset(),
 }

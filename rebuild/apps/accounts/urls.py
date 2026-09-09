@@ -7,6 +7,8 @@ from . import views
 app_name = "accounts"
 urlpatterns = [
     path("connexion/", views.LoginView.as_view(), name="login"),
+    path("connexion/verification/", views.mfa_verify, name="mfa_verify"),
+    path("espace/authentification-forte/", views.mfa_setup, name="mfa_setup"),
     path("deconnexion/", auth.LogoutView.as_view(), name="logout"),
     path("mot-de-passe-oublie/", views.PasswordResetView.as_view(), name="reset"),
     path("mot-de-passe-oublie/demande-recue/", TemplateView.as_view(template_name="accounts/reset_done.html"), name="reset_done"),

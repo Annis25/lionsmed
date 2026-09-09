@@ -22,6 +22,29 @@ class AuthThrottle(models.Model):
     expires_at = models.DateTimeField(db_index=True)
 
 
+class LegacyImportRecord(models.Model):
+    """Provenance d'un import legacy : rejeu idempotent, jamais de lien vivant vers l'ancienne base."""
+    class State(models.TextChoices):
+        IMPORTED = "IMPORTED", "Importé"
+        REJECTED = "REJECTED", "Rejeté"
+        QUARANTINE = "QUARANTINE", "Quarantaine"
+
+    source = models.CharField(max_length=100)
+    table = models.CharField(max_length=100)
+    legacy_pk = models.CharField(max_length=64)
+    target_type = models.CharField(max_length=100, blank=True)
+    target_id = models.CharField(max_length=64, blank=True)
+    source_hash = models.CharField(max_length=64, blank=True)
+    batch = models.CharField(max_length=64)
+    state = models.CharField(max_length=12, choices=State.choices)
+    reason = models.CharField(max_length=300, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["source", "table", "legacy_pk"], name="legacy_import_unique_source_table_pk")]
+        indexes = [models.Index(fields=["batch", "state"], name="legacy_import_batch_state_idx")]
+
+
 class PublicImage(models.Model):
     import uuid
     id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)

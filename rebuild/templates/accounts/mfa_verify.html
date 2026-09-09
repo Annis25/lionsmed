@@ -1,0 +1,3 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Vérification en deux étapes — Lions Club Sfax-Méditerranée{% endblock %}
+{% block account_content %}<h1>Vérification en deux étapes</h1><p class="carte-acces__intro">Saisissez le code de votre application d'authentification, ou un code de récupération à usage unique.</p><form class="formulaire" method="post" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}{% include 'components/forms/field.html' with field=form.token %}<button class="btn btn--solid btn--block" type="submit">Vérifier</button></form>{% endblock %}
