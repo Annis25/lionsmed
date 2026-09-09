@@ -1,0 +1,6 @@
+{% extends 'emails/public_base.html' %}
+{% block preheader %}Une information du Bureau vous attend.{% endblock %}
+{% block content %}
+<h1 style="margin:0 0 16px;font-size:26px;line-height:32px;color:#0E2E5E;">{{ campaign.subject }}</h1>
+<div style="font-size:16px;line-height:25px;color:#12294D;">{{ campaign.body|linebreaksbr }}</div>
+{% endblock %}

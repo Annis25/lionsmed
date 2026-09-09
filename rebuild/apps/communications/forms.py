@@ -1,5 +1,7 @@
 from django import forms
+from django.utils.html import strip_tags
 from django.core import signing
+import uuid
 from apps.accounts.forms import StyledFields
 from apps.accounts.models import normalize_email
 from apps.members.models import MembershipApplication
@@ -41,3 +43,24 @@ class ImportantNotificationForm(StyledFields,forms.Form):
     email=forms.EmailField(label="Adresse email du destinataire")
     title=forms.CharField(max_length=180,label="Titre")
     excerpt=forms.CharField(max_length=300,widget=forms.Textarea(attrs={"rows":3}),label="Extrait",required=False)
+
+
+class MemberBroadcastForm(StyledFields, forms.Form):
+    campaign_key = forms.UUIDField(widget=forms.HiddenInput, required=True)
+    subject = forms.CharField(max_length=180, label="Objet")
+    body = forms.CharField(max_length=8000, label="Message", widget=forms.Textarea(attrs={"rows": 12}))
+
+    def clean_subject(self):
+        value = " ".join(strip_tags(self.cleaned_data["subject"]).replace("\r", "").replace("\n", " ").split())
+        if not value:
+            raise forms.ValidationError("L’objet est obligatoire.")
+        return value
+
+    def clean_body(self):
+        # Le Bureau écrit du texte, jamais du HTML : cela bloque XSS, attributs d'événement
+        # et protocoles dangereux sans faire reposer la sécurité sur le navigateur.
+        raw = self.cleaned_data["body"].replace("\r\n", "\n").replace("\r", "\n")
+        value = strip_tags(raw).strip()
+        if not value:
+            raise forms.ValidationError("Le message est obligatoire.")
+        return value

@@ -1,5 +1,9 @@
-Lions Club Sfax-Méditerranée
-Comment s'est passé ce mois ? La consultation ouvre le 1er et se termine 24 h avant le troisième samedi.
+Bonjour{% if first_name %} {{ first_name }}{% endif %},
+
+Un petit moment pour nous dire comment s’est passé ce mois ? Votre avis nous aide à améliorer la vie et le fonctionnement du club.
 {{ origin }}/espace/satisfaction/
+Merci pour votre retour,
+L’équipe du Lions Club Sfax-Méditerranée
+
 Sfax, Tunisie · District 414 Tunisie
 Nous servons.

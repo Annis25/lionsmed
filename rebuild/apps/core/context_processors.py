@@ -59,6 +59,7 @@ def shell(request):
         private_navigation += entries([("Cotisations", "dues:own", "dues.view_own")])
     private_navigation += entries([
         ("Notifications", "notifications:list", "notification.view_own"),
+        ("Communication", "communications:broadcast", "communication.view_member_broadcast"),
         ("Contenu public", "editorial_management:dashboard", "public_content.access_management"),
     ])
     if can(request.user, "application.view"):

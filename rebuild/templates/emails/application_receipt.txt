@@ -1,5 +1,10 @@
-Lions Club Sfax-Méditerranée
-Nous avons reçu votre candidature. Cette réception constitue le début d'un échange et ne vaut pas acceptation.
+Bonjour{% if first_name %} {{ first_name }}{% endif %},
+
+Bonne nouvelle, nous avons bien reçu votre candidature.
+Merci pour votre intérêt envers le Lions Club Sfax-Méditerranée. Cette candidature ne vaut pas encore acceptation définitive.
 {{ origin }}/rejoindre/
+À bientôt,
+L’équipe du Lions Club Sfax-Méditerranée
+
 Sfax, Tunisie · District 414 Tunisie
 Nous servons.

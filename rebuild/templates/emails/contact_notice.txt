@@ -1,4 +1,8 @@
-Lions Club Sfax-Méditerranée
-Un message de contact a été reçu. Référence : {{ reference }}
+Bonjour{% if first_name %} {{ first_name }}{% endif %},
+
+Un nouveau message reçu depuis le formulaire de contact vous attend. Référence : {{ reference }}{% if contact_subject %} · Objet : {{ contact_subject }}{% endif %}
 Consultation réservée aux comptes autorisés : {{ origin }}/espace/demandes/contact/
 Aucun contenu privé n'est reproduit dans cet email.
+
+À bientôt,
+L’équipe du Lions Club Sfax-Méditerranée

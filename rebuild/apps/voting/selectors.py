@@ -84,6 +84,7 @@ def vote_results(actor, vote):
         "participation_count": participation_count,
         "participation_rate": round(participation_count * 100 / elector_count, 1) if elector_count else 0,
         "ballot_count": ballot_count,
+        "expressed_count": expressed,
         "blank_count": blank_count,
         "options": options,
     }

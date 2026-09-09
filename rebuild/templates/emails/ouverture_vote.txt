@@ -1,5 +1,9 @@
-Lions Club Sfax-Méditerranée
-Un vote est ouvert. Consultez les modalités et la date de clôture dans votre espace membre. Après envoi, le bulletin ne peut plus être modifié.
+Bonjour{% if first_name %} {{ first_name }}{% endif %},
+
+Un nouveau vote est maintenant ouvert dans votre espace membre. Votre participation contribue à la vie et aux décisions du club. Une fois votre bulletin validé, il ne pourra plus être modifié.
 {{ origin }}/espace/votes/
+Merci pour votre participation,
+L’équipe du Lions Club Sfax-Méditerranée
+
 Sfax, Tunisie · District 414 Tunisie
 Nous servons.

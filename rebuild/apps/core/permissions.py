@@ -17,6 +17,11 @@ APPLICATION_INBOX_ROLES = frozenset({Role.PRESIDENT, Role.GMT})
 # Palier « bureau » des documents : BUREAU/PRESIDENT/SECRETAIRE/SUPER_ADMIN. DIRECTEUR en est
 # exclu tant que ses capacités avancées ne sont pas confirmées humainement.
 BUREAU_LEVEL = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.SECRETAIRE, Role.BUREAU})
+# Communication générale : périmètre explicitement validé, indépendant de la simple
+# visibilité d'un lien de navigation. Les responsables techniques (GST/GMT/GLT/LCIF)
+# et DIRECTEUR n'y accèdent pas par défaut.
+BROADCAST_EMAIL_ROLES = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.VICE_PRESIDENT,
+    Role.SECRETAIRE, Role.TRESORIER, Role.BUREAU})
 # Cotisations (recette V2) : seul le Trésorier (+ Super Admin) modifie ; le reste du
 # bureau (PRESIDENT/SECRETAIRE/BUREAU) consulte sans modifier — décision explicite du
 # club, qui retire ce droit de modification à PRESIDENT/SECRETAIRE.
@@ -40,6 +45,8 @@ CAPABILITIES = {
     "event.register": MEMBERS, "attendance.record": MANAGERS,
     "document.view": PERSONAL, "document.manage": MANAGERS,
     "notification.view_own": PERSONAL, "notification.send": MANAGERS,
+    "communication.send_member_broadcast": BROADCAST_EMAIL_ROLES,
+    "communication.view_member_broadcast": BROADCAST_EMAIL_ROLES,
     "dues.view_own": PERSONAL, "dues.manage": DUES_MANAGERS, "dues.view_management": DUES_VIEWERS,
     "statistics.view": MANAGERS,
     # Votes et satisfaction (Phase B). INVITE jamais électeur ; DIRECTEUR/BUREAU sans gestion.

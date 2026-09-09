@@ -118,7 +118,8 @@ class PasswordResetView(auth_views.PasswordResetView):
                 request=self.request, from_email=settings.DEFAULT_FROM_EMAIL,
                 email_template_name=self.email_template_name,
                 html_email_template_name=self.html_email_template_name,
-                subject_template_name=self.subject_template_name)
+                subject_template_name=self.subject_template_name,
+                extra_email_context={"site_origin": settings.SITE_ORIGIN})
         return HttpResponseRedirect(self.success_url)
 
 

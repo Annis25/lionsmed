@@ -1,0 +1,10 @@
+Bonjour{% if first_name %} {{ first_name }}{% endif %},
+
+{{ campaign.body }}
+
+À bientôt,
+L’équipe du Lions Club Sfax-Méditerranée
+
+Lions Club Sfax-Méditerranée
+Sfax, Tunisie · District 414 Tunisie
+Nous servons.

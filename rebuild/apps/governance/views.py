@@ -22,7 +22,8 @@ def _send_activation_link(request, user):
         origin = urlsplit(settings.SITE_ORIGIN)
         form.save(use_https=origin.scheme == "https", domain_override=origin.netloc, request=request,
             from_email=settings.DEFAULT_FROM_EMAIL, email_template_name="emails/password_reset.txt",
-            html_email_template_name="emails/password_reset.html", subject_template_name="emails/password_reset_subject.txt")
+            html_email_template_name="emails/password_reset.html", subject_template_name="emails/password_reset_subject.txt",
+            extra_email_context={"site_origin": settings.SITE_ORIGIN})
 
 @capability_required("members.view_management")
 @require_safe

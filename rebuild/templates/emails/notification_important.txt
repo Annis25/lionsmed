@@ -1,4 +1,5 @@
-Lions Club Sfax-Méditerranée
+Bonjour{% if first_name %} {{ first_name }}{% endif %},
+
 Une notification importante vous attend dans votre espace membre.
 {{ origin }}/espace/notifications/
 Sfax, Tunisie · District 414 Tunisie

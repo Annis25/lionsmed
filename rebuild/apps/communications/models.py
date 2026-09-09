@@ -25,7 +25,8 @@ class OutboxMessage(models.Model):
     event_key=models.CharField(max_length=150,unique=True)
     kind=models.CharField(max_length=20,choices=[("APPLICATION","Accusé candidature"),("CONTACT","Avis contact interne"),
         ("EVENT_REMINDER","Rappel de rendez-vous"),("IMPORTANT","Notification importante"),("DOCUMENT","Nouveau document"),
-        ("VOTE_OPENED","Ouverture d'un vote"),("VOTE_RESULTS","Résultats d'un vote"),("SATISFACTION_OPENED","Ouverture satisfaction")])
+        ("VOTE_OPENED","Ouverture d'un vote"),("VOTE_RESULTS","Résultats d'un vote"),("SATISFACTION_OPENED","Ouverture satisfaction"),
+        ("MEMBER_BROADCAST", "Communication aux membres")])
     recipient=models.EmailField()
     object_id=models.UUIDField()
     attempts=models.PositiveSmallIntegerField(default=0)
@@ -38,6 +39,30 @@ class OutboxMessage(models.Model):
     error_code=models.CharField(max_length=32,blank=True)
     class Meta:
         indexes=[models.Index(fields=["state","available_at"],name="outbox_ready_idx")]
+
+
+class MemberEmailCampaign(models.Model):
+    """Message du Bureau, immuable une fois placé dans l'outbox."""
+    class Status(models.TextChoices):
+        QUEUED = "QUEUED", "En attente d'envoi"
+        SENT = "SENT", "Envoyée"
+        PARTIAL = "PARTIAL", "Envoi partiel"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    idempotency_key = models.UUIDField(unique=True)
+    subject = models.CharField(max_length=180)
+    body = models.TextField(max_length=8000)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="member_email_campaigns")
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=8, choices=Status.choices, default=Status.QUEUED)
+    recipient_count = models.PositiveIntegerField(default=0)
+    queued_count = models.PositiveIntegerField(default=0)
+    sent_count = models.PositiveIntegerField(default=0)
+    failed_count = models.PositiveIntegerField(default=0)
+    sent_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at", "id"]
 
 
 class Notification(models.Model):
