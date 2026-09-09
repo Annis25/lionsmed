@@ -17,23 +17,23 @@
 <h2 class="footer-title" id="footer-liens">Liens rapides</h2>
 <ul class="footer-list">
 <li><a href="{% url 'core:home' %}">Accueil</a></li>
-<li><span aria-disabled="true">Notre Club</span></li>
-<li><span aria-disabled="true">Nos Actions</span></li>
-<li><span aria-disabled="true">Événements</span></li>
-<li><span aria-disabled="true">Actualités</span></li>
-<li><span aria-disabled="true">Nous rejoindre</span></li>
-<li><span aria-disabled="true">Contact</span></li>
+<li><a href="{% url 'editorial:club' %}">Notre Club</a></li>
+<li><a href="{% url 'actions:list' %}">Nos Actions</a></li>
+<li><a href="{% url 'agenda:list' %}">Événements</a></li>
+<li><a href="{% url 'editorial:news' %}">Actualités</a></li>
+<li><a href="{% url 'editorial:join' %}">Nous rejoindre</a></li>
+<li><a href="{% url 'communications:contact' %}">Contact</a></li>
 </ul>
 </nav>
 <nav aria-labelledby="footer-club">
 <h2 class="footer-title" id="footer-club">Notre club</h2>
 <ul class="footer-list">
-<li><span aria-disabled="true">Qui sommes-nous</span></li>
-<li><span aria-disabled="true">Notre histoire</span></li>
-<li><span aria-disabled="true">Nos valeurs</span></li>
-<li><span aria-disabled="true">Notre bureau</span></li>
+<li><a href="{% url 'editorial:club' %}">Qui sommes-nous</a></li>
+<li><a href="{% url 'editorial:club' %}">Notre histoire</a></li>
+<li><a href="{% url 'editorial:club' %}">Nos valeurs</a></li>
+<li><a href="{% url 'editorial:club' %}">Notre bureau</a></li>
 <li><a href="https://www.lionsclubs.org/fr" rel="noopener noreferrer" target="_blank">Lions Clubs International</a></li>
-<li><span aria-disabled="true">District 414 Tunisie</span></li>
+<li><a href="{% url 'editorial:club' %}">District 414 Tunisie</a></li>
 </ul>
 </nav>
 <div>
@@ -49,13 +49,8 @@
 </li>
 <li>
 
-<!-- DONNÉE À VALIDER PAR LE CLUB : adresse reprise de la maquette, délivrabilité à confirmer. -->
-<a href="mailto:secretariat@lionsmed.tn">
-<svg aria-hidden="true" fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24" width="15">
-<rect height="14" rx="2" width="18" x="3" y="5"></rect><path d="m3.5 7 8.5 6 8.5-6"></path>
-</svg>
-              secretariat@lionsmed.tn
-            </a>
+
+{% if institution.email %}<a href="mailto:{{ institution.email }}">{{ institution.email }}</a>{% else %}<a href="{% url 'communications:contact' %}">Nous écrire</a>{% endif %}
 </li>
 </ul>
 </div>
@@ -63,9 +58,9 @@
 <div class="footer-bottom">
 <p>© <span data-annee="">2026</span> Lions Club Sfax-Méditerranée. Tous droits réservés.</p>
 <nav aria-label="Liens légaux">
-<span aria-disabled="true">Mentions légales</span>
-<span aria-disabled="true">Politique de confidentialité</span>
-<span aria-disabled="true">Plan du site</span>
+<a href="{% url 'editorial:legal' %}">Mentions légales</a>
+<a href="{% url 'editorial:privacy' %}">Politique de confidentialité</a>
+<a href="{% url 'editorial:sitemap' %}">Plan du site</a>
 </nav>
 </div>
 </div>

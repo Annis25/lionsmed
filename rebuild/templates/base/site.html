@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap">
 <link rel="stylesheet" href="{% static 'css/lions.css' %}">{% block extra_css %}{% endblock %}
+{% block social_meta %}{% endblock %}
 {% block structured_data %}{% endblock %}
 <script src="{% static 'js/lions.js' %}" defer></script></head>
 <body class="{% block body_class %}public-dense{% endblock %}"><a class="skip-link" href="#contenu">Aller au contenu principal</a>{% block shell %}{% endblock %}</body></html>

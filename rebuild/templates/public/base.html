@@ -1,0 +1,7 @@
+{% extends 'base/public.html' %}{% load static %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block meta_description %}{{ seo_description }}{% endblock %}
+{% block robots %}{{ seo_robots }}{% endblock %}
+{% block social_meta %}<meta property="og:type" content="{% if kind == 'news' and item %}article{% else %}website{% endif %}"><meta property="og:locale" content="fr_TN"><meta property="og:site_name" content="{{ institution.name }}"><meta property="og:title" content="{{ seo_title }}"><meta property="og:description" content="{{ seo_description }}"><meta property="og:url" content="{{ canonical_url }}"><meta property="og:image" content="{{ seo_image }}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{{ seo_title }}"><meta name="twitter:description" content="{{ seo_description }}"><meta name="twitter:image" content="{{ seo_image }}">{% endblock %}
+{% block structured_data %}{% if structured_json %}<script type="application/ld+json">{% autoescape off %}{{ structured_json }}{% endautoescape %}</script>{% endif %}{% endblock %}
+{% block extra_css %}{% if page_css %}<link rel="stylesheet" href="{% static page_css %}">{% endif %}{% endblock %}

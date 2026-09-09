@@ -1,0 +1,154 @@
+@charset "UTF-8";
+/* ═══════════════════════════════════════════════════════════════════════════
+   NOUS REJOINDRE — composants propres à cette page
+   ═══════════════════════════════════════════════════════════════════════════
+   Consomme les jetons de lions.css. Ne redéfinit AUCUNE variable.
+   Tout ce qui pourrait resservir ailleurs (l'arche, les listes de liens, les
+   colonnes) vit dans lions.css, pas ici.
+
+     1 · Pourquoi nous rejoindre    3 · Ce que nous attendons
+     2 · Le parcours d'adhésion     4 · Bloc de conversion
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1 · POURQUOI NOUS REJOINDRE ────────────────────────────────────────── */
+.pourquoi__grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e7);
+}
+@media (min-width: 1081px) {
+  .pourquoi__grille { grid-template-columns: 40fr 60fr; gap: var(--e9); align-items: start; }
+}
+
+/* Quatre raisons, deux traitements. La première porte le poids de la section,
+   les trois autres se lisent en filet : jamais quatre cartes identiques. */
+.raison-majeure { padding-bottom: var(--e6); }
+.raison-majeure h3 {
+  font-family: var(--police-titre);
+  font-size: clamp(1.5rem, 2.4vw, 1.875rem);
+  line-height: 1.2;
+  letter-spacing: -.015em;
+}
+.raison-majeure p { margin: var(--e4) 0 0; color: var(--gris); }
+
+/* Les chiffres viennent de la base : ils datent, et le disent. */
+.raison-majeure__chiffres {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--e3) var(--e5);
+  margin-top: var(--e5);
+  padding-top: var(--e5);
+  border-top: 1px solid var(--bord);
+}
+.raison-majeure__chiffre {
+  display: flex;
+  align-items: baseline;
+  gap: var(--e2);
+  font-size: .9375rem;
+  color: var(--gris);
+}
+.raison-majeure__chiffre b {
+  font-family: var(--police-titre);
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--bleu);
+  font-variant-numeric: tabular-nums;
+}
+
+.raisons li { padding-block: var(--e5); border-top: 1px solid var(--bord); }
+.raisons li:last-child { padding-bottom: 0; }
+.raisons h3 { font-size: 1.0625rem; font-weight: 600; }
+.raisons p { margin: var(--e2) 0 0; font-size: .9375rem; color: var(--gris); max-width: 56ch; }
+
+/* ─── 2 · LE PARCOURS D'ADHÉSION ─────────────────────────────────────────── */
+.parcours {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e6);
+  counter-reset: pas;
+}
+@media (min-width: 900px) {
+  .parcours { grid-template-columns: repeat(3, 1fr); gap: var(--gouttiere); }
+}
+.parcours__pas {
+  counter-increment: pas;
+  padding-top: var(--e5);
+  border-top: 1px solid var(--bord);
+}
+/* Le numéro porte le rythme de la section — pas un filet or de plus, qui
+   diluerait la ponctuation réservée aux têtes de section. */
+.parcours__pas::before {
+  content: counter(pas, decimal-leading-zero);
+  display: block;
+  margin-bottom: var(--e4);
+  font-family: var(--police-titre);
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--bleu);
+  font-variant-numeric: tabular-nums;
+}
+.parcours__pas h3 { font-size: 1.0625rem; font-weight: 600; }
+.parcours__pas p { margin: var(--e2) 0 0; font-size: .9375rem; color: var(--gris); }
+
+.parcours__pied {
+  margin-top: var(--e7);
+  padding-top: var(--e5);
+  border-top: 1px solid var(--bord);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e4) var(--e6);
+}
+.parcours__pied p { margin: 0; }
+
+/* ─── 3 · CE QUE NOUS ATTENDONS ──────────────────────────────────────────── */
+.attentes__grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e6);
+}
+@media (min-width: 900px) {
+  .attentes__grille { grid-template-columns: repeat(3, 1fr); gap: var(--e8); }
+  .attente + .attente { border-left: 1px solid var(--sur-sombre-filet); padding-left: var(--e6); }
+}
+@media (max-width: 899px) {
+  .attente + .attente { border-top: 1px solid var(--sur-sombre-filet); padding-top: var(--e6); }
+}
+.attente h3 { font-size: var(--t-h3); margin-bottom: var(--e3); }
+.attente p { color: var(--sur-sombre-doux); font-size: .9375rem; max-width: 44ch; }
+.attentes .demo-note { margin-top: var(--e7); }
+
+/* ─── 4 · BLOC DE CONVERSION ─────────────────────────────────────────────── */
+/* Emploi structurel de la signature : l'arche, une seule fois sur la page.
+   La forme est portée par .media--arche (lions.css) ; ici, le cadrage. */
+.conversion__grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e7);
+  align-items: center;
+}
+@media (min-width: 1081px) {
+  .conversion__grille { grid-template-columns: 38fr 62fr; gap: var(--e9); }
+}
+.conversion__media { aspect-ratio: 1 / 1; }
+.conversion__media img { object-position: 50% 34%; }
+@media (max-width: 1080px) {
+  .conversion__media { aspect-ratio: 16 / 10; }
+}
+.conversion__texte .lede { margin: var(--e5) 0 var(--e7); }
+.conversion__actions { display: flex; flex-wrap: wrap; gap: var(--e4); }
+
+/* Densité de la page intérieure, sans changement de composition. */
+.public-dense .pourquoi__grille, .public-dense .conversion__grille { gap: var(--e6); }
+.public-dense .raison-majeure { padding-bottom: var(--e5); }
+.public-dense .raisons li { padding-block: var(--e4); }
+.public-dense .parcours, .public-dense .attentes__grille { gap: var(--e5); }
+.public-dense .parcours__pas { padding-top: var(--e4); }
+.public-dense .parcours__pied, .public-dense .attentes .demo-note { margin-top: var(--e5); }
+.public-dense .conversion__texte .lede { margin-block: var(--e4) var(--e5); }
+@media(max-width:899px) {
+ .public-dense .attente + .attente { padding-top: var(--e5); }
+}

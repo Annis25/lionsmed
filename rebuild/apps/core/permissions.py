@@ -14,6 +14,13 @@ MANAGERS = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.SECRETAIRE})
 CAPABILITIES = {
     "account.access_private_area": PERSONAL,
     "account.change_own_password": PERSONAL,
+    "public_content.access_management": MANAGERS,
+    "action.create": MANAGERS, "action.edit": MANAGERS, "action.publish": MANAGERS,
+    "news.create": MANAGERS, "news.edit": MANAGERS, "news.publish": MANAGERS,
+    "event.create": MANAGERS, "event.edit": MANAGERS, "event.publish": MANAGERS,
+    "editorial.manage": MANAGERS, "image.manage": MANAGERS,
+    "application.view": MANAGERS, "application.manage": MANAGERS,
+    "contact.view": MANAGERS, "contact.manage": MANAGERS,
     "profile.view_own": PERSONAL, "profile.edit_own": PERSONAL,
     "experience.manage_own": PERSONAL,
     "directory.view": MEMBERS, "member.view": MEMBERS,
@@ -51,6 +58,11 @@ def can(user, capability, obj=None):
     if capability in {"directory.view", "member.view"} and status != MemberProfile.Status.ACTIVE:
         return False
     if obj is not None:
+        public_types = {"action": "service_actions.action", "news": "editorial.newsarticle", "event": "agenda.event",
+            "application":"members.membershipapplication", "contact":"communications.contactrequest"}
+        prefix = capability.split(".")[0]
+        if prefix in public_types:
+            return getattr(getattr(obj, "_meta", None), "label_lower", None) == public_types[prefix]
         if capability.startswith("account."):
             return isinstance(obj, get_user_model()) and obj.pk == user.pk
         if capability in {"profile.view_own", "profile.edit_own", "experience.manage_own"}:

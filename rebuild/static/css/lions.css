@@ -1881,3 +1881,28 @@ html:not(.js) .nav-burger, html:not(.js) .app-bascule, html:not(.js) .champ__oei
  .app-nav__marque { min-height: 64px; }
 }
 .shell-menu-open { overflow: hidden; }
+
+/* Intégration serveur public : composants existants, espacements de la charte. */
+.lot3-breadcrumb { display: flex; flex-wrap: wrap; gap: var(--e3); list-style: none; padding: 0; margin-bottom: var(--e4); font-size: var(--t-meta); }
+.lot3-breadcrumb a { color: inherit; text-decoration: underline; }
+.lot3-reading { max-width: 864px; }
+.lot3-cover { margin: 0 0 var(--e5); }
+.lot3-cover img, .lot3-card-image img { width: 100%; height: auto; border-radius: var(--r-carte); }
+.lot3-prose p { margin-block: var(--e4); }
+.lot3-pagination, .lot3-filters { display: flex; flex-wrap: wrap; align-items: end; gap: var(--e4); margin-block: var(--e5); }
+.lot3-filters .champ { flex: 1 1 160px; }
+.lot3-pagination a, .lot3-site-links a { display: inline-flex; align-items: center; min-height: 44px; }
+.lot3-form { display: flex; flex-direction: column; max-width: none; gap: var(--e4); }
+.lot3-form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--e4); }
+.lot3-wide { grid-column: 1/-1; }
+.lot3-honeypot { display: none; }
+.lot3-steps { display: grid; gap: var(--e5); margin-block: var(--e5); }
+.public-dense .editorial-card h2 { font-family: var(--police); font-size: var(--t-h3); }
+.editorial-card h2 a { color: inherit; }
+@media(max-width:760px) { .lot3-form-grid { grid-template-columns: minmax(0,1fr); } }
+
+.lot3-form .champ--choix { display: grid; grid-template-columns: auto minmax(0,1fr); gap: var(--e3); align-items: start; }
+.lot3-form .champ--choix input { grid-column: 1; grid-row: 1; width: 24px; height: 24px; }
+.lot3-form .champ--choix label { grid-column: 2; }
+
+.lot3-management .app-titre h1 { font-family: var(--police); }

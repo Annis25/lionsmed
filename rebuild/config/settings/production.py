@@ -18,3 +18,6 @@ if os.environ.get("LIONSMED_SMTP_ENABLED") == "true":
     EMAIL_USE_TLS = True
     EMAIL_TIMEOUT = 10
     DEFAULT_FROM_EMAIL = required("DEFAULT_FROM_EMAIL")
+
+# Activation explicite après validation éditoriale ; préproduction reste noindex.
+PUBLIC_INDEXING_ENABLED = os.environ.get("LIONSMED_PUBLIC_INDEXING") == "true"

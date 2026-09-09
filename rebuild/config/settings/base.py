@@ -41,7 +41,7 @@ SITE_ORIGIN = SITE_ORIGIN.rstrip("/")
 INSTALLED_APPS = [
     "django.contrib.admin", "django.contrib.auth", "django.contrib.contenttypes",
     "django.contrib.sessions", "django.contrib.messages", "django.contrib.staticfiles",
-    "django.contrib.postgres", "axes", "apps.accounts", "apps.members",
+    "django.contrib.postgres", "django.contrib.sitemaps", "axes", "apps.editorial", "apps.service_actions", "apps.agenda", "apps.communications", "apps.accounts", "apps.members",
     "apps.governance", "apps.core",
 ]
 MIDDLEWARE = [
@@ -131,3 +131,15 @@ FILE_UPLOAD_HANDLERS = [
     "django.core.files.uploadhandler.MemoryFileUploadHandler",
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 ]
+
+PUBLIC_INDEXING_ENABLED = False
+CONTACT_RECIPIENT = os.environ.get("LIONSMED_CONTACT_RECIPIENT", "")
+PUBLIC_IMAGE_ROOT = BASE_DIR / "runtime" / "public_images"
+
+if CONTACT_RECIPIENT:
+    from django.core.validators import validate_email
+    from django.core.exceptions import ValidationError
+    try:
+        validate_email(CONTACT_RECIPIENT)
+    except ValidationError:
+        raise ImproperlyConfigured("LIONSMED_CONTACT_RECIPIENT doit être une adresse email valide.") from None

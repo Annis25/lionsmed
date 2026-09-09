@@ -1,0 +1,473 @@
+@charset "UTF-8";
+/* ═══════════════════════════════════════════════════════════════════════════
+   PAGE D'ACCUEIL — composants spécifiques
+   ═══════════════════════════════════════════════════════════════════════════
+   Ne redéfinit AUCUNE variable : tous les jetons viennent de lions.css.
+
+   Rythme des sections — deux voisines ne partagent jamais fond ET structure :
+     hero      champ navy, composition asymétrique, arcs monumentaux
+     intro     blanc, deux colonnes déséquilibrées, texte dominant
+     axes      fond clair, grille de cartes
+     causes    bande basse fond-2, alignement horizontal, discret
+     chiffres  bandeau navy pleine largeur, chiffres énormes
+     agenda    blanc, deux colonnes de densités différentes
+     rejoindre split arche/navy, un seul appel à l'action
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── HERO ───────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: clamp(500px, 74vh, 640px);
+  padding-block: clamp(64px, 8vw, 96px);
+  background: var(--navy);
+  color: var(--sur-sombre);
+  overflow: hidden;
+}
+.hero__photo { position: absolute; inset: 0; }
+.hero__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 62% 42%; }
+
+/* Navy opaque à gauche, ouverture progressive sur la photo à droite.
+   Garantit le contraste AA du texte blanc sur toute la zone de lecture. */
+.hero__voile {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    var(--navy) 0%,
+    rgba(14,46,94,.985) 30%,
+    rgba(14,46,94,.88) 48%,
+    rgba(14,46,94,.76) 68%,
+    rgba(14,46,94,.55) 86%,
+    rgba(14,46,94,.40) 100%);
+}
+
+/* Voile bas — garantit le contraste AA de la mention de lieu, posée sur la
+   partie claire de la photographie. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 240px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(10,35,73,.88));
+}
+
+/* Emploi monumental de l'arc : le centre du motif tombe hors de l'écran,
+   on n'en voit qu'un fragment. C'est ce fragment qui rend la page mémorable. */
+.hero__arcs {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: min(880px, 74vw);
+  height: auto;
+  transform: translate(60%, -50%);
+  opacity: .55;
+  pointer-events: none;
+}
+
+.hero__grille {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: var(--e8);
+}
+
+.hero__titre { color: var(--sur-sombre); }
+.hero__lede {
+  margin: var(--e5) 0 0;
+  font-size: var(--t-lede);
+  line-height: 1.6;
+  color: var(--sur-sombre-doux);
+  max-width: 46ch;
+}
+.hero__actions { display: flex; flex-wrap: wrap; gap: var(--e3); margin-top: var(--e7); }
+
+/* Ancrage — la mention de lieu, en bas à droite */
+.hero__lieu {
+  position: absolute;
+  right: var(--gouttiere);
+  bottom: var(--e6);
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e2);
+  text-align: right;
+}
+.hero__lieu svg { color: var(--or); margin-top: var(--e1); }
+.hero__lieu strong { display: block; font-size: .9375rem; color: var(--sur-sombre); font-weight: 600; }
+.hero__lieu em { display: block; font-size: var(--t-meta); color: var(--sur-sombre-doux); font-style: italic; }
+
+/* ─── INTRO — prise de parole courte, deux colonnes éditoriales ──────────── */
+.intro { padding-block: var(--e8); }
+.intro__grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e6);
+}
+@media (min-width: 1081px) {
+  .intro__grille { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: var(--e9); align-items: start; }
+}
+.intro__titre { margin-bottom: 0; }
+.intro__texte p { color: var(--gris); }
+.intro__texte p + p { margin-top: var(--e4); }
+.intro__texte .link-arrow { margin-top: var(--e5); }
+.intro__affiliation {
+  padding-top: var(--e4);
+  border-top: 1px solid var(--bord);
+  font-size: var(--t-meta);
+  font-weight: 600;
+  color: var(--bleu) !important;
+}
+
+/* ─── AXES — grille de cartes ────────────────────────────────────────────── */
+.axes { padding-block: var(--e9); }
+.axes .section-head { margin-bottom: var(--e7); }
+.axes__grille {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--e5);
+}
+.axe__media { border-radius: var(--r-carte) var(--r-carte) 0 0; }
+/* La pastille déborde sur le bas-gauche de la photo. Cette zone est réservée :
+   voir IMAGES.md, aucun visage ne doit y tomber. */
+.axe__pastille {
+  position: relative;
+  z-index: 2;
+  width: 52px;
+  height: 52px;
+  margin-top: calc(-1 * var(--e7));
+  border-radius: 50%;
+  border: 3px solid var(--blanc);
+  display: grid;
+  place-items: center;
+  color: var(--blanc);
+  flex: none;
+}
+.axe__pastille--diabete     { background: var(--bleu); }
+.axe__pastille--environnement { background: var(--bleu); }
+.axe__pastille--humanitaire { background: var(--bleu); }
+.axe__pastille--jeunesse    { background: var(--bleu); }
+.axe h3 { margin-top: var(--e1); }
+/* Les descriptions ont des longueurs inégales : le lien reste ancré en bas. */
+.axe .card__body > p { flex: 1; }
+.axe .card__body > .link-arrow { margin-top: 0; }
+
+/* ─── CAUSES — bande basse, alignement horizontal, traitement discret ────── */
+/* Padding plus court que --section-y : c'est une bande, pas une section pleine.
+   Réduit d'autant le blanc qui la séparait de la grille des axes. */
+.causes { padding-block: var(--e7); }
+.causes .section-head { margin-bottom: var(--e5); }
+.causes__liste {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--e5);
+}
+.cause { text-align: center; display: grid; justify-items: center; gap: var(--e2); }
+.cause__rond {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--blanc);
+  box-shadow: var(--ombre-fine), 0 8px 20px rgba(14,46,94,.08);
+  display: grid;
+  place-items: center;
+}
+/* Section secondaire : le titre ne doit jamais concurrencer « Nos 4 axes
+   prioritaires ». Taille réduite, deux lignes maximum, et pas de filet or. */
+.causes__titre { font-size: clamp(1.4rem, 2.2vw, 1.9rem); max-width: 30ch; line-height: 1.2; }
+.cause span { font-size: .875rem; font-weight: 500; color: var(--gris); line-height: 1.45; max-width: 16ch; }
+
+/* ─── CHIFFRES — bandeau navy, chiffres énormes ──────────────────────────── */
+.chiffres {
+  padding-block: clamp(48px, 5vw, 64px);
+  position: relative;
+  background:
+    radial-gradient(120% 140% at 18% 0%, rgba(24,72,152,.55) 0%, transparent 62%),
+    var(--navy);
+  overflow: hidden;
+}
+/* Une seule rangée : trois statistiques puis la devise. Plus de bloc flottant
+   à droite, plus d'aplat bleu inoccupé. */
+.chiffres__grille {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: center;
+  gap: var(--e6);
+}
+.chiffres__stats { display: contents; }
+.stat { display: grid; gap: var(--e2); }
+.stat svg { color: var(--or); }
+.stat__valeur {
+  font-family: var(--police-titre);
+  font-size: clamp(2.5rem, 4.4vw, 3.75rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--sur-sombre);
+  font-variant-numeric: tabular-nums;
+}
+.stat__label { font-size: .9375rem; color: var(--sur-sombre-faible); line-height: 1.45; }
+
+/* « WE SERVE » — seconde et dernière exception aux capitales, avec les
+   surtitres. L'emblème en filigrane a été retiré : en blanc désaturé à faible
+   opacité, le dessin s'écrasait en une tache informe. Une forme illisible est
+   pire que pas de forme. */
+.chiffres__devise {
+  align-self: center;
+  margin: 0;
+  padding-left: var(--e6);
+  border-left: 1px solid var(--sur-sombre-filet);
+  white-space: nowrap;
+  font-family: var(--police-titre);
+  font-family: var(--police-titre);
+  font-size: clamp(1.0625rem, 1.5vw, 1.375rem);
+  font-weight: 600;
+  letter-spacing: .3em;
+  color: var(--or);
+}
+.chiffres__devise span {
+  display: block;
+  margin-top: var(--e2);
+  font-family: var(--police);
+  font-size: var(--t-meta);
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--sur-sombre-doux);
+}
+/* Datation puis réserve : un chiffre sans période devient faux tout seul. */
+.chiffres__note { margin-top: var(--e6); display: grid; gap: var(--e1); }
+.chiffres__note p { max-width: none; margin: 0; }
+
+/* ─── ACTIONS — action dominante, liste récente et actualité secondaire ─── */
+.agenda { padding-block: var(--e8); }
+.agenda > .container > .section-head { margin-bottom: var(--e7); }
+.actions__grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e6);
+  align-items: start;
+}
+.action-vedette__media { border-radius: var(--r-carte) var(--r-carte) 0 0; }
+.action-vedette__media img { object-position: 50% 58%; }
+.action-vedette .card__body { padding: var(--e5); gap: var(--e2); }
+.action-vedette h3 { font-size: clamp(1.5rem, 2.2vw, 2rem); }
+.action-vedette .link-arrow { margin-top: var(--e3); }
+.action-vedette__lieu {
+  display: flex;
+  align-items: center;
+  gap: var(--e2);
+  font-size: var(--t-meta) !important;
+  font-weight: 600;
+  color: var(--bleu) !important;
+}
+.action-vedette__lieu svg { flex: none; }
+
+.actions-recentes {
+  min-width: 0;
+  padding: var(--e5);
+  border: 1px solid var(--bord);
+  border-radius: var(--r-carte);
+  background: var(--blanc);
+}
+.actions-recentes > h3 {
+  padding-bottom: var(--e4);
+  border-bottom: 2px solid var(--or);
+  font-size: 1.25rem;
+}
+.actions-recentes__liste { display: grid; }
+.action-compacte {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: var(--e4);
+  align-items: center;
+  padding-block: var(--e4);
+  border-bottom: 1px solid var(--bord);
+}
+.action-compacte__media { border-radius: var(--r-carte); }
+.action-compacte h4 { margin-top: var(--e1); font-size: .9375rem; line-height: 1.35; }
+.action-compacte h4 a { transition: color var(--duree) var(--courbe); }
+.action-compacte h4 a:hover { color: var(--bleu); }
+.action-compacte p { margin-top: var(--e2); font-size: .75rem; line-height: 1.45; color: var(--gris); }
+.actions-recentes__suite { margin-top: var(--e5); font-size: var(--t-meta); }
+
+.actualites-bandeau {
+  margin-top: var(--e6);
+  padding: var(--e5);
+  border-radius: var(--r-carte);
+  background: var(--fond-2);
+  display: grid;
+  grid-template-columns: minmax(180px, .7fr) minmax(0, 1.6fr) auto;
+  gap: var(--e6);
+  align-items: center;
+}
+.actualites-bandeau__titre h3 { margin-top: var(--e2); font-size: 1.25rem; }
+.actualite {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: var(--e4);
+  align-items: center;
+}
+.actualite__media { border-radius: var(--r-carte); }
+.actualite h4 { margin-top: var(--e1); font-family: var(--police-titre); font-size: .9375rem; line-height: 1.35; transition: color var(--duree) var(--courbe); }
+.actualite a:hover h4 { color: var(--bleu); }
+.actualite time { display: block; margin-top: var(--e2); font-size: .75rem; color: var(--gris); }
+.actualites-bandeau__suite { white-space: nowrap; font-size: var(--t-meta); }
+
+@media (min-width: 1081px) {
+  .actions__grille { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+}
+
+/* ─── REJOINDRE — emploi structurel de l'arc ─────────────────────────────── */
+.rejoindre { padding-block: var(--e8); background: var(--navy); overflow: hidden; }
+.rejoindre__grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--e7);
+  align-items: center;
+}
+@media (min-width: 1081px) {
+  .rejoindre__grille { grid-template-columns: 38fr 62fr; gap: var(--e8); }
+}
+/* La forme de l'arche est portée par .media--arche (lions.css) : elle sert
+   aussi à rejoindre.html. Ne reste ici que ce qui appartient à ce bloc —
+   le cadrage carré et le fondu vers le navy. */
+.rejoindre__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+.rejoindre__media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 34%; }
+/* Fondu vers le navy, sans coupure nette */
+.rejoindre__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 44%, rgba(14,46,94,.42) 78%, var(--navy) 100%);
+}
+.rejoindre__texte .lede { color: var(--sur-sombre-doux); margin: var(--e5) 0 var(--e7); }
+
+/* Ajouter ?capture=final à l'URL masque uniquement l'avertissement de
+   développement pour les captures de validation publique. */
+.capture-finale .notice-demo { display: none; }
+
+/* ─── SÉQUENCE D'OUVERTURE DU HERO ───────────────────────────────────────── */
+/* Le seul moment orchestré de la page. Décalage de 90 ms, 850 ms de durée. */
+/* `backwards` et non `both` : l'état FINAL est porté par la règle elle-même
+   (opacity:1), l'animation ne fait que jouer l'entrée. Si elle ne se déclenche
+   pas — moteur exotique, onglet en arrière-plan, bug —, le contenu est visible
+   immédiatement au lieu de rester bloqué à zéro. */
+.js .hero [data-seq] { opacity: 0; }
+.js .hero.is-ready [data-seq] { opacity: 1; animation: heroEntree .85s var(--courbe) backwards; }
+.js .hero.is-ready [data-seq="0"] { animation-delay:   0ms; }
+.js .hero.is-ready [data-seq="1"] { animation-delay:  90ms; }
+.js .hero.is-ready [data-seq="2"] { animation-delay: 180ms; }
+.js .hero.is-ready [data-seq="3"] { animation-delay: 270ms; }
+.js .hero.is-ready [data-seq="4"] { animation-delay: 360ms; }
+.js .hero.is-ready [data-seq="5"] { animation-delay: 450ms; }
+@keyframes heroEntree {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Les arcs se déploient : 1,1 s, léger retard. */
+.js .hero .hero__arcs { opacity: 0; }
+.js .hero.is-ready .hero__arcs {
+  opacity: .55;
+  animation: arcsEntree 1.1s var(--courbe) .18s backwards;
+}
+@keyframes arcsEntree {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to   { opacity: .55; clip-path: inset(0 0 0 0); }
+}
+
+/* ═══ RESPONSIVE ═══════════════════════════════════════════════════════════ */
+
+/* ─── ≤ 1080 px ──────────────────────────────────────────────────────────── */
+@media (max-width: 1080px) {
+  .hero__grille { grid-template-columns: 1fr; gap: var(--e7); }
+  .axes__grille { grid-template-columns: repeat(2, 1fr); }
+  .causes__liste { grid-template-columns: repeat(3, 1fr); row-gap: var(--e6); }
+  /* .chiffres__stats est en display:contents : c'est la grille parente qui
+     porte les colonnes. */
+  .chiffres__grille { grid-template-columns: repeat(2, 1fr); gap: var(--e6) var(--e5); }
+  .chiffres__devise {
+    grid-column: 1 / -1;
+    padding: var(--e5) 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--sur-sombre-filet);
+  }
+  .actualites-bandeau { grid-template-columns: minmax(180px, .7fr) minmax(0, 1.6fr); }
+  .actualites-bandeau__suite { grid-column: 1 / -1; }
+  .rejoindre__media { aspect-ratio: 16 / 10; }
+  .rejoindre__media::after { background: linear-gradient(180deg, transparent 46%, rgba(14,46,94,.5) 82%, var(--navy) 100%); }
+}
+
+/* ─── ≤ 760 px ───────────────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  /* Le dégradé devient vertical et couvrant : la lisibilité prime. */
+  .hero { min-height: 0; padding-block: var(--e8) var(--e9); }
+  .hero__photo img { object-position: 50% 40%; }
+  .hero__voile {
+    background: linear-gradient(180deg,
+      rgba(14,46,94,.86) 0%,
+      rgba(14,46,94,.93) 40%,
+      var(--navy) 78%,
+      var(--navy) 100%);
+  }
+  .hero__arcs { width: 130vw; transform: translate(60%, -50%); opacity: .3; }
+  .js .hero.is-ready .hero__arcs { opacity: .3; animation-name: arcsEntreeMobile; }
+  /* Le hero repasse en colonne : la mention de lieu se range sous le contenu
+     au lieu de flotter à sa droite. */
+  .hero { flex-direction: column; align-items: stretch; justify-content: center; }
+  .hero__lieu {
+    position: static;
+    z-index: 2;
+    margin: var(--e7) 0 0;
+    padding-inline: var(--gouttiere);
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .causes__liste { grid-template-columns: repeat(2, 1fr); }
+  .axes { padding-block: var(--e8); }
+  .actions__grille { gap: var(--e5); }
+  .brand,
+  .nav-burger,
+  .link-arrow,
+  .action-compacte h4 a,
+  .actualite > a,
+  .footer-list a,
+  .footer-bottom a { min-height: 44px; align-items: center; }
+  .action-compacte h4 a,
+  .actualite > a,
+  .footer-bottom a { display: inline-flex; }
+  .nav-burger { min-width: 44px; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
+}
+@keyframes arcsEntreeMobile {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to   { opacity: .3; clip-path: inset(0 0 0 0); }
+}
+
+/* ─── ≤ 520 px ───────────────────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .axes__grille { grid-template-columns: 1fr; }
+  .actualites-bandeau { grid-template-columns: 1fr; gap: var(--e4); padding: var(--e4); }
+  .actualites-bandeau__suite { grid-column: auto; }
+  .actualite { grid-template-columns: 64px minmax(0, 1fr); }
+  .hero__actions .btn { width: 100%; }
+  .action-compacte { grid-template-columns: 96px minmax(0, 1fr); gap: var(--e3); }
+}
+
+/* ─── ANIMATIONS RÉDUITES ────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .js .hero [data-seq],
+  .js .hero.is-ready [data-seq] { opacity: 1 !important; animation: none !important; transform: none !important; }
+  .js .hero .hero__arcs,
+  .js .hero.is-ready .hero__arcs { opacity: .55 !important; animation: none !important; clip-path: none !important; }
+}

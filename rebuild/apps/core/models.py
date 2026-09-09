@@ -20,3 +20,26 @@ class AuthThrottle(models.Model):
     key = models.CharField(max_length=64, primary_key=True)
     count = models.PositiveIntegerField(default=0)
     expires_at = models.DateTimeField(db_index=True)
+
+
+class PublicImage(models.Model):
+    import uuid
+    id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+    small_key=models.CharField(max_length=100,editable=False)
+    large_key=models.CharField(max_length=100,editable=False)
+    width=models.PositiveIntegerField()
+    height=models.PositiveIntegerField()
+    alt=models.CharField(max_length=250)
+    source=models.CharField(max_length=300)
+    approved_at=models.DateTimeField(null=True,blank=True)
+    uploaded_by=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.PROTECT)
+    created_at=models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.alt
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse("editorial:image",args=[self.pk,1024])
+    def small_url(self):
+        from django.urls import reverse
+        return reverse("editorial:image",args=[self.pk,480])

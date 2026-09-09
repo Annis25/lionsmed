@@ -49,3 +49,23 @@ class AssociationExperience(models.Model):
             models.CheckConstraint(condition=models.Q(ends_on__isnull=True) | models.Q(ends_on__gte=models.F("starts_on")), name="experience_dates_ordered"),
             models.CheckConstraint(condition=models.Q(starts_on__day=1) & (models.Q(ends_on__isnull=True) | models.Q(ends_on__day=1)), name="experience_month_precision"),
         ]
+
+
+class MembershipApplication(models.Model):
+    import uuid
+    id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+    submission_key=models.UUIDField(unique=True)
+    first_name=models.CharField(max_length=150)
+    last_name=models.CharField(max_length=150)
+    email=models.EmailField()
+    phone=models.CharField(max_length=32,blank=True)
+    profession=models.CharField(max_length=150,blank=True)
+    motivation=models.TextField(max_length=5000)
+    origin=models.CharField(max_length=40,blank=True)
+    state=models.CharField(max_length=12,choices=[("RECEIVED","Reçue"),("CONTACTED","Contact établi"),("FOLLOW_UP","En suivi"),("CLOSED","Close")],default="RECEIVED")
+    notice_version=models.CharField(max_length=32,default="lot3-v1")
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+    class Meta:
+        ordering=["-created_at","id"]
+        constraints=[models.CheckConstraint(condition=models.Q(state__in=["RECEIVED","CONTACTED","FOLLOW_UP","CLOSED"]),name="application_state_valid")]

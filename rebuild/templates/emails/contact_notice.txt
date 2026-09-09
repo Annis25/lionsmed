@@ -1,0 +1,4 @@
+Lions Club Sfax-Méditerranée
+Un message de contact a été reçu. Référence : {{ reference }}
+Consultation réservée aux comptes autorisés : {{ origin }}/espace/demandes/contact/
+Aucun contenu privé n'est reproduit dans cet email.

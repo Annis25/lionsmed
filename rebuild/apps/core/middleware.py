@@ -4,7 +4,7 @@ class PrivateHeadersMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        response["X-Robots-Tag"] = "noindex, nofollow"
+        response["X-Robots-Tag"] = "index, follow" if getattr(request,"public_indexable",False) and response.status_code == 200 else "noindex, nofollow"
         response["Cache-Control"] = "private, no-store"
         # Ne pas transmettre de jetons reset à un site tiers.
         response["Referrer-Policy"] = "same-origin"
