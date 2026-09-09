@@ -172,6 +172,15 @@ class CalendarQuickAddTests(TestCase):
         self.assertRedirects(response, reverse("agenda_private:calendar"))
         self.assertTrue(Event.objects.filter(title="Formation secourisme", status="PUBLISHED").exists())
 
+    def test_calendar_post_rejects_external_return_url(self):
+        self.client.force_login(self.president)
+        response = self.client.post(reverse("agenda_private:calendar_event_add"), {
+            "title": "Retour sûr", "description": "", "all_day": "",
+            "starts_at": (timezone.now()+timedelta(days=5)).strftime("%Y-%m-%dT%H:%M"),
+            "next": "https://example.invalid/phishing",
+        })
+        self.assertRedirects(response, reverse("agenda_private:calendar"))
+
 
 class CalendarIcsTests(TestCase):
     def setUp(self):

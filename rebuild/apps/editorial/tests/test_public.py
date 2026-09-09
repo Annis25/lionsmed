@@ -274,13 +274,47 @@ class SubmissionTests(TestCase):
         submit(ContactForm(submission('contact')));self.assertEqual(OutboxMessage.objects.count(),0)
     def test_state_change_permissions_and_audit(self):
         obj=submit(ApplicationForm(submission()))
+        allowed_roles={Role.PRESIDENT,Role.GMT}
         for role in Role.values:
             actor=account(role+'@example.invalid',role=role)
-            if role in {Role.SUPER_ADMIN,Role.PRESIDENT,Role.SECRETAIRE}:
+            self.assertEqual(can(actor,'application.view'),role in allowed_roles)
+            self.assertEqual(can(actor,'application.manage'),role in allowed_roles)
+            audits_before=AuditEvent.objects.filter(action='application.state_changed').count()
+            state_before=obj.state
+            if role in allowed_roles:
                 self.assertEqual(change_state(actor=actor,obj=obj,state='CONTACTED').state,'CONTACTED')
             else:
                 with self.assertRaises(PermissionDenied):change_state(actor=actor,obj=obj,state='CLOSED')
-        self.assertEqual(AuditEvent.objects.filter(action='application.state_changed').count(),3)
+            obj.refresh_from_db()
+            self.assertEqual(obj.state,'CONTACTED' if role in allowed_roles else state_before)
+            expected_delta=1 if role in allowed_roles else 0
+            self.assertEqual(AuditEvent.objects.filter(action='application.state_changed').count(),audits_before+expected_delta)
+        self.assertEqual(AuditEvent.objects.filter(action='application.state_changed').count(),2)
+
+    def test_application_state_http_permissions_and_invalid_state(self):
+        obj=submit(ApplicationForm(submission()))
+        url=reverse('communications:request',kwargs={'kind':'application','object_id':obj.pk})
+        allowed_roles={Role.PRESIDENT,Role.GMT}
+        self.assertEqual(self.client.get(url).status_code,302)
+        for role in Role.values:
+            actor=account('http-'+role+'@example.invalid',role=role)
+            self.client.force_login(actor)
+            expected=200 if role in allowed_roles else 403
+            self.assertEqual(self.client.get(url).status_code,expected)
+            audits_before=AuditEvent.objects.filter(action='application.state_changed').count()
+            state_before=obj.state
+            response=self.client.post(url,{'state':'FOLLOW_UP'})
+            self.assertEqual(response.status_code,302 if role in allowed_roles else 403)
+            obj.refresh_from_db()
+            self.assertEqual(obj.state,'FOLLOW_UP' if role in allowed_roles else state_before)
+            self.assertEqual(AuditEvent.objects.filter(action='application.state_changed').count(),audits_before+(1 if role in allowed_roles else 0))
+            self.client.logout()
+        actor=account('invalid-state@example.invalid',role=Role.PRESIDENT)
+        audits_before=AuditEvent.objects.filter(action='application.state_changed').count()
+        with self.assertRaises(ValidationError):change_state(actor=actor,obj=obj,state='INVALID')
+        obj.refresh_from_db()
+        self.assertEqual(obj.state,'FOLLOW_UP')
+        self.assertEqual(AuditEvent.objects.filter(action='application.state_changed').count(),audits_before)
 
 from concurrent.futures import ThreadPoolExecutor
 from django.db import connections

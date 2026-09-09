@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.shortcuts import render, redirect
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods, require_safe
 from apps.core.permissions import capability_required, can
 from apps.governance.models import LionsYear, ClubState
@@ -42,7 +43,10 @@ def manage_toggle_tranche(request, record_id, tranche):
         messages.success(request, "Tranche mise à jour.")
     except (ValidationError, PermissionDenied) as error:
         messages.error(request, " ".join(error.messages) if hasattr(error, "messages") else str(error))
-    return redirect(request.META.get("HTTP_REFERER") or "dues:manage_list")
+    referer = request.META.get("HTTP_REFERER", "")
+    if not url_has_allowed_host_and_scheme(referer, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        referer = ""
+    return redirect(referer or "dues:manage_list")
 
 
 @capability_required("dues.view_management")

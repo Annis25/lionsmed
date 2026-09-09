@@ -54,4 +54,12 @@ La source unique est `rebuild/apps/core/permissions.py`.
 - Les rôles Bureau autorisés disposent de la capability `communication.send_member_broadcast` pour préparer, prévisualiser, tester et mettre en file une campagne individuelle via l’outbox.
 - Les campagnes conservent un historique d’audit et des compteurs d’envoi, sans stocker de copie personnalisée par destinataire.
 
+## Passe finale — 10 septembre 2026
+
+- L’invitation d’un nouveau membre est mise dans l’outbox sans mot de passe connu : l’e-mail « Bienvenue parmi nous » porte un lien Django sécurisé permettant à la personne de choisir son propre mot de passe. Son renvoi exige une confirmation et reste idempotent sur une courte fenêtre.
+- Les e-mails utilisent une base HTML et texte communs, avec logo absolu depuis `SITE_ORIGIN`, footer institutionnel, salutation au prénom et CTA jaune compatible clients e-mail.
+- Les liens de retour POST du calendrier et des cotisations sont désormais limités à l’hôte courant : aucun `next` ou `Referer` externe n’est suivi.
+- Les résultats de vote envoyés par e-mail restent strictement agrégés ; aucun électeur, bulletin ou choix individuel n’est fourni au modèle.
+- Les décisions non techniques restent : seuil de satisfaction, audience finale des résultats de vote, activation de l’indexation publique, politique MFA obligatoire et préparation réelle SMTP/ClamAV/backup avant production.
+
 Le détail, les priorités et la checklist sont dans `docs/AUDIT_FINAL_AVANT_PRODUCTION.md`.

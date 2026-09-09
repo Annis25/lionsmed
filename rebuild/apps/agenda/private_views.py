@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError, PermissionDenied
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_safe
 from apps.core.permissions import capability_required, can
@@ -16,6 +17,14 @@ from .forms import QuickEventForm
 from .ics import build_calendar
 
 TUNIS = timezone.get_default_timezone()
+
+
+def _safe_return_url(request):
+    """Accepte seulement un retour interne fourni par le formulaire."""
+    candidate = request.POST.get("next", "")
+    if url_has_allowed_host_and_scheme(candidate, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        return candidate
+    return ""
 
 
 def _parse_date(value):
@@ -118,7 +127,7 @@ def calendar_event_add(request):
             messages.error(request, " ".join(error.messages) if hasattr(error, "messages") else str(error))
     else:
         messages.error(request, "Formulaire invalide : " + " ".join(f"{k} : {', '.join(v)}" for k, v in form.errors.items()))
-    return redirect(request.POST.get("next") or "agenda_private:calendar")
+    return redirect(_safe_return_url(request) or "agenda_private:calendar")
 
 
 @capability_required("event.register")
@@ -133,7 +142,7 @@ def rsvp(request, event_id):
         messages.success(request, "Votre inscription a été enregistrée.")
     except ValidationError as error:
         messages.error(request, " ".join(error.messages))
-    return redirect(request.POST.get("next") or "agenda_private:calendar")
+    return redirect(_safe_return_url(request) or "agenda_private:calendar")
 
 
 @capability_required("event.register")

@@ -107,6 +107,14 @@ class DuesTranchesTests(TestCase):
         self.record.refresh_from_db()
         self.assertTrue(self.record.tranche1_paid)
 
+    def test_toggle_rejects_external_referer(self):
+        self.client.force_login(self.tresorier)
+        response = self.client.post(
+            reverse("dues:manage_toggle_tranche", args=[self.record.pk, 1]),
+            HTTP_REFERER="https://example.invalid/phishing",
+        )
+        self.assertRedirects(response, reverse("dues:manage_list"))
+
     def test_schedule_view_requires_edit_capability(self):
         ClubState.objects.update_or_create(pk=1, defaults={"active_year": self.year})
         self.client.force_login(self.bureau)
