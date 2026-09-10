@@ -122,32 +122,29 @@ portent pas de secret ici, mais éviter tout ajout futur qui journaliserait un c
 
 ## 7. Scheduler outbox / rappels (systemd timers — pas de Celery)
 
-Un seul mécanisme d'envoi (`OutboxMessage`/`deliver_outbox`), déjà en place. Deux commandes à
-planifier, aucune seconde file :
+Un seul mécanisme d'envoi (`OutboxMessage`/`deliver_outbox`), déjà en place. **Sans ces
+timers actifs, les messages restent indéfiniment `PENDING`** (incident déjà rencontré en
+production : outbox alimentée normalement, mais jamais livrée faute de worker planifié).
 
-`/etc/systemd/system/lionsmed-outbox.service` :
-```ini
-[Service]
-Type=oneshot
-User=www-data
-EnvironmentFile=/srv/lionsmed/rebuild/.env
-WorkingDirectory=/srv/lionsmed/rebuild
-ExecStart=/srv/lionsmed/rebuild/.venv/bin/python manage.py deliver_outbox --limit 50 --settings=config.settings.production
-```
-`/etc/systemd/system/lionsmed-outbox.timer` : `OnUnitActiveSec=2min`, `Persistent=true`.
-
-`/etc/systemd/system/lionsmed-reminders.service` : même modèle, `ExecStart=... send_event_reminders`.
-`/etc/systemd/system/lionsmed-reminders.timer` : `OnCalendar=*-*-* 07:00:00` (une fois par jour).
+Unités versionnées dans `rebuild/deploy/systemd/` (`lionsmed-outbox.service/.timer`,
+`lionsmed-event-reminders.service/.timer`) — voir `rebuild/deploy/systemd/README.md`
+pour l'installation, la vérification et la fréquence de chacune. Adapter `User`,
+`Group`, `WorkingDirectory` et `EnvironmentFile` au chemin réel du serveur avant copie.
 
 ```sh
-sudo systemctl enable --now lionsmed-outbox.timer lionsmed-reminders.timer
+sudo cp rebuild/deploy/systemd/lionsmed-*.service rebuild/deploy/systemd/lionsmed-*.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now lionsmed-outbox.timer lionsmed-event-reminders.timer
 systemctl list-timers lionsmed-*
 journalctl -u lionsmed-outbox.service -n 50
 ```
 
 `select_for_update(skip_locked)` dans `deliver_batch` rend un chevauchement de deux exécutions
-inoffensif (pas de verrou externe nécessaire). Superviser : messages `FAILED` (`OutboxMessage.objects.filter(state="FAILED")`),
-échecs du timer (`systemctl status`), absence d'exécution (`journalctl` silencieux > 10 min).
+inoffensif (pas de verrou externe nécessaire). Superviser via
+`rebuild/.venv/bin/python manage.py outbox_status --settings=config.settings.production`
+(compteurs par état, âge du plus ancien `PENDING`, jamais de destinataire ni de contenu) :
+messages `FAILED` en hausse, `PENDING` anormalement ancien, ou timer `inactive`/absent de
+`systemctl list-timers`.
 
 ## 8. Sauvegardes / restauration
 

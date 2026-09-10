@@ -1,0 +1,15 @@
+[Unit]
+Description=LionsMed Event Reminders (J-7 / J-1)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=www-data
+WorkingDirectory=/var/www/lionsmed/rebuild
+EnvironmentFile=/var/www/lionsmed/rebuild/.env
+Environment=DJANGO_SETTINGS_MODULE=config.settings.production
+ExecStart=/var/www/lionsmed/rebuild/.venv/bin/python manage.py send_event_reminders
+NoNewPrivileges=true
+PrivateTmp=true

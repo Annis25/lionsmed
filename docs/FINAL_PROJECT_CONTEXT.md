@@ -62,4 +62,37 @@ La source unique est `rebuild/apps/core/permissions.py`.
 - Les résultats de vote envoyés par e-mail restent strictement agrégés ; aucun électeur, bulletin ou choix individuel n’est fourni au modèle.
 - Les décisions non techniques restent : seuil de satisfaction, audience finale des résultats de vote, activation de l’indexation publique, politique MFA obligatoire et préparation réelle SMTP/ClamAV/backup avant production.
 
+## Fiabilisation outbox — 10 septembre 2026
+
+- **Aucun e-mail Lionsmed n'est envoyé de manière synchrone** (hors réinitialisation de
+  mot de passe, volontairement à part — vue Django standard, action interactive
+  attendue immédiatement par l'utilisateur). Tout le reste passe par `OutboxMessage` +
+  `manage.py deliver_outbox`, qui **doit** être planifié en continu : sans worker actif,
+  les messages restent `PENDING` indéfiniment (incident déjà rencontré en production,
+  résolu manuellement par un timer systemd).
+- Unités systemd désormais versionnées dans `rebuild/deploy/systemd/`
+  (`lionsmed-outbox.service/.timer` — toutes les minutes — et
+  `lionsmed-event-reminders.service/.timer` — une fois par jour) ; voir le
+  `README.md` du dossier pour l'installation et la vérification (`active (waiting)`
+  attendu sur le timer, `inactive (dead)` normal sur le service `oneshot`).
+- `manage.py outbox_status` ajouté : compteurs par état et âge du plus ancien `PENDING`,
+  sans jamais afficher destinataire, sujet ou contenu — à utiliser pour la surveillance
+  opérationnelle plutôt qu'une requête ORM manuelle.
+- Correctif de fond dans `deliver_batch()` : un message devenu **définitivement** non
+  pertinent avant l'envoi (mot de passe déjà défini, droit de consulter un résultat de
+  vote retiré, événement/document/vote/période de satisfaction disparu, destinataire
+  d'une campagne désactivé) passe désormais directement en `FAILED` avec
+  `error_code="not_applicable"`, sans les cinq tentatives de retry inutiles réservées
+  aux échecs SMTP réellement transitoires (`error_code="delivery_failed"`). Aucune
+  migration nécessaire (champ `error_code` déjà existant).
+- Un test préexistant (`governance.tests.test_view_creates_account_and_sends_activation_link`)
+  supposait un envoi synchrone à la création d'un membre ; il correspondait exactement
+  au bug de production décrit ci-dessus. Corrigé pour refléter le comportement réel :
+  l'e-mail est mis en file, puis livré seulement après passage de `deliver_batch()`.
+- Le type `DOCUMENT` (modèle, rendu, gabarit HTML/texte, traitement outbox) est
+  entièrement fonctionnel mais **n'est déclenché par aucun code actuel** : aucun dépôt
+  de document ne crée de `Notification`/`OutboxMessage`. Décision produit à confirmer :
+  notifier par e-mail au dépôt d'un nouveau document, ou laisser la découverte se faire
+  uniquement dans l'espace « Documents ».
+
 Le détail, les priorités et la checklist sont dans `docs/AUDIT_FINAL_AVANT_PRODUCTION.md`.

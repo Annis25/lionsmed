@@ -41,13 +41,21 @@ class CreateMemberTests(TestCase):
                 email="member@example.invalid", role=Role.MEMBRE)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
-    def test_view_creates_account_and_sends_activation_link(self):
+    def test_view_creates_account_and_queues_activation_link(self):
+        from apps.communications.models import OutboxMessage
+        from apps.communications.outbox import deliver_batch
         self.client.force_login(self.president)
         response = self.client.post(reverse("governance:member_add"), {
             "first_name": "Web", "last_name": "Recrue", "email": "web-recrue@example.invalid", "role": "MEMBRE",
         })
         user = MemberProfile.objects.get(user__email="web-recrue@example.invalid").user
         self.assertRedirects(response, reverse("governance:member", args=[user.pk]))
+        # L'invitation est mise en file d'attente, pas envoyée en direct : elle ne part
+        # qu'au passage du worker `deliver_outbox` (architecture outbox asynchrone).
+        self.assertTrue(OutboxMessage.objects.filter(kind="ACTIVATION", recipient=user.email, state="PENDING").exists())
+        self.assertEqual(len(mail.outbox), 0)
+        report = deliver_batch(limit=5)
+        self.assertEqual(report, {"sent": 1, "failed": 0, "disabled": False})
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("web-recrue@example.invalid", mail.outbox[0].to)
 

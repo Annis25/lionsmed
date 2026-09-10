@@ -43,13 +43,23 @@ def _mail_parts(item):
     user = notification.recipient
     if item.kind == "EVENT_REMINDER":
         from apps.agenda.models import Event
-        return render_transactional(item.kind, user=user, event=Event.objects.filter(pk=notification.target_id).first())
+        event = Event.objects.filter(pk=notification.target_id).first()
+        # Un objet disparu ne doit jamais partir sous forme d'e-mail à moitié vide.
+        if event is None:
+            return None
+        return render_transactional(item.kind, user=user, event=event)
     if item.kind == "DOCUMENT":
         from apps.documents.models import Document
-        return render_transactional(item.kind, user=user, document=Document.objects.filter(pk=notification.target_id).first())
+        document = Document.objects.filter(pk=notification.target_id).first()
+        if document is None:
+            return None
+        return render_transactional(item.kind, user=user, document=document)
     if item.kind == "VOTE_OPENED":
         from apps.voting.models import Vote
-        return render_transactional(item.kind, user=user, vote=Vote.objects.filter(pk=notification.target_id).first())
+        vote = Vote.objects.filter(pk=notification.target_id).first()
+        if vote is None:
+            return None
+        return render_transactional(item.kind, user=user, vote=vote)
     if item.kind == "VOTE_RESULTS":
         from apps.voting.models import Vote
         from apps.voting.selectors import can_view_results, vote_results
@@ -60,7 +70,10 @@ def _mail_parts(item):
         return render_transactional(item.kind, user=user, vote=vote, results=vote_results(user, vote))
     if item.kind == "SATISFACTION_OPENED":
         from apps.satisfaction.models import SatisfactionPeriod
-        return render_transactional(item.kind, user=user, period=SatisfactionPeriod.objects.filter(pk=notification.target_id).first())
+        period = SatisfactionPeriod.objects.filter(pk=notification.target_id).first()
+        if period is None:
+            return None
+        return render_transactional(item.kind, user=user, period=period)
     return render_transactional(item.kind, user=user, notification=notification)
 
 def deliver_batch(limit=20):
@@ -78,10 +91,15 @@ def deliver_batch(limit=20):
             item.state="SENDING";item.attempts+=1;item.lease_token=uuid4();item.lease_until=now+timedelta(minutes=5);item.save()
             lease=item.lease_token
         # SMTP hors transaction ; identifiant stable, jamais de secret dans le journal.
-        ok=False
+        ok=False;not_applicable=False
         try:
             parts = _mail_parts(item)
-            if parts is not None:
+            if parts is None:
+                # Devenu définitivement non pertinent (mot de passe déjà défini, droit
+                # retiré entre la mise en file et l'envoi, objet source disparu…) : un
+                # nouvel essai ne changera jamais l'issue, donc pas de retry inutile.
+                not_applicable=True
+            else:
                 subject, text_body, html_body = parts
                 message=EmailMultiAlternatives(subject,text_body,settings.DEFAULT_FROM_EMAIL,[item.recipient],headers={"Message-ID":f"<{item.pk}@lionsmed-outbox.invalid>"})
                 message.attach_alternative(html_body,"text/html")
@@ -91,9 +109,14 @@ def deliver_batch(limit=20):
         with transaction.atomic():
             current=OutboxMessage.objects.select_for_update().get(pk=item.pk)
             if current.lease_token!=lease:continue
-            current.state="SENT" if ok else "FAILED" if current.attempts>=5 else "PENDING"
+            if ok:
+                current.state="SENT";current.error_code=""
+            elif not_applicable:
+                current.state="FAILED";current.error_code="not_applicable"
+            else:
+                current.state="FAILED" if current.attempts>=5 else "PENDING"
+                current.error_code="delivery_failed"
             current.sent_at=timezone.now() if ok else None
-            current.error_code="" if ok else "delivery_failed"
             current.available_at=timezone.now()+timedelta(minutes=2**current.attempts)
             current.lease_token=None;current.lease_until=None;current.save()
         sent+=int(ok);failed+=int(not ok)

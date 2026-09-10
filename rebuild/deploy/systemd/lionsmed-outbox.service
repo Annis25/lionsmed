@@ -1,0 +1,15 @@
+[Unit]
+Description=LionsMed Outbox Email Delivery
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=www-data
+WorkingDirectory=/var/www/lionsmed/rebuild
+EnvironmentFile=/var/www/lionsmed/rebuild/.env
+Environment=DJANGO_SETTINGS_MODULE=config.settings.production
+ExecStart=/var/www/lionsmed/rebuild/.venv/bin/python manage.py deliver_outbox --limit 20
+NoNewPrivileges=true
+PrivateTmp=true

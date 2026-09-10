@@ -3,7 +3,7 @@
 {% block title %}Fiche de gestion — Lions Club Sfax-Méditerranée{% endblock %}
 
 {% block content %}
-<div class="app-titre"><h1>Fiche de gestion</h1></div>
+<div class="app-titre"><h1>Fiche de gestion</h1><a class="btn btn--ghost btn--sm" href="{% url 'governance:members' %}">← Retour aux membres et mandats</a></div>
 
 <section class="workspace-panel">
   <h2>{{ member.name }}</h2>
@@ -46,5 +46,4 @@
 {% endif %}
 
 {% include 'components/private/mandates.html' %}
-<a class="link-arrow" href="{% url 'governance:members' %}">Retour aux membres</a>
 {% endblock %}
