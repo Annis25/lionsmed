@@ -11,7 +11,7 @@ from apps.members.models import MemberProfile, AssociationExperience
 PERSONAL = frozenset(Role.values)
 MEMBERS = PERSONAL - {Role.INVITE}
 DIRECTORY_ROLES = MEMBERS - {Role.SUPER_ADMIN}
-MANAGERS = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.SECRETAIRE})
+MANAGERS = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.PRESIDENT_FONDATEUR, Role.SECRETAIRE})
 CONTACT_INBOX_ROLES = frozenset({Role.PRESIDENT, Role.SECRETAIRE})
 APPLICATION_INBOX_ROLES = frozenset({Role.PRESIDENT, Role.GMT})
 # Palier « bureau » des documents : BUREAU/PRESIDENT/SECRETAIRE/SUPER_ADMIN. DIRECTEUR en est

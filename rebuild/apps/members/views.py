@@ -28,7 +28,7 @@ def edit_profile(request):
         if form is None:
             messages.success(request,"Votre profil a été enregistré."); return redirect("members:profile")
     else:
-        initial = {key:getattr(p,key) for key in ["phone","profession","bio","public_profile_enabled"]}
+        initial = {key:getattr(p,key) for key in ["phone","profession","public_title","bio","public_profile_enabled"]}
         initial.update(first_name=p.user.first_name,last_name=p.user.last_name)
         form = ProfileForm(actor=request.user,profile=p,initial=initial)
     return render(request,"espace/profile_edit.html",{"form":form,"member":profile_data(request.user,p,own=True)})

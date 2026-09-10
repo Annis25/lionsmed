@@ -125,7 +125,7 @@ class PublicationTests(TestCase):
     def test_permission_matrix_http_and_service(self):
         for role in Role.values:
             user=account(email=role+'@example.invalid',role=role);self.client.force_login(user)
-            allowed=role in {Role.SUPER_ADMIN,Role.PRESIDENT,Role.SECRETAIRE}
+            allowed=role in {Role.SUPER_ADMIN,Role.PRESIDENT,Role.PRESIDENT_FONDATEUR,Role.SECRETAIRE}
             for kind in ['action','event']:
                 self.assertEqual(self.client.get(reverse('editorial_management:add',kwargs={'kind':kind})).status_code,200 if allowed else 403)
                 obj=content(self.actor,kind,slug=str(uuid4()))

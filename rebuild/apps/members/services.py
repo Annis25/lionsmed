@@ -8,7 +8,7 @@ from .forms import ProfileForm, ExperienceForm
 from .uploads import encode_photo, photo_storage
 from .public_profile import ensure_public_slug
 
-PROFILE_FIELDS = {"phone", "profession", "bio", "public_profile_enabled"}
+PROFILE_FIELDS = {"phone", "profession", "public_title", "bio", "public_profile_enabled"}
 
 def update_profile(*, actor, profile, data, files=None):
     if not can(actor, "profile.edit_own", profile): raise PermissionDenied

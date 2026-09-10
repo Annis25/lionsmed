@@ -31,6 +31,20 @@ class PublicProfileTests(TestCase):
         self.assertNotIn(self.user.email, html)
         self.assertNotIn("20000000", html)
 
+    def test_membership_line_defaults_to_membre_when_no_title_set(self):
+        self.profile.public_profile_enabled = True
+        ensure_public_slug(self.profile); self.profile.save()
+        html = self.client.get(f"/membres/{self.profile.public_slug}/").content.decode()
+        self.assertIn("Membre du Lions Club Sfax-Méditerranée", html)
+
+    def test_membership_line_uses_custom_public_title(self):
+        self.profile.public_profile_enabled = True
+        self.profile.public_title = "Past President"
+        ensure_public_slug(self.profile); self.profile.save()
+        html = self.client.get(f"/membres/{self.profile.public_slug}/").content.decode()
+        self.assertIn("Past President du Lions Club Sfax-Méditerranée", html)
+        self.assertNotIn("Membre du Lions Club Sfax-Méditerranée", html)
+
     @override_settings(PUBLIC_INDEXING_ENABLED=True, SITE_ORIGIN="https://canonical.example.invalid")
     def test_person_json_ld_present_and_safe(self):
         self.profile.public_profile_enabled = True

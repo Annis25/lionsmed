@@ -18,6 +18,9 @@ class ProfileForm(StyledFields, forms.Form):
     last_name = forms.CharField(label="Nom", max_length=150, widget=forms.TextInput(attrs={"autocomplete":"family-name"}))
     phone = forms.CharField(label="Téléphone", required=False, max_length=32, widget=forms.TextInput(attrs={"autocomplete":"tel", "inputmode":"tel"}))
     profession = forms.CharField(label="Profession", required=False, max_length=150)
+    public_title = forms.CharField(label="Titre affiché sur mon profil public", required=False, max_length=150,
+        help_text="Par exemple « Past President », « Trésorier », « Président fondateur ». Laissez vide pour afficher « Membre ». "
+            "Apparaît uniquement si votre profil public est activé.")
     bio = forms.CharField(label="Présentation", required=False, max_length=1000, widget=forms.Textarea(attrs={"rows":3}))
     photo = forms.FileField(label="Photo privée", required=False, widget=forms.FileInput(attrs={"accept":"image/jpeg,image/png,image/webp"}), help_text="JPEG, PNG ou WebP · 5 Mo · 16 millions de pixels maximum.")
     remove_photo = forms.BooleanField(label="Supprimer ma photo actuelle", required=False)

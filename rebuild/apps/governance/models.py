@@ -9,6 +9,7 @@ class Role(models.TextChoices):
     SUPER_ADMIN = "SUPER_ADMIN", "Super administrateur"
     DIRECTEUR = "DIRECTEUR", "Directeur"
     PRESIDENT = "PRESIDENT", "Président"
+    PRESIDENT_FONDATEUR = "PRESIDENT_FONDATEUR", "Président fondateur"
     VICE_PRESIDENT = "VICE_PRESIDENT", "Vice-président"
     SECRETAIRE = "SECRETAIRE", "Secrétaire"
     TRESORIER = "TRESORIER", "Trésorier"
@@ -53,7 +54,7 @@ class ClubState(models.Model):
 
 class RoleGrant(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="role_grants")
-    role = models.CharField(max_length=16, choices=Role.choices)
+    role = models.CharField(max_length=24, choices=Role.choices)
     starts_at = models.DateTimeField()
     ends_at = models.DateTimeField(null=True, blank=True)
     revoked_at = models.DateTimeField(null=True, blank=True)

@@ -23,7 +23,7 @@
           {% endif %}
           <div>
             <h1>{{ name }}</h1>
-            <p class="member-profile-card__membership">Membre du Lions Club Sfax-Méditerranée</p>
+            <p class="member-profile-card__membership">{{ member.public_title|default:"Membre" }} du Lions Club Sfax-Méditerranée</p>
             <p class="member-profile-card__location">Sfax, Tunisie · District 414 Tunisie</p>
           </div>
         </div>

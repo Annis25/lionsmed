@@ -21,8 +21,10 @@ def detail(request, slug):
     profile = _public_profile_or_404(slug)
     name = profile.user.get_full_name() or "Membre"
     title = f"{name} | {identity.NAME}"
-    description = (profile.bio or f"{name}, membre du {identity.NAME}.")[:300]
+    role_label = profile.public_title or "membre"
+    description = (profile.bio or f"{name}, {role_label} du {identity.NAME}.")[:300]
     person = {"@type": "Person", "name": name, "memberOf": {"@type": "Organization", "name": identity.NAME}}
+    if profile.public_title: person["jobTitle"] = profile.public_title
     if profile.photo_key: person["image"] = settings.SITE_ORIGIN + f"/membres/{slug}/photo/"
     context = metadata(request, title=title, description=description, schema=person,
         parents=({"name": "Notre Club", "url": "/notre-club/"},))

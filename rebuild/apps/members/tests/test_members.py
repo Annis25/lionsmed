@@ -47,6 +47,15 @@ class MemberTests(TestCase):
         self.p.refresh_from_db();self.actor.refresh_from_db()
         self.assertEqual(self.p.phone,"00000");self.assertEqual(self.actor.first_name,PROFILE["first_name"])
 
+    def test_public_title_saved_and_optional(self):
+        result = self.client.post(reverse("members:profile_edit"), {**PROFILE, "public_title": "Past President"})
+        self.assertEqual(result.status_code, 302)
+        self.p.refresh_from_db()
+        self.assertEqual(self.p.public_title, "Past President")
+        self.client.post(reverse("members:profile_edit"), PROFILE)
+        self.p.refresh_from_db()
+        self.assertEqual(self.p.public_title, "")
+
     def test_forged_fields_never_mutate_account_or_status(self):
         original=self.actor.email
         data={**PROFILE,"email":"stolen@example.invalid","role":"SUPER_ADMIN","is_staff":"1","is_superuser":"1","is_active":"0","status":"SUSPENDED","user":str(self.other.pk),"photo_key":"secret"}

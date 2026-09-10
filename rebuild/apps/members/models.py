@@ -23,6 +23,10 @@ class MemberProfile(models.Model):
     # Profil public (recette V1) : opt-in strictement indépendant des permissions de
     # l'annuaire privé ci-dessus. Jamais activé par défaut, jamais de coordonnées exposées.
     public_profile_enabled = models.BooleanField(default=False)
+    # Titre affiché sur le profil public, saisi librement par le membre (ex. « Past
+    # President », « Trésorier », « Président fondateur ») ; vide = « Membre » par défaut.
+    # Distinct des Mandats officiels (validés par le bureau) : ici, aucune validation.
+    public_title = models.CharField(max_length=150, blank=True)
     public_slug = models.SlugField(max_length=160, null=True, blank=True, unique=True)
     # Désignation individuelle (indépendante du rôle) : un membre peut être nommé
     # responsable des votes sans devenir PRESIDENT/SECRETAIRE/SUPER_ADMIN pour autant.

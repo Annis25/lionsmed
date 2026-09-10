@@ -212,3 +212,40 @@ class NewOfficerRolesTests(TestCase):
         values = {value for value, _ in ASSIGNABLE_ROLES}
         self.assertTrue({"VICE_PRESIDENT", "TRESORIER", "GST", "GMT", "GLT", "LCIF"} <= values)
         self.assertNotIn("SUPER_ADMIN", values)
+
+
+class PresidentFondateurRoleTests(TestCase):
+    """Rôle ajouté à la demande explicite du club, avec les mêmes capacités que
+    Président (palier MANAGERS) — décision confirmée, contrairement aux autres
+    nouveaux rôles officiers qui n'ont volontairement aucune capacité élevée."""
+
+    def setUp(self):
+        self.president = account("president5@example.invalid", role=Role.PRESIDENT)
+        self.fondateur = services.create_member(actor=self.president, first_name="Fondateur", last_name="Historique",
+            email="fondateur@example.invalid", role=Role.PRESIDENT_FONDATEUR)
+
+    def test_assignable_and_appears_in_choices(self):
+        from apps.governance.forms import ASSIGNABLE_ROLES
+        self.assertEqual(effective_role(self.fondateur), Role.PRESIDENT_FONDATEUR)
+        values = {value for value, _ in ASSIGNABLE_ROLES}
+        self.assertIn("PRESIDENT_FONDATEUR", values)
+
+    def test_has_same_manager_level_capabilities_as_president(self):
+        from apps.core.permissions import can
+        manager_capabilities = ["event.create", "action.create", "editorial.manage", "members.manage",
+            "members.view_management", "management.access", "year.manage", "document.manage",
+            "notification.send", "vote.manage", "satisfaction.manage", "statistics.view",
+            "attendance.record", "mfa.manage_own"]
+        for capability in manager_capabilities:
+            with self.subTest(capability=capability):
+                self.assertEqual(can(self.fondateur, capability), can(self.president, capability))
+                self.assertTrue(can(self.fondateur, capability))
+
+    def test_narrower_president_specific_inboxes_not_included(self):
+        """Périmètre volontairement plus étroit que Président sur ces trois points
+        précis (boîtes de contact/candidature, diffusion Bureau) : à élargir seulement
+        sur nouvelle confirmation explicite du club."""
+        from apps.core.permissions import can
+        self.assertFalse(can(self.fondateur, "contact.manage"))
+        self.assertFalse(can(self.fondateur, "application.manage"))
+        self.assertFalse(can(self.fondateur, "communication.send_member_broadcast"))

@@ -246,3 +246,60 @@ class CalendarIcsTests(TestCase):
         response = self.client.post(reverse("agenda_private:calendar_token_regenerate"))
         self.assertEqual(response.status_code, 302)
         self.assertIn("/connexion/", response.url)
+
+
+class CalendarResponsiveViewsTests(TestCase):
+    """Refonte responsive (Mois/Semaine/Jour) : positions de la timeline, structure de
+    grille mensuelle constante (jamais 1 colonne, cause du bug mobile précédent), et
+    présence des données nécessaires aux <dialog> côté client."""
+
+    def setUp(self):
+        self.president = account("president-responsive@example.invalid", role=Role.PRESIDENT)
+        self.member = account("member-responsive@example.invalid", role=Role.MEMBRE)
+        from datetime import datetime, time
+        today = timezone.localdate()
+        starts_at = timezone.make_aware(datetime.combine(today, time(14, 0)))
+        ends_at = timezone.make_aware(datetime.combine(today, time(15, 30)))
+        self.event = event(self.president, title="Réunion après-midi", starts_at=starts_at, ends_at=ends_at)
+
+    def test_timeline_positions_use_period_decimal_not_locale_comma(self):
+        """Régression : {{ }} sur un float en template FR rend une virgule décimale,
+        ce qui casserait silencieusement tout style inline top/height/left/width."""
+        self.client.force_login(self.member)
+        for view in ("day", "week"):
+            with self.subTest(view=view):
+                content = self.client.get(reverse("agenda_private:calendar"), {"view": view}).content.decode()
+                self.assertIn('style="top:50.00%;height:10.71%;left:0.00%;width:100.00%;"', content)
+                self.assertNotIn("top:50,00%", content)
+
+    def test_month_grid_is_always_seven_columns_never_single_column(self):
+        import pathlib, re
+        self.client.force_login(self.member)
+        content = self.client.get(reverse("agenda_private:calendar"), {"view": "month"}).content.decode()
+        day_count = len(re.findall(r'<div class="cal-day(?:"| )', content))
+        self.assertGreaterEqual(day_count, 28)
+        self.assertEqual(day_count % 7, 0)  # toujours un multiple exact de 7, jamais 1 colonne
+        css_path = pathlib.Path(__file__).resolve().parents[3] / "static" / "css" / "prive.css"
+        css = css_path.read_text()
+        self.assertIn(".cal-month__grid { display: grid; grid-template-columns: repeat(7, minmax(0,1fr))", css)
+        self.assertNotRegex(css, r"\.cal-month__grid[^}]*grid-template-columns:\s*1fr[^0-9]")
+
+    def test_events_json_available_for_dialog(self):
+        self.client.force_login(self.member)
+        content = self.client.get(reverse("agenda_private:calendar")).content.decode()
+        self.assertIn('id="cal-events-data"', content)
+        self.assertIn(str(self.event.pk), content)
+        self.assertIn('data-cal-event="' + str(self.event.pk) + '"', content)
+
+    def test_ics_link_never_rendered_as_visible_text_field(self):
+        """Le lien d'abonnement reste dans un champ hidden, jamais un texte affiché en clair."""
+        self.client.force_login(self.member)
+        content = self.client.get(reverse("agenda_private:calendar")).content.decode()
+        self.assertIn('type="hidden" id="lien-abonnement"', content)
+
+    def test_all_three_views_render_without_error_for_authorized_member(self):
+        self.client.force_login(self.member)
+        for view in ("month", "week", "day"):
+            with self.subTest(view=view):
+                response = self.client.get(reverse("agenda_private:calendar"), {"view": view})
+                self.assertEqual(response.status_code, 200)

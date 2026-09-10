@@ -318,47 +318,174 @@
 .options-list__ligne { display: flex; align-items: center; gap: var(--e2); margin-bottom: var(--e2); }
 .options-list__ligne .champ__input { flex: 1; }
 
-/* Calendrier — vues Mois/Semaine/Jour (recette V2) */
-.calendrier-barre { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); margin-bottom: var(--e5); }
-.calendrier-barre__nav { display: flex; align-items: center; gap: var(--e2); }
-.calendrier-fleche { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid var(--bord); border-radius: 50%; font-size: 1.125rem; line-height: 1; color: var(--encre); }
-.calendrier-fleche:hover { background: var(--fond); color: var(--bleu); }
-.calendrier-label { min-width: 12ch; text-align: center; text-transform: capitalize; }
-.calendrier-barre__vues { display: flex; gap: var(--e1); }
+/* Calendrier — refonte responsive (recette V3). Grille mensuelle 7 colonnes réelle sur
+   desktop ET mobile (jamais grid-template-columns:1fr — c'était le bug de la version
+   précédente, qui transformait chaque jour en carte pleine largeur et forçait un
+   défilement du 1 au 30) ; timeline Semaine/Jour ; ajout et détail d'événement dans des
+   <dialog> natives (fermeture Échap/backdrop gratuite) plutôt qu'un formulaire et une URL
+   ICS affichés en permanence sous le calendrier. */
 
-.calendrier-mois__entetes { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: var(--e1); margin-bottom: var(--e1); font-size: .75rem; font-weight: 600; color: var(--gris); text-align: center; }
-.calendrier-mois__semaine { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: var(--e1); margin-bottom: var(--e1); }
-.calendrier-jour { min-height: 96px; padding: var(--e2); background: var(--blanc); border: 1px solid var(--bord); border-radius: 8px; display: flex; flex-direction: column; gap: var(--e1); overflow: hidden; }
-.calendrier-jour--hors { background: var(--fond); color: var(--gris); }
-.calendrier-jour--aujourdhui { border-color: var(--bleu); box-shadow: inset 0 0 0 1px var(--bleu); }
-.calendrier-jour__num { font-size: .8125rem; font-weight: 600; }
-.calendrier-puce { display: block; padding: 2px var(--e1); background: var(--fond-2); border-radius: 4px; font-size: .75rem; line-height: 1.3; color: var(--bleu); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.calendrier-puce:hover { background: var(--bleu); color: var(--blanc); }
-.calendrier-plus { font-size: .6875rem; color: var(--gris); }
+.cal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--e4); flex-wrap: wrap; }
 
-.calendrier-semaine { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: var(--e2); margin-bottom: var(--e5); }
-.calendrier-jour--large { min-height: 220px; }
-.calendrier-jour--large h3 { font-size: .8125rem; margin-bottom: var(--e2); text-transform: capitalize; }
-.calendrier-jour-vue { display: grid; gap: var(--e3); margin-bottom: var(--e5); }
+.cal-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); margin-bottom: var(--e5); }
+.cal-toolbar__nav { display: flex; align-items: center; gap: var(--e2); }
+.cal-toolbar__right { display: flex; align-items: center; gap: var(--e3); }
+.cal-arrow { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid var(--bord); border-radius: 50%; color: var(--encre); transition: background 150ms, color 150ms; }
+.cal-arrow:hover { background: var(--fond); color: var(--bleu); }
+.cal-label { min-width: 14ch; text-align: center; text-transform: capitalize; font-weight: 600; color: var(--encre); }
+.cal-views { display: flex; gap: 2px; padding: 2px; background: var(--fond); border: 1px solid var(--bord); border-radius: var(--r-pilule); }
+.cal-view-btn { padding: 6px var(--e3); border-radius: var(--r-pilule); font-size: .8125rem; font-weight: 600; color: var(--gris); transition: background 150ms, color 150ms; }
+.cal-view-btn:hover { color: var(--encre); }
+.cal-view-btn.is-active { background: var(--blanc); color: var(--bleu); box-shadow: var(--ombre); }
+.cal-icon-btn { display: inline-flex; align-items: center; gap: var(--e2); padding: 6px var(--e3); border: 1px solid var(--bord); border-radius: var(--r-pilule); color: var(--encre); font-size: .8125rem; font-weight: 600; transition: background 150ms, border-color 150ms; }
+.cal-icon-btn:hover { background: var(--fond); border-color: var(--gris-clair); }
 
-.calendrier-details { position: relative; }
-.calendrier-detail { display: none; position: fixed; inset: 0; z-index: 200; align-items: center; justify-content: center; padding: var(--e4); background: rgba(14,46,94,.45); }
-.calendrier-detail:target { display: flex; }
-.calendrier-detail__carte { position: relative; width: min(480px, 100%); max-height: 80vh; overflow-y: auto; padding: var(--e5); background: var(--blanc); border-radius: var(--r-carte); box-shadow: var(--ombre); }
-.calendrier-detail__fermer { position: absolute; top: var(--e3); right: var(--e3); font-size: 1.5rem; line-height: 1; color: var(--gris); }
-.calendrier-detail__fermer:hover { color: var(--encre); }
+.cal-layout { display: grid; grid-template-columns: minmax(0,1fr) 280px; gap: var(--e5); align-items: start; }
+.cal-main { min-width: 0; }
+.cal-aside { display: grid; gap: var(--e3); padding: var(--e4); background: var(--blanc); border: 1px solid var(--bord); border-radius: var(--r-carte); }
+.cal-aside h2 { margin: 0; font-size: .9375rem; }
+.cal-aside__item { border-top: 1px solid var(--bord); }
+.cal-aside__item:first-of-type { border-top: 0; }
+.cal-aside__link { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: var(--e2) 0; text-align: left; border-radius: 6px; }
+.cal-aside__link:hover { color: var(--bleu); }
+.cal-aside__date { font-size: .75rem; color: var(--gris); text-transform: capitalize; }
+.cal-aside__title { font-size: .875rem; font-weight: 600; color: var(--encre); }
+.cal-aside__link:hover .cal-aside__title { color: var(--bleu); }
 
-.calendrier-sync { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); margin-bottom: var(--e3); }
-.calendrier-sync .champ__input { flex: 1; min-width: 220px; font-size: .8125rem; }
-.calendrier-aide { margin-top: var(--e3); font-size: .875rem; }
+.cal-empty { margin: var(--e3) 0; padding: var(--e3) var(--e4); background: var(--fond); border-radius: var(--r-carte); color: var(--gris); font-size: .875rem; }
+
+/* Vue Mois — grille 7 colonnes constante desktop/mobile. */
+.cal-month__head { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 1px; margin-bottom: var(--e1); font-size: .6875rem; font-weight: 600; color: var(--gris); text-align: center; text-transform: uppercase; letter-spacing: .02em; }
+.cal-month__grid { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 1px; background: var(--bord); border: 1px solid var(--bord); border-radius: var(--r-carte); overflow: hidden; }
+.cal-day { position: relative; min-height: 108px; background: var(--blanc); }
+.cal-day.is-muted { background: var(--fond); }
+.cal-day.is-muted .cal-day__num { color: var(--gris); }
+.cal-day__zone { position: absolute; inset: 0; z-index: 0; }
+.cal-day:hover .cal-day__zone { background: var(--fond); }
+.cal-day.is-selected { box-shadow: inset 0 0 0 2px var(--bleu); z-index: 1; }
+.cal-day__body { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--e1); height: 100%; padding: var(--e2); pointer-events: none; }
+.cal-day__num { display: inline-flex; align-items: center; justify-content: center; align-self: flex-start; min-width: 22px; height: 22px; padding: 0 4px; font-size: .8125rem; font-weight: 600; color: var(--encre); border-radius: var(--r-pilule); }
+.cal-day.is-today .cal-day__num { background: var(--navy); color: var(--blanc); }
+.cal-day__chips { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+.cal-chip { display: flex; align-items: baseline; gap: 4px; padding: 2px 6px; background: var(--fond-2); border-radius: 5px; font-size: .6875rem; line-height: 1.3; color: var(--bleu); text-align: left; overflow: hidden; white-space: nowrap; pointer-events: auto; transition: background 150ms, color 150ms; }
+.cal-chip__time { flex: none; font-variant-numeric: tabular-nums; opacity: .8; }
+.cal-chip__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-chip:hover, .cal-chip:focus-visible { background: var(--bleu); color: var(--blanc); }
+.cal-chip--allday { background: var(--fond-2); }
+.cal-day__more { align-self: flex-start; margin-top: 1px; font-size: .6875rem; font-weight: 600; color: var(--gris); pointer-events: auto; }
+.cal-day__more:hover { color: var(--bleu); }
+.cal-day__dots { display: none; gap: 3px; }
+.cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--bleu); }
+
+/* Liste "du jour" sous le mini-calendrier — pièce maîtresse mobile, secondaire sur desktop. */
+.cal-day-list { margin-top: var(--e4); }
+.cal-day-list__title { margin: 0 0 var(--e2); font-size: .9375rem; text-transform: capitalize; }
+.cal-day-list__item { border-top: 1px solid var(--bord); }
+.cal-day-list__item:first-of-type { border-top: 0; }
+.cal-day-list__link { display: grid; grid-template-columns: 56px minmax(0,1fr); align-items: baseline; gap: var(--e3); width: 100%; padding: var(--e2) 0; text-align: left; }
+.cal-day-list__link:hover .cal-day-list__title2 { color: var(--bleu); }
+.cal-day-list__time { font-size: .75rem; font-weight: 600; color: var(--gris); font-variant-numeric: tabular-nums; }
+.cal-day-list__title2 { font-size: .875rem; font-weight: 600; color: var(--encre); grid-column: 2; }
+.cal-day-list__loc { grid-column: 2; font-size: .75rem; color: var(--gris); }
+.cal-day-list__empty { color: var(--gris); font-size: .875rem; }
+
+/* Vue Semaine — timeline desktop (grille horaire réelle, 8 colonnes). */
+.cal-week-grid { display: none; }
+.cal-week-grid__head, .cal-week-grid__allday { display: grid; grid-template-columns: 56px repeat(7, minmax(0,1fr)); }
+.cal-week-grid__day-head { padding: var(--e2) var(--e1); text-align: center; font-size: .75rem; color: var(--gris); border-left: 1px solid var(--bord); }
+.cal-week-grid__day-head span { display: block; text-transform: uppercase; letter-spacing: .02em; }
+.cal-week-grid__day-head strong { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; margin-top: 2px; border-radius: 50%; font-size: .9375rem; color: var(--encre); }
+.cal-week-grid__day-head.is-today strong { background: var(--navy); color: var(--blanc); }
+.cal-week-grid__corner, .cal-week-grid__corner-label { font-size: .6875rem; color: var(--gris); display: flex; align-items: center; justify-content: center; }
+.cal-week-grid__allday { min-height: 32px; border-top: 1px solid var(--bord); border-bottom: 1px solid var(--bord); }
+.cal-week-grid__allday-cell { padding: 4px; border-left: 1px solid var(--bord); display: flex; flex-direction: column; gap: 2px; }
+.cal-week-grid__body { display: grid; grid-template-columns: 56px repeat(7, minmax(0,1fr)); }
+.cal-week-grid__hours { position: relative; }
+.cal-week-grid__col { position: relative; border-left: 1px solid var(--bord); }
+.cal-week-grid__col.is-today { background: var(--fond); }
+
+/* Timeline partagée (Semaine desktop réutilise .cal-timeline__hour/.cal-timeline__row
+   pour la colonne d'heures et les repères horaires ; Jour et Semaine mobile réutilisent
+   le composant complet components/private/calendar_timeline.html). */
+.cal-timeline { display: grid; grid-template-columns: 56px minmax(0,1fr); }
+.cal-timeline__hours, .cal-week-grid__hours { display: flex; flex-direction: column; }
+.cal-timeline__hour { height: 56px; padding-right: var(--e2); font-size: .6875rem; color: var(--gris); text-align: right; transform: translateY(-.5em); font-variant-numeric: tabular-nums; }
+.cal-timeline__grid, .cal-week-grid__col { position: relative; }
+.cal-timeline__row { height: 56px; border-top: 1px solid var(--bord); }
+.cal-event-block { position: absolute; display: flex; flex-direction: column; gap: 1px; padding: 4px 6px; overflow: hidden; background: var(--fond-2); border-left: 3px solid var(--bleu); border-radius: 6px; font-size: .6875rem; line-height: 1.25; color: var(--encre); text-align: left; box-shadow: var(--ombre); transition: box-shadow 150ms; }
+.cal-event-block:hover, .cal-event-block:focus-visible { box-shadow: var(--ombre-survol); background: var(--blanc); }
+.cal-event-block__title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-event-block__time { color: var(--gris); font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-allday { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 var(--e2) 64px; }
+
+/* Vue Semaine mobile — bandeau horizontal + timeline du jour sélectionné. */
+.cal-week-mobile { display: none; }
+.cal-week-strip { display: flex; gap: var(--e2); overflow-x: auto; padding-bottom: var(--e2); margin-bottom: var(--e3); }
+.cal-week-strip__day { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 44px; padding: var(--e2) var(--e1); border-radius: var(--r-carte); color: var(--gris); font-size: .6875rem; text-transform: uppercase; }
+.cal-week-strip__day strong { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; font-size: .9375rem; color: var(--encre); font-weight: 600; }
+.cal-week-strip__day.is-today strong { box-shadow: inset 0 0 0 1.5px var(--bleu); }
+.cal-week-strip__day.is-active { background: var(--fond-2); }
+.cal-week-strip__day.is-active strong { background: var(--navy); color: var(--blanc); }
+
+.cal-day-view .cal-day-list__title { text-transform: capitalize; }
+
+/* Dialogues natifs — ajout, détail, synchronisation. */
+.cal-dialog { width: min(440px, calc(100vw - var(--e6))); max-height: min(640px, 86vh); padding: var(--e5); border: 0; border-radius: var(--r-carte); box-shadow: var(--ombre-survol); background: var(--blanc); color: var(--encre); overscroll-behavior: contain; }
+.cal-dialog::backdrop { background: rgba(14,46,94,.45); }
+.cal-dialog__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--e3); margin-bottom: var(--e3); }
+.cal-dialog__head h2 { margin: 0; font-size: 1.0625rem; }
+.cal-dialog__close { display: inline-flex; padding: 4px; color: var(--gris); border-radius: 50%; }
+.cal-dialog__close:hover { color: var(--encre); background: var(--fond); }
+.cal-dialog__meta { margin: 0 0 var(--e2); color: var(--gris); font-size: .875rem; }
+.cal-dialog--view p[data-field="description"] { margin: 0 0 var(--e3); }
+.cal-dialog--view .badge { margin-bottom: var(--e3); }
+.cal-dialog__rsvp { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); padding-top: var(--e3); border-top: 1px solid var(--bord); }
+.cal-dialog__rsvp p { margin: 0; width: 100%; font-size: .8125rem; }
+.cal-add-form__row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--e3); }
+.cal-dialog__actions { display: flex; justify-content: flex-end; gap: var(--e2); margin-top: var(--e2); }
+.cal-sync-actions { display: flex; flex-wrap: wrap; gap: var(--e2); margin-bottom: var(--e3); }
+.cal-dialog__regen { margin-bottom: var(--e3); }
+.calendrier-aide { font-size: .8125rem; }
 .calendrier-aide summary { cursor: pointer; color: var(--bleu); font-weight: 600; }
 .calendrier-aide ul { margin-top: var(--e2); display: grid; gap: var(--e2); padding-left: var(--e4); list-style: disc; }
 
+@media (max-width: 900px) {
+  .cal-layout { grid-template-columns: minmax(0,1fr); }
+  .cal-aside { display: none; }
+}
+
+@media (min-width: 761px) {
+  .cal-week-grid { display: block; }
+  .cal-week-mobile { display: none !important; }
+}
+
 @media (max-width: 760px) {
-  .calendrier-mois__entetes { display: none; }
-  .calendrier-mois__semaine { grid-template-columns: 1fr; }
-  .calendrier-jour { min-height: 0; flex-direction: row; align-items: center; flex-wrap: wrap; }
-  .calendrier-jour__num { flex: none; width: 28px; }
-  .calendrier-jour--hors { display: none; }
-  .calendrier-semaine { grid-template-columns: 1fr; }
+  .cal-header { gap: var(--e3); }
+  .cal-header .btn { width: 100%; }
+  .cal-toolbar { flex-direction: column; align-items: stretch; gap: var(--e2); }
+  .cal-toolbar__nav { justify-content: space-between; }
+  .cal-toolbar__right { justify-content: space-between; }
+  .cal-icon-btn__label { display: none; }
+
+  .cal-day { min-height: 0; aspect-ratio: 1 / 1; max-height: 46px; }
+  .cal-day__body { padding: 2px; align-items: center; justify-content: center; gap: 2px; }
+  .cal-day__num { min-width: 20px; height: 20px; font-size: .75rem; }
+  .cal-day__chips { display: none; }
+  .cal-day__more { display: none; }
+  .cal-day__dots { display: flex; }
+
+  .cal-week-grid { display: none; }
+  .cal-week-mobile { display: block; }
+
+  .cal-dialog {
+    position: fixed; inset: 0; margin: 0; width: 100vw; max-width: none;
+    height: 100vh; height: 100dvh; max-height: none; border-radius: 0; overflow-y: auto;
+    padding: max(var(--e4), env(safe-area-inset-top)) max(var(--e4), env(safe-area-inset-right))
+      max(var(--e4), env(safe-area-inset-bottom)) max(var(--e4), env(safe-area-inset-left));
+  }
+  .cal-add-form__row { grid-template-columns: minmax(0,1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cal-arrow, .cal-view-btn, .cal-icon-btn, .cal-chip, .cal-event-block { transition: none; }
 }

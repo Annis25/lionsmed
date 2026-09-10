@@ -1,0 +1,9 @@
+{% if all_day_events %}<div class="cal-allday">{% for e in all_day_events %}<button type="button" class="cal-chip cal-chip--allday" data-cal-event="{{ e.pk }}">{{ e.title }}</button>{% endfor %}</div>{% endif %}
+<div class="cal-timeline">
+  <div class="cal-timeline__hours">{% for h in hour_labels %}<div class="cal-timeline__hour">{{ h }}</div>{% endfor %}</div>
+  <div class="cal-timeline__grid">
+    {% for h in hour_labels %}<div class="cal-timeline__row"></div>{% endfor %}
+    {% for slot in timeline %}<button type="button" class="cal-event-block" data-cal-event="{{ slot.event.pk }}" style="top:{{ slot.top_pct }}%;height:{{ slot.height_pct }}%;left:{{ slot.left_pct }}%;width:{{ slot.width_pct }}%;"><span class="cal-event-block__title">{{ slot.event.title }}</span><span class="cal-event-block__time">{{ slot.event.starts_at|date:"H:i" }}–{{ slot.event.ends_at|date:"H:i" }}{% if slot.event.location %} · {{ slot.event.location }}{% endif %}</span></button>{% endfor %}
+  </div>
+</div>
+{% if not all_day_events and not timeline %}<p class="cal-empty">Aucun événement prévu.</p>{% endif %}

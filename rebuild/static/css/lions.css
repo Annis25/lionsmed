@@ -1949,9 +1949,13 @@ html:not(.js) .nav-burger, html:not(.js) .app-bascule, html:not(.js) .champ__oei
 .member-profile-card { overflow: hidden; background: var(--blanc); border: 1px solid var(--bord); border-radius: var(--r-carte); box-shadow: var(--ombre); }
 .member-profile-card__cover { height: 112px; background: var(--navy); }
 .member-profile-card__body { padding: 0 var(--e6) var(--e6); }
-.member-profile-card__identity { display: flex; align-items: end; gap: var(--e4); margin-top: -48px; }
-.member-profile-card__identity > div { padding-top: var(--e7); }
-.member-profile-card__photo, .member-profile-card__avatar { width: 144px; height: 144px; flex: none; border: 4px solid var(--blanc); border-radius: 50%; background: var(--fond-2); color: var(--bleu); }
+.member-profile-card__identity { display: flex; align-items: flex-end; gap: var(--e4); }
+.member-profile-card__identity > div { padding-top: 0; }
+/* La photo se positionne indépendamment du bloc de texte (align-self: flex-start +
+   margin-top négatif de la moitié de sa hauteur) : elle chevauche le bandeau navy de
+   moitié, quelle que soit la hauteur du nom/texte à côté — l'ancien réglage couplait
+   les deux via align-items + un padding-top disproportionné, d'où le décalage. */
+.member-profile-card__photo, .member-profile-card__avatar { width: 144px; height: 144px; flex: none; border: 4px solid var(--blanc); border-radius: 50%; background: var(--fond-2); color: var(--bleu); align-self: flex-start; margin-top: -72px; }
 .member-profile-card__photo { display: block; object-fit: cover; object-position: center; }
 .member-profile-card__avatar { display: grid; place-items: center; }
 .member-profile-card h1 { max-width: none; margin: 0; font-size: clamp(2rem,4vw,3.25rem); }
@@ -1983,9 +1987,8 @@ html:not(.js) .nav-burger, html:not(.js) .app-bascule, html:not(.js) .champ__oei
 @media (max-width: 760px) {
   .member-profile-page { padding-block: var(--e5) var(--e7); }
   .member-profile-card__body { padding-inline: var(--e4); padding-bottom: var(--e5); }
-  .member-profile-card__identity { align-items: flex-start; flex-direction: column; margin-top: -56px; gap: var(--e3); }
-  .member-profile-card__identity > div { padding-top: 0; }
-  .member-profile-card__photo, .member-profile-card__avatar { width: 112px; height: 112px; }
+  .member-profile-card__identity { align-items: flex-start; flex-direction: column; gap: var(--e3); }
+  .member-profile-card__photo, .member-profile-card__avatar { width: 112px; height: 112px; margin-top: -56px; }
   .member-profile-layout { grid-template-columns: minmax(0,1fr); gap: var(--e4); margin-top: var(--e4); }
   .member-profile-section, .member-profile-aside { padding: var(--e4); }
 }
