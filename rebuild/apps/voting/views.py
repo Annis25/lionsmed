@@ -82,7 +82,8 @@ def manage_list(request):
 @capability_required("vote.manage")
 @require_http_methods(["GET", "POST"])
 def manage_create(request):
-    form = VoteForm(request.POST or None)
+    from uuid import uuid4
+    form = VoteForm(request.POST or None, initial={"creation_key": uuid4()})
     option_labels = request.POST.getlist("options") if request.method == "POST" else ["", ""]
     if request.method == "POST" and form.is_valid():
         try:

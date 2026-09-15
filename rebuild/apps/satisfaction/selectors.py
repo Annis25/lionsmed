@@ -46,5 +46,10 @@ def period_results(actor, period):
         return {"count": count, "hidden": True, "threshold": period.threshold, "average": None, "distribution": None}
     average = responses.aggregate(avg=Avg("score"))["avg"]
     distribution = {row["score"]: row["total"] for row in responses.values("score").annotate(total=Count("id"))}
-    return {"count": count, "hidden": False, "threshold": period.threshold, "average": round(average, 1) if average else None,
+    axes = []
+    for axis in period.axes.all():
+        stats = axis.scores.aggregate(average=Avg("score"), count=Count("id"))
+        if stats["count"] >= period.threshold:
+            axes.append({"label": axis.label, "average": round(stats["average"], 1), "count": stats["count"]})
+    return {"axes": axes, "count": count, "hidden": False, "threshold": period.threshold, "average": round(average, 1) if average else None,
         "distribution": {score: distribution.get(score, 0) for score in range(1, 6)}}

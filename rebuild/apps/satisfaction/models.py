@@ -8,6 +8,8 @@ class SatisfactionPeriod(models.Model):
     n'est pas configurée : la période n'est alors pas activable (voir scheduling.compute_window)."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     month = models.DateField(unique=True, help_text="Premier jour du mois concerné")
+    title = models.CharField(max_length=180, blank=True)
+    description = models.TextField(max_length=3000, blank=True)
     rule_version = models.CharField(max_length=32)
     opens_at = models.DateTimeField(null=True, blank=True)
     closes_at = models.DateTimeField(null=True, blank=True)
@@ -36,4 +38,25 @@ class SatisfactionResponse(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["period", "profile"], name="satisfaction_unique_period_profile"),
             models.CheckConstraint(condition=models.Q(score__gte=1) & models.Q(score__lte=5), name="satisfaction_score_range"),
+        ]
+
+
+class SatisfactionAxis(models.Model):
+    period = models.ForeignKey(SatisfactionPeriod, on_delete=models.CASCADE, related_name="axes")
+    label = models.CharField(max_length=180)
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "pk"]
+
+
+class SatisfactionAxisScore(models.Model):
+    response = models.ForeignKey(SatisfactionResponse, on_delete=models.PROTECT, related_name="axis_scores")
+    axis = models.ForeignKey(SatisfactionAxis, on_delete=models.PROTECT, related_name="scores")
+    score = models.PositiveSmallIntegerField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["response", "axis"], name="satisfaction_unique_axis_score"),
+            models.CheckConstraint(condition=models.Q(score__gte=1, score__lte=5), name="satisfaction_axis_score_range"),
         ]

@@ -289,6 +289,9 @@
 .lot2-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e4); margin-block: var(--e4); }
 .lot2-actions a { display: inline-flex; align-items: center; min-height: 44px; }
 .lot2-card-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--e4); }
+.lot2-card-grid.dues-collection-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.dashboard-actions > .carte-action:only-child { grid-column: 1 / -1; }
+@media(max-width:760px) { .lot2-card-grid.dues-collection-grid { grid-template-columns: minmax(0,1fr); } }
 .lot2-filters { display: flex; flex-wrap: wrap; align-items: end; gap: var(--e4); }
 .lot2-filters .champ { flex: 1 1 160px; min-width: 0; }
 .lot2-timeline { list-style: none; padding: 0; }

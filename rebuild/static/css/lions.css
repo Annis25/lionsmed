@@ -2004,6 +2004,46 @@ html:not(.js) .nav-burger, html:not(.js) .app-bascule, html:not(.js) .champ__oei
 .editorial-card h2 a { color: inherit; }
 @media(max-width:760px) { .lot3-form-grid { grid-template-columns: minmax(0,1fr); } }
 
+.satisfaction-meter { width: 100%; height: 24px; accent-color: #184898; }
+.satisfaction-axes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px; margin-block: 24px; }
+.satisfaction-axes .workspace-panel { margin: 0; }
+.dues-payment summary { min-height: 44px; padding-block: 12px; cursor: pointer; font-weight: 600; }
+.dues-member { padding: 24px; box-shadow: 0 4px 16px rgba(14,46,94,.04); }
+.dues-member__identity { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.dues-member__identity h2 { margin: 0 0 4px; overflow-wrap: anywhere; }
+.dues-member__avatar { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border-radius: 12px; background: var(--fond-2); color: var(--navy); font-weight: 700; }
+.dues-status--paid { background: #eaf6ef; color: #18623c; border-color: #c3e5d0; }
+.dues-status--partial { background: var(--fond-2); color: var(--navy); border-color: var(--bord); }
+.dues-status--to_regularize { background: #fff2ed; color: #963c20; border-color: #f1d4c9; }
+.dues-progress { display: flex; align-items: center; gap: 16px; margin-block: 16px; color: var(--gris); font-size: 13px; }
+.dues-progress__track { display: flex; gap: 4px; width: 160px; max-width: 100%; }
+.dues-progress__track span { flex: 1; height: 8px; border-radius: 999px; background: var(--fond-2); }
+.dues-progress__track .is-paid { background: var(--bleu); }
+.dues-member__payments { margin-top: 24px; }
+.dues-member .dues-payment { min-width: 0; border: 1px solid var(--bord); border-radius: 10px; overflow: hidden; }
+.dues-member .dues-payment summary { display: flex; align-items: center; gap: 12px; padding: 16px; list-style: none; background: var(--fond); }
+.dues-payment summary::-webkit-details-marker { display: none; }
+.dues-payment__number { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--bord); border-radius: 10px; background: var(--blanc); color: var(--navy); flex: none; }
+.dues-payment--paid .dues-payment__number { background: var(--bleu); color: var(--blanc); border-color: var(--bleu); }
+.dues-payment summary small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: var(--gris); }
+.dues-payment__action { margin-left: auto; font-size: 12px; color: var(--bleu); }
+.dues-payment__chevron { flex: none; }
+.dues-payment[open] .dues-payment__chevron { transform: rotate(180deg); }
+.dues-member .dues-payment__form { display: flex; flex-direction: column; max-width: none; gap: 8px; padding: 16px; margin: 0; }
+.dues-payment__form label:not(:first-of-type) { margin-top: 8px; }
+.dues-payment__form .btn { margin-top: 8px; align-self: flex-start; }
+.dues-payment > p { padding: 16px; margin: 0; }
+@media (max-width: 760px) {
+  .dues-member { padding: 16px; }
+  .dues-member > .bloc-titre { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .dues-progress { flex-wrap: wrap; gap: 8px; }
+  .dues-payment__form .btn { align-self: stretch; }
+}
+.phone-input { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.phone-input__country { flex: 0 0 auto; font-size: 12px; color: #0E2E5E; }
+.phone-input input { min-width: 0; flex: 1; }
+.satisfaction-distribution { display: grid; grid-template-columns: 60px minmax(0, 1fr) 100px; gap: 12px; align-items: center; margin-block: 16px; }
+.satisfaction-distribution progress { width: 100%; accent-color: #184898; }
 /* La note sous le téléphone ne doit pas repousser « Profession » dans la
    colonne voisine. Elle reste dans le flux sur mobile, où les champs sont
    volontairement empilés. */

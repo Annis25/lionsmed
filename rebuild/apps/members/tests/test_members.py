@@ -22,7 +22,7 @@ from apps.governance.models import Role, LionsYear, Mandate
 from apps.governance.mandates import save_mandate
 from apps.accounts.email_changes import validate_new_email, request_email_change
 
-PROFILE={"first_name":"Prénom synthétique","last_name":"Nom synthétique","phone":"00000","profession":"Profession privée","bio":"Bio privée"}
+PROFILE={"first_name":"Prénom synthétique","last_name":"Nom synthétique","phone":"20123456","profession":"Profession privée","bio":"Bio privée"}
 EXPERIENCE={"network":"LEO","club":"Club synthétique","function":"Président historique","district":"District synthétique","start_year":"2020","end_year":"2021","description":"Description privée","achievements":"Réalisations privées"}
 
 def picture(name="portrait.png", kind="PNG", mime="image/png", size=(80,80)):
@@ -45,7 +45,7 @@ class MemberTests(TestCase):
         result=self.client.post(reverse("members:profile_edit"),PROFILE)
         self.assertEqual(result.status_code,302)
         self.p.refresh_from_db();self.actor.refresh_from_db()
-        self.assertEqual(self.p.phone,"00000");self.assertEqual(self.actor.first_name,PROFILE["first_name"])
+        self.assertEqual(self.p.phone,"+21620123456");self.assertEqual(self.actor.first_name,PROFILE["first_name"])
 
     def test_public_title_saved_and_optional(self):
         result = self.client.post(reverse("members:profile_edit"), {**PROFILE, "public_title": "Past President"})

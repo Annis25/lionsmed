@@ -1,4 +1,5 @@
 {% extends 'base/private.html' %}
+{% load l10n %}
 
 {% block title %}Tableau de bord — Lions Club Sfax-Méditerranée{% endblock %}
 
@@ -13,6 +14,24 @@
   </div>
 </div>
 
+{% if dues_collection %}
+<section class="app-section" aria-labelledby="titre-encaissement">
+  <div class="bloc-titre"><h2 id="titre-encaissement">Suivi des cotisations</h2><a class="btn btn--outline btn--sm" href="{% url 'dues:manage_list' %}">Gérer les cotisations</a></div>
+  {% if active_year %}
+  <p class="app-note">Année Lions {{ active_year.label }} · {{ dues_collection.member_count }} membre{{ dues_collection.member_count|pluralize }} actif{{ dues_collection.member_count|pluralize }}</p>
+  {% if dues_collection.configured %}
+  <div class="lot2-card-grid dues-collection-grid">
+    <article class="workspace-panel"><h3>Cotisations encaissées</h3><p class="lot2-number">{{ dues_collection.collected|floatformat:2 }} <small>TND</small></p><p class="app-note">Tranches marquées payées.</p></article>
+    <article class="workspace-panel"><h3>Reste à encaisser</h3><p class="lot2-number">{{ dues_collection.remaining|floatformat:2 }} <small>TND</small></p><p class="app-note">Inclut les membres sans règlement enregistré.</p></article>
+  </div>
+  <div class="workspace-panel"><label for="dues-collection-progress">{{ dues_collection.rate|floatformat:1 }} % encaissés · Total attendu : {{ dues_collection.expected|floatformat:2 }} TND</label><progress class="satisfaction-meter" id="dues-collection-progress" max="100" value="{{ dues_collection.rate|unlocalize }}">{{ dues_collection.rate }} %</progress><p class="app-note">Calcul déclaratif au barème actuel de l’année, selon les membres actifs. Ce suivi ne remplace pas une comptabilité.</p></div>
+  {% else %}
+  <article class="workspace-panel"><h3>Montants non configurés</h3><p>Renseignez les montants des deux tranches pour calculer les sommes encaissées et restantes.</p><a class="btn btn--solid btn--sm" href="{% url 'dues:manage_schedule' %}">Configurer les montants</a></article>
+  {% endif %}
+  {% else %}<p class="app-note">Définissez une année Lions active pour afficher le suivi.</p>{% endif %}
+</section>
+{% endif %}
+
 <section class="atelier-barre dashboard-repere" aria-label="Repères de votre espace">
   <div>
     <strong>Votre espace membre</strong>
@@ -26,7 +45,7 @@
 {% if votes_to_complete or satisfaction_to_complete or current_dues.status != 'PAID' %}
 <section class="app-section" aria-labelledby="titre-actions">
   <div class="bloc-titre"><h2 id="titre-actions">À faire</h2></div>
-  <div class="grille-actions">
+  <div class="grille-actions dashboard-actions">
     {% for vote in votes_to_complete %}
     <article class="carte-action carte-action--urgent">
       <div class="carte-action__haut">

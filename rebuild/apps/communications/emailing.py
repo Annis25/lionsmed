@@ -13,6 +13,7 @@ from django.utils.html import strip_tags
 
 
 SUBJECTS = {
+    "EVENT_CREATED": "Nouvel événement — Lions Club Sfax-Méditerranée",
     "APPLICATION": "Candidature reçue — Lions Club Sfax-Méditerranée",
     "CONTACT": "Nouveau message de contact — Lions Club Sfax-Méditerranée",
     "EVENT_REMINDER": "Rappel de rendez-vous — Lions Club Sfax-Méditerranée",
@@ -25,6 +26,7 @@ SUBJECTS = {
 }
 
 STEMS = {
+    "EVENT_CREATED": "event_created",
     "APPLICATION": "application_receipt", "CONTACT": "contact_notice",
     "EVENT_REMINDER": "event_reminder", "IMPORTANT": "notification_important",
     "DOCUMENT": "notification_document", "VOTE_OPENED": "ouverture_vote",

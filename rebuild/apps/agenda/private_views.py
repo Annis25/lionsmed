@@ -1,4 +1,5 @@
 import calendar as calendar_module
+from uuid import uuid4
 from datetime import datetime, timedelta, date, time
 from django.contrib import messages
 from django.core.exceptions import ValidationError, PermissionDenied
@@ -131,7 +132,7 @@ def calendar(request):
     today = timezone.localdate()
     context = {"view": view, "ref_date": ref, "today": today, "can_create": can_create,
         "hour_labels": _hour_labels(),
-        "quick_form": QuickEventForm(initial={"starts_at": timezone.localtime().replace(minute=0, second=0, microsecond=0)})}
+        "quick_form": QuickEventForm(initial={"creation_key": uuid4(), "starts_at": timezone.localtime().replace(minute=0, second=0, microsecond=0)})}
 
     if view == "day":
         start = _aware(ref)
@@ -216,7 +217,7 @@ def calendar_event_add(request):
             create_calendar_event(actor=request.user, title=form.cleaned_data["title"],
                 description=form.cleaned_data["description"], starts_at=form.cleaned_data["starts_at"],
                 ends_at=form.cleaned_data["ends_at"], all_day=form.cleaned_data["all_day"],
-                location=form.cleaned_data["location"], meeting_link=form.cleaned_data["meeting_link"])
+                location=form.cleaned_data["location"], meeting_link=form.cleaned_data["meeting_link"], creation_key=form.cleaned_data["creation_key"])
             messages.success(request, "Événement ajouté au calendrier interne.")
         except ValidationError as error:
             messages.error(request, " ".join(error.messages) if hasattr(error, "messages") else str(error))

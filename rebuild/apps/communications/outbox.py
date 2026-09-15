@@ -41,12 +41,16 @@ def _mail_parts(item):
         return render_transactional(item.kind, user=user, reference=str(contact.pk), contact_subject=contact.get_subject_display())
     notification = Notification.objects.select_related("recipient").get(pk=item.object_id)
     user = notification.recipient
-    if item.kind == "EVENT_REMINDER":
+    if item.kind in ("EVENT_REMINDER", "EVENT_CREATED"):
         from apps.agenda.models import Event
         event = Event.objects.filter(pk=notification.target_id).first()
         # Un objet disparu ne doit jamais partir sous forme d'e-mail à moitié vide.
         if event is None:
             return None
+        if item.kind == "EVENT_CREATED":
+            from apps.core.permissions import can
+            if event.status != "PUBLISHED" or not event.starts_at or event.starts_at <= timezone.now() or not can(user, "event.register", event):
+                return None
         return render_transactional(item.kind, user=user, event=event)
     if item.kind == "DOCUMENT":
         from apps.documents.models import Document

@@ -29,6 +29,8 @@ class EventReminderOutboxTests(TestCase):
         self.member = account("member-reminder@example.invalid", role=Role.MEMBRE)
         self.event = event(self.president, starts_at=timezone.now() + timedelta(days=7), ends_at=timezone.now() + timedelta(days=7, hours=2))
         agenda_services.set_registration(actor=self.member, event=self.event, status=Registration.Status.CONFIRMED)
+        # Isoler les rappels : la première publication déclenche désormais aussi une annonce.
+        OutboxMessage.objects.filter(kind="EVENT_CREATED").delete()
 
     def _run_command(self):
         from django.core.management import call_command

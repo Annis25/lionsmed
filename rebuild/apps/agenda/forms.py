@@ -7,6 +7,7 @@ from .models import Event
 
 
 class QuickEventForm(StyledFields, forms.Form):
+    creation_key = forms.UUIDField(widget=forms.HiddenInput)
     """Ajout rapide depuis le calendrier interne — volontairement minimal (titre,
     description, dates, lieu, lien) : la fiche éditoriale complète (SEO, image, mise en
     avant publique) reste dans /espace/contenu/, pas dans ce formulaire."""

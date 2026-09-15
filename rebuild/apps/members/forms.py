@@ -1,4 +1,5 @@
 from django import forms
+from apps.core.phone import PhoneField
 from django.core.exceptions import PermissionDenied
 from apps.accounts.forms import StyledFields
 from apps.core.permissions import can
@@ -16,7 +17,7 @@ VISIBILITY = {
 class ProfileForm(StyledFields, forms.Form):
     first_name = forms.CharField(label="Prénom", max_length=150, widget=forms.TextInput(attrs={"autocomplete":"given-name"}))
     last_name = forms.CharField(label="Nom", max_length=150, widget=forms.TextInput(attrs={"autocomplete":"family-name"}))
-    phone = forms.CharField(label="Téléphone", required=False, max_length=32, widget=forms.TextInput(attrs={"autocomplete":"tel", "inputmode":"tel"}))
+    phone = PhoneField(required=False, max_length=32)
     profession = forms.CharField(label="Profession", required=False, max_length=150)
     public_title = forms.CharField(label="Titre affiché sur mon profil public", required=False, max_length=150,
         help_text="Par exemple « Past President », « Trésorier », « Président fondateur ». Laissez vide pour afficher « Membre ». "

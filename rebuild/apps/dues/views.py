@@ -1,11 +1,11 @@
 from django.contrib import messages
 from django.core.exceptions import ValidationError, PermissionDenied
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods, require_safe
 from apps.core.permissions import capability_required, can
 from apps.governance.models import LionsYear, ClubState
-from .selectors import own_dues, dues_for_manager, dues_management_list, schedule_for_year
+from .selectors import own_dues, dues_for_manager, schedule_for_year, treasurer_workspace, workspace_members
 from .services import set_tranche_paid, set_dues_schedule, ensure_record
 from .forms import ScheduleForm
 from .models import DuesRecord
@@ -23,20 +23,48 @@ def own(request):
 @require_safe
 def manage_list(request):
     state = ClubState.objects.select_related("active_year").first()
+    params = request.GET.copy()
+    if "year" not in params and state and state.active_year:
+        params["year"] = str(state.active_year_id)
+    selected_year, counts, rows = treasurer_workspace(request.user, params, state.active_year if state else None)
     return render(request, "espace/dues_management.html", {
-        "page_obj": dues_management_list(request.user, request.GET),
+        "page_obj": rows, "counts": counts, "selected_year": selected_year,
         "years": LionsYear.objects.all(),
         "statuses": DuesRecord.STATUS_LABELS.items(),
         "schedule": schedule_for_year(state.active_year if state else None),
         "active_year": state.active_year if state else None,
         "can_edit": can(request.user, "dues.manage"),
+        "member_suggestions": sorted({profile.user.get_full_name() for profile in workspace_members(request.user) if profile.user.get_full_name()}),
     })
+
+
+@capability_required("dues.manage")
+@require_http_methods(["POST"])
+def manage_set(request, year_id, profile_id, tranche):
+    from apps.members.models import MemberProfile
+    from .forms import TranchePaymentForm
+    year = get_object_or_404(LionsYear, pk=year_id)
+    profile = get_object_or_404(MemberProfile, pk=profile_id, status="ACTIVE", user__is_active=True)
+    from apps.core.permissions import DIRECTORY_ROLES, effective_role
+    if effective_role(profile.user) not in DIRECTORY_ROLES or tranche not in (1, 2):
+        raise PermissionDenied
+    form = TranchePaymentForm(request.POST)
+    if not form.is_valid():
+        messages.error(request, "Paiement invalide : vérifiez l’état et la date.")
+    else:
+        record = ensure_record(actor=request.user, profile=profile, lions_year=year)
+        set_tranche_paid(actor=request.user, record=record, tranche=tranche, **form.cleaned_data)
+        messages.success(request, "Cotisation enregistrée.")
+    from django.urls import reverse
+    return redirect(reverse("dues:manage_list") + f"?year={year.pk}")
 
 
 @capability_required("dues.manage")
 @require_http_methods(["POST"])
 def manage_toggle_tranche(request, record_id, tranche):
     record = dues_for_manager(request.user, record_id)
+    if tranche not in (1, 2):
+        raise PermissionDenied
     try:
         set_tranche_paid(actor=request.user, record=record, tranche=tranche,
             paid=not getattr(record, f"tranche{tranche}_paid"))

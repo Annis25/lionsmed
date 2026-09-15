@@ -125,6 +125,7 @@
   <form method="post" action="{% url 'agenda_private:calendar_event_add' %}" class="formulaire cal-add-form" novalidate>
     {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
     {% with field=quick_form.title %}{% include 'components/forms/field.html' %}{% endwith %}
+    {{ quick_form.creation_key }}
     {% with field=quick_form.all_day %}{% include 'components/forms/field.html' %}{% endwith %}
     <div class="cal-add-form__row">
       {% with field=quick_form.starts_at %}{% include 'components/forms/field.html' %}{% endwith %}

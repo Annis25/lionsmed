@@ -12,6 +12,7 @@ PERSONAL = frozenset(Role.values)
 MEMBERS = PERSONAL - {Role.INVITE}
 DIRECTORY_ROLES = MEMBERS - {Role.SUPER_ADMIN}
 MANAGERS = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.PRESIDENT_FONDATEUR, Role.SECRETAIRE})
+CONTENT_MANAGERS = MANAGERS | {Role.MARKETING_COMMUNICATION}
 CONTACT_INBOX_ROLES = frozenset({Role.PRESIDENT, Role.SECRETAIRE})
 APPLICATION_INBOX_ROLES = frozenset({Role.PRESIDENT, Role.GMT})
 # Palier « bureau » des documents : BUREAU/PRESIDENT/SECRETAIRE/SUPER_ADMIN. DIRECTEUR en est
@@ -21,7 +22,7 @@ BUREAU_LEVEL = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.SECRETAIRE, Rol
 # visibilité d'un lien de navigation. Les responsables techniques (GST/GMT/GLT/LCIF)
 # et DIRECTEUR n'y accèdent pas par défaut.
 BROADCAST_EMAIL_ROLES = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.VICE_PRESIDENT,
-    Role.SECRETAIRE, Role.TRESORIER, Role.BUREAU})
+    Role.SECRETAIRE, Role.TRESORIER, Role.BUREAU, Role.MARKETING_COMMUNICATION})
 # Cotisations (recette V2) : seul le Trésorier (+ Super Admin) modifie ; le reste du
 # bureau (PRESIDENT/SECRETAIRE/BUREAU) consulte sans modifier — décision explicite du
 # club, qui retire ce droit de modification à PRESIDENT/SECRETAIRE.
@@ -30,10 +31,10 @@ DUES_VIEWERS = BUREAU_LEVEL | {Role.TRESORIER}
 CAPABILITIES = {
     "account.access_private_area": PERSONAL,
     "account.change_own_password": PERSONAL,
-    "public_content.access_management": MANAGERS,
-    "action.create": MANAGERS, "action.edit": MANAGERS, "action.publish": MANAGERS,
+    "public_content.access_management": CONTENT_MANAGERS,
+    "action.create": CONTENT_MANAGERS, "action.edit": CONTENT_MANAGERS, "action.publish": CONTENT_MANAGERS,
     "event.create": MANAGERS, "event.edit": MANAGERS, "event.publish": MANAGERS,
-    "editorial.manage": MANAGERS, "image.manage": MANAGERS,
+    "editorial.manage": CONTENT_MANAGERS, "image.manage": CONTENT_MANAGERS,
     "application.view": APPLICATION_INBOX_ROLES, "application.manage": APPLICATION_INBOX_ROLES,
     "contact.view": CONTACT_INBOX_ROLES, "contact.manage": CONTACT_INBOX_ROLES,
     "profile.view_own": PERSONAL, "profile.edit_own": PERSONAL,

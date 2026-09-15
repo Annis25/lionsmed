@@ -1,3 +1,16 @@
 {% extends 'base/private.html' %}
-{% block title %}Satisfaction agrégée — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>Satisfaction agrégée</h1><p class="app-titre__contexte">{{ period.month|date:"F Y" }}</p></div><section class="workspace-panel">{% if results.hidden %}<p>Résultats masqués : effectif de réponses ({{ results.count }}) inférieur au seuil de confidentialité ({{ results.threshold }}).</p>{% else %}<div class="metrics"><div class="metric"><strong>{{ results.average }} / 5</strong><span>Moyenne</span></div><div class="metric"><strong>{{ results.count }}</strong><span>Réponses</span></div></div><div class="tableau-cadre"><table class="tableau"><caption>Distribution du mois</caption><thead><tr><th scope="col">Note</th><th scope="col">Réponses</th></tr></thead><tbody>{% for score, total in results.distribution.items %}<tr><td>{{ score }}</td><td>{{ total }}</td></tr>{% endfor %}</tbody></table></div><p class="app-note">Vue agrégée, sans identité des répondants. Les commentaires ne sont pas affichés nominativement.</p>{% endif %}</section>{% endblock %}
+{% block title %}Résultats satisfaction — Lionsmed{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>{{ period.title|default:'Résultats satisfaction' }}</h1><p class="app-titre__contexte">{{ period.month|date:'F Y' }}</p></div>
+<section class="workspace-panel">
+{% if results.hidden %}<p>Résultats masqués : {{ results.count }} réponses, seuil de confidentialité {{ results.threshold }}.</p>
+{% else %}
+<div class="metrics"><div class="metric"><strong>{{ results.count }}</strong><span>Participants</span></div><div class="metric"><strong>{{ results.average }} / 5</strong><span>Moyenne générale</span></div></div>
+<h2>Moyennes par axe</h2>
+<div class="satisfaction-axes">{% for axis in results.axes %}<section class="workspace-panel"><h3>{{ axis.label }}</h3><p>{{ axis.average }} / 5 · {{ axis.count }} réponses</p><meter class="satisfaction-meter" min="0" max="5" value="{{ axis.average|stringformat:'.1f' }}" aria-label="Moyenne {{ axis.label }}">{{ axis.average }} / 5</meter></section>{% empty %}<p class="app-note">Aucun agrégat par axe disponible.</p>{% endfor %}</div>
+<h2>Distribution des notes générales</h2>
+{% for score,total in results.distribution.items %}<div class="satisfaction-distribution"><span>{{ score }} / 5</span><progress max="{{ results.count }}" value="{{ total }}" aria-label="{{ score }} sur 5 : {{ total }} réponses">{{ total }}</progress><span>{{ total }} réponses</span></div>{% endfor %}
+<p class="app-note">Agrégats uniquement, sans identité ni commentaire individuel. Aucun effectif historique d’éligibles n’est figé : aucun taux de participation estimé n’est affiché.</p>
+{% endif %}</section>
+<a class="btn btn--outline" href="{% url 'satisfaction:manage_list' %}">Retour aux consultations</a>
+{% endblock %}

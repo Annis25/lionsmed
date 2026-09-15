@@ -1,4 +1,5 @@
 from django import forms
+from apps.core.phone import PhoneField
 from apps.accounts.forms import StyledFields
 from .models import EditorialSection,ClubIdentity,ImpactMetric
 class ImageForm(StyledFields,forms.Form):
@@ -12,6 +13,7 @@ class SectionForm(StyledFields,forms.ModelForm):
         model=EditorialSection;fields=["key","title","body","source"]
         labels={"key":"Rubrique","title":"Titre","body":"Texte","source":"Source de validation"}
 class IdentityForm(StyledFields,forms.ModelForm):
+    phone = PhoneField(required=False)
     validated=forms.BooleanField(label="Coordonnées validées pour publication",required=False)
     class Meta:
         model=ClubIdentity;fields=["contact_email","phone","postal_address","source"]

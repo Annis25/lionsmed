@@ -4,5 +4,6 @@ app_name = "satisfaction"
 urlpatterns = [
     path("satisfaction/", views.respond, name="respond"),
     path("satisfaction/gestion/", views.manage_list, name="manage_list"),
+    path("satisfaction/gestion/<uuid:period_id>/modifier/", views.edit, name="edit"),
     path("satisfaction/gestion/<uuid:period_id>/resultats/", views.results, name="results"),
 ]

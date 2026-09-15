@@ -16,6 +16,7 @@ class Vote(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=180)
+    creation_key = models.UUIDField(null=True, blank=True, unique=True, editable=False)
     description = models.TextField(max_length=5000, blank=True)
     status = models.CharField(max_length=8, choices=Status.choices, default=Status.DRAFT)
     mode = models.CharField(max_length=10, choices=Mode.choices, default=Mode.SINGLE)

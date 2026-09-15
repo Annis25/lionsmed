@@ -85,16 +85,24 @@ def set_vote_manager(*, actor, profile, enabled):
 
 
 @transaction.atomic
-def create_and_open_vote(*, actor, title, description, mode, blank_allowed, option_labels):
+def create_and_open_vote(*, actor, title, description, mode, blank_allowed, option_labels, creation_key=None):
     """Création en un seul geste (recette V1) : le scrutin est actif dès la création,
     partagé avec tous les électeurs, fermeture uniquement manuelle (`closes_at` vide).
     Choix unique par défaut (`min_choices`/`max_choices` = 1, non éditable ici)."""
     require(actor, "vote.manage")
+    from django.contrib.auth import get_user_model
+    actor = get_user_model().objects.select_for_update().get(pk=actor.pk)
+    if creation_key:
+        existing = Vote.objects.filter(creation_key=creation_key).first()
+        if existing:
+            if existing.responsible_id != actor.pk:
+                raise PermissionDenied
+            return existing
     labels = [label.strip()[:180] for label in option_labels if label and label.strip()]
     if len(labels) < 1:
         raise ValidationError("Au moins un choix est requis.")
     now = timezone.now()
-    vote = Vote(title=title[:180], description=(description or "")[:5000], mode=mode,
+    vote = Vote(title=title[:180], description=(description or "")[:5000], mode=mode, creation_key=creation_key,
         opens_at=now, closes_at=None, min_choices=1, max_choices=1,
         blank_allowed=blank_allowed, responsible=actor)
     vote.full_clean()

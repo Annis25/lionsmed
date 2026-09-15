@@ -1,0 +1,3 @@
+{% extends 'emails/public_base.html' %}
+{% block preheader %}Un nouvel événement a été ajouté au calendrier.{% endblock %}
+{% block content %}<h1 style="color:#0E2E5E;font-size:26px;">Un nouveau rendez-vous</h1><p>Un nouvel événement vient d’être ajouté au calendrier du Lions Club Sfax-Méditerranée.</p><p><strong>{{ event.title }}</strong><br>{{ event.starts_at|date:'l d F Y à H:i' }}{% if event.location %}<br>{{ event.location }}{% endif %}</p><p><a href="{{ origin }}/espace/calendrier/" style="display:inline-block;padding:14px 20px;background:#F8C800;color:#0E2E5E;text-decoration:none;">Voir l’événement dans le calendrier</a></p><p>Consultez les détails et confirmez votre participation si nécessaire.</p>{% endblock %}

@@ -8,8 +8,17 @@ class SatisfactionForm(StyledFields, forms.Form):
     score = forms.TypedChoiceField(choices=SCALE, coerce=int, widget=forms.RadioSelect, label="Comment évaluez-vous ce mois au club ?")
     comment = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs={"rows": 4}), label="Votre commentaire (facultatif)")
 
+    def __init__(self, *args, period=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if period:
+            for axis in period.axes.all():
+                self.fields[f"axis_{axis.pk}"] = forms.TypedChoiceField(choices=SCALE, coerce=int, label=axis.label, widget=forms.RadioSelect)
+
 
 class PeriodOpenForm(StyledFields, forms.Form):
+    title = forms.CharField(max_length=180, required=False, label="Titre")
+    description = forms.CharField(max_length=3000, required=False, label="Description", widget=forms.Textarea(attrs={"rows": 3}))
+    axes = forms.CharField(required=False, label="Axes (un intitulé par ligne, dans l’ordre souhaité)", widget=forms.Textarea(attrs={"rows": 6}))
     year = forms.IntegerField(min_value=2020, max_value=2100, label="Année")
     month = forms.IntegerField(min_value=1, max_value=12, label="Mois")
     auto_schedule = forms.BooleanField(required=False,

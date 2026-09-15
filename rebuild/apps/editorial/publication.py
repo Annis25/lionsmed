@@ -56,8 +56,12 @@ def publish_content(*,actor,obj,kind):
         if not obj.starts_at or not obj.ends_at or obj.ends_at<=obj.starts_at or not obj.location:raise ValidationError("Dates et lieu requis.")
     obj.meta_title=obj.meta_title or obj.title
     obj.meta_description=obj.meta_description or obj.summary[:300]
+    first_publication = obj.published_at is None
     obj.status="PUBLISHED";obj.published_at=obj.published_at or timezone.now();obj.updated_by=actor
     obj.full_clean();obj.save();audit(actor,kind+".published",obj)
+    if kind == "event" and first_publication:
+        from apps.agenda.services import notify_event_created
+        notify_event_created(obj)
     return obj
 
 @transaction.atomic

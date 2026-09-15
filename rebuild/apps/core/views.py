@@ -83,6 +83,9 @@ def dashboard(request):
     }
     if can(request.user, "management.access"):
         context.update(_management_overview(request, state))
+    if can(request.user, "dues.manage"):
+        from apps.dues.selectors import collection_summary
+        context["dues_collection"] = collection_summary(request.user, state.active_year if state else None)
     return render(request, "espace/dashboard.html", context)
 
 

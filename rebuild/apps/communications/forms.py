@@ -1,4 +1,5 @@
 from django import forms
+from apps.core.phone import PhoneField
 from django.utils.html import strip_tags
 from django.core import signing
 import uuid
@@ -23,6 +24,7 @@ class SubmissionForm(StyledFields,forms.ModelForm):
         return ""
 
 class ApplicationForm(SubmissionForm):
+    phone = PhoneField(required=True)
     kind="application"
     consent=forms.BooleanField(label="J’accepte l’utilisation de ces informations pour traiter ma candidature.")
     origin=forms.ChoiceField(label="Comment avez-vous connu le club ?",required=False,choices=[("","Sélectionner…"),("MEMBRE","Par un membre"),("ACTION","Lors d’une action"),("SOCIAL","Réseaux sociaux"),("PRESSE","Presse"),("LIONS","Site de Lions International"),("AUTRE","Autre")])
@@ -32,6 +34,7 @@ class ApplicationForm(SubmissionForm):
         labels={"last_name":"Nom","first_name":"Prénom","email":"Adresse e-mail","phone":"Téléphone","profession":"Profession","motivation":"Pourquoi souhaitez-vous nous rejoindre ?"}
         widgets={"last_name":forms.TextInput(attrs={"autocomplete":"family-name"}),"first_name":forms.TextInput(attrs={"autocomplete":"given-name"}),"email":forms.EmailInput(attrs={"autocomplete":"email","inputmode":"email"}),"phone":forms.TextInput(attrs={"autocomplete":"tel","inputmode":"tel"}),"motivation":forms.Textarea(attrs={"rows":6})}
 class ContactForm(SubmissionForm):
+    phone = PhoneField(required=False)
     kind="contact"
     class Meta:
         model=ContactRequest

@@ -5,6 +5,7 @@ from .models import Vote, VoteOption
 
 
 class VoteForm(StyledFields, forms.ModelForm):
+    creation_key = forms.UUIDField(widget=forms.HiddenInput)
     class Meta:
         model = Vote
         fields = ["title", "description", "mode", "blank_allowed"]

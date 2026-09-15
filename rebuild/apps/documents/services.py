@@ -8,7 +8,7 @@ from apps.core.models import AuditEvent
 from .models import Document, DocumentGrant
 from .storage import document_storage
 from .office_validation import validate_structure
-from .scanning import scan_bytes, ScannerUnavailable
+from .scanning import scan_bytes
 
 MAX_BYTES = 50 * 1024 * 1024
 # Extension et MIME annoncé doivent concorder ; complété par la signature/structure (office_validation)
@@ -50,7 +50,7 @@ def upload_document(*, actor, upload, title, description, category, visibility, 
     validate_structure(raw, suffix)
     try:
         result = scan_bytes(raw)
-    except ScannerUnavailable as error:
+    except Exception as error:
         # Échec fermé : sans scanner joignable, aucun document ne devient disponible.
         raise ValidationError("Analyse antivirus indisponible : dépôt refusé, réessayez plus tard.") from error
     if not result.clean:

@@ -6,6 +6,7 @@ from apps.editorial.models import Publication, PublicationQuerySet
 class EventQuerySet(PublicationQuerySet):
     def public(self):return super().public().filter(visibility="PUBLIC")
 class Event(Publication):
+    creation_key=models.UUIDField(null=True,blank=True,unique=True,editable=False)
     starts_at=models.DateTimeField(null=True,blank=True)
     ends_at=models.DateTimeField(null=True,blank=True)
     all_day=models.BooleanField(default=False,help_text="Événement journée entière — heures ignorées à l'affichage.")

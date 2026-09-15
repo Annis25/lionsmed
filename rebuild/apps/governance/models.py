@@ -18,6 +18,7 @@ class Role(models.TextChoices):
     GMT = "GMT", "GMT"
     GLT = "GLT", "GLT"
     LCIF = "LCIF", "LCIF"
+    MARKETING_COMMUNICATION = "MARKETING_COMMUNICATION", "Marketing & Communication"
     MEMBRE = "MEMBRE", "Membre"
     INVITE = "INVITE", "Invité"
 

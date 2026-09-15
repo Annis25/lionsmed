@@ -164,6 +164,7 @@ class CalendarQuickAddTests(TestCase):
     def test_view_created_via_http_appears_for_everyone(self):
         self.client.force_login(self.president)
         response = self.client.post(reverse("agenda_private:calendar_event_add"), {
+            "creation_key": str(self.client.get(reverse("agenda_private:calendar")).context["quick_form"].initial["creation_key"]),
             "title": "Formation secourisme", "description": "Premiers secours", "all_day": "",
             "starts_at": (timezone.now()+timedelta(days=5)).strftime("%Y-%m-%dT%H:%M"),
             "ends_at": (timezone.now()+timedelta(days=5, hours=3)).strftime("%Y-%m-%dT%H:%M"),

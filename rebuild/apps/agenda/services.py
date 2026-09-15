@@ -47,11 +47,19 @@ def record_attendance(*,actor,event,profile,status,note=""):
     return attendance
 
 @transaction.atomic
-def create_calendar_event(*, actor, title, description, starts_at, ends_at, all_day, location, meeting_link):
+def create_calendar_event(*, actor, title, description, starts_at, ends_at, all_day, location, meeting_link, creation_key=None):
     """Ajout rapide depuis le calendrier interne : jamais public par défaut (`visibility`
     reste PRIVATE — la publication publique passe par le workflow éditorial existant,
     /espace/contenu/, jamais automatique)."""
     require(actor, "event.create")
+    from django.contrib.auth import get_user_model
+    actor = get_user_model().objects.select_for_update().get(pk=actor.pk)
+    if creation_key:
+        existing = Event.objects.filter(creation_key=creation_key).first()
+        if existing:
+            if existing.created_by_id != actor.pk:
+                raise PermissionDenied
+            return existing
     if not title or not title.strip():
         raise ValidationError("Le titre est obligatoire.")
     if not starts_at:
@@ -60,8 +68,9 @@ def create_calendar_event(*, actor, title, description, starts_at, ends_at, all_
         raise ValidationError("La fin doit être postérieure au début.")
     base = slugify(title)[:150] or "evenement"
     slug = f"{base}-{secrets.token_hex(4)}"
-    event = Event(title=title[:180], slug=slug, summary=(description or "")[:500], body=description or "",
-        starts_at=starts_at, ends_at=ends_at or starts_at, all_day=all_day, location=location[:200],
+    from datetime import timedelta
+    event = Event(title=title[:180], slug=slug, summary=(description or "")[:500], body=description or "", creation_key=creation_key,
+        starts_at=starts_at, ends_at=ends_at or starts_at + timedelta(hours=1), all_day=all_day, location=location[:200],
         meeting_link=meeting_link or "", visibility="PRIVATE",
         status="PUBLISHED", published_at=timezone.now(), created_by=actor, updated_by=actor)
     event.meta_title = event.title
@@ -69,7 +78,25 @@ def create_calendar_event(*, actor, title, description, starts_at, ends_at, all_
     event.full_clean()
     event.save()
     audit(actor, "event.created_from_calendar", event)
+    notify_event_created(event)
     return event
+
+
+@transaction.atomic
+def notify_event_created(event):
+    """Une annonce par événement/destinataire ; jamais d'annonce à chaque modification."""
+    from datetime import timedelta
+    from apps.communications.services import broadcast_recipients, notify
+    event = Event.objects.select_for_update().get(pk=event.pk)
+    now = timezone.now()
+    if event.status != "PUBLISHED" or not event.starts_at or not now < event.starts_at <= now + timedelta(days=7):
+        return
+    for recipient in broadcast_recipients():
+        if can(recipient, "event.register", event):
+            notify(recipient=recipient, category="EVENT", title=f"Nouvel événement — {event.title}",
+                excerpt=f"Le {timezone.localtime(event.starts_at):%d/%m/%Y à %H:%M}.",
+                event_key=f"event-created:{event.pk}:{recipient.pk}:v1", target_kind="event", target_id=event.pk,
+                email=True, outbox_kind="EVENT_CREATED")
 
 
 @transaction.atomic

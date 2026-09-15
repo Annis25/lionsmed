@@ -238,6 +238,7 @@ class CreateAndOpenVoteTests(TestCase):
     def test_manage_create_view_one_shot_redirects_to_tracking(self):
         self.client.force_login(self.president)
         response = self.client.post(reverse("voting:manage_create"), {
+            "creation_key": str(self.client.get(reverse("voting:manage_create")).context["form"].initial["creation_key"]),
             "title": "Nouveau bureau", "description": "", "mode": "SINGLE",
             "options": ["Candidat A", "Candidat B"],
         })
