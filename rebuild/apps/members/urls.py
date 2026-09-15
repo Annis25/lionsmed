@@ -4,6 +4,7 @@ app_name="members"
 urlpatterns=[
     path("profil/",views.profile,name="profile"),
     path("profil/modifier/",views.edit_profile,name="profile_edit"),
+    path("profil/photo/original/",views.photo_original,name="photo_original"),
     path("profil/email/",views.email_information,name="email_information"),
     path("profil/public/qr/",views.public_profile_qr,name="public_profile_qr"),
     path("annuaire/",views.directory,name="directory"),

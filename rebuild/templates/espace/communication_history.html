@@ -1,3 +1,23 @@
 {% extends 'base/private.html' %}
-{% block title %}Historique communication · Lionsmed{% endblock %}
-{% block content %}<section class="app-page"><header class="app-page__head"><h1>Historique des communications</h1><p>Les messages déjà envoyés sont conservés à titre d’audit et ne sont pas modifiables.</p></header><div class="app-card"><table class="table"><thead><tr><th>Objet</th><th>Date</th><th>Auteur</th><th>Destinataires</th><th>Statut</th></tr></thead><tbody>{% for campaign in page_obj %}<tr><td>{{ campaign.subject }}</td><td>{{ campaign.created_at|date:"d/m/Y H:i" }}</td><td>{{ campaign.created_by.get_full_name|default:campaign.created_by.email }}</td><td>{{ campaign.recipient_count }}</td><td>{{ campaign.get_status_display }}</td></tr>{% empty %}<tr><td colspan="5">Aucune communication envoyée.</td></tr>{% endfor %}</tbody></table></div><p><a href="{% url 'communications:broadcast' %}">Envoyer un e-mail</a></p></section>{% endblock %}
+{% block title %}Historique des communications · Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Historique des communications</h1><p class="app-titre__contexte">Les messages déjà envoyés sont conservés à titre d’audit et ne sont pas modifiables.</p></div>
+<section class="workspace-panel">
+<div class="tableau-cadre"><table class="tableau">
+<caption class="visually-hidden">Communications envoyées aux membres</caption>
+<thead><tr><th scope="col">Objet</th><th scope="col">Date</th><th scope="col">Auteur</th><th scope="col">Audience</th><th scope="col">Destinataires</th><th scope="col">Envoyés</th><th scope="col">Échecs</th><th scope="col">Statut</th></tr></thead>
+<tbody>{% for campaign in page_obj %}<tr>
+<td data-libelle="Objet">{{ campaign.subject }}</td>
+<td data-libelle="Date">{{ campaign.created_at|date:"d/m/Y H:i" }}</td>
+<td data-libelle="Auteur">{{ campaign.created_by.get_full_name|default:campaign.created_by.email }}</td>
+<td data-libelle="Audience">{{ campaign.get_audience_display }}{% if campaign.external_emails %} + {{ campaign.external_emails|length }} externe{{ campaign.external_emails|length|pluralize }}{% endif %}</td>
+<td data-libelle="Destinataires">{{ campaign.recipient_count }}</td>
+<td data-libelle="Envoyés">{{ campaign.sent_count }}</td>
+<td data-libelle="Échecs">{{ campaign.failed_count }}</td>
+<td data-libelle="Statut"><span class="badge{% if campaign.status == 'SENT' %} badge--paye{% elif campaign.status == 'PARTIAL' %} badge--a-regulariser{% else %} badge--en-cours{% endif %}">{{ campaign.get_status_display }}</span></td>
+</tr>{% empty %}<tr><td colspan="8">Aucune communication envoyée.</td></tr>{% endfor %}</tbody>
+</table></div>
+{% include 'components/private/pagination.html' %}
+</section>
+<p><a href="{% url 'communications:broadcast' %}">Envoyer un e-mail</a></p>
+{% endblock %}

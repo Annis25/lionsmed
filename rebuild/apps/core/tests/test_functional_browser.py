@@ -22,6 +22,18 @@ class FunctionalBrowserTests(StaticLiveServerTestCase):
         treasurer = account("visual-treasurer@example.invalid", role=Role.TRESORIER)
         member = account("visual-member@example.invalid")
         respondent = account("visual-respondent@example.invalid")
+        from tempfile import TemporaryDirectory
+        from django.test import override_settings
+        from apps.members.tests.test_members import picture
+        from apps.members.uploads import encode_photo, photo_storage
+        portrait_directory = TemporaryDirectory()
+        self.addCleanup(portrait_directory.cleanup)
+        portrait_settings = override_settings(PRIVATE_MEDIA_ROOT=portrait_directory.name)
+        portrait_settings.enable()
+        self.addCleanup(portrait_settings.disable)
+        profile = member.member_profile
+        profile.photo_key = photo_storage().save("portraits/visual.jpg", encode_photo(picture(size=(240, 400))))
+        profile.save()
         period = open_period(actor=president, year=2026, month=9, title="Satisfaction générale", description="Votre avis sur la vie du club", threshold=1,
             opens_at=timezone.now()-timedelta(hours=1), closes_at=timezone.now()+timedelta(days=1), axes="Organisation\nCommunication\nVie du club")
         submit_satisfaction(actor=respondent, period=period, score=4, axis_scores={axis.pk: 4 for axis in period.axes.all()})

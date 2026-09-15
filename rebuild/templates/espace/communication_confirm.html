@@ -1,3 +1,25 @@
 {% extends 'base/private.html' %}
-{% block title %}Confirmer l’envoi · Lionsmed{% endblock %}
-{% block content %}<section class="app-page"><header class="app-page__head"><h1>Confirmer l’envoi</h1><p>Vous êtes sur le point d’envoyer cet e-mail à <strong>{{ recipient_count }} membres</strong>.</p></header><div class="app-card"><h2>{{ form.cleaned_data.subject }}</h2><p>{{ form.cleaned_data.body|linebreaksbr }}</p><form method="post">{% csrf_token %}{% for field in form %}{{ field }}{% endfor %}<input type="hidden" name="confirmed" value="yes"><div class="actions"><a class="btn btn--ghost" href="{% url 'communications:broadcast' %}">Annuler</a><button class="btn" type="submit" name="action" value="send">Confirmer l’envoi</button></div></form></div></section>{% endblock %}
+{% load static %}
+{% block title %}Confirmer l’envoi · Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Confirmer l’envoi</h1><p class="app-titre__contexte">Vous êtes sur le point d’envoyer ce message à {{ counts.total }} destinataire{{ counts.total|pluralize }}.</p></div>
+<section class="workspace-panel lot2-reading">
+<dl class="paire-liste">
+<div><dt>Objet</dt><dd>{{ form.cleaned_data.subject }}</dd></div>
+<div><dt>Audience</dt><dd>{{ audience_label }}</dd></div>
+<div><dt>Membres</dt><dd>{{ counts.internal }}</dd></div>
+<div><dt>Adresses supplémentaires</dt><dd>{{ counts.external }}{% if external_emails %} ({{ external_emails|join:", " }}){% endif %}</dd></div>
+<div><dt>Total</dt><dd><strong>{{ counts.total }} destinataire{{ counts.total|pluralize }}</strong></dd></div>
+</dl>
+<p class="champ__label">Message</p>
+<p>{{ form.cleaned_data.body|linebreaksbr }}</p>
+<form method="post" action="{% url 'communications:broadcast' %}">
+{% csrf_token %}{% for field in form %}{{ field.as_hidden }}{% endfor %}<input type="hidden" name="confirmed" value="yes">
+<div class="lot2-actions">
+<button class="btn btn--outline" type="submit" name="action" value="back">Retour</button>
+<button class="btn btn--solid" type="submit" name="action" value="send" data-confirm-send>Confirmer l’envoi</button>
+</div>
+</form>
+</section>
+<script src="{% static 'js/communication.js' %}" defer></script>
+{% endblock %}

@@ -8,7 +8,7 @@ from .selectors import own_profile, profile_data, directory_page, member_profile
 from .forms import ProfileForm, ExperienceForm
 from .services import update_profile, save_experience, delete_experience
 from .uploads import photo_storage
-from .public_profile import public_profile_url, qr_png_bytes
+from .public_profile import public_profile_url, qr_png_bytes, qr_png_data_uri
 
 @capability_required("profile.view_own")
 @require_safe
@@ -16,7 +16,9 @@ def profile(request):
     p = own_profile(request.user)
     context = {"member":profile_data(request.user,p,own=True),"own":True}
     if p.public_profile_enabled and p.public_slug:
-        context["public_profile_url"] = public_profile_url(p)
+        url = public_profile_url(p)
+        context["public_profile_url"] = url
+        context["qr_data_uri"] = qr_png_data_uri(url)
     return render(request,"espace/profile.html",context)
 
 @capability_required("profile.edit_own")
@@ -30,8 +32,23 @@ def edit_profile(request):
     else:
         initial = {key:getattr(p,key) for key in ["phone","profession","public_title","bio","public_profile_enabled"]}
         initial.update(first_name=p.user.first_name,last_name=p.user.last_name)
+        initial.update(photo_zoom=p.photo_crop.get("zoom", 1), photo_x=p.photo_crop.get("x", 50), photo_y=p.photo_crop.get("y", 50))
         form = ProfileForm(actor=request.user,profile=p,initial=initial)
-    return render(request,"espace/profile_edit.html",{"form":form,"member":profile_data(request.user,p,own=True)})
+    return render(request,"espace/profile_edit.html",{"form":form,"member":profile_data(request.user,p,own=True), "has_portrait": bool(p.photo_key)})
+
+
+@capability_required("profile.edit_own")
+@require_safe
+def photo_original(request):
+    p = own_profile(request.user)
+    key = p.photo_original_key or p.photo_key
+    if not key: raise Http404
+    try: handle = photo_storage().open(key, "rb")
+    except FileNotFoundError: raise Http404
+    response = FileResponse(handle, content_type="image/jpeg")
+    response["Cache-Control"] = "private, no-store"
+    response["X-Content-Type-Options"] = "nosniff"
+    return response
 
 @capability_required("directory.view")
 @require_safe
@@ -97,6 +114,6 @@ def public_profile_qr(request):
     p = own_profile(request.user)
     if not p.public_profile_enabled or not p.public_slug: raise Http404
     response = HttpResponse(qr_png_bytes(public_profile_url(p)), content_type="image/png")
-    response["Content-Disposition"] = 'attachment; filename="profil-public-qr.png"'
+    response["Content-Disposition"] = f'attachment; filename="lionsmed-{p.public_slug}-qr.png"'
     response["Cache-Control"] = "private, no-store"
     return response

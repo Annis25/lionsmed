@@ -17,3 +17,17 @@ def photo_storage():
 
 
 from apps.core.image_processing import encode_photo
+
+
+def crop_portrait(source, crop):
+    """Même géométrie carrée que l’aperçu navigateur, sortie nettoyée JPEG."""
+    with Image.open(source) as image:
+        image.load()
+        side = min(image.size) / crop["zoom"]
+        left = (image.width - side) * crop["x"] / 100
+        top = (image.height - side) * crop["y"] / 100
+        portrait = image.convert("RGB").resize((512, 512), Image.Resampling.LANCZOS,
+                                               box=(left, top, left + side, top + side))
+        out = BytesIO()
+        portrait.save(out, format="JPEG", quality=90)
+        return ContentFile(out.getvalue())

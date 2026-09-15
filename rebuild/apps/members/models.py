@@ -13,6 +13,8 @@ class MemberProfile(models.Model):
     profession = models.CharField(max_length=150, blank=True)
     bio = models.TextField(max_length=1000, blank=True)
     photo_key = models.CharField(max_length=100, blank=True, editable=False)
+    photo_original_key = models.CharField(max_length=100, blank=True, editable=False)
+    photo_crop = models.JSONField(default=dict, blank=True, editable=False)
     directory_visible = models.BooleanField(default=False)
     share_profession = models.BooleanField(default=False)
     share_bio = models.BooleanField(default=False)

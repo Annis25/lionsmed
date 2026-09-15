@@ -15,9 +15,17 @@ def _mail_parts(item):
     user = recipient_for_email(item.recipient)
     if item.kind == "MEMBER_BROADCAST":
         campaign = MemberEmailCampaign.objects.get(pk=item.object_id)
-        if user is None:
-            return None
-        return render_broadcast(campaign, user=user)
+        if user is not None:
+            # Personnalisé dès qu'un compte actif correspond — y compris une adresse
+            # externe qui se trouve coïncider avec un membre (voir emailing.render_broadcast).
+            return render_broadcast(campaign, user=user)
+        if ":ext:" in item.event_key:
+            # Adresse supplémentaire saisie manuellement, sans compte connu : salutation
+            # générique (« Bonjour, »), jamais de prénom inventé.
+            return render_broadcast(campaign, user=None)
+        # Membre interne mis en file à l'origine, devenu introuvable/inactif avant
+        # l'envoi (droit retiré, compte désactivé...) : jamais de retry, jamais d'envoi.
+        return None
     if item.kind == "ACTIVATION":
         from django.contrib.auth.tokens import default_token_generator
         from django.utils.encoding import force_bytes

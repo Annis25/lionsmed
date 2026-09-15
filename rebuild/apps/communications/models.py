@@ -48,6 +48,10 @@ class MemberEmailCampaign(models.Model):
         SENT = "SENT", "Envoyée"
         PARTIAL = "PARTIAL", "Envoi partiel"
 
+    class Audience(models.TextChoices):
+        ALL_ACTIVE = "ALL_ACTIVE", "Tous les membres actifs"
+        RESPONSIBLES = "RESPONSIBLES", "Responsables uniquement"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     idempotency_key = models.UUIDField(unique=True)
     subject = models.CharField(max_length=180)
@@ -55,6 +59,14 @@ class MemberEmailCampaign(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="member_email_campaigns")
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=8, choices=Status.choices, default=Status.QUEUED)
+    audience = models.CharField(max_length=12, choices=Audience.choices, default=Audience.ALL_ACTIVE)
+    # Nombre de membres internes atteints (sous-ensemble de recipient_count) ; le nombre
+    # d'adresses supplémentaires se lit avec len(external_emails). Adresses normalisées
+    # (recadrées, en minuscules, dédupliquées) : nécessaires pour l'audit opérationnel
+    # (historique, distinction membre/externe à l'envoi) — jamais affichées en clair
+    # dans les vues générales, jamais journalisées ailleurs.
+    internal_recipient_count = models.PositiveIntegerField(default=0)
+    external_emails = models.JSONField(default=list, blank=True)
     recipient_count = models.PositiveIntegerField(default=0)
     queued_count = models.PositiveIntegerField(default=0)
     sent_count = models.PositiveIntegerField(default=0)

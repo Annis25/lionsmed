@@ -25,6 +25,9 @@ class ProfileForm(StyledFields, forms.Form):
     bio = forms.CharField(label="Présentation", required=False, max_length=1000, widget=forms.Textarea(attrs={"rows":3}))
     photo = forms.FileField(label="Photo privée", required=False, widget=forms.FileInput(attrs={"accept":"image/jpeg,image/png,image/webp"}), help_text="JPEG, PNG ou WebP · 5 Mo · 16 millions de pixels maximum.")
     remove_photo = forms.BooleanField(label="Supprimer ma photo actuelle", required=False)
+    photo_zoom = forms.FloatField(required=False, min_value=1, max_value=4, widget=forms.HiddenInput)
+    photo_x = forms.FloatField(required=False, min_value=0, max_value=100, widget=forms.HiddenInput)
+    photo_y = forms.FloatField(required=False, min_value=0, max_value=100, widget=forms.HiddenInput)
     public_profile_enabled = forms.BooleanField(label="Rendre mon profil public", required=False,
         help_text="En activant cette option, une page publique Lionsmed sera créée à votre nom. Elle "
             "pourra être consultée sur Internet et apparaître dans les moteurs de recherche. Votre "
@@ -36,6 +39,10 @@ class ProfileForm(StyledFields, forms.Form):
 
     def clean(self):
         data = super().clean()
+        from math import isfinite
+        for name in ("photo_zoom", "photo_x", "photo_y"):
+            if data.get(name) is not None and not isfinite(data[name]):
+                self.add_error(name, "Réglage de cadrage invalide.")
         if data.get("photo") and data.get("remove_photo"):
             raise forms.ValidationError("Choisissez une nouvelle photo ou sa suppression, pas les deux.")
         return data

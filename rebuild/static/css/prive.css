@@ -291,6 +291,11 @@
 .lot2-card-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--e4); }
 .lot2-card-grid.dues-collection-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 .dashboard-actions > .carte-action:only-child { grid-column: 1 / -1; }
+.portrait-editor:not([hidden]) { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 24px; padding: 24px; margin-top: 16px; border: 1px solid var(--bord); border-radius: 10px; background: var(--fond); }
+.portrait-editor canvas { display: block; width: 100%; max-width: 320px; aspect-ratio: 1; border-radius: 50%; touch-action: none; cursor: grab; background: var(--fond-2); }
+.portrait-editor__controls { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.portrait-editor__controls input { width: 100%; min-height: 44px; accent-color: var(--bleu); }
+@media(max-width:760px) { .portrait-editor:not([hidden]) { grid-template-columns: minmax(0,1fr); padding: 16px; } }
 @media(max-width:760px) { .lot2-card-grid.dues-collection-grid { grid-template-columns: minmax(0,1fr); } }
 .lot2-filters { display: flex; flex-wrap: wrap; align-items: end; gap: var(--e4); }
 .lot2-filters .champ { flex: 1 1 160px; min-width: 0; }
@@ -491,4 +496,50 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cal-arrow, .cal-view-btn, .cal-icon-btn, .cal-chip, .cal-event-block { transition: none; }
+}
+
+/* Profil public — bloc « Mon profil public » et modal QR (dialog native, cf. .cal-dialog). */
+.qr-public-url { margin: 0 0 var(--e3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .875rem; }
+.qr-public-url a { color: var(--bleu); font-weight: 600; }
+
+.qr-dialog { text-align: center; }
+.qr-dialog .cal-dialog__head { text-align: left; }
+.qr-dialog__lede { margin: 0 0 var(--e4); font-size: .875rem; color: var(--gris); }
+.qr-image { display: block; width: 100%; max-width: 300px; height: auto; margin: 0 auto var(--e4); border-radius: var(--e2); box-shadow: var(--ombre); }
+.qr-dialog__url { margin: 0 0 var(--e4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .8125rem; color: var(--gris); }
+.qr-dialog .lot2-actions { justify-content: center; margin-block: 0 var(--e4); }
+.qr-dialog .lot2-actions button { display: inline-flex; align-items: center; min-height: 44px; }
+.qr-dialog__hint { padding-top: 0; }
+
+@media (max-width: 760px) {
+  .qr-image { max-width: 240px; }
+  .qr-dialog .lot2-actions { flex-direction: column; align-items: stretch; }
+}
+
+/* Communication — composition (deux colonnes desktop), destinataires supplémentaires,
+   aperçu et historique. */
+.communication-layout { display: grid; grid-template-columns: minmax(0,1fr) 340px; grid-template-areas: "main aside"; gap: var(--e5); align-items: start; }
+.communication-layout__main { grid-area: main; display: grid; gap: var(--e5); min-width: 0; }
+.communication-layout__aside { grid-area: aside; position: sticky; top: var(--e5); }
+.communication-layout__aside .lot2-actions { flex-direction: column; align-items: stretch; margin-block: var(--e4) 0; }
+@media (max-width: 1080px) {
+  .communication-layout { grid-template-columns: minmax(0,1fr); grid-template-areas: "main" "aside"; }
+  .communication-layout__aside { position: static; }
+}
+
+.email-picker__row { display: flex; gap: var(--e2); margin-top: var(--e2); }
+.email-picker__row input { flex: 1 1 auto; min-width: 0; }
+.email-picker__row button { flex: none; white-space: nowrap; }
+.email-picker__error { margin: var(--e2) 0 0; font-size: var(--t-meta); color: #B3243B; }
+.email-chips { display: flex; flex-wrap: wrap; gap: var(--e2); margin-top: var(--e3); }
+.email-chip { display: inline-flex; align-items: center; gap: var(--e1); max-width: 100%; padding: var(--e1) var(--e1) var(--e1) var(--e3); border: 1px solid var(--bord); border-radius: var(--r-pilule); background: var(--fond-2); font-size: .8125rem; color: var(--encre); }
+.email-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.email-chip button { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; color: var(--gris); font-size: 1rem; line-height: 1; }
+.email-chip button:hover { background: var(--blanc); color: #B3243B; }
+
+.email-preview-frame { display: block; width: 100%; height: 640px; margin-top: var(--e3); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); }
+.email-preview-text { margin-top: var(--e2); padding: var(--e3); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); white-space: pre-wrap; font-size: .8125rem; line-height: 1.6; }
+
+@media (max-width: 760px) {
+  .email-picker__row { flex-direction: column; align-items: stretch; }
 }

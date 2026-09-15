@@ -25,6 +25,15 @@ const assert = require('assert');
       assert.equal(response.status(), 200, path);
       assert.equal(new URL(page.url()).pathname, path, 'Unexpected redirect');
       await page.evaluate(() => document.fonts.ready);
+      if (name === 'phone') {
+        await page.locator('[data-portrait-editor]:visible').waitFor();
+        await page.locator('#portrait-zoom').fill('2');
+        assert.equal(await page.locator('#id_photo_zoom').inputValue(), '2');
+        await page.locator('#portrait-y').fill('25');
+        assert.equal(await page.locator('#id_photo_y').inputValue(), '25');
+        await page.locator('[data-portrait-reset]').click();
+        assert.equal(await page.locator('#id_photo_zoom').inputValue(), '1');
+      }
       const result = await page.evaluate(() => ({
         overflow: document.documentElement.scrollWidth > innerWidth,
         h1: document.querySelectorAll('h1').length,

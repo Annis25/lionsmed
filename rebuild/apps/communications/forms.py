@@ -1,12 +1,17 @@
+import re
 from django import forms
 from apps.core.phone import PhoneField
+from django.core.validators import validate_email
 from django.utils.html import strip_tags
 from django.core import signing
 import uuid
 from apps.accounts.forms import StyledFields
 from apps.accounts.models import normalize_email
 from apps.members.models import MembershipApplication
-from .models import ContactRequest
+from .models import ContactRequest, MemberEmailCampaign
+
+EXTRA_EMAILS_MAX = 50
+_EMAIL_SPLIT_RE = re.compile(r"[,;\s]+")
 
 class SubmissionForm(StyledFields,forms.ModelForm):
     submission_token=forms.CharField(widget=forms.HiddenInput)
@@ -52,6 +57,11 @@ class MemberBroadcastForm(StyledFields, forms.Form):
     campaign_key = forms.UUIDField(widget=forms.HiddenInput, required=True)
     subject = forms.CharField(max_length=180, label="Objet")
     body = forms.CharField(max_length=8000, label="Message", widget=forms.Textarea(attrs={"rows": 12}))
+    audience = forms.ChoiceField(choices=MemberEmailCampaign.Audience.choices, widget=forms.RadioSelect,
+        initial=MemberEmailCampaign.Audience.ALL_ACTIVE, label="Destinataires")
+    extra_emails = forms.CharField(required=False, label="Destinataires supplémentaires",
+        widget=forms.Textarea(attrs={"rows": 3, "placeholder": "adresse@exemple.com"}),
+        help_text="Une adresse par ligne, ou séparées par une virgule.")
 
     def clean_subject(self):
         value = " ".join(strip_tags(self.cleaned_data["subject"]).replace("\r", "").replace("\n", " ").split())
@@ -67,3 +77,24 @@ class MemberBroadcastForm(StyledFields, forms.Form):
         if not value:
             raise forms.ValidationError("Le message est obligatoire.")
         return value
+
+    def clean_extra_emails(self):
+        raw = self.cleaned_data.get("extra_emails", "")
+        tokens = [token.strip() for token in _EMAIL_SPLIT_RE.split(raw) if token.strip()]
+        deduped, seen = [], set()
+        for token in tokens:
+            key = token.lower()
+            if key not in seen:
+                seen.add(key)
+                deduped.append(token)
+        invalid = []
+        for token in deduped:
+            try:
+                validate_email(token)
+            except forms.ValidationError:
+                invalid.append(token)
+        if invalid:
+            raise forms.ValidationError("Adresse(s) invalide(s) : " + ", ".join(invalid))
+        if len(deduped) > EXTRA_EMAILS_MAX:
+            raise forms.ValidationError(f"{EXTRA_EMAILS_MAX} adresses supplémentaires maximum ({len(deduped)} saisies).")
+        return deduped

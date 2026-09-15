@@ -3,10 +3,17 @@ from django.core.exceptions import PermissionDenied,ValidationError
 from django.db import transaction
 from django.utils import timezone
 from django.core.validators import validate_email
-from apps.core.permissions import can, effective_role, MEMBERS
+from apps.core.permissions import can, effective_role
 from apps.editorial.publication import require,audit
+from apps.governance.models import Role
 from apps.members.models import MembershipApplication
 from .models import ContactRequest,OutboxMessage,Notification,MemberEmailCampaign
+
+Audience = MemberEmailCampaign.Audience
+# Rôles jamais qualifiés de « responsables » même s'ils étaient un jour ajoutés à
+# BROADCAST_EMAIL_ROLES : définition métier fixe, indépendante de la liste des rôles
+# autorisés à déclencher une diffusion (apps.core.permissions.BROADCAST_EMAIL_ROLES).
+_NOT_RESPONSIBLE = frozenset({Role.MEMBRE, Role.INVITE})
 
 @transaction.atomic
 def submit(form):
@@ -55,36 +62,78 @@ def send_important_notification(*,actor,recipient,title,excerpt):
     return notification
 
 
-def broadcast_recipients():
-    """Membres actifs avec rôle métier et adresse exploitable, hors invités/suspendus."""
+def broadcast_recipients(audience=Audience.ALL_ACTIVE):
+    """Membres actifs avec adresse exploitable, hors invités/suspendus, et hors rôle
+    ambigu (effective_role() refuse déjà de trancher — voir apps.core.permissions).
+
+    ALL_ACTIVE : tout rôle métier (comportement historique, inchangé).
+    RESPONSIBLES : rôle actif différent de MEMBRE/INVITE — résolu uniquement via la
+    logique officielle effective_role(), jamais une liste de rôles recopiée à la main."""
     from apps.members.models import MemberProfile
+    if audience not in Audience.values:
+        raise ValidationError("Audience invalide.")
+    excluded = _NOT_RESPONSIBLE if audience == Audience.RESPONSIBLES else {Role.INVITE}
     profiles = MemberProfile.objects.filter(
         status=MemberProfile.Status.ACTIVE, user__is_active=True,
     ).select_related("user")
-    return [profile.user for profile in profiles if effective_role(profile.user) in MEMBERS and profile.user.email]
+    recipients = []
+    for profile in profiles:
+        role = effective_role(profile.user)
+        if role is not None and role not in excluded and profile.user.email:
+            recipients.append(profile.user)
+    return recipients
+
+
+def resolve_broadcast_recipients(audience, extra_emails):
+    """(membres, externes) sans doublon (insensible à la casse) : une adresse externe qui
+    coïncide avec un membre interne est absorbée par celui-ci, jamais envoyée deux fois."""
+    members = broadcast_recipients(audience)
+    seen = {member.email.strip().lower() for member in members}
+    external = []
+    for email in extra_emails:
+        key = email.strip().lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        external.append(email.strip())
+    return members, external
+
+
+def _external_event_key(campaign_id, email):
+    import hashlib
+    digest = hashlib.sha1(email.strip().lower().encode()).hexdigest()
+    return f"broadcast:{campaign_id}:ext:{digest}"
 
 
 @transaction.atomic
-def queue_member_broadcast(*, actor, subject, body, idempotency_key):
+def queue_member_broadcast(*, actor, subject, body, idempotency_key, audience=Audience.ALL_ACTIVE, extra_emails=()):
     if not can(actor, "communication.send_member_broadcast"):
         raise PermissionDenied
+    if audience not in Audience.values:
+        raise ValidationError("Audience invalide.")
     from django.contrib.auth import get_user_model
     actor = get_user_model().objects.select_for_update().get(pk=actor.pk)
     campaign, created = MemberEmailCampaign.objects.get_or_create(
         idempotency_key=idempotency_key,
-        defaults={"subject": subject, "body": body, "created_by": actor},
+        defaults={"subject": subject, "body": body, "created_by": actor,
+                  "audience": audience, "external_emails": list(extra_emails)},
     )
     if not created:
         # Une resoumission du même POST est un succès idempotent, sans second envoi.
         return campaign, False
-    recipients = broadcast_recipients()
+    members, external = resolve_broadcast_recipients(audience, extra_emails)
     messages = [OutboxMessage(
         event_key=f"broadcast:{campaign.pk}:{recipient.pk}", kind="MEMBER_BROADCAST",
         recipient=recipient.email, object_id=campaign.pk,
-    ) for recipient in recipients]
+    ) for recipient in members]
+    messages += [OutboxMessage(
+        event_key=_external_event_key(campaign.pk, email), kind="MEMBER_BROADCAST",
+        recipient=email, object_id=campaign.pk,
+    ) for email in external]
     OutboxMessage.objects.bulk_create(messages, ignore_conflicts=True)
     campaign.recipient_count = campaign.queued_count = len(messages)
-    campaign.save(update_fields=["recipient_count", "queued_count"])
+    campaign.internal_recipient_count = len(members)
+    campaign.save(update_fields=["recipient_count", "queued_count", "internal_recipient_count"])
     audit(actor, "communication.member_broadcast_queued", campaign)
     return campaign, True
 
