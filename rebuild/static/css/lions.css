@@ -1956,7 +1956,7 @@ html:not(.js) .nav-burger, html:not(.js) .app-bascule, html:not(.js) .champ__oei
    moitié, quelle que soit la hauteur du nom/texte à côté — l'ancien réglage couplait
    les deux via align-items + un padding-top disproportionné, d'où le décalage. */
 .member-profile-card__photo, .member-profile-card__avatar { width: 144px; height: 144px; flex: none; border: 4px solid var(--blanc); border-radius: 50%; background: var(--fond-2); color: var(--bleu); align-self: flex-start; margin-top: -72px; }
-.member-profile-card__photo { display: block; object-fit: cover; object-position: center; }
+.member-profile-card__photo { display: block; object-fit: contain; object-position: center; }
 .member-profile-card__avatar { display: grid; place-items: center; }
 .member-profile-card h1 { max-width: none; margin: 0; font-size: clamp(2rem,4vw,3.25rem); }
 .member-profile-card__membership { margin: var(--e1) 0 0; font-size: var(--t-lede); font-weight: 600; color: var(--encre); }

@@ -45,6 +45,23 @@ class PublicProfileTests(TestCase):
         self.assertIn("Past President du Lions Club Sfax-Méditerranée", html)
         self.assertNotIn("Membre du Lions Club Sfax-Méditerranée", html)
 
+    def test_poste_edited_in_private_profile_is_displayed_publicly(self):
+        from django.urls import reverse
+        from apps.members.tests.test_members import PROFILE
+        self.profile.public_profile_enabled = True
+        ensure_public_slug(self.profile)
+        self.profile.save()
+        self.client.force_login(self.user)
+        self.assertContains(self.client.get(reverse("members:profile_edit")), "Poste au sein du club")
+        response = self.client.post(reverse("members:profile_edit"), {
+            **PROFILE, "public_profile_enabled": "on", "public_title": "Trésorier",
+        })
+        self.assertEqual(response.status_code, 302)
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.public_title, "Trésorier")
+        response = self.client.get(f"/membres/{self.profile.public_slug}/")
+        self.assertContains(response, "Trésorier du Lions Club Sfax-Méditerranée")
+
     @override_settings(PUBLIC_INDEXING_ENABLED=True, SITE_ORIGIN="https://canonical.example.invalid")
     def test_person_json_ld_present_and_safe(self):
         self.profile.public_profile_enabled = True
