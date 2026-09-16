@@ -131,6 +131,23 @@ def close_vote(*, actor, vote):
     return vote
 
 
+def validate_vote_selection(*, vote, option_ids, is_blank=False):
+    """Valide un bulletin sans l'enregistrer, notamment avant le récapitulatif."""
+    option_ids = list(dict.fromkeys(option_ids or []))
+    if is_blank:
+        if not vote.blank_allowed:
+            raise ValidationError("Le vote blanc n'est pas autorisé pour ce scrutin.")
+        if option_ids:
+            raise ValidationError("Le vote blanc exclut tout autre choix.")
+    else:
+        if not (vote.min_choices <= len(option_ids) <= vote.max_choices):
+            raise ValidationError("Sélectionnez le nombre de choix demandé avant de continuer.")
+        valid_ids = set(vote.options.values_list("id", flat=True))
+        if not set(option_ids) <= valid_ids:
+            raise ValidationError("Un choix sélectionné n'appartient pas à ce scrutin.")
+    return option_ids
+
+
 @transaction.atomic
 def cast_vote(*, actor, vote, option_ids, is_blank=False):
     """Service unique de dépôt. Verrouille Vote puis Elector, ordre identique pour tous les chemins."""
@@ -147,18 +164,7 @@ def cast_vote(*, actor, vote, option_ids, is_blank=False):
         raise PermissionDenied("Vous n'êtes pas habilité pour ce scrutin.")
     if Participation.objects.filter(elector=elector).exists():
         raise ValidationError("Votre bulletin a déjà été enregistré.")
-    option_ids = list(dict.fromkeys(option_ids or []))
-    if is_blank:
-        if not vote.blank_allowed:
-            raise ValidationError("Le vote blanc n'est pas autorisé pour ce scrutin.")
-        if option_ids:
-            raise ValidationError("Le vote blanc exclut tout choix.")
-    else:
-        if not (vote.min_choices <= len(option_ids) <= vote.max_choices):
-            raise ValidationError("Nombre de choix invalide pour ce scrutin.")
-        valid_ids = set(vote.options.values_list("id", flat=True))
-        if not set(option_ids) <= valid_ids:
-            raise ValidationError("Un choix sélectionné n'appartient pas à ce scrutin.")
+    option_ids = validate_vote_selection(vote=vote, option_ids=option_ids, is_blank=is_blank)
     ballot = Ballot(vote=vote, is_blank=is_blank)
     ballot.full_clean()
     ballot.save()

@@ -8,7 +8,8 @@ from apps.core.permissions import capability_required
 from apps.members.selectors import directory_page, member_profile
 from .models import Vote, VoteOption
 from .selectors import votes_for_member, vote_for_member, own_participation, votes_for_manager, vote_for_manager, tracking_rows, vote_results, can_view_results, require
-from .services import add_option, remove_option, open_vote, close_vote, cast_vote, create_and_open_vote, set_vote_manager
+from .services import (add_option, remove_option, open_vote, close_vote, cast_vote,
+    create_and_open_vote, set_vote_manager, validate_vote_selection)
 from .forms import VoteForm, VoteOptionForm
 
 
@@ -30,14 +31,37 @@ def _parse_choices(request):
     return ids
 
 
+def _parse_member_selection(request, vote):
+    """Le choix unique partage un seul groupe radio, vote blanc compris."""
+    if vote.mode != Vote.Mode.MULTIPLE:
+        value = request.POST.get("ballot_choice", "")
+        legacy_ids = _parse_choices(request)
+        legacy_blank = request.POST.get("blank") == "1"
+        if value == "__blank__":
+            return legacy_ids, True
+        if value:
+            try:
+                return [UUID(value), *legacy_ids], legacy_blank
+            except ValueError:
+                raise Http404
+        # Compatibilité avec un formulaire déjà ouvert avant le déploiement : le
+        # serveur conserve l'ancien format, mais applique la même validation stricte.
+        return legacy_ids, legacy_blank
+    return _parse_choices(request), request.POST.get("blank") == "1"
+
+
 @capability_required("vote.cast")
 @require_http_methods(["GET", "POST"])
 def member_detail(request, vote_id):
     vote = vote_for_member(request.user, vote_id)
     participation = own_participation(request.user, vote)
     if request.method == "POST" and vote.status == "OPEN" and not participation:
-        option_ids = _parse_choices(request)
-        is_blank = request.POST.get("blank") == "1"
+        option_ids, is_blank = _parse_member_selection(request, vote)
+        try:
+            option_ids = validate_vote_selection(vote=vote, option_ids=option_ids, is_blank=is_blank)
+        except ValidationError as error:
+            messages.error(request, " ".join(error.messages))
+            return redirect("voting:member_detail", vote_id=vote.pk)
         options = list(VoteOption.objects.filter(pk__in=option_ids, vote=vote))
         return render(request, "espace/vote_confirm.html", {
             "vote": vote, "options": options, "is_blank": is_blank,

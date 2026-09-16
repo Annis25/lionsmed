@@ -109,6 +109,40 @@ class VoteLifecycleTests(TestCase):
         with self.assertRaises(ValidationError):
             services.cast_vote(actor=self.member, vote=vote, option_ids=[], is_blank=True)
 
+    def test_single_choice_and_blank_share_one_radio_group(self):
+        vote = opened_vote(self.president, blank_allowed=True)
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("voting:member_detail", args=[vote.pk]))
+        self.assertContains(response, 'name="ballot_choice"', count=vote.options.count() + 1)
+        self.assertContains(response, 'value="__blank__"')
+        self.assertContains(response, 'data-vote-blank')
+        self.assertContains(response, 'js/vote_ballot.js')
+
+    def test_blank_only_goes_to_confirmation_as_blank(self):
+        vote = opened_vote(self.president, blank_allowed=True)
+        self.client.force_login(self.member)
+        response = self.client.post(
+            reverse("voting:member_detail", args=[vote.pk]),
+            {"ballot_choice": "__blank__"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "espace/vote_confirm.html")
+        self.assertContains(response, "Vote blanc")
+        self.assertTrue(response.context["is_blank"])
+        self.assertEqual(response.context["option_ids"], [])
+
+    def test_multiple_choice_and_blank_combination_is_refused_before_confirmation(self):
+        vote = opened_vote(self.president, mode=Vote.Mode.MULTIPLE,
+            min_choices=1, max_choices=2, blank_allowed=True)
+        option = vote.options.first()
+        self.client.force_login(self.member)
+        response = self.client.post(
+            reverse("voting:member_detail", args=[vote.pk]),
+            {"options": [str(option.pk)], "blank": "1"},
+        )
+        self.assertRedirects(response, reverse("voting:member_detail", args=[vote.pk]))
+        self.assertFalse(Ballot.objects.filter(vote=vote).exists())
+
     def test_vote_before_opening_refused(self):
         vote = draft_vote(self.president, opens_at=timezone.now() + timedelta(days=1), closes_at=timezone.now() + timedelta(days=2))
         services.add_option(actor=self.president, vote=vote, label="A")
