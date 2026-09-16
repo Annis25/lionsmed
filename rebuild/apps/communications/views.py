@@ -83,7 +83,7 @@ def member_broadcast(request):
     audience_options = [{"value": value, "label": label, "count": len(broadcast_recipients(value))}
         for value, label in MemberEmailCampaign.Audience.choices]
     default_count = audience_options[0]["count"]
-    counts = {"internal": default_count, "external": 0, "total": default_count}
+    counts = {"internal": default_count, "external": 0, "duplicates": 0, "total": default_count}
     context = {"form": form, "counts": counts, "audience_options": audience_options}
 
     if request.method == "POST" and form.is_valid():
@@ -91,7 +91,10 @@ def member_broadcast(request):
         audience = form.cleaned_data["audience"]
         extra_emails = form.cleaned_data["extra_emails"]
         members, external = resolve_broadcast_recipients(audience, extra_emails)
-        counts = {"internal": len(members), "external": len(external), "total": len(members) + len(external)}
+        # « Doublons retirés » : adresses saisies qui coïncidaient avec un membre déjà
+        # compté dans l'audience — jamais un second message pour la même adresse.
+        duplicates = len(extra_emails) - len(external)
+        counts = {"internal": len(members), "external": len(external), "duplicates": duplicates, "total": len(members) + len(external)}
         context["counts"] = counts
         draft = SimpleNamespace(subject=form.cleaned_data["subject"], body=form.cleaned_data["body"])
 

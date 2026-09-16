@@ -143,11 +143,6 @@ CLAMD_SOCKET = os.environ.get("LIONSMED_CLAMD_SOCKET") or None
 CLAMD_HOST = os.environ.get("LIONSMED_CLAMD_HOST") or None
 CLAMD_PORT = os.environ.get("LIONSMED_CLAMD_PORT") or None
 
-# Heure de référence (Africa/Tunis, "HH:MM") pour l'ouverture/fermeture satisfaction.
-# Non définie par défaut : aucune heure de production n'est présentée comme officielle
-# tant que le club ne l'a pas confirmée ; sans elle, une période reste non activable.
-SATISFACTION_REFERENCE_HOUR = os.environ.get("LIONSMED_SATISFACTION_HOUR") or None
-
 PUBLIC_INDEXING_ENABLED = False
 CONTACT_RECIPIENT = os.environ.get("LIONSMED_CONTACT_RECIPIENT", "")
 PUBLIC_IMAGE_ROOT = BASE_DIR / "runtime" / "public_images"

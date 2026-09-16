@@ -1,9 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date, timedelta, datetime, time
-from zoneinfo import ZoneInfo
+from datetime import timedelta
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import connections, IntegrityError
-from django.test import TestCase, TransactionTestCase, override_settings
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
 from apps.core.tests.test_foundations import account
@@ -11,11 +10,8 @@ from apps.core.models import AuditEvent
 from apps.governance.models import Role
 from .. import services
 from ..models import SatisfactionPeriod, SatisfactionResponse
-from ..scheduling import second_friday, third_friday, compute_auto_window
-from ..selectors import period_results
+from ..selectors import period_results, own_response
 
-# Heure de référence synthétique pour les tests uniquement ; aucune valeur de production.
-SYNTHETIC_HOUR = "00:00"
 DEFAULT_THRESHOLD = 5
 
 
@@ -27,44 +23,10 @@ def force_open_now(period):
     return period
 
 
-def open_auto(actor, year, month, threshold=DEFAULT_THRESHOLD):
-    return services.open_period(actor=actor, year=year, month=month, threshold=threshold, auto_schedule=True)
-
-
-def open_manual(actor, year, month, opens_at, closes_at, threshold=DEFAULT_THRESHOLD):
-    return services.open_period(actor=actor, year=year, month=month, threshold=threshold,
-        auto_schedule=False, opens_at=opens_at, closes_at=closes_at)
-
-
-class SchedulingTests(TestCase):
-    def test_all_twelve_months_2026_second_and_third_friday(self):
-        expected_second = {1: 9, 2: 13, 3: 13, 4: 10, 5: 8, 6: 12, 7: 10, 8: 14, 9: 11, 10: 9, 11: 13, 12: 11}
-        for month, day in expected_second.items():
-            with self.subTest(month=month):
-                second = second_friday(2026, month)
-                third = third_friday(2026, month)
-                self.assertEqual(second.weekday(), 4)
-                self.assertEqual(third.weekday(), 4)
-                self.assertEqual(second.day, day)
-                self.assertEqual(third.day, day + 7)
-
-    def test_leap_year_february(self):
-        second = second_friday(2028, 2)
-        self.assertEqual(second, date(2028, 2, 11))
-        self.assertEqual(second.weekday(), 4)
-
-    def test_window_none_when_hour_not_configured(self):
-        opens, closes = compute_auto_window(2026, 9)
-        self.assertIsNone(opens)
-        self.assertIsNone(closes)
-
-    @override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR)
-    def test_window_configured_africa_tunis_second_to_third_friday(self):
-        opens, closes = compute_auto_window(2026, 9)
-        self.assertIsNotNone(opens)
-        third = third_friday(2026, 9)
-        self.assertEqual(timezone.localtime(closes, timezone=ZoneInfo("Africa/Tunis")).date(), third)
-        self.assertLess(opens, closes)
+def open_period(actor, opens_at=None, closes_at=None, threshold=DEFAULT_THRESHOLD, **extra):
+    opens_at = opens_at or (timezone.now() - timedelta(hours=1))
+    closes_at = closes_at or (timezone.now() + timedelta(days=1))
+    return services.create_period(actor=actor, opens_at=opens_at, closes_at=closes_at, threshold=threshold, **extra)
 
 
 class SubmissionTests(TestCase):
@@ -73,86 +35,133 @@ class SubmissionTests(TestCase):
         self.member = account("member@example.invalid", role=Role.MEMBRE)
         self.invite = account("guest@example.invalid", role=Role.INVITE)
 
-    @override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR)
     def test_cannot_open_without_manage_capability(self):
         with self.assertRaises(PermissionDenied):
-            open_auto(self.member, 2026, 9)
+            open_period(self.member)
 
-    def test_auto_open_refused_without_configured_hour(self):
+    def test_create_requires_both_dates(self):
         with self.assertRaises(ValidationError):
-            open_auto(self.president, 2026, 9)
+            services.create_period(actor=self.president, opens_at=None, closes_at=None, threshold=DEFAULT_THRESHOLD)
 
-    def test_manual_open_requires_both_dates(self):
-        with self.assertRaises(ValidationError):
-            services.open_period(actor=self.president, year=2026, month=9, threshold=DEFAULT_THRESHOLD, auto_schedule=False)
-
-    def test_manual_open_rejects_close_before_open(self):
+    def test_create_rejects_close_before_open(self):
         now = timezone.now()
         with self.assertRaises(ValidationError):
-            open_manual(self.president, 2026, 9, now, now - timedelta(hours=1))
+            open_period(self.president, opens_at=now, closes_at=now - timedelta(hours=1))
 
-    def test_manual_open_with_explicit_dates(self):
-        opens = timezone.now() - timedelta(hours=1)
-        closes = timezone.now() + timedelta(days=1)
-        period = open_manual(self.president, 2026, 9, opens, closes)
-        self.assertEqual(period.opens_at, opens)
-        self.assertEqual(period.closes_at, closes)
+    def test_create_derives_month_from_opens_at(self):
+        opens = timezone.now().replace(year=2026, month=9, day=20, hour=10, minute=0, second=0, microsecond=0)
+        closes = opens + timedelta(days=1)
+        period = open_period(self.president, opens_at=opens, closes_at=closes)
+        self.assertEqual(period.month.year, 2026)
+        self.assertEqual(period.month.month, 9)
+        self.assertEqual(period.month.day, 1)
 
-    @override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR)
+    def test_several_periods_in_the_same_month_are_allowed(self):
+        # `month` n'est plus qu'un libellé dérivé de opens_at : plus aucune contrainte
+        # d'unicité n'empêche deux consultations sur le même mois calendaire.
+        opens = timezone.now().replace(year=2026, month=9, day=5, hour=10, minute=0, second=0, microsecond=0)
+        closes = opens + timedelta(hours=2)
+        first = open_period(self.president, opens_at=opens, closes_at=closes, title="Première")
+        second = open_period(self.president, opens_at=opens + timedelta(days=10), closes_at=closes + timedelta(days=10), title="Seconde")
+        self.assertNotEqual(first.pk, second.pk)
+        self.assertEqual(first.month, second.month)
+        self.assertEqual(SatisfactionPeriod.objects.filter(month=first.month).count(), 2)
+
     def test_score_out_of_range_refused(self):
-        period = force_open_now(open_auto(self.president, 2026, 1))
+        period = force_open_now(open_period(self.president))
         with self.assertRaises(ValidationError):
             services.submit_satisfaction(actor=self.member, period=period, score=0)
         with self.assertRaises(ValidationError):
             services.submit_satisfaction(actor=self.member, period=period, score=6)
 
-    @override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR)
     def test_invite_cannot_respond(self):
-        period = force_open_now(open_auto(self.president, 2026, 1))
+        period = force_open_now(open_period(self.president))
         with self.assertRaises(PermissionDenied):
             services.submit_satisfaction(actor=self.invite, period=period, score=4)
 
-    @override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR)
     def test_closed_period_refuses_submission(self):
-        period = open_auto(self.president, 2020, 1)  # largement passé, jamais forcé ouvert
+        past = timezone.now() - timedelta(days=400)
+        period = open_period(self.president, opens_at=past, closes_at=past + timedelta(days=1))  # jamais forcé ouvert
         with self.assertRaises(ValidationError):
             services.submit_satisfaction(actor=self.member, period=period, score=3)
 
-    @override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR)
     def test_single_response_then_refused(self):
-        period = force_open_now(open_auto(self.president, 2026, 1))
+        period = force_open_now(open_period(self.president))
         services.submit_satisfaction(actor=self.member, period=period, score=5, comment="Très bien")
         with self.assertRaises(ValidationError):
             services.submit_satisfaction(actor=self.member, period=period, score=1)
         self.assertEqual(SatisfactionResponse.objects.filter(period=period).count(), 1)
 
-    @override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR)
+    def test_comment_over_500_chars_is_truncated_not_rejected(self):
+        period = force_open_now(open_period(self.president))
+        long_comment = "x" * 600
+        response = services.submit_satisfaction(actor=self.member, period=period, score=3, comment=long_comment)
+        self.assertEqual(len(response.comment), 500)
+
     def test_audit_never_stores_score_or_comment(self):
-        period = force_open_now(open_auto(self.president, 2026, 1))
+        period = force_open_now(open_period(self.president))
         services.submit_satisfaction(actor=self.member, period=period, score=2, comment="Commentaire sensible")
         events = AuditEvent.objects.filter(action="satisfaction.responded")
         self.assertTrue(events.exists())
         for field in AuditEvent._meta.get_fields():
             self.assertNotIn("Commentaire sensible", str(getattr(events.first(), field.name, "")))
 
+    def test_axis_questions_are_numbered_sequentially_after_the_main_score(self):
+        # Régression : le gabarit numérote chaque question par sa position dans le
+        # formulaire (score=1, puis les axes) ; « comment » doit rester hors du calcul
+        # quel que soit son rang dans self.fields (voir SatisfactionForm.__init__).
+        period = force_open_now(open_period(self.president))
+        services.add_axis(actor=self.president, period=period, label="Organisation")
+        services.add_axis(actor=self.president, period=period, label="Communication")
+        self.client.force_login(self.member)
+        html = self.client.get(reverse("satisfaction:respond")).content.decode()
+        for number, label in [(1, "Comment évaluez-vous ce mois au club ?"), (2, "Organisation"), (3, "Communication")]:
+            needle = f'<span class="smiley-scale__number" aria-hidden="true">{number}</span><span class="smiley-scale__label">{label}</span>'
+            self.assertIn(needle, html)
+
+    def test_two_periods_open_at_once_both_appear_and_are_answered_independently(self):
+        # open_period() par défaut ouvre déjà "maintenant" (now-1h -> now+1j) : les deux
+        # appels tombent dans le même mois calendaire, ce qui est précisément le cas que
+        # la levée de la contrainte d'unicité doit désormais permettre.
+        first = open_period(self.president, title="Premier sondage")
+        second = open_period(self.president, title="Autre sondage")
+        self.assertNotEqual(first.pk, second.pk)
+        self.assertEqual(first.month, second.month)
+        self.client.force_login(self.member)
+
+        html = self.client.get(reverse("satisfaction:respond")).content.decode()
+        self.assertEqual(html.count('name="period_id"'), 2)
+        self.assertIn(f'value="{first.pk}"', html)
+        self.assertIn(f'value="{second.pk}"', html)
+
+        # Répondre à "second" ne doit ni répondre à "first" ni le faire disparaître.
+        data = {"period_id": str(second.pk), f"{second.pk}-score": "4"}
+        response = self.client.post(reverse("satisfaction:respond"), data)
+        self.assertEqual(response.status_code, 302)
+        self.assertIsNotNone(own_response(self.member, second))
+        self.assertIsNone(own_response(self.member, first))
+
+        html = self.client.get(reverse("satisfaction:respond")).content.decode()
+        self.assertIn("Merci, votre avis a déjà été enregistré", html)  # pour "second"
+        self.assertIn(f'name="{first.pk}-score"', html)  # "first" toujours à répondre
+
 
 class ResultsTests(TestCase):
     def setUp(self):
         self.president = account("president@example.invalid", role=Role.PRESIDENT)
 
-    @override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR)
     def test_small_cohort_hidden(self):
-        period = force_open_now(open_auto(self.president, 2026, 1, threshold=5))
+        period = force_open_now(open_period(self.president, threshold=5))
         for i in range(2):
             member = account(f"member{i}@example.invalid", role=Role.MEMBRE)
             services.submit_satisfaction(actor=member, period=period, score=4)
         result = period_results(self.president, period)
         self.assertTrue(result["hidden"])
         self.assertIsNone(result["average"])
+        self.assertIsNone(result["participation_rate"])
 
-    @override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR)
-    def test_cohort_meeting_threshold_shows_aggregate(self):
-        period = force_open_now(open_auto(self.president, 2026, 1, threshold=2))
+    def test_cohort_meeting_threshold_shows_aggregate_and_participation_rate(self):
+        period = force_open_now(open_period(self.president, threshold=2))
         for i, score in enumerate([4, 2]):
             member = account(f"member{i}@example.invalid", role=Role.MEMBRE)
             services.submit_satisfaction(actor=member, period=period, score=score)
@@ -160,20 +169,20 @@ class ResultsTests(TestCase):
         self.assertFalse(result["hidden"])
         self.assertEqual(result["count"], 2)
         self.assertEqual(result["average"], 3.0)
+        self.assertIsNotNone(result["participation_rate"])
+        self.assertGreater(result["eligible_count"], 0)
 
     def test_member_cannot_view_results(self):
         member = account("member@example.invalid", role=Role.MEMBRE)
-        with override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR):
-            period = open_auto(self.president, 2026, 1)
+        period = open_period(self.president)
         self.client.force_login(member)
         self.assertEqual(self.client.get(reverse("satisfaction:results", args=[period.pk])).status_code, 403)
 
 
 class SatisfactionConcurrencyTests(TransactionTestCase):
-    @override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR)
     def test_double_post_creates_single_response(self):
         president = account("president@example.invalid", role=Role.PRESIDENT)
-        period = force_open_now(open_auto(president, 2026, 1))
+        period = force_open_now(open_period(president))
         member = account("member@example.invalid", role=Role.MEMBRE)
 
         def attempt(_):
@@ -210,34 +219,103 @@ class ManageViewAndNavigationTests(TestCase):
         self.assertNotIn("children", nav["Satisfaction"])
         self.assertEqual(nav["Satisfaction"]["url"], reverse("satisfaction:respond"))
 
-    def test_manage_view_opens_period_with_manual_dates(self):
+    def test_manage_view_creates_period_with_manual_dates_no_year_or_month_field(self):
         self.client.force_login(self.president)
         opens = timezone.now() + timedelta(days=1)
         closes = timezone.now() + timedelta(days=10)
         response = self.client.post(reverse("satisfaction:manage_list"), {
-            "year": "2027", "month": "3", "threshold": "3",
+            "threshold": "3",
             "opens_at": opens.strftime("%Y-%m-%dT%H:%M"), "closes_at": closes.strftime("%Y-%m-%dT%H:%M"),
+            "axes": "Organisation\nCommunication",
         })
-        self.assertRedirects(response, reverse("satisfaction:manage_list"))
-        period = SatisfactionPeriod.objects.get(month=date(2027, 3, 1))
+        period = SatisfactionPeriod.objects.get()
+        self.assertRedirects(response, reverse("satisfaction:edit", args=[period.pk]))
         self.assertEqual(period.threshold, 3)
+        self.assertEqual(list(period.axes.values_list("label", flat=True)), ["Organisation", "Communication"])
         self.assertIsNotNone(period.opens_at)
+        form_page = self.client.get(reverse("satisfaction:manage_list"))
+        self.assertNotContains(form_page, 'name="year"')
+        self.assertNotContains(form_page, 'name="month"')
+        self.assertNotContains(form_page, 'name="auto_schedule"')
 
-    @override_settings(SATISFACTION_REFERENCE_HOUR=SYNTHETIC_HOUR)
-    def test_manage_view_auto_schedule_uses_second_and_third_friday(self):
+    def test_manage_view_rejects_missing_dates(self):
         self.client.force_login(self.president)
-        response = self.client.post(reverse("satisfaction:manage_list"), {
-            "year": "2026", "month": "9", "threshold": "5", "auto_schedule": "on",
-        })
-        self.assertRedirects(response, reverse("satisfaction:manage_list"))
-        period = SatisfactionPeriod.objects.get(month=date(2026, 9, 1))
-        self.assertEqual(timezone.localtime(period.opens_at, ZoneInfo("Africa/Tunis")).date(), second_friday(2026, 9))
-        self.assertEqual(timezone.localtime(period.closes_at, ZoneInfo("Africa/Tunis")).date(), third_friday(2026, 9))
+        response = self.client.post(reverse("satisfaction:manage_list"), {"threshold": "5", "axes": "Organisation"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(SatisfactionPeriod.objects.count(), 0)
 
-    def test_manage_view_rejects_missing_dates_without_auto(self):
+    def test_manage_view_requires_initial_axes_and_preserves_the_form(self):
         self.client.force_login(self.president)
+        now = timezone.now()
         response = self.client.post(reverse("satisfaction:manage_list"), {
-            "year": "2026", "month": "9", "threshold": "5",
+            "title": "Satisfaction générale",
+            "threshold": "2",
+            "opens_at": now.strftime("%Y-%m-%dT%H:%M"),
+            "closes_at": (now + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M"),
+            "axes": "",
         })
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(SatisfactionPeriod.objects.filter(month=date(2026, 9, 1)).exists())
+        self.assertContains(response, "Ce champ est obligatoire.", count=1)
+        self.assertContains(response, "Satisfaction générale")
+        self.assertEqual(SatisfactionPeriod.objects.count(), 0)
+
+    def test_manage_view_rejects_duplicate_initial_axes_without_partial_creation(self):
+        self.client.force_login(self.president)
+        now = timezone.now()
+        response = self.client.post(reverse("satisfaction:manage_list"), {
+            "threshold": "2",
+            "opens_at": now.strftime("%Y-%m-%dT%H:%M"),
+            "closes_at": (now + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M"),
+            "axes": "Organisation\nORGANISATION",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Chaque axe doit avoir un nom différent.", count=1)
+        self.assertEqual(SatisfactionPeriod.objects.count(), 0)
+
+    def test_gestion_non_field_error_shown_once_in_a_compact_alert(self):
+        # Erreur croisée (clean()), non rattachée à un champ précis : plus de gros
+        # bloc récapitulatif dupliqué — une alerte compacte, une seule fois.
+        self.client.force_login(self.president)
+        now = timezone.now()
+        response = self.client.post(reverse("satisfaction:manage_list"), {
+            "threshold": "1",
+            "opens_at": now.strftime("%Y-%m-%dT%H:%M"),
+            "closes_at": (now - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M"),
+            "axes": "Organisation",
+        })
+        html = response.content.decode()
+        self.assertNotIn("Vérifiez les informations du formulaire", html)
+        self.assertIn("form-errors--compact", html)
+        self.assertEqual(html.count("La fermeture doit être postérieure au lancement."), 1)
+
+    def test_gestion_field_error_shown_once_under_its_field(self):
+        self.client.force_login(self.president)
+        now = timezone.now()
+        response = self.client.post(reverse("satisfaction:manage_list"), {
+            "threshold": "",
+            "opens_at": now.strftime("%Y-%m-%dT%H:%M"),
+            "closes_at": (now + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M"),
+            "axes": "Organisation",
+        })
+        html = response.content.decode()
+        self.assertNotIn("Vérifiez les informations du formulaire", html)
+        self.assertEqual(html.count("Ce champ est obligatoire."), 1)
+
+    def test_gestion_and_edit_headings_are_compact_single_line(self):
+        self.client.force_login(self.president)
+        gestion_html = self.client.get(reverse("satisfaction:manage_list")).content.decode()
+        self.assertIn("<h1>Satisfaction</h1>", gestion_html)
+        period = open_period(self.president)
+        edit_html = self.client.get(reverse("satisfaction:edit", args=[period.pk])).content.decode()
+        self.assertIn("<h1>Modifier</h1>", edit_html)
+
+    def test_respond_page_radios_stay_real_focusable_inputs(self):
+        # Masqués visuellement (CSS clip, voir .smiley-option input), jamais retirés du
+        # DOM ni transformés en type="hidden" : le clavier et les lecteurs d'écran
+        # doivent continuer à les voir comme de vrais boutons radio.
+        period = force_open_now(open_period(self.president))
+        self.client.force_login(self.member)
+        html = self.client.get(reverse("satisfaction:respond")).content.decode()
+        self.assertIn('type="radio"', html)
+        self.assertNotIn('type="hidden" name="score"', html)
+        self.assertGreaterEqual(html.count('type="radio"'), 5)

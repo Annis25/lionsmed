@@ -1,3 +1,50 @@
 {% extends 'base/private.html' %}
-{% block title %}Votre satisfaction — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>Votre satisfaction</h1></div><section class="workspace-panel lot2-reading">{% if not period %}<p>Aucune consultation ouverte ce mois-ci.</p>{% elif response %}<h2>Vous avez déjà répondu</h2><p>Votre réponse pour ce mois est déjà enregistrée. Aucune nouvelle réponse n’est proposée.</p>{% else %}<h2>{{ period.title|default:"Votre avis sur la vie du club" }}</h2><p>{{ period.description }}</p><p class="app-note">Du {{ period.opens_at|date:"d/m/Y H:i" }} au {{ period.closes_at|date:"d/m/Y H:i" }}.</p><form method="post" class="formulaire" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}<fieldset class="groupe"><legend>Comment évaluez-vous ce mois au club ? (obligatoire)</legend>{% for radio in form.score %}<label class="choix">{{ radio.tag }} {{ radio.choice_label }}</label>{% endfor %}</fieldset>{% for field in form %}{% if field.name != "score" and field.name != "comment" %}<fieldset class="groupe"><legend>{{ field.label }}</legend>{% for radio in field %}<label class="choix">{{ radio.tag }} {{ radio.choice_label }}</label>{% endfor %}{{ field.errors }}</fieldset>{% endif %}{% endfor %}<div class="champ"><label class="champ__label" for="{{ form.comment.id_for_label }}">Votre commentaire (facultatif)</label>{{ form.comment }}</div><button class="btn btn--solid" type="submit">Envoyer mon avis</button></form>{% endif %}</section>{% endblock %}
+{% load static %}
+{% block title %}Satisfaction du club — Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Satisfaction du club</h1></div>
+{% if not entries %}
+<section class="workspace-panel lot2-reading"><h2>Votre avis compte !</h2><p class="satisfaction-intro">Aucune consultation n’est ouverte actuellement. Revenez lors de la prochaine période d’évaluation.</p></section>
+{% else %}{% for entry in entries %}
+<section class="workspace-panel lot2-reading">
+{% if entry.response %}
+<h2>Votre avis compte !</h2>
+<div class="satisfaction-already"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg><div><strong>Merci, votre avis a déjà été enregistré{% if entry.period.title %} pour « {{ entry.period.title }} »{% endif %}.</strong><p class="app-note">Votre réponse pour cette consultation est prise en compte. Aucune nouvelle réponse n’est proposée pour cette période.</p></div></div>
+{% else %}
+<h2>Votre avis compte !</h2>
+<p class="satisfaction-intro">Aidez-nous à faire grandir notre club en partageant votre ressenti. Vos retours sont précieux pour améliorer nos actions, nos services et la vie de notre club.</p>
+<p class="satisfaction-period"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Période d’évaluation — du {{ entry.period.opens_at|date:"d/m/Y" }} au {{ entry.period.closes_at|date:"d/m/Y" }}</p>
+{% if entry.period.title %}<h3>{{ entry.period.title }}</h3>{% endif %}
+<form method="post" class="satisfaction-form" novalidate>
+{% csrf_token %}<input type="hidden" name="period_id" value="{{ entry.period.pk }}">{% if entry.form.non_field_errors %}<div class="form-errors form-errors--compact" role="alert">{{ entry.form.non_field_errors }}</div>{% endif %}
+
+<fieldset class="smiley-scale">
+<legend class="visually-hidden">{{ entry.form.score.label }}</legend>
+<div class="smiley-scale__question"><div class="smiley-scale__heading"><span class="smiley-scale__number" aria-hidden="true">1</span><span class="smiley-scale__label">{{ entry.form.score.label }}</span></div>{% if entry.period.description %}<p class="smiley-scale__description">{{ entry.period.description }}</p>{% endif %}</div>
+<div class="smiley-scale__options">{% for radio in entry.form.score %}<label class="smiley-option smiley-option--{{ forloop.counter }}">{{ radio.tag }}<span class="smiley-option__face" aria-hidden="true">{% if forloop.counter == 1 %}😠{% elif forloop.counter == 2 %}🙁{% elif forloop.counter == 3 %}😐{% elif forloop.counter == 4 %}🙂{% else %}😄{% endif %}</span><span class="smiley-option__text">{{ radio.choice_label|slice:"4:" }}</span></label>{% endfor %}</div>
+</fieldset>
+{{ entry.form.score.errors }}
+
+{% for field in entry.form %}{% if field.name != "score" and field.name != "comment" %}
+<fieldset class="smiley-scale">
+<legend class="visually-hidden">{{ field.label }}</legend>
+<div class="smiley-scale__question"><div class="smiley-scale__heading"><span class="smiley-scale__number" aria-hidden="true">{{ forloop.counter0|add:1 }}</span><span class="smiley-scale__label">{{ field.label }}</span></div></div>
+<div class="smiley-scale__options">{% for radio in field %}<label class="smiley-option smiley-option--{{ forloop.counter }}">{{ radio.tag }}<span class="smiley-option__face" aria-hidden="true">{% if forloop.counter == 1 %}😠{% elif forloop.counter == 2 %}🙁{% elif forloop.counter == 3 %}😐{% elif forloop.counter == 4 %}🙂{% else %}😄{% endif %}</span><span class="smiley-option__text">{{ radio.choice_label|slice:"4:" }}</span></label>{% endfor %}</div>
+</fieldset>
+{{ field.errors }}
+{% endif %}{% endfor %}
+
+<div class="champ">
+<label class="champ__label" for="{{ entry.form.comment.id_for_label }}"><span class="satisfaction-comment__title">Un commentaire ?</span> <span class="satisfaction-comment__optional">(optionnel)</span></label>
+{{ entry.form.comment }}
+<span class="satisfaction-comment__counter" data-comment-counter aria-live="polite">0 / 500</span>
+{{ entry.form.comment.errors }}
+</div>
+
+<button class="btn btn--solid" type="submit">Envoyer ma réponse</button>
+</form>
+{% endif %}
+</section>
+{% endfor %}{% endif %}
+<script src="{% static 'js/satisfaction.js' %}" defer></script>
+{% endblock %}

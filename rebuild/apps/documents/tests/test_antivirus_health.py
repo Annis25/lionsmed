@@ -24,12 +24,43 @@ class HealthTests(SimpleTestCase):
             call_command("check_antivirus")
 
     @override_settings(CLAMD_SOCKET="/synthetic/socket", CLAMD_HOST=None, CLAMD_PORT=None)
-    def test_protocol_health_and_timeout(self):
-        sockets = [MagicMock(), MagicMock()]
-        sockets[0].__enter__.return_value.recv.return_value = b"PONG\0"
-        sockets[1].__enter__.return_value.recv.return_value = b"ClamAV synthetic\0"
-        with patch("apps.documents.scanning._connect", side_effect=sockets):
-            self.assertEqual(check_scanner(), "ClamAV synthetic")
+    def test_ping_ok_and_real_synthetic_scan_ok(self):
+        ping_socket = MagicMock()
+        ping_socket.__enter__.return_value.recv.return_value = b"PONG\0"
+        scan_socket = MagicMock()
+        scan_socket.__enter__.return_value.recv.return_value = b"stream: OK\0"
+        with patch("apps.documents.scanning._connect", side_effect=[ping_socket, scan_socket]) as connect:
+            self.assertEqual(check_scanner(), "PING + INSTREAM OK")
+        self.assertEqual(connect.call_count, 2)
+        sent = b"".join(call.args[0] for call in scan_socket.__enter__.return_value.sendall.call_args_list)
+        self.assertIn(b"lionsmed-antivirus-health-check", sent)
+
+    @override_settings(CLAMD_SOCKET="/synthetic/socket", CLAMD_HOST=None, CLAMD_PORT=None)
+    def test_ping_failure_is_unavailable(self):
+        bad_ping = MagicMock()
+        bad_ping.__enter__.return_value.recv.return_value = b"NOPE\0"
+        with patch("apps.documents.scanning._connect", return_value=bad_ping):
+            with self.assertRaises(ScannerUnavailable):
+                check_scanner()
+
+    @override_settings(CLAMD_SOCKET="/synthetic/socket", CLAMD_HOST=None, CLAMD_PORT=None)
+    def test_scan_rejection_and_timeout_are_unavailable(self):
+        ping = MagicMock()
+        ping.__enter__.return_value.recv.return_value = b"PONG\0"
+        infected = MagicMock()
+        infected.__enter__.return_value.recv.return_value = b"stream: Synthetic FOUND\0"
+        with patch("apps.documents.scanning._connect", side_effect=[ping, infected]):
+            with self.assertRaises(ScannerUnavailable):
+                check_scanner()
+
+        ping = MagicMock()
+        ping.__enter__.return_value.recv.return_value = b"PONG\0"
+        with patch("apps.documents.scanning._connect", side_effect=[ping, TimeoutError]):
+            with self.assertRaises(ScannerUnavailable):
+                check_scanner()
+
+    @override_settings(CLAMD_SOCKET="/synthetic/socket", CLAMD_HOST=None, CLAMD_PORT=None)
+    def test_connection_timeout_remains_fail_closed(self):
         with patch("apps.documents.scanning._connect", side_effect=TimeoutError):
             with self.assertRaises(ScannerUnavailable):
                 check_scanner()

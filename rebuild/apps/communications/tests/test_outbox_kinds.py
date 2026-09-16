@@ -147,8 +147,7 @@ class SatisfactionOutboxTests(TestCase):
 
     def test_eligible_member_gets_email_invite_excluded(self):
         now = timezone.now()
-        period = satisfaction_services.open_period(actor=self.president, year=now.year, month=now.month,
-            threshold=3, opens_at=now, closes_at=now + timedelta(days=7))
+        period = satisfaction_services.create_period(actor=self.president, opens_at=now, closes_at=now + timedelta(days=7), threshold=3)
         notify_period_opened(period)
         self.assertTrue(OutboxMessage.objects.filter(kind="SATISFACTION_OPENED", recipient=self.member.email).exists())
         self.assertFalse(OutboxMessage.objects.filter(kind="SATISFACTION_OPENED", recipient=self.invite.email).exists())
@@ -158,8 +157,7 @@ class SatisfactionOutboxTests(TestCase):
 
     def test_notify_period_opened_is_idempotent(self):
         now = timezone.now()
-        period = satisfaction_services.open_period(actor=self.president, year=now.year, month=now.month,
-            threshold=3, opens_at=now, closes_at=now + timedelta(days=7))
+        period = satisfaction_services.create_period(actor=self.president, opens_at=now, closes_at=now + timedelta(days=7), threshold=3)
         notify_period_opened(period)
         count = OutboxMessage.objects.filter(kind="SATISFACTION_OPENED").count()
         notify_period_opened(period)

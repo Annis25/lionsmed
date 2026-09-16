@@ -9,6 +9,7 @@
 <div><dt>Audience</dt><dd>{{ audience_label }}</dd></div>
 <div><dt>Membres</dt><dd>{{ counts.internal }}</dd></div>
 <div><dt>Adresses supplémentaires</dt><dd>{{ counts.external }}{% if external_emails %} ({{ external_emails|join:", " }}){% endif %}</dd></div>
+{% if counts.duplicates %}<div><dt>Doublons retirés</dt><dd>{{ counts.duplicates }}</dd></div>{% endif %}
 <div><dt>Total</dt><dd><strong>{{ counts.total }} destinataire{{ counts.total|pluralize }}</strong></dd></div>
 </dl>
 <p class="champ__label">Message</p>

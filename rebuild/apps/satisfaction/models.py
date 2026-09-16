@@ -4,10 +4,13 @@ from django.db import models
 
 
 class SatisfactionPeriod(models.Model):
-    """Une ligne par mois. opens_at/closes_at restent nuls tant que l'heure de référence
-    n'est pas configurée : la période n'est alors pas activable (voir scheduling.compute_window)."""
+    """`month` n'est jamais saisi : dérivé de opens_at (premier jour de son mois) à la
+    création, pour un affichage/tri sans dupliquer une information déjà portée par
+    opens_at/closes_at. Plusieurs consultations peuvent partager le même mois (plus
+    unique depuis la demande explicite de pouvoir en ouvrir plusieurs en parallèle) :
+    seule leur identité (id) est unique, jamais leur mois."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    month = models.DateField(unique=True, help_text="Premier jour du mois concerné")
+    month = models.DateField(help_text="Premier jour du mois concerné")
     title = models.CharField(max_length=180, blank=True)
     description = models.TextField(max_length=3000, blank=True)
     rule_version = models.CharField(max_length=32)

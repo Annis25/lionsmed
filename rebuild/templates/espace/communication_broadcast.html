@@ -54,6 +54,7 @@
 <div><dt>Audience</dt><dd data-summary-audience>{% for option in audience_options %}{% if option.value == form.audience.value %}{{ option.label }}{% endif %}{% endfor %}</dd></div>
 <div><dt>Membres</dt><dd data-summary-internal>{{ counts.internal }}</dd></div>
 <div><dt>Adresses supplémentaires</dt><dd data-summary-external>{{ counts.external }}</dd></div>
+{% if counts.duplicates %}<div><dt>Doublons retirés</dt><dd data-summary-duplicates>{{ counts.duplicates }}</dd></div>{% endif %}
 <div><dt>Total</dt><dd data-summary-total>{{ counts.total }}</dd></div>
 </dl>
 <div class="lot2-actions">

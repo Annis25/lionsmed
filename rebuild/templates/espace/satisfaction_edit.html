@@ -1,9 +1,43 @@
 {% extends 'base/private.html' %}
-{% block title %}Modifier la satisfaction — Lionsmed{% endblock %}
+{% load static %}
+{% block title %}Modifier la satisfaction — Lions Club Sfax-Méditerranée{% endblock %}
 {% block content %}
-<div class="app-titre"><h1>Modifier la consultation</h1></div>
-<section class="workspace-panel"><p class="app-note">Après la première réponse, les axes, dates et seuil sont figés pour protéger les résultats.</p>
-<form method="post" class="formulaire">{% csrf_token %}{% include 'components/forms/errors.html' %}
+<div class="app-titre"><h1>Modifier</h1><p class="app-titre__contexte">{{ period.title|default:"Sans titre" }} — {{ period.month|date:"F Y" }}</p></div>
+
+<section class="workspace-panel lot2-reading">
+<h2>Informations</h2>
+{% if has_responses %}<p class="app-note">Des réponses existent déjà : dates et seuil sont figés pour protéger les résultats. Titre et description restent modifiables.</p>{% endif %}
+<form method="post" class="satisfaction-form" novalidate>
+{% csrf_token %}{% if form.non_field_errors %}<div class="form-errors form-errors--compact" role="alert">{{ form.non_field_errors }}</div>{% endif %}
 <div class="lot2-form-grid">{% for field in form %}<div>{% include 'components/forms/field.html' %}</div>{% endfor %}</div>
-<div class="lot2-actions"><button class="btn btn--solid">Enregistrer</button><a class="btn btn--outline" href="{% url 'satisfaction:manage_list' %}">Retour</a></div></form></section>
+<div class="lot2-actions"><button class="btn btn--solid" type="submit">Enregistrer</button><a class="btn btn--outline" href="{% url 'satisfaction:manage_list' %}">Retour à la liste</a></div>
+</form>
+</section>
+
+<section class="workspace-panel lot2-reading">
+<h2>Axes de satisfaction</h2>
+{% if has_responses %}
+<p class="satisfaction-axis-frozen-note">Des réponses existent déjà pour cette consultation : les axes sont figés pour préserver la cohérence des résultats.</p>
+{% else %}
+<p class="app-note satisfaction-axis-hint">Un axe par ligne : donnez-lui un nom, puis ajustez son ordre avec les flèches.</p>
+<form method="post" action="{% url 'satisfaction:axis_add' period.pk %}" class="satisfaction-axis-add-form">
+{% csrf_token %}
+<div class="satisfaction-axis-add-form__row"><label class="visually-hidden" for="{{ axis_form.label.id_for_label }}">Nom de l’axe</label>{{ axis_form.label }}<button class="btn btn--solid btn--sm" type="submit">Ajouter</button></div>
+{{ axis_form.label.errors }}
+</form>
+{% endif %}
+<ol class="satisfaction-axis-list">{% for axis in axes %}<li class="satisfaction-axis-row">
+<span class="satisfaction-axis-row__order">{{ forloop.counter }}</span>
+<span class="satisfaction-axis-row__label">{{ axis.label }}</span>
+{% if not has_responses %}<div class="satisfaction-axis-row__actions">
+<form method="post" action="{% url 'satisfaction:axis_move' period.pk axis.pk %}"><input type="hidden" name="direction" value="up">{% csrf_token %}<button class="satisfaction-axis-row__btn" type="submit"{% if forloop.first %} disabled{% endif %} aria-label="Monter « {{ axis.label }} »"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg></button></form>
+<form method="post" action="{% url 'satisfaction:axis_move' period.pk axis.pk %}"><input type="hidden" name="direction" value="down">{% csrf_token %}<button class="satisfaction-axis-row__btn" type="submit"{% if forloop.last %} disabled{% endif %} aria-label="Descendre « {{ axis.label }} »"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"></path></svg></button></form>
+<details class="satisfaction-axis-row__edit"><summary class="satisfaction-axis-row__btn" aria-label="Modifier « {{ axis.label }} »"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></summary>
+<form method="post" action="{% url 'satisfaction:axis_edit' period.pk axis.pk %}" class="satisfaction-axis-edit-form">{% csrf_token %}<label class="visually-hidden" for="rename-{{ axis.pk }}">Nouveau nom de l’axe</label><input id="rename-{{ axis.pk }}" type="text" class="champ__input" name="label" value="{{ axis.label }}" maxlength="180"><button class="btn btn--outline btn--sm" type="submit">Enregistrer</button></form>
+</details>
+<form method="post" action="{% url 'satisfaction:axis_delete' period.pk axis.pk %}" data-confirm="Supprimer l’axe « {{ axis.label }} » ?">{% csrf_token %}<button class="satisfaction-axis-row__btn satisfaction-axis-row__btn--danger" type="submit" aria-label="Supprimer « {{ axis.label }} »"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0-1 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 6"></path></svg></button></form>
+</div>{% endif %}
+</li>{% empty %}<li class="satisfaction-axis-row satisfaction-axis-row--empty">Aucun axe pour l’instant. Ajoutez-en un ci-dessus.</li>{% endfor %}</ol>
+</section>
+<script src="{% static 'js/satisfaction_axes.js' %}" defer></script>
 {% endblock %}

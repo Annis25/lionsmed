@@ -69,27 +69,33 @@ def scan_bytes(data, *, host=None, port=None, unix_socket=None, timeout=10):
 
 
 def check_scanner(*, timeout=5):
-    """PING et VERSION uniquement : aucun document utilisateur n'est transmis."""
+    """Vérifie clamd par PING puis par un petit INSTREAM synthétique."""
     unix_socket = settings.CLAMD_SOCKET
     host, port = settings.CLAMD_HOST, settings.CLAMD_PORT
     if not unix_socket and not (host and port):
         raise ScannerUnavailable("Scanner antivirus non configuré.")
-    replies = []
-    for command in (b"zPING\0", b"zVERSION\0"):
-        try:
-            with _connect(host, port, unix_socket, timeout) as sock:
-                sock.sendall(command)
-                response = b""
-                while b"\0" not in response:
-                    chunk = sock.recv(1024)
-                    if not chunk:
-                        raise ScannerUnavailable("Réponse antivirus incomplète.")
-                    response += chunk
-                    if len(response) > 4096:
-                        raise ScannerUnavailable("Réponse antivirus trop longue.")
-                replies.append(response.split(b"\0", 1)[0].decode("ascii", "replace"))
-        except OSError as error:
-            raise ScannerUnavailable("Connexion antivirus indisponible.") from error
-    if replies[0] != "PONG" or not replies[1].startswith("ClamAV "):
+    try:
+        with _connect(host, port, unix_socket, timeout) as sock:
+            sock.sendall(b"zPING\0")
+            response = b""
+            while b"\0" not in response:
+                chunk = sock.recv(1024)
+                if not chunk:
+                    raise ScannerUnavailable("Réponse antivirus incomplète.")
+                response += chunk
+                if len(response) > 4096:
+                    raise ScannerUnavailable("Réponse antivirus trop longue.")
+    except (OSError, socket.timeout) as error:
+        raise ScannerUnavailable("Connexion antivirus indisponible.") from error
+    if response.split(b"\0", 1)[0] != b"PONG":
         raise ScannerUnavailable("Réponse antivirus inattendue.")
-    return replies[1]
+    result = scan_bytes(
+        b"lionsmed-antivirus-health-check",
+        host=host,
+        port=port,
+        unix_socket=unix_socket,
+        timeout=timeout,
+    )
+    if not result.clean:
+        raise ScannerUnavailable("Le scan antivirus de contrôle a été refusé.")
+    return "PING + INSTREAM OK"

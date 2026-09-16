@@ -1,12 +1,30 @@
-{% extends 'base/private.html' %}
+{% extends 'base/private.html' %}{% load static %}
 {% block title %}Satisfaction — Gestion — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>Satisfaction — Gestion</h1></div><section class="workspace-panel lot2-reading"><h2>Configurer une période</h2><form method="post" class="formulaire" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}<div class="lot2-form-grid">{% for field in form %}<div{% if field.name == 'opens_at' or field.name == 'closes_at' %} id="champ-{{ field.name }}"{% endif %}>{% include 'components/forms/field.html' %}</div>{% endfor %}</div><button class="btn btn--solid" type="submit">Configurer et ouvrir</button></form></section><section class="workspace-panel"><h2>Périodes</h2><ul class="lot2-timeline">{% for period in periods %}<li><a href="{% url 'satisfaction:edit' period.pk %}">Modifier</a> · {{ period.title }} · {{ period.month|date:"F Y" }}{% if period.opens_at %} — configurée{% else %} — non activable (heure de référence absente){% endif %}{% if period.opens_at %}<br><a href="{% url 'satisfaction:results' period.pk %}">Résultats</a>{% endif %}</li>{% empty %}<li>Aucune période créée.</li>{% endfor %}</ul></section><script>
-(function(){
-  var auto=document.getElementById('id_auto_schedule');
-  var opens=document.getElementById('champ-opens_at');
-  var closes=document.getElementById('champ-closes_at');
-  if(!auto||!opens||!closes)return;
-  function sync(){opens.hidden=auto.checked;closes.hidden=auto.checked;}
-  auto.addEventListener('change',sync);sync();
-})();
-</script>{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Satisfaction</h1><p class="app-titre__contexte">Créez et gérez les consultations du club.</p></div>
+<section class="workspace-panel lot2-reading">
+<h2>Nouvelle consultation</h2>
+<form method="post" class="satisfaction-form" novalidate>
+{% csrf_token %}{% if form.non_field_errors %}<div class="form-errors form-errors--compact" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+<div class="lot2-form-grid">{% for field in form %}{% if field.name != 'axes' %}<div>{% include 'components/forms/field.html' %}</div>{% endif %}{% endfor %}</div>
+<section class="satisfaction-axis-builder" data-axis-builder>
+<h3>Axes de satisfaction</h3><p class="app-note">Ajoutez les axes maintenant et placez-les dans l’ordre où ils seront présentés aux membres.</p>
+<div class="satisfaction-axis-add-form__row"><label for="axis-draft">Nom du nouvel axe</label><input id="axis-draft" class="champ__input" maxlength="180"><button class="btn btn--outline" type="button" data-axis-add>Ajouter</button></div>
+<ol class="satisfaction-axis-list" data-axis-list></ol>
+<div class="satisfaction-axis-source"><div class="champ{% if form.axes.errors %} champ--erreur{% endif %}"><label class="champ__label" for="{{ form.axes.id_for_label }}">{{ form.axes.label }} <span class="champ__requis">(obligatoire)</span></label>{{ form.axes }}{% if form.axes.help_text %}<div class="champ__aide" id="{{ form.axes.auto_id }}_helptext">{{ form.axes.help_text }}</div>{% endif %}</div></div>
+{% if form.axes.errors %}<div class="form-errors form-errors--compact" role="alert">{{ form.axes.errors }}</div>{% endif %}
+<p class="form-errors form-errors--compact" data-axis-error role="alert" hidden></p>
+</section>
+<button class="btn btn--solid" type="submit">Créer la consultation</button>
+</form>
+</section>
+<section class="workspace-panel">
+<h2>Consultations</h2>
+<div class="satisfaction-period-list">{% for period in periods %}<div class="satisfaction-period-card">
+<div><span class="satisfaction-period-card__title">{{ period.title|default:"Sans titre" }} — {{ period.month|date:"F Y" }}</span>
+<span class="satisfaction-period-card__meta">{% if period.opens_at %}Du {{ period.opens_at|date:"d/m/Y H:i" }} au {{ period.closes_at|date:"d/m/Y H:i" }} · {{ period.axes.count }} axe{{ period.axes.count|pluralize }}{% else %}Non configurée{% endif %}</span></div>
+<div class="satisfaction-period-card__actions"><a class="btn btn--outline btn--sm" href="{% url 'satisfaction:edit' period.pk %}">Modifier</a><a class="btn btn--outline btn--sm" href="{% url 'satisfaction:results' period.pk %}">Résultats</a></div>
+</div>{% empty %}<p class="app-note">Aucune consultation créée.</p>{% endfor %}</div>
+</section>
+<script src="{% static 'js/satisfaction_creation.js' %}" defer></script>
+{% endblock %}

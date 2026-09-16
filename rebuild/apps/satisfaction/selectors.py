@@ -2,7 +2,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Avg, Count
 from django.http import Http404
 from django.utils import timezone
-from apps.core.permissions import can
+from apps.core.permissions import can, effective_role, MEMBERS
 from .models import SatisfactionPeriod, SatisfactionResponse
 
 
@@ -11,10 +11,12 @@ def require(actor, capability, obj=None):
         raise PermissionDenied
 
 
-def current_period(actor):
+def open_periods(actor):
+    """Toutes les consultations actuellement ouvertes — plusieurs peuvent l'être en
+    même temps depuis que `month` n'est plus une contrainte d'unicité."""
     require(actor, "satisfaction.respond")
     now = timezone.now()
-    return SatisfactionPeriod.objects.filter(opens_at__lte=now, closes_at__gt=now).first()
+    return SatisfactionPeriod.objects.filter(opens_at__lte=now, closes_at__gt=now).order_by("-opens_at")
 
 
 def own_response(actor, period):
@@ -36,6 +38,15 @@ def periods_for_manager(actor):
     return SatisfactionPeriod.objects.all()
 
 
+def eligible_respondents_count():
+    """Membres actuellement en mesure de répondre (satisfaction.respond) : approximation
+    au jour de la consultation, jamais un effectif figé au moment de l'ouverture — les
+    entrées/sorties de membres depuis la période concernée ne sont pas reconstituées."""
+    from apps.members.models import MemberProfile
+    profiles = MemberProfile.objects.filter(status=MemberProfile.Status.ACTIVE, user__is_active=True).select_related("user")
+    return sum(1 for profile in profiles if effective_role(profile.user) in MEMBERS)
+
+
 def period_results(actor, period):
     """Agrégats seulement : jamais de note ou de commentaire individuel exposé ici."""
     require(actor, "satisfaction.view_results")
@@ -43,7 +54,8 @@ def period_results(actor, period):
     count = responses.count()
     hidden = count < period.threshold
     if hidden:
-        return {"count": count, "hidden": True, "threshold": period.threshold, "average": None, "distribution": None}
+        return {"count": count, "hidden": True, "threshold": period.threshold, "average": None, "distribution": None,
+            "participation_rate": None, "eligible_count": None}
     average = responses.aggregate(avg=Avg("score"))["avg"]
     distribution = {row["score"]: row["total"] for row in responses.values("score").annotate(total=Count("id"))}
     axes = []
@@ -51,5 +63,7 @@ def period_results(actor, period):
         stats = axis.scores.aggregate(average=Avg("score"), count=Count("id"))
         if stats["count"] >= period.threshold:
             axes.append({"label": axis.label, "average": round(stats["average"], 1), "count": stats["count"]})
+    eligible = eligible_respondents_count()
     return {"axes": axes, "count": count, "hidden": False, "threshold": period.threshold, "average": round(average, 1) if average else None,
-        "distribution": {score: distribution.get(score, 0) for score in range(1, 6)}}
+        "distribution": {score: distribution.get(score, 0) for score in range(1, 6)},
+        "eligible_count": eligible, "participation_rate": round(100 * count / eligible, 1) if eligible else None}

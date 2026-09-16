@@ -17,7 +17,7 @@ def _management_overview(request, state):
     from apps.agenda.models import Event
     from apps.documents.models import Document
     from apps.voting.models import Vote, Elector, Participation
-    from apps.satisfaction.selectors import current_period, period_results
+    from apps.satisfaction.selectors import open_periods, period_results
     from apps.governance.models import Mandate
     qs = scoped_profiles(request.user, management=True)
     to_regularize = DuesRecord.objects.filter(Q(tranche1_paid=False) | Q(tranche2_paid=False), lions_year=state.active_year).count() if state and state.active_year else 0
@@ -27,7 +27,10 @@ def _management_overview(request, state):
         participation_count = Participation.objects.filter(elector__vote=vote).count()
         open_votes.append({"vote": vote, "elector_count": elector_count, "participation_count": participation_count,
             "rate": round(participation_count * 100 / elector_count, 1) if elector_count else 0})
-    satisfaction_period = current_period(request.user)
+    # Plusieurs consultations peuvent être ouvertes en même temps : la carte de synthèse
+    # du tableau de bord n'en affiche qu'une (la plus récente) ; la liste complète reste
+    # accessible via "Gestion satisfaction".
+    satisfaction_period = open_periods(request.user).first()
     satisfaction_summary = period_results(request.user, satisfaction_period) if satisfaction_period else None
     return {
         "member_count": qs.count(), "active_count": qs.filter(status="ACTIVE", user__is_active=True).count(),
@@ -65,10 +68,11 @@ def dashboard(request):
         pass  # INVITE : jamais électeur.
     satisfaction_to_complete = None
     try:
-        from apps.satisfaction.selectors import current_period, own_response
-        period = current_period(request.user)
-        if period and not own_response(request.user, period):
-            satisfaction_to_complete = period
+        from apps.satisfaction.selectors import open_periods, own_response
+        for period in open_periods(request.user):
+            if not own_response(request.user, period):
+                satisfaction_to_complete = period
+                break
     except PermissionDenied:
         pass
     context = {

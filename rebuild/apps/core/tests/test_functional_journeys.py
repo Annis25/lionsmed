@@ -46,53 +46,69 @@ class FunctionalJourneys(TestCase):
         token = self.client.cookies[settings.CSRF_COOKIE_NAME].value
         return self.client.post(url, {**data, "csrfmiddlewaretoken": token})
 
-    def survey(self, threshold=1):
+    def survey(self, threshold=1, axes=("Organisation", "Communication")):
         now = timezone.localtime().replace(second=0, microsecond=0)
-        data = {"year": now.year, "month": now.month, "threshold": threshold,
+        data = {"threshold": threshold,
             "opens_at": (now-timedelta(hours=1)).isoformat(), "closes_at": (now+timedelta(days=1)).isoformat(),
-            "title": "Avis du club", "description": "Consultation synthétique", "axes": "Organisation\nCommunication"}
+            "title": "Avis du club", "description": "Consultation synthétique", "axes": "\n".join(axes)}
         response = self.post(self.secretary, reverse("satisfaction:manage_list"), data)
         self.assertEqual(response.status_code, 302)
-        return SatisfactionPeriod.objects.get(), data
+        period = SatisfactionPeriod.objects.get()
+        self.assertEqual(list(period.axes.values_list("label", flat=True)), list(axes))
+        return period, data
 
     def test_satisfaction_create_edit_respond_results_and_replay(self):
         period, data = self.survey()
         edit = reverse("satisfaction:edit", args=[period.pk])
-        self.assertEqual(self.post(self.president, edit, {**data, "axes": "Ambiance\nOrganisation"}).status_code, 302)
+        # Axes librement modifiables avant toute réponse : supprime "Communication", ajoute "Ambiance".
+        communication = period.axes.get(label="Communication")
+        self.assertEqual(self.post(self.secretary, reverse("satisfaction:axis_delete", args=[period.pk, communication.pk]), {}).status_code, 302)
+        self.assertEqual(self.post(self.president, reverse("satisfaction:axis_add", args=[period.pk]), {"label": "Ambiance"}).status_code, 302)
+        self.assertEqual(set(period.axes.values_list("label", flat=True)), {"Organisation", "Ambiance"})
         axes = list(period.axes.all())
-        answer = {"score": "4", "comment": "COMMENTAIRE_CONFIDENTIEL", **{f"axis_{a.pk}": "5" for a in axes}}
+        prefix = str(period.pk)
+        answer = {"period_id": prefix, f"{prefix}-score": "4", f"{prefix}-comment": "COMMENTAIRE_CONFIDENTIEL",
+            **{f"{prefix}-axis_{a.pk}": "5" for a in axes}}
         self.assertEqual(self.post(self.member, reverse("satisfaction:respond"), answer).status_code, 302)
         self.post(self.member, reverse("satisfaction:respond"), answer)
         self.assertEqual(SatisfactionResponse.objects.count(), 1)
         self.assertEqual(SatisfactionResponse.objects.get().axis_scores.count(), 2)
-        # Un POST forgé ne peut pas modifier les champs figés après réponse.
-        self.assertEqual(self.post(self.secretary, edit, {**data, "title": "Titre corrigé", "axes": "AXE_FORGE", "threshold": 0}).status_code, 302)
+        # Un POST forgé ne peut pas modifier les champs figés après réponse (dates/seuil disabled côté formulaire).
+        self.assertEqual(self.post(self.secretary, edit, {**data, "title": "Titre corrigé", "threshold": 0}).status_code, 302)
         period.refresh_from_db()
         self.assertEqual(period.title, "Titre corrigé")
-        self.assertEqual(list(period.axes.values_list("label", flat=True)), ["Ambiance", "Organisation"])
+        self.assertEqual(set(period.axes.values_list("label", flat=True)), {"Organisation", "Ambiance"})
         self.assertEqual(period.threshold, 1)
+        # Suppression d'axe après réponse : refusée, jamais silencieuse.
+        organisation = period.axes.get(label="Organisation")
+        self.assertEqual(self.post(self.secretary, reverse("satisfaction:axis_delete", args=[period.pk, organisation.pk]), {}).status_code, 302)
+        self.assertTrue(period.axes.filter(pk=organisation.pk).exists())
         self.client.force_login(self.president)
         results = self.client.get(reverse("satisfaction:results", args=[period.pk]))
-        self.assertContains(results, "<meter")
+        self.assertContains(results, "result-bar")
         self.assertEqual(results.context["results"]["average"], 4)
         self.assertNotContains(results, "COMMENTAIRE_CONFIDENTIEL")
         self.assertNotContains(results, self.member.email)
 
     def test_satisfaction_missing_axis_and_closed_window_leave_no_response(self):
         period, _ = self.survey()
-        response = self.post(self.member, reverse("satisfaction:respond"), {"score": "4"})
+        prefix = str(period.pk)
+        response = self.post(self.member, reverse("satisfaction:respond"), {"period_id": prefix, f"{prefix}-score": "4"})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context["form"].errors)
+        entry = next(e for e in response.context["entries"] if e["period"].pk == period.pk)
+        self.assertTrue(entry["form"].errors)
         self.assertFalse(SatisfactionResponse.objects.exists())
         SatisfactionPeriod.objects.filter(pk=period.pk).update(closes_at=timezone.now()-timedelta(minutes=1))
-        answer = {"score": "4", **{f"axis_{a.pk}": "5" for a in period.axes.all()}}
+        answer = {"period_id": prefix, f"{prefix}-score": "4", **{f"{prefix}-axis_{a.pk}": "5" for a in period.axes.all()}}
         self.post(self.member, reverse("satisfaction:respond"), answer)
         self.assertFalse(SatisfactionResponse.objects.exists())
         self.assertFalse(AuditEvent.objects.filter(action="satisfaction.responded").exists())
 
     def test_satisfaction_results_hidden_below_threshold(self):
         period, _ = self.survey(threshold=2)
-        self.post(self.member, reverse("satisfaction:respond"), {"score": "4", **{f"axis_{a.pk}": "5" for a in period.axes.all()}})
+        prefix = str(period.pk)
+        self.post(self.member, reverse("satisfaction:respond"),
+            {"period_id": prefix, f"{prefix}-score": "4", **{f"{prefix}-axis_{a.pk}": "5" for a in period.axes.all()}})
         self.client.force_login(self.president)
         response = self.client.get(reverse("satisfaction:results", args=[period.pk]))
         self.assertTrue(response.context["results"]["hidden"])

@@ -239,6 +239,11 @@ class ExternalEmailsTests(TestCase):
         self.assertEqual(OutboxMessage.objects.filter(kind="MEMBER_BROADCAST").count(), 3)
         self.assertTrue(OutboxMessage.objects.filter(kind="MEMBER_BROADCAST", recipient="partenaire@example.invalid").exists())
 
+    def test_confirm_screen_shows_duplicates_removed_count(self):
+        response = self.post(self.president, "confirm", extra_emails=self.member.email.upper())
+        self.assertContains(response, "Doublons retirés")
+        self.assertContains(response, "<dd>1</dd>", html=True)
+
     def test_double_submission_with_external_emails_creates_a_single_campaign(self):
         key = str(uuid4())
         self.client.force_login(self.president)

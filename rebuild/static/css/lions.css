@@ -873,6 +873,7 @@ p:last-child { margin-bottom: 0; }
               box-shadow var(--duree) var(--courbe);
 }
 .champ__input::placeholder { color: var(--gris-clair); }
+.champ__input:disabled { background: var(--fond); color: var(--gris); cursor: not-allowed; }
 /* Survol et focus sont distincts : le survol épaissit le trait, le focus pose
    le contour or du système. */
 .champ__input:hover { border-color: var(--gris-clair); }

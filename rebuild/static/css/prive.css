@@ -543,3 +543,167 @@
 @media (max-width: 760px) {
   .email-picker__row { flex-direction: column; align-items: stretch; }
 }
+
+/* Pagination partagée (components/private/pagination.html) — toutes les listes de
+   l'espace privé : flèches + numéros avec ellipse (Paginator.get_elided_page_range),
+   « Page X sur Y » en repli sur mobile plutôt que la liste de numéros. */
+.pagination { display: flex; align-items: center; justify-content: center; gap: var(--e2); margin-block: var(--e5) 0; }
+.pagination__pages { display: flex; align-items: center; gap: var(--e1); list-style: none; margin: 0; padding: 0; }
+.pagination__arrow, .pagination__page {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; min-height: 44px; padding: 0 var(--e2);
+  border: 1px solid var(--bord); border-radius: var(--r-pilule);
+  background: var(--blanc); color: var(--bleu); font: inherit; font-size: .875rem; font-weight: 600;
+  transition: background-color var(--duree) var(--courbe), border-color var(--duree) var(--courbe), color var(--duree) var(--courbe);
+}
+a.pagination__arrow:hover, a.pagination__page:hover { border-color: var(--bleu); background: var(--fond-2); }
+.pagination__arrow:disabled { border-color: var(--bord); color: var(--gris); }
+.pagination__page--current { background: var(--bleu); border-color: var(--bleu); color: var(--blanc); cursor: default; }
+.pagination__ellipsis { display: inline-flex; align-items: center; justify-content: center; min-width: var(--e5); color: var(--gris); }
+.pagination__status { display: none; margin: 0; padding: 0 var(--e2); font-size: .8125rem; color: var(--gris); }
+
+@media (max-width: 560px) {
+  .pagination__pages { display: none; }
+  .pagination__status { display: inline-flex; align-items: center; }
+}
+
+/* Satisfaction — page « Répondre » : intro, période, échelle de smileys, commentaire. */
+/* Alerte compacte (non-field errors uniquement — jamais la grosse bordure bleue
+   partagée de .form-errors) : réponse à une erreur réellement globale, sans doublon
+   avec les erreurs déjà affichées sous chaque champ. */
+.form-errors--compact { border-color: #F0C7CF; background: #FBECEF; color: #B3243B; padding: var(--e3) var(--e4); }
+.form-errors--compact .errorlist { color: inherit; list-style: none; margin: 0; padding: 0; }
+/* Formulaires Satisfaction (gestion + édition) : .formulaire impose ses propres 2
+   colonnes à ses enfants directs, ce qui écrase .lot2-form-grid/.lot2-actions (déjà des
+   grilles à 2 colonnes) dès qu'un second enfant comme l'alerte d'erreur compacte
+   apparaît. Remplacé ici par un simple empilement espacé, sans ce conflit. */
+.satisfaction-form { display: grid; gap: var(--e4); }
+.satisfaction-intro { margin: 0 0 var(--e5); max-width: 62ch; color: var(--gris); }
+.satisfaction-period { display: inline-flex; align-items: center; gap: var(--e2); padding: var(--e2) var(--e4); margin-bottom: var(--e5); border: 1px solid var(--bord); border-radius: var(--r-pilule); background: var(--fond-2); font-size: .8125rem; color: var(--bleu); font-weight: 600; }
+.satisfaction-period svg { flex: none; color: var(--bleu); }
+
+.smiley-scale { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e4); padding: var(--e4) var(--e5); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--blanc); margin-bottom: var(--e3); min-width: 0; transition: border-color var(--duree) var(--courbe), box-shadow var(--duree) var(--courbe); }
+.smiley-scale:hover { border-color: var(--bord); box-shadow: var(--ombre); }
+.smiley-scale + .smiley-scale { margin-top: 0; }
+.smiley-scale__question { display: grid; gap: 2px; min-width: 0; flex: 1 1 240px; }
+.smiley-scale__heading { display: flex; align-items: center; gap: var(--e3); }
+.smiley-scale__number { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--fond-2); color: var(--bleu); font-size: .8125rem; font-weight: 700; }
+.smiley-scale__label { font-size: 1.0625rem; font-weight: 600; color: var(--encre); line-height: 1.35; }
+.smiley-scale__description { margin: var(--e1) 0 0 calc(30px + var(--e3)); font-size: .8125rem; line-height: 1.5; color: var(--gris); max-width: 48ch; }
+.smiley-scale__options { display: flex; gap: var(--e2); flex-wrap: wrap; }
+.smiley-option { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 72px; padding: var(--e3) var(--e1); border: 1.5px solid var(--bord); border-radius: var(--r-carte); text-align: center; cursor: pointer;
+  transition: border-color var(--duree) var(--courbe), background-color var(--duree) var(--courbe), box-shadow var(--duree) var(--courbe), transform var(--duree) var(--courbe); }
+/* Vrai <input type=radio>, focusable et lisible par un lecteur d'écran, mais jamais
+   affiché : toute la tuile .smiley-option sert de label cliquable (voir :focus-within
+   pour l'anneau de focus, reporté sur la tuile puisque l'input lui-même est invisible).
+   Préfixé .prive-dense pour battre en spécificité .prive-dense .champ__input (44px de
+   min-height/height) : StyledFields pose class="champ__input" sur tout widget non-
+   checkbox, RadioSelect inclus — sans ce niveau de spécificité, la case redeviendrait
+   visible malgré height:1px. */
+.prive-dense .smiley-option input {
+  position: absolute; width: 1px; height: 1px; min-width: 0; min-height: 0; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.smiley-option__face { font-size: 1.625rem; line-height: 1; transition: transform var(--duree) var(--courbe); }
+.smiley-option__text { font-size: .6875rem; line-height: 1.3; color: var(--gris); transition: color var(--duree) var(--courbe); }
+.smiley-option:hover { border-color: var(--bleu); transform: translateY(-2px); box-shadow: var(--ombre); }
+.smiley-option:has(input:checked) { box-shadow: var(--ombre); }
+.smiley-option:has(input:checked) .smiley-option__face { transform: scale(1.22); }
+.smiley-option:has(input:checked) .smiley-option__text { font-weight: 700; color: var(--encre); }
+.smiley-option:focus-within { outline: 3px solid var(--or); outline-offset: 2px; }
+.smiley-option--1:has(input:checked) { border-color: #F0C7CF; background: #FBECEF; }
+.smiley-option--1:has(input:checked) .smiley-option__text { color: #B3243B; }
+.smiley-option--2:has(input:checked) { border-color: #F5D3A8; background: #FFF3E0; }
+.smiley-option--2:has(input:checked) .smiley-option__text { color: #9A5B00; }
+.smiley-option--3:has(input:checked) { border-color: #CBDDF2; background: #E9F1FA; }
+.smiley-option--3:has(input:checked) .smiley-option__text { color: var(--bleu); }
+.smiley-option--4:has(input:checked) { border-color: #B9E0C9; background: #EAF6EF; }
+.smiley-option--4:has(input:checked) .smiley-option__text { color: #14603A; }
+.smiley-option--5:has(input:checked) { border-color: #8FCFA8; background: #DCF2E4; }
+.smiley-option--5:has(input:checked) .smiley-option__text { color: #0E4B2C; }
+
+.satisfaction-comment__title { font-weight: 600; color: var(--encre); }
+.satisfaction-comment__optional { font-weight: 400; color: var(--gris); }
+.satisfaction-comment__counter { display: block; margin-top: var(--e1); font-size: .75rem; color: var(--gris); text-align: right; }
+.satisfaction-already { display: flex; align-items: flex-start; gap: var(--e3); padding: var(--e4); border: 1px solid #B9E0C9; border-radius: var(--r-carte); background: #EAF6EF; color: #14603A; }
+.satisfaction-already svg { flex: none; margin-top: 2px; }
+
+@media (max-width: 700px) {
+  .smiley-scale { flex-direction: column; align-items: stretch; }
+  /* flex-basis suit l'axe principal : 240px devient une HAUTEUR minimale une fois
+     l'axe basculé en colonne ci-dessus, d'où le grand vide observé sous chaque titre
+     d'axe sans description — remis à auto pour que le bloc ne prenne que sa hauteur
+     de contenu réelle. */
+  .smiley-scale__question { flex: initial; }
+  .smiley-scale__options { justify-content: space-between; }
+  .smiley-scale__description { margin-left: 0; }
+}
+@media (max-width: 480px) {
+  /* 5 tuiles sur une ligne : 20% ne compte pas les 4 espaces (gap) entre elles, ce qui
+     les fait déborder de la largeur totale et pousse la 5ᵉ à la ligne — recalculé pour
+     que les 5 se partagent réellement 100% une fois les gaps déduits. */
+  .smiley-option { width: calc((100% - 4 * var(--e2)) / 5); min-width: 0; padding: var(--e2) 2px; }
+  .smiley-option__face { font-size: 1.3125rem; }
+  .smiley-option__text { font-size: .625rem; }
+}
+
+/* Satisfaction — gestion : liste des périodes en cards, gestionnaire d'axes. */
+.satisfaction-period-list { display: grid; gap: var(--e3); }
+.satisfaction-period-card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); padding: var(--e4); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--blanc); }
+.satisfaction-period-card__title { font-weight: 600; color: var(--encre); }
+.satisfaction-period-card__meta { display: block; margin-top: 2px; font-size: .8125rem; color: var(--gris); }
+.satisfaction-period-card__actions { display: flex; gap: var(--e2); flex-wrap: wrap; }
+
+.satisfaction-axis-add-form__row { display: flex; gap: var(--e2); align-items: flex-start; }
+.satisfaction-axis-add-form__row input { flex: 1 1 auto; min-width: 0; }
+.satisfaction-axis-builder { grid-column: 1 / -1; padding: var(--e4); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); }
+.satisfaction-axis-builder h3 { margin-top: 0; }
+.satisfaction-axis-builder .satisfaction-axis-add-form__row { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; }
+.satisfaction-axis-builder .satisfaction-axis-add-form__row label { grid-column: 1 / -1; }
+.satisfaction-axis-builder__actions { display: flex; flex-wrap: wrap; gap: var(--e1); margin-left: auto; }
+.satisfaction-axis-builder.is-enhanced .satisfaction-axis-source { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.satisfaction-axis-add-form__row button { flex: none; white-space: nowrap; }
+.satisfaction-axis-frozen-note { padding: var(--e3); border: 1px solid #F1DFA0; border-radius: var(--r-carte); background: #FFF7DB; color: #7A5C00; }
+.satisfaction-axis-list { list-style: none; margin: var(--e3) 0 0; padding: 0; display: grid; gap: var(--e2); }
+.satisfaction-axis-row { display: flex; align-items: center; gap: var(--e3); padding: var(--e2) var(--e3); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--blanc); }
+.satisfaction-axis-row--empty { color: var(--gris); font-size: .875rem; }
+.satisfaction-axis-row__order { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--fond-2); color: var(--bleu); font-size: .75rem; font-weight: 700; }
+.satisfaction-axis-row__label { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.satisfaction-axis-row__actions { display: flex; align-items: center; gap: var(--e1); flex: none; position: relative; }
+.satisfaction-axis-row__actions form { display: contents; }
+.satisfaction-axis-row__btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; color: var(--gris); }
+.satisfaction-axis-row__btn:hover { background: var(--fond); color: var(--bleu); }
+.satisfaction-axis-row__btn:disabled { opacity: .35; cursor: default; }
+.satisfaction-axis-row__btn--danger:hover { background: #FBECEF; color: #B3243B; }
+.satisfaction-axis-row__edit { position: relative; }
+.satisfaction-axis-row__edit summary { list-style: none; }
+.satisfaction-axis-row__edit summary::-webkit-details-marker { display: none; }
+.satisfaction-axis-row__edit[open] summary { background: var(--fond); color: var(--bleu); border-radius: 50%; }
+.satisfaction-axis-edit-form { position: absolute; z-index: 2; top: calc(100% + var(--e1)); right: 0; display: flex; gap: var(--e2); padding: var(--e2); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--blanc); box-shadow: var(--ombre); width: max(240px, 100%); }
+.satisfaction-axis-edit-form input { flex: 1 1 auto; min-width: 0; }
+
+@media (max-width: 560px) {
+  .satisfaction-period-card { flex-direction: column; align-items: stretch; }
+  .satisfaction-axis-row { flex-wrap: wrap; }
+  .satisfaction-axis-builder .satisfaction-axis-add-form__row { grid-template-columns: 1fr; }
+  .satisfaction-axis-builder .satisfaction-axis-add-form__row label { grid-column: auto; }
+  .satisfaction-axis-builder .satisfaction-axis-add-form__row button { width: 100%; }
+  .satisfaction-axis-builder__actions { width: 100%; margin-left: 0; }
+  .satisfaction-axis-builder__actions .btn { flex: 1 1 auto; }
+  .satisfaction-axis-edit-form { position: static; box-shadow: none; width: auto; margin-top: var(--e2); }
+}
+
+/* Satisfaction — résultats : barres par axe, distribution. */
+.result-bar { margin-bottom: var(--e3); }
+.result-bar__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--e2); margin-bottom: var(--e1); font-size: .875rem; }
+.result-bar__label { font-weight: 600; color: var(--encre); }
+.result-bar__value { font-variant-numeric: tabular-nums; color: var(--gris); }
+.result-bar__track { position: relative; height: 12px; border-radius: var(--r-pilule); background: var(--fond-2); overflow: hidden; }
+.result-bar__fill { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: var(--r-pilule); background: var(--bleu); }
+.result-bar--1 .result-bar__fill { background: #B3243B; }
+.result-bar--2 .result-bar__fill { background: #C97A00; }
+.result-bar--3 .result-bar__fill { background: var(--bleu); }
+.result-bar--4 .result-bar__fill { background: #2F9E5E; }
+.result-bar--5 .result-bar__fill { background: #14603A; }
+.result-hidden { display: flex; align-items: flex-start; gap: var(--e3); padding: var(--e4); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); color: var(--gris); }
+.result-hidden svg { flex: none; margin-top: 2px; }

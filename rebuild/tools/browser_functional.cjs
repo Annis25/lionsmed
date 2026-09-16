@@ -5,6 +5,7 @@ const assert = require('assert');
   const base = process.env.LIONSMED_BROWSER_URL;
   const sessions = process.env.LIONSMED_VISUAL_SESSIONS.split(',');
   const routes = [
+    [0, '/espace/satisfaction/gestion/', 'satisfaction-create'],
     [0, `/espace/satisfaction/gestion/${process.env.LIONSMED_VISUAL_PERIOD}/resultats/`, 'results'],
     [0, `/espace/satisfaction/gestion/${process.env.LIONSMED_VISUAL_PERIOD}/modifier/`, 'axes'],
     [1, '/espace/cotisations/gestion/', 'dues'],
@@ -25,6 +26,16 @@ const assert = require('assert');
       assert.equal(response.status(), 200, path);
       assert.equal(new URL(page.url()).pathname, path, 'Unexpected redirect');
       await page.evaluate(() => document.fonts.ready);
+      if (name === 'satisfaction-create') {
+        const draft = page.locator('#axis-draft');
+        await draft.fill('Organisation');
+        await page.locator('[data-axis-add]').click();
+        await draft.fill('Communication');
+        await draft.press('Enter');
+        assert.equal(await page.locator('[data-axis-source]').inputValue(), 'Organisation\nCommunication');
+        await page.locator('[data-axis-list] [data-action="up"]').nth(1).click();
+        assert.equal(await page.locator('[data-axis-source]').inputValue(), 'Communication\nOrganisation');
+      }
       if (name === 'phone') {
         await page.locator('[data-portrait-editor]:visible').waitFor();
         await page.locator('#portrait-zoom').fill('2');
@@ -42,6 +53,7 @@ const assert = require('assert');
       assert(!result.overflow, `Overflow ${name} ${width}`);
       assert.equal(result.h1, 1, name);
       assert.equal(result.unlabeled, 0, name);
+      await page.evaluate(() => document.activeElement?.blur());
       await page.screenshot({path: `/tmp/lionsmed-functional-${name}-${width}.png`, fullPage: true});
       checks++;
     }

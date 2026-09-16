@@ -10,7 +10,7 @@ from django.utils import timezone
 from apps.core.tests.test_foundations import account
 from apps.governance.models import Role, ClubState
 from apps.dues.tests.test_dues import lions_year
-from apps.satisfaction.services import open_period, submit_satisfaction
+from apps.satisfaction.services import create_period, submit_satisfaction
 
 
 @skipUnless(os.environ.get("LIONSMED_FUNCTIONAL_BROWSER") == "1", "Contrôle navigateur fonctionnel opt-in")
@@ -34,8 +34,9 @@ class FunctionalBrowserTests(StaticLiveServerTestCase):
         profile = member.member_profile
         profile.photo_key = photo_storage().save("portraits/visual.jpg", encode_photo(picture(size=(240, 400))))
         profile.save()
-        period = open_period(actor=president, year=2026, month=9, title="Satisfaction générale", description="Votre avis sur la vie du club", threshold=1,
-            opens_at=timezone.now()-timedelta(hours=1), closes_at=timezone.now()+timedelta(days=1), axes="Organisation\nCommunication\nVie du club")
+        period = create_period(actor=president, title="Satisfaction générale", description="Votre avis sur la vie du club", threshold=1,
+            opens_at=timezone.now()-timedelta(hours=1), closes_at=timezone.now()+timedelta(days=1),
+            axes=("Organisation", "Communication", "Vie du club"))
         submit_satisfaction(actor=respondent, period=period, score=4, axis_scores={axis.pk: 4 for axis in period.axes.all()})
         year = lions_year()
         ClubState.objects.update_or_create(pk=1, defaults={"active_year": year})
