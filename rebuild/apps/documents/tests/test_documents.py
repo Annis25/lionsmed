@@ -167,6 +167,128 @@ class DocumentAclTests(TestCase):
         self.assertContains(response, reverse("documents:manage_delete", args=[document.pk]))
 
 
+class DocumentUIRedesignTests(TestCase):
+    """Refonte UI/UX des 4 pages Documents — structure/contenu rendu et permissions,
+    aucune règle métier changée au-delà des filtres/tri additifs déjà couverts ici."""
+
+    def setUp(self):
+        self.president = account("ui-president@example.invalid", role=Role.PRESIDENT)
+        self.member = account("ui-member@example.invalid", role=Role.MEMBRE)
+        self.invite = account("ui-guest@example.invalid", role=Role.INVITE)
+        patcher = patch("apps.documents.services.scan_bytes", return_value=ScanResult(clean=True, detail="stream: OK"))
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def upload(self, **kwargs):
+        data = dict(actor=self.president, upload=pdf(kwargs.pop("filename", "doc.pdf")), title="Règlement intérieur",
+            description="Document synthétique", category=Document.Category.GOUVERNANCE, visibility=Document.Visibility.MEMBERS)
+        data.update(kwargs)
+        return services.upload_document(**data)
+
+    def test_member_list_shows_inline_actions_and_category_badge(self):
+        self.upload()
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("documents:list"))
+        self.assertContains(response, "Visualiser")
+        self.assertContains(response, "Télécharger")
+        self.assertContains(response, "badge--excuse")
+        self.assertContains(response, "Gouvernance")
+
+    def test_member_list_category_filter_and_sort_are_server_side(self):
+        self.upload(title="A - Financier", category=Document.Category.FINANCIER)
+        self.upload(title="B - District", category=Document.Category.DISTRICT)
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("documents:list"), {"category": Document.Category.FINANCIER})
+        self.assertContains(response, "A - Financier")
+        self.assertNotContains(response, "B - District")
+        response = self.client.get(reverse("documents:list"), {"tri": "alpha"})
+        titles = [d.title for d in response.context["page_obj"]]
+        self.assertEqual(titles, sorted(titles))
+
+    def test_member_list_empty_state(self):
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("documents:list"))
+        self.assertContains(response, "Aucun document disponible")
+
+    def test_gestion_list_shows_kpi_counts(self):
+        self.upload(title="Doc 1")
+        self.upload(title="Doc 2", category=Document.Category.FINANCIER)
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("documents:manage_list"))
+        self.assertEqual(response.context["counts"]["total"], 2)
+        self.assertEqual(response.context["counts"]["available"], 2)
+        self.assertEqual(response.context["counts"]["categories"], 2)
+        self.assertContains(response, "kpi-card")
+
+    def test_gestion_list_visibility_filter(self):
+        self.upload(title="Membres doc", visibility=Document.Visibility.MEMBERS)
+        self.upload(title="Bureau doc", visibility=Document.Visibility.BUREAU)
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("documents:manage_list"), {"visibilite": Document.Visibility.BUREAU})
+        self.assertContains(response, "Bureau doc")
+        self.assertNotContains(response, "Membres doc")
+
+    def test_gestion_list_empty_state_has_upload_cta(self):
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("documents:manage_list"))
+        self.assertContains(response, "Aucun document n’a encore été déposé.")
+        self.assertContains(response, reverse("documents:upload"))
+
+    def test_gestion_detail_shows_breadcrumb_and_author(self):
+        document = self.upload()
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("documents:manage_detail", args=[document.pk]))
+        self.assertContains(response, "doc-breadcrumb")
+        self.assertContains(response, self.president.get_full_name())
+
+    def test_gestion_detail_grant_status_active_and_expired(self):
+        document = self.upload()
+        services.grant_access(actor=self.president, document=document, user=self.invite,
+            expires_at=timezone.now() + timedelta(days=5))
+        expired_guest = account("ui-expired-guest@example.invalid", role=Role.INVITE)
+        services.grant_access(actor=self.president, document=document, user=expired_guest,
+            expires_at=timezone.now() - timedelta(days=1))
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("documents:manage_detail", args=[document.pk]))
+        self.assertContains(response, "Actif")
+        self.assertContains(response, "Expiré")
+
+    def test_gestion_detail_no_grants_empty_state(self):
+        document = self.upload()
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("documents:manage_detail", args=[document.pk]))
+        self.assertContains(response, "Aucun accès nominatif accordé.")
+
+    def test_gestion_detail_danger_zone_preserved(self):
+        document = self.upload()
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("documents:manage_detail", args=[document.pk]))
+        self.assertContains(response, "document-danger-zone")
+        self.assertContains(response, "Supprimer le document")
+        self.assertContains(response, "data-confirm-delete")
+        self.assertContains(response, reverse("documents:manage_delete", args=[document.pk]))
+
+    def test_upload_form_renders_grouped_sections_and_file_drop(self):
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("documents:upload"))
+        self.assertContains(response, "Informations")
+        self.assertContains(response, "Classification")
+        self.assertContains(response, "Fichier")
+        self.assertContains(response, "file-drop")
+        self.assertContains(response, "Analyse antivirus automatique")
+
+    def test_upload_scanner_unavailable_shows_inline_error_under_file_field(self):
+        self.client.force_login(self.president)
+        with patch("apps.documents.services.scan_bytes", side_effect=ScannerUnavailable):
+            response = self.client.post(reverse("documents:upload"), {
+                "title": "x", "description": "", "category": Document.Category.GENERAL,
+                "visibility": Document.Visibility.MEMBERS, "file": pdf(),
+            })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "indisponible")
+        self.assertFalse(Document.objects.exists())
+
+
 class UploadSizeLimitTests(TestCase):
     def setUp(self):
         self.president = account("president2@example.invalid", role=Role.PRESIDENT)

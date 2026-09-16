@@ -1,0 +1,10 @@
+<section class="app-section" aria-labelledby="titre-membres">
+<div class="bloc-titre"><h2 id="titre-membres">Membres et mandats</h2></div>
+<article class="carte-info">
+<dl class="paire-liste">
+<div><dt>Membres actifs</dt><dd>{{ active_count }}</dd></div>
+<div><dt>Mandats enregistrés</dt><dd>{{ mandate_count }}</dd></div>
+</dl>
+<a class="link-arrow" href="{% url 'governance:members' %}">Membres et mandats<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</article>
+</section>

@@ -1,0 +1,9 @@
+<div class="identite-titre dashboard-header">
+<span class="identite-avatar" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 21v-2a7 7 0 0 1 14 0v2"></path></svg></span>
+<div class="app-titre">
+<h1>Tableau de bord</h1>
+<p class="app-titre__contexte">{% if active_year %}Année Lions {{ active_year.label }}{% else %}Aucune année active définie{% endif %} · {{ effective_role_label }}</p>
+<p class="app-titre__contexte">{{ dashboard_intro }}</p>
+</div>
+{% if can_directory %}<a class="link-arrow dashboard-header__annuaire" href="{% url 'members:directory' %}">{% if member.directory_visible %}Profil partagé{% else %}Profil masqué{% endif %} · Annuaire<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>{% endif %}
+</div>

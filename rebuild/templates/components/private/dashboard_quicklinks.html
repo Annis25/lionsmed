@@ -1,0 +1,8 @@
+{% if dashboard_quicklinks %}
+<section class="app-section" aria-labelledby="titre-actions-rapides">
+<div class="bloc-titre"><h2 id="titre-actions-rapides">Actions rapides</h2></div>
+<div class="lot2-actions">
+{% for link in dashboard_quicklinks %}<a class="btn btn--outline btn--sm" href="{{ link.url }}">{{ link.label }}</a>{% endfor %}
+</div>
+</section>
+{% endif %}

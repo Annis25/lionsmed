@@ -2,8 +2,10 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.utils.http import content_disposition_header
 from django.views.decorators.http import require_http_methods, require_safe
 from apps.core.permissions import capability_required
@@ -27,8 +29,13 @@ def document_list(request):
     category = request.GET.get("category", "")
     if category in Document.Category.values:
         qs = qs.filter(category=category)
+    sort = request.GET.get("tri", "")
+    qs = qs.order_by("title") if sort == "alpha" else qs.order_by("-created_at")
     page = Paginator(qs, 20).get_page(request.GET.get("page"))
-    return render(request, "espace/documents.html", {"page_obj": page, "categories": Document.Category.choices})
+    return render(request, "espace/documents.html", {
+        "page_obj": page, "categories": Document.Category.choices,
+        "current_category": category, "current_sort": sort,
+    })
 
 
 @capability_required("document.view")
@@ -93,8 +100,28 @@ def document_upload(request):
 @capability_required("document.manage")
 @require_safe
 def manage_list(request):
-    page = Paginator(Document.objects.exclude(status=Document.Status.DELETED).order_by("-created_at"), 20).get_page(request.GET.get("page"))
-    return render(request, "espace/document_manage_list.html", {"page_obj": page})
+    qs = Document.objects.exclude(status=Document.Status.DELETED)
+    category = request.GET.get("category", "")
+    if category in Document.Category.values:
+        qs = qs.filter(category=category)
+    visibility = request.GET.get("visibilite", "")
+    if visibility in Document.Visibility.values:
+        qs = qs.filter(visibility=visibility)
+    sort = request.GET.get("tri", "")
+    qs = qs.order_by("title") if sort == "alpha" else qs.order_by("-created_at")
+    page = Paginator(qs, 20).get_page(request.GET.get("page"))
+    now = timezone.now()
+    all_active = Document.objects.exclude(status=Document.Status.DELETED)
+    counts = {
+        "total": all_active.count(),
+        "available": all_active.filter(status=Document.Status.AVAILABLE).count(),
+        "categories": all_active.values("category").distinct().count(),
+        "grants": DocumentGrant.objects.filter(Q(expires_at__isnull=True) | Q(expires_at__gt=now)).count(),
+    }
+    return render(request, "espace/document_manage_list.html", {
+        "page_obj": page, "categories": Document.Category.choices, "visibilities": Document.Visibility.choices,
+        "current_category": category, "current_visibility": visibility, "current_sort": sort, "counts": counts,
+    })
 
 
 @capability_required("document.manage")
@@ -116,6 +143,7 @@ def manage_detail(request, document_id):
         "form": form,
         "grants": document.grants.select_related("user"),
         "can_preview": _is_previewable(document),
+        "now": timezone.now(),
     })
 
 

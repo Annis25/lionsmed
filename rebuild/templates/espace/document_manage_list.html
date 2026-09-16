@@ -1,3 +1,55 @@
 {% extends 'base/private.html' %}
+{% load static document_extras %}
 {% block title %}Gestion des documents — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>Gestion des documents</h1></div><section class="workspace-panel"><a class="btn btn--solid" href="{% url 'documents:upload' %}">Déposer un document</a><ul class="lot2-timeline">{% for document in page_obj %}<li><a href="{% url 'documents:manage_detail' document.pk %}">{{ document.title }}</a> <span class="badge">{{ document.get_visibility_display }}</span></li>{% empty %}<li>Aucun document déposé.</li>{% endfor %}</ul>{% include 'components/private/pagination.html' %}</section>{% endblock %}
+{% block content %}
+<div class="bloc-titre">
+<div class="app-titre"><h1>Gestion des documents</h1><p class="app-titre__contexte">Gérez les documents internes du club, leur visibilité et leur accès.</p></div>
+<a class="btn btn--solid" href="{% url 'documents:upload' %}">Déposer un document<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+</div>
+
+<div class="kpi-grid">
+<div class="kpi-card"><span class="kpi-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"></path><path d="M14 3v4h4M9 13h6M9 17h6"></path></svg></span><div><p class="kpi-card__value">{{ counts.total }}</p><p class="kpi-card__label">Document{{ counts.total|pluralize }} au total</p></div></div>
+<div class="kpi-card"><span class="kpi-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg></span><div><p class="kpi-card__value">{{ counts.available }}</p><p class="kpi-card__label">Disponible{{ counts.available|pluralize }}</p></div></div>
+<div class="kpi-card"><span class="kpi-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg></span><div><p class="kpi-card__value">{{ counts.categories }}</p><p class="kpi-card__label">Catégorie{{ counts.categories|pluralize }} utilisée{{ counts.categories|pluralize }}</p></div></div>
+<div class="kpi-card"><span class="kpi-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20a7.5 7.5 0 0 1 15 0"></path></svg></span><div><p class="kpi-card__value">{{ counts.grants }}</p><p class="kpi-card__label">Accès nominatif{{ counts.grants|pluralize }}</p></div></div>
+</div>
+
+{% if page_obj %}
+<form method="get" class="lot2-filters" role="search">
+<div class="champ"><label for="doc-category">Catégorie</label><select class="champ__input" id="doc-category" name="category"><option value="">Toutes</option>{% for value,label in categories %}<option value="{{ value }}"{% if current_category == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+<div class="champ"><label for="doc-visibility">Visibilité</label><select class="champ__input" id="doc-visibility" name="visibilite"><option value="">Toutes</option>{% for value,label in visibilities %}<option value="{{ value }}"{% if current_visibility == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+<div class="champ"><label for="doc-sort">Trier par</label><select class="champ__input" id="doc-sort" name="tri"><option value="recent"{% if current_sort != 'alpha' %} selected{% endif %}>Plus récent</option><option value="alpha"{% if current_sort == 'alpha' %} selected{% endif %}>Alphabétique</option></select></div>
+<button class="btn btn--outline" type="submit">Filtrer</button>
+</form>
+<div class="icon-search doc-search-row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg><input type="search" class="champ__input" placeholder="Rechercher dans cette page…" aria-label="Rechercher un document" data-doc-search></div>
+
+<div class="satisfaction-period-list">
+{% for document in page_obj %}
+<div class="satisfaction-period-card" data-doc-card data-doc-title="{{ document.title|lower }}">
+<div>
+<span class="satisfaction-period-card__title"><a href="{% url 'documents:manage_detail' document.pk %}">{{ document.title }}</a></span>
+<span class="badge badge--excuse">{{ document.get_category_display }}</span>
+<span class="satisfaction-period-card__meta">Visibilité : {{ document.get_visibility_display }} · Ajouté le {{ document.created_at|date:"d/m/Y" }} · {{ document.content_type|file_kind }} · {{ document.size|filesizeformat }}</span>
+</div>
+<div class="satisfaction-period-card__actions">
+{% if document|is_previewable %}<a class="btn btn--outline btn--sm" href="{% url 'documents:preview' document.pk %}" target="_blank" rel="noopener">Visualiser</a>{% endif %}
+<a class="btn btn--outline btn--sm" href="{% url 'documents:download' document.pk %}">Télécharger</a>
+<a class="btn btn--solid btn--sm" href="{% url 'documents:manage_detail' document.pk %}">Gérer</a>
+</div>
+</div>
+{% endfor %}
+</div>
+<div class="etat-vide" data-doc-empty hidden>
+<span class="etat-vide__icone" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg></span>
+<h3>Aucun document ne correspond</h3><p>Essayez un autre filtre ou une autre recherche.</p>
+</div>
+{% include 'components/private/pagination.html' %}
+{% else %}
+<div class="etat-vide">
+<span class="etat-vide__icone" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 3h9l3 3v15H6z"></path><path d="M14 3v4h4M9 13h6M9 17h6"></path></svg></span>
+<h3>Aucun document n’a encore été déposé.</h3>
+<a class="btn btn--solid" href="{% url 'documents:upload' %}">Déposer un document</a>
+</div>
+{% endif %}
+<script src="{% static 'js/documents.js' %}" defer></script>
+{% endblock %}

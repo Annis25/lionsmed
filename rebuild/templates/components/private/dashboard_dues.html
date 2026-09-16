@@ -1,0 +1,24 @@
+{% load l10n %}
+<section class="app-section" aria-labelledby="titre-encaissement">
+<div class="bloc-titre"><h2 id="titre-encaissement">Suivi des cotisations</h2><a class="btn btn--solid btn--sm" href="{% url 'dues:manage_list' %}">Gérer les cotisations</a></div>
+{% if active_year %}
+<p class="app-titre__contexte">Année Lions {{ active_year.label }} · {{ dues_collection.member_count }} membre{{ dues_collection.member_count|pluralize }} actif{{ dues_collection.member_count|pluralize }}</p>
+{% if dues_collection.configured %}
+<div class="kpi-grid">
+<div class="kpi-card"><span class="kpi-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg></span><div><p class="kpi-card__value">{{ dues_collection.collected|floatformat:2 }} <small>TND</small></p><p class="kpi-card__label">Cotisations encaissées</p></div></div>
+<div class="kpi-card"><span class="kpi-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 10h18"></path></svg></span><div><p class="kpi-card__value">{{ dues_collection.remaining|floatformat:2 }} <small>TND</small></p><p class="kpi-card__label">Reste à encaisser</p></div></div>
+<div class="kpi-card"><span class="kpi-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"></path></svg></span><div><p class="kpi-card__value">{{ dues_collection.rate|floatformat:1 }} %</p><p class="kpi-card__label">Taux encaissé</p></div></div>
+</div>
+<div class="workspace-panel">
+<label for="dues-collection-progress">{{ dues_collection.rate|floatformat:1 }} % encaissés · Total attendu : {{ dues_collection.expected|floatformat:2 }} TND</label>
+<progress class="satisfaction-meter" id="dues-collection-progress" max="100" value="{{ dues_collection.rate|unlocalize }}">{{ dues_collection.rate }} %</progress>
+<p class="app-note">Calcul indicatif selon le barème actif et les membres concernés. Ce suivi ne remplace pas une comptabilité.</p>
+</div>
+{% if dues_regularize_member_count %}
+<p class="app-note">{{ dues_regularize_member_count }} membre{{ dues_regularize_member_count|pluralize }} à régulariser. <a href="{% url 'dues:manage_list' %}">Voir les cotisations</a></p>
+{% endif %}
+{% else %}
+<article class="workspace-panel"><h3>Montants non configurés</h3><p>Renseignez les montants des deux tranches pour calculer les sommes encaissées et restantes.</p><a class="btn btn--solid btn--sm" href="{% url 'dues:manage_schedule' %}">Configurer les montants</a></article>
+{% endif %}
+{% else %}<p class="app-note">Définissez une année Lions active pour afficher le suivi.</p>{% endif %}
+</section>

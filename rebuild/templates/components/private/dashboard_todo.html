@@ -1,0 +1,37 @@
+<section class="app-section" aria-labelledby="titre-actions">
+<div class="bloc-titre"><h2 id="titre-actions">À faire</h2></div>
+{% if has_todo %}
+<div class="grille-actions dashboard-actions">
+{% for vote in votes_to_complete %}
+<article class="carte-action carte-action--urgent">
+<div class="carte-action__haut"><span class="carte-action__icone" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="m8 12 3 3 5-6"></path></svg></span><div><h3>Un vote attend votre voix</h3><p>{{ vote.title }}</p></div></div>
+<a class="btn btn--solid btn--sm" href="{% url 'voting:member_list' %}">Voter</a>
+</article>
+{% endfor %}
+{% if satisfaction_to_complete %}
+<article class="carte-action carte-action--urgent">
+<div class="carte-action__haut"><span class="carte-action__icone" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path></svg></span><div><h3>Votre satisfaction du mois</h3><p>Un choix sur une échelle de 1 à 5, avec un commentaire facultatif.</p></div></div>
+<a class="btn btn--solid btn--sm" href="{% url 'satisfaction:respond' %}">Répondre</a>
+</article>
+{% endif %}
+{% if dues_to_regularize %}
+<article class="carte-action">
+<div class="carte-action__haut"><span class="carte-action__icone" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 10h18"></path></svg></span><div><h3>Cotisation {{ active_year.label }}</h3><p>Votre cotisation de l’année en cours reste à régulariser auprès du trésorier.</p></div></div>
+<span class="badge badge--a-regulariser">À régulariser</span>
+<a class="btn btn--outline btn--sm" href="{% url 'dues:own' %}">Voir le détail</a>
+</article>
+{% endif %}
+{% if contact_pending_count %}
+<article class="carte-action carte-action--urgent">
+<div class="carte-action__haut"><span class="carte-action__icone" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m4 7 8 6 8-6"></path></svg></span><div><h3>Messages de contact à traiter</h3><p>{{ contact_pending_count }} message{{ contact_pending_count|pluralize }} en attente de suivi.</p></div></div>
+<a class="btn btn--solid btn--sm" href="{% url 'communications:inbox' 'contact' %}">Consulter</a>
+</article>
+{% endif %}
+</div>
+{% else %}
+<div class="dashboard-done">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg>
+<div><strong>Tout est à jour</strong><p>Vous n’avez aucune action nécessitant votre attention.</p></div>
+</div>
+{% endif %}
+</section>

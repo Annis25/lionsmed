@@ -1,4 +1,65 @@
 {% extends 'base/private.html' %}
-{% load static %}
+{% load static document_extras %}
 {% block title %}{{ document.title }} — Gestion — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>{{ document.title }}</h1></div><section class="workspace-panel lot2-reading"><dl class="paire-liste"><div><dt>Catégorie</dt><dd>{{ document.get_category_display }}</dd></div><div><dt>Visibilité</dt><dd>{{ document.get_visibility_display }}</dd></div></dl><div class="lot2-actions">{% if can_preview %}<a class="btn btn--solid btn--sm" href="{% url 'documents:preview' document.pk %}" target="_blank" rel="noopener">Visualiser</a><a class="btn btn--outline btn--sm" href="{% url 'documents:download' document.pk %}">Télécharger</a>{% else %}<a class="btn btn--solid btn--sm" href="{% url 'documents:download' document.pk %}">Télécharger</a>{% endif %}</div></section><section class="workspace-panel lot2-reading"><h2>Accès nominatifs (invités)</h2><ul class="lot2-timeline">{% for grant in grants %}<li>{{ grant.user.email }}{% if grant.expires_at %} — expire le {{ grant.expires_at|date:"d/m/Y" }}{% endif %}<form method="post" action="{% url 'documents:manage_revoke' document.pk grant.pk %}">{% csrf_token %}<button class="btn btn--ghost btn--sm" type="submit">Révoquer</button></form></li>{% empty %}<li>Aucun accès nominatif accordé.</li>{% endfor %}</ul><form method="post" class="formulaire" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}<div class="lot2-form-grid">{% for field in form %}<div>{% include 'components/forms/field.html' %}</div>{% endfor %}</div><button class="btn btn--solid" type="submit">Accorder l’accès</button></form></section><section class="workspace-panel lot2-reading document-danger-zone"><h2>Supprimer le document</h2><p class="app-note">Le document ne sera plus accessible et son fichier privé sera effacé. La trace d’audit sera conservée.</p><form method="post" action="{% url 'documents:manage_delete' document.pk %}" data-confirm-delete="Supprimer définitivement « {{ document.title|escapejs }} » ?"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"><button class="btn btn--danger" type="submit">Supprimer le document</button></form></section><script src="{% static 'js/document_management.js' %}" defer></script>{% endblock %}
+{% block content %}
+<nav class="doc-breadcrumb" aria-label="Fil d’Ariane"><a href="{% url 'documents:list' %}">Documents</a> <span aria-hidden="true">·</span> <a href="{% url 'documents:manage_list' %}">Gestion</a> <span aria-hidden="true">·</span> <span aria-current="page">{{ document.title }}</span></nav>
+<div class="app-titre"><h1>{{ document.title }}</h1><p class="app-titre__contexte">Consultez les informations du document et gérez ses accès.</p></div>
+
+<section class="workspace-panel lot2-reading">
+<div class="carte-info__haut"><span class="carte-info__icone" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"></path><path d="M14 3v4h4M9 13h6M9 17h6"></path></svg></span><div class="card-title-row"><h2>{{ document.title }}</h2><span class="badge badge--excuse">{{ document.get_category_display }}</span></div></div>
+{% if document.description %}<p>{{ document.description }}</p>{% endif %}
+<dl class="paire-liste">
+<div><dt>Visibilité</dt><dd>{{ document.get_visibility_display }}</dd></div>
+<div><dt>Ajouté le</dt><dd>{{ document.created_at|date:"d/m/Y H:i" }}</dd></div>
+<div><dt>Déposé par</dt><dd>{{ document.author.get_full_name|default:document.author.email }}</dd></div>
+<div><dt>Fichier</dt><dd>{{ document.content_type|file_kind }} · {{ document.size|filesizeformat }}</dd></div>
+</dl>
+<div class="lot2-actions">
+{% if can_preview %}<a class="btn btn--solid" href="{% url 'documents:preview' document.pk %}" target="_blank" rel="noopener">Visualiser</a><a class="btn btn--outline" href="{% url 'documents:download' document.pk %}">Télécharger</a>
+{% else %}<a class="btn btn--solid" href="{% url 'documents:download' document.pk %}">Télécharger</a>{% endif %}
+</div>
+</section>
+
+<section class="workspace-panel lot2-reading">
+<h2>Accès nominatifs</h2>
+<p class="app-titre__contexte">Accordez temporairement ou durablement l’accès à un compte invité.</p>
+
+<h3>Accès actuels</h3>
+{% if grants %}
+<ul class="lot2-timeline">
+{% for grant in grants %}
+<li>
+<div class="card-title-row">
+<span>{{ grant.user.email }}{% if grant.expires_at %} — expire le {{ grant.expires_at|date:"d/m/Y H:i" }}{% else %} — sans expiration{% endif %}</span>
+<span class="badge {% if grant.expires_at and grant.expires_at < now %}badge--clos{% else %}badge--present{% endif %}">{% if grant.expires_at and grant.expires_at < now %}Expiré{% else %}Actif{% endif %}</span>
+</div>
+<form method="post" action="{% url 'documents:manage_revoke' document.pk grant.pk %}">{% csrf_token %}<button class="btn btn--ghost btn--sm" type="submit">Révoquer</button></form>
+</li>
+{% endfor %}
+</ul>
+{% else %}
+<div class="etat-vide">
+<span class="etat-vide__icone" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20a7.5 7.5 0 0 1 15 0"></path></svg></span>
+<p>Aucun accès nominatif accordé.</p>
+</div>
+{% endif %}
+
+<h3>Accorder un accès</h3>
+<form method="post" class="formulaire" novalidate>
+{% csrf_token %}{% include 'components/forms/errors.html' %}
+<div class="lot2-form-grid">{% for field in form %}<div>{% include 'components/forms/field.html' %}</div>{% endfor %}</div>
+<button class="btn btn--solid" type="submit">Accorder l’accès</button>
+</form>
+</section>
+
+<section class="workspace-panel lot2-reading document-danger-zone">
+<h2>Danger zone</h2>
+<h3>Supprimer le document</h3>
+<p class="app-titre__contexte">Le document ne sera plus accessible et son fichier privé sera supprimé. La trace d’audit sera conservée.</p>
+<form method="post" action="{% url 'documents:manage_delete' document.pk %}" data-confirm-delete="Supprimer définitivement « {{ document.title|escapejs }} » ?">
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+<button class="btn btn--danger" type="submit">Supprimer le document</button>
+</form>
+</section>
+<script src="{% static 'js/document_management.js' %}" defer></script>
+{% endblock %}

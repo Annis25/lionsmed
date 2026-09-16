@@ -1,0 +1,21 @@
+{% if dashboard_kpis %}
+<section class="app-section" aria-labelledby="titre-kpis">
+<div class="bloc-titre"><h2 id="titre-kpis">Indicateurs</h2></div>
+<div class="kpi-grid">
+{% for kpi in dashboard_kpis %}
+<div class="kpi-card">
+<span class="kpi-card__icon" aria-hidden="true">
+{% if kpi.icon == "members" %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"></circle><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 5a3 3 0 0 1 0 6M18 15a5 5 0 0 1 3 5"></path></svg>
+{% elif kpi.icon == "events" %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>
+{% elif kpi.icon == "votes" %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="m8 12 3 3 5-6"></path></svg>
+{% elif kpi.icon == "dues" %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 10h18"></path></svg>
+{% elif kpi.icon == "documents" %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"></path><path d="M14 3v4h4M9 13h6M9 17h6"></path></svg>
+{% elif kpi.icon == "contact" %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m4 7 8 6 8-6"></path></svg>
+{% endif %}
+</span>
+<div><p class="kpi-card__value">{{ kpi.value }}</p><p class="kpi-card__label">{{ kpi.label }}</p></div>
+</div>
+{% endfor %}
+</div>
+</section>
+{% endif %}

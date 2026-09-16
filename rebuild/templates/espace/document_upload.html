@@ -1,3 +1,46 @@
 {% extends 'base/private.html' %}
 {% block title %}Déposer un document — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>Déposer un document</h1></div><section class="workspace-panel lot2-reading"><form method="post" enctype="multipart/form-data" class="formulaire" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}<div class="lot2-form-grid">{% for field in form %}<div>{% include 'components/forms/field.html' %}</div>{% endfor %}</div><div class="lot2-actions"><button class="btn btn--solid" type="submit">Déposer</button><a href="{% url 'documents:manage_list' %}">Annuler</a></div></form></section>{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Déposer un document</h1><p class="app-titre__contexte">Ajoutez un document interne et définissez qui peut y accéder.</p></div>
+
+<section class="workspace-panel lot2-reading">
+<form method="post" enctype="multipart/form-data" class="stack-form" novalidate>
+{% csrf_token %}{% include 'components/forms/errors.html' %}
+
+<fieldset class="groupe"><legend>Informations</legend>
+<div class="groupe__champs">
+<div>{% include 'components/forms/field.html' with field=form.title %}</div>
+<div>{% include 'components/forms/field.html' with field=form.description %}</div>
+</div>
+</fieldset>
+
+<fieldset class="groupe"><legend>Classification</legend>
+<div class="lot2-form-grid">
+<div>{% include 'components/forms/field.html' with field=form.category %}</div>
+<div>{% include 'components/forms/field.html' with field=form.visibility %}</div>
+</div>
+</fieldset>
+
+<fieldset class="groupe"><legend>Fichier</legend>
+<div class="groupe__champs">
+<div class="champ{% if form.file.errors %} champ--erreur{% endif %}">
+<label class="champ__label" for="{{ form.file.id_for_label }}">{{ form.file.label }} <span class="champ__requis">(obligatoire)</span></label>
+<div class="file-drop">
+<span class="file-drop__icon" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"></path><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span>
+<span class="file-drop__label">Choisir un fichier</span>
+{{ form.file }}
+<p class="file-drop__hint">PDF, DOCX, XLSX, PNG ou JPEG · 50 Mo maximum.</p>
+</div>
+{{ form.file.errors }}
+</div>
+<p class="scan-note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>Analyse antivirus automatique lors du dépôt.</p>
+</div>
+</fieldset>
+
+<div class="lot2-actions">
+<button class="btn btn--solid" type="submit">Déposer le document</button>
+<a class="btn btn--outline" href="{% url 'documents:manage_list' %}">Annuler</a>
+</div>
+</form>
+</section>
+{% endblock %}

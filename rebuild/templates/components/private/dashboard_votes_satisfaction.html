@@ -1,0 +1,32 @@
+<section class="app-section" aria-labelledby="titre-votes">
+<div class="bloc-titre"><h2 id="titre-votes">Votes et satisfaction</h2></div>
+<div class="grille-blocs grille-blocs--60-40">
+<article class="carte-info">
+<h3>Votes ouverts</h3>
+{% if open_votes %}
+<ul class="lot2-timeline">
+{% for row in open_votes %}
+<li>
+<strong>{{ row.vote.title }}</strong>
+<p class="app-note">{{ row.rate }} % · {{ row.participation_count }} / {{ row.elector_count }}</p>
+<a class="btn btn--outline btn--sm" href="{% url 'voting:manage_track' row.vote.pk %}">Gérer ce vote</a>
+</li>
+{% endfor %}
+</ul>
+{% else %}<p class="app-note">Aucun vote ouvert.</p>{% endif %}
+<a class="link-arrow" href="{% url 'voting:manage_list' %}">Gérer les votes<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</article>
+<article class="carte-info">
+<h3>Satisfaction du mois</h3>
+{% if not satisfaction_period %}
+<p class="app-note">Aucune période ouverte.</p>
+{% elif satisfaction_summary.hidden %}
+<p>Résultats masqués : effectif ({{ satisfaction_summary.count }}) sous le seuil ({{ satisfaction_summary.threshold }}).</p>
+{% else %}
+<p>{{ satisfaction_period.title|default:"Consultation en cours" }}</p>
+<p class="app-note">{{ satisfaction_summary.average }} / 5 — {{ satisfaction_summary.count }} réponse{{ satisfaction_summary.count|pluralize }}.</p>
+{% endif %}
+<a class="link-arrow" href="{% url 'satisfaction:manage_list' %}">Gestion satisfaction<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</article>
+</div>
+</section>

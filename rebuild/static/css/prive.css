@@ -580,7 +580,7 @@ a.pagination__arrow:hover, a.pagination__page:hover { border-color: var(--bleu);
    colonnes à ses enfants directs, ce qui écrase .lot2-form-grid/.lot2-actions (déjà des
    grilles à 2 colonnes) dès qu'un second enfant comme l'alerte d'erreur compacte
    apparaît. Remplacé ici par un simple empilement espacé, sans ce conflit. */
-.satisfaction-form { display: grid; gap: var(--e4); }
+.satisfaction-form, .stack-form { display: grid; gap: var(--e4); }
 .satisfaction-intro { margin: 0 0 var(--e5); max-width: 62ch; color: var(--gris); }
 .satisfaction-period { display: inline-flex; align-items: center; gap: var(--e2); padding: var(--e2) var(--e4); margin-bottom: var(--e5); border: 1px solid var(--bord); border-radius: var(--r-pilule); background: var(--fond-2); font-size: .8125rem; color: var(--bleu); font-weight: 600; }
 .satisfaction-period svg { flex: none; color: var(--bleu); }
@@ -730,14 +730,14 @@ a.pagination__arrow:hover, a.pagination__page:hover { border-color: var(--bleu);
 .vote-tabs__btn:hover { color: var(--encre); }
 .vote-tabs__btn[aria-pressed="true"] { background: var(--blanc); color: var(--bleu); box-shadow: var(--ombre); }
 .vote-tabs__count { font-variant-numeric: tabular-nums; opacity: .75; }
-.vote-search { position: relative; flex: 0 1 260px; min-width: 180px; }
-.vote-search svg { position: absolute; left: var(--e3); top: 50%; transform: translateY(-50%); color: var(--gris); pointer-events: none; }
-.vote-search input { padding-left: var(--e7); }
+.vote-search, .icon-search { position: relative; flex: 0 1 260px; min-width: 180px; }
+.vote-search svg, .icon-search svg { position: absolute; left: var(--e3); top: 50%; transform: translateY(-50%); color: var(--gris); pointer-events: none; }
+.vote-search input, .icon-search input { padding-left: var(--e7); }
 
 .vote-list { display: grid; gap: var(--e3); margin-bottom: var(--e5); }
-.vote-card__title-row { display: flex; align-items: center; justify-content: space-between; gap: var(--e3); flex: 1; min-width: 0; }
-.vote-card__title-row h3 { min-width: 0; overflow-wrap: anywhere; }
-.vote-card__meta { display: grid; gap: var(--e1); }
+.vote-card__title-row, .card-title-row { display: flex; align-items: center; justify-content: space-between; gap: var(--e3); flex: 1; min-width: 0; }
+.vote-card__title-row h3, .card-title-row h3 { min-width: 0; overflow-wrap: anywhere; }
+.vote-card__meta, .card-meta { display: grid; gap: var(--e1); }
 
 .vote-steps { display: flex; align-items: center; list-style: none; margin: 0 0 var(--e5); padding: 0; }
 .vote-steps__step { display: flex; align-items: center; gap: var(--e2); flex: 1; min-width: 0; }
@@ -815,3 +815,55 @@ a.pagination__arrow:hover, a.pagination__page:hover { border-color: var(--bleu);
 /* Gestion des votes — liste (recette identique à .satisfaction-period-card, badge de
    statut ajouté dans le titre). */
 .vote-manage-card__actions form { display: contents; }
+
+/* Documents — bibliothèque (liste membre en grille de cartes, gestion en lignes
+   compactes réutilisant .satisfaction-period-card, détail avec zone dangereuse). */
+.doc-search-row { margin-bottom: var(--e4); }
+.doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--e4); margin-bottom: var(--e5); }
+.doc-card { min-width: 0; }
+.doc-card p { overflow-wrap: anywhere; }
+.doc-card__actions { margin-top: auto; }
+
+/* Zone dangereuse — même recette que .carte-action--urgent (accent en bandeau interne),
+   en rouge très doux au lieu de l'or, jamais utilisé ailleurs dans l'app. */
+.document-danger-zone { border-color: #F0C7CF; background: #FFFBFB; box-shadow: inset 3px 0 0 #B3243B; }
+.document-danger-zone h2 { color: #8F1D30; }
+.document-danger-zone .btn--danger { margin-top: var(--e2); }
+
+.doc-breadcrumb { margin-bottom: var(--e3); font-size: .75rem; color: var(--gris); }
+.doc-breadcrumb a { color: var(--gris); text-decoration: none; }
+.doc-breadcrumb a:hover { color: var(--bleu); text-decoration: underline; text-underline-offset: 2px; }
+.doc-breadcrumb [aria-current] { color: var(--encre); font-weight: 600; }
+
+/* Zone de dépôt — input natif conservé (accessible, clavier), simplement mieux encadré
+   visuellement ; aucun glisser-déposer simulé. */
+.file-drop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--e2); padding: var(--e5) var(--e4); border: 1.5px dashed var(--bord); border-radius: var(--r-carte); background: var(--fond); text-align: center; }
+.file-drop:has(input:focus-visible) { outline: 3px solid var(--or); outline-offset: 2px; }
+.file-drop__icon { color: var(--bleu); }
+.file-drop__label { font-weight: 600; color: var(--encre); }
+.file-drop__hint { margin: 0; font-size: .75rem; color: var(--gris); }
+.file-drop input[type="file"] { max-width: 100%; margin-top: var(--e2); }
+.file-drop .champ__erreur { text-align: left; }
+.scan-note { display: flex; align-items: center; gap: var(--e2); margin-top: var(--e2); font-size: .75rem; color: var(--gris); }
+.scan-note svg { flex: none; }
+
+@media (max-width: 560px) {
+  .doc-grid { grid-template-columns: minmax(0,1fr); }
+}
+
+/* Tableau de bord — en-tête (bandeau annuaire replié dans l'en-tête, voir refonte
+   dashboards par rôle), rangée notifications récentes, état positif de "À faire". */
+.dashboard-header { flex-wrap: wrap; row-gap: var(--e2); }
+.dashboard-header__annuaire { margin-left: auto; white-space: nowrap; }
+@media (max-width: 560px) {
+  .dashboard-header__annuaire { margin-left: 0; }
+}
+.dashboard-notif-preview { list-style: none; margin: var(--e2) 0 0; padding: 0; display: grid; gap: var(--e1); }
+.dashboard-notif-preview li { padding-top: var(--e1); border-top: 1px solid var(--bord); font-size: .8125rem; }
+.dashboard-notif-preview li:first-child { border-top: 0; padding-top: 0; }
+.dashboard-notif-preview a { color: var(--encre); font-weight: 600; text-decoration: none; }
+.dashboard-notif-preview a:hover { color: var(--bleu); text-decoration: underline; }
+.dashboard-notif-preview time { display: block; margin-top: 2px; font-size: .6875rem; color: var(--gris); }
+.dashboard-done { display: flex; align-items: center; gap: var(--e3); padding: var(--e4); border: 1px solid #B9E0C9; border-radius: var(--r-carte); background: #EAF6EF; color: #14603A; }
+.dashboard-done svg { flex: none; }
+.dashboard-done p { margin: 2px 0 0; color: #14603A; opacity: .85; font-size: .875rem; }
