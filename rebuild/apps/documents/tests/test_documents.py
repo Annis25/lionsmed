@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
 from apps.core.tests.test_foundations import account
+from apps.core.models import AuditEvent
 from apps.governance.models import Role
 from .. import services
 from ..models import Document, DocumentGrant
@@ -62,18 +63,43 @@ class DocumentAclTests(TestCase):
         services.grant_access(actor=self.president, document=document, user=self.invite, expires_at=timezone.now()-timedelta(days=1))
         self.assertFalse(scope_documents(self.invite).filter(pk=document.pk).exists())
 
-    def test_list_detail_head_download_share_the_same_acl(self):
+    def test_list_detail_preview_and_download_share_the_same_acl(self):
         document = self.upload(Document.Visibility.RESPONSABLES)
         self.client.force_login(self.member)
         list_response = self.client.get(reverse("documents:list"))
         self.assertNotContains(list_response, document.title)
         self.assertEqual(self.client.get(reverse("documents:detail", args=[document.pk])).status_code, 404)
+        self.assertEqual(self.client.head(reverse("documents:preview", args=[document.pk])).status_code, 404)
+        self.assertEqual(self.client.get(reverse("documents:preview", args=[document.pk])).status_code, 404)
         self.assertEqual(self.client.head(reverse("documents:download", args=[document.pk])).status_code, 404)
         self.assertEqual(self.client.get(reverse("documents:download", args=[document.pk])).status_code, 404)
         self.client.force_login(self.president)
         self.assertContains(self.client.get(reverse("documents:list")), document.title)
-        self.assertEqual(self.client.get(reverse("documents:detail", args=[document.pk])).status_code, 200)
-        self.assertEqual(self.client.head(reverse("documents:download", args=[document.pk])).status_code, 200)
+        detail = self.client.get(reverse("documents:detail", args=[document.pk]))
+        self.assertContains(detail, "Visualiser")
+        preview_head = self.client.head(reverse("documents:preview", args=[document.pk]))
+        self.assertEqual(preview_head.status_code, 200)
+        self.assertTrue(preview_head["Content-Disposition"].startswith("inline;"))
+        preview = self.client.get(reverse("documents:preview", args=[document.pk]))
+        self.assertEqual(preview.status_code, 200)
+        self.assertEqual(preview["Cache-Control"], "private, no-store")
+        self.assertEqual(preview["X-Content-Type-Options"], "nosniff")
+        self.assertEqual(preview["Cross-Origin-Resource-Policy"], "same-origin")
+        download_head = self.client.head(reverse("documents:download", args=[document.pk]))
+        self.assertEqual(download_head.status_code, 200)
+        self.assertTrue(download_head["Content-Disposition"].startswith("attachment;"))
+        self.assertEqual(self.client.get(reverse("documents:download", args=[document.pk])).status_code, 200)
+
+    def test_office_document_is_download_only_and_cannot_be_forced_inline(self):
+        document = self.upload(Document.Visibility.MEMBERS)
+        document.content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        document.original_filename = "document.docx"
+        document.save(update_fields=["content_type", "original_filename"])
+        self.client.force_login(self.member)
+        detail = self.client.get(reverse("documents:detail", args=[document.pk]))
+        self.assertNotContains(detail, "Visualiser")
+        self.assertContains(detail, "Télécharger")
+        self.assertEqual(self.client.get(reverse("documents:preview", args=[document.pk])).status_code, 404)
         self.assertEqual(self.client.get(reverse("documents:download", args=[document.pk])).status_code, 200)
 
     def test_bureau_cannot_manage_documents(self):
@@ -92,6 +118,53 @@ class DocumentAclTests(TestCase):
         self.client.force_login(self.other_member)
         self.assertEqual(self.client.get(reverse("documents:manage_detail", args=[document.pk])).status_code, 403)
         self.assertEqual(self.client.get(reverse("documents:manage_list")).status_code, 403)
+
+    def test_manager_can_delete_document_and_private_file_after_commit(self):
+        document = self.upload(Document.Visibility.MEMBERS)
+        services.grant_access(actor=self.president, document=document, user=self.invite)
+        storage_key = document.storage_key
+        with patch("apps.documents.services.document_storage") as storage_factory:
+            with self.captureOnCommitCallbacks(execute=True):
+                services.delete_document(actor=self.president, document=document)
+        document.refresh_from_db()
+        self.assertEqual(document.status, Document.Status.DELETED)
+        self.assertFalse(DocumentGrant.objects.filter(document=document).exists())
+        storage_factory.return_value.delete.assert_called_once_with(storage_key)
+        self.assertFalse(scope_documents(self.member).filter(pk=document.pk).exists())
+        self.assertTrue(AuditEvent.objects.filter(
+            actor=self.president,
+            action="document.deleted",
+            object_id=str(document.pk),
+        ).exists())
+
+    def test_delete_view_is_post_only_and_removes_document_from_management(self):
+        document = self.upload(Document.Visibility.MEMBERS)
+        url = reverse("documents:manage_delete", args=[document.pk])
+        self.client.force_login(self.president)
+        self.assertEqual(self.client.get(url).status_code, 405)
+        with patch("apps.documents.services.document_storage"):
+            response = self.client.post(url)
+        self.assertRedirects(response, reverse("documents:manage_list"))
+        document.refresh_from_db()
+        self.assertEqual(document.status, Document.Status.DELETED)
+        self.assertEqual(self.client.get(reverse("documents:manage_detail", args=[document.pk])).status_code, 404)
+        self.assertNotContains(self.client.get(reverse("documents:manage_list")), document.title)
+
+    def test_member_cannot_delete_document_by_direct_post(self):
+        document = self.upload(Document.Visibility.MEMBERS)
+        self.client.force_login(self.member)
+        response = self.client.post(reverse("documents:manage_delete", args=[document.pk]))
+        self.assertEqual(response.status_code, 403)
+        document.refresh_from_db()
+        self.assertEqual(document.status, Document.Status.AVAILABLE)
+        self.assertFalse(AuditEvent.objects.filter(action="document.deleted", object_id=str(document.pk)).exists())
+
+    def test_management_detail_displays_confirmed_delete_action(self):
+        document = self.upload(Document.Visibility.MEMBERS)
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("documents:manage_detail", args=[document.pk]))
+        self.assertContains(response, "Supprimer le document")
+        self.assertContains(response, reverse("documents:manage_delete", args=[document.pk]))
 
 
 class UploadSizeLimitTests(TestCase):

@@ -83,6 +83,63 @@ def create_calendar_event(*, actor, title, description, starts_at, ends_at, all_
 
 
 @transaction.atomic
+def update_calendar_event(*, actor, event, title, description, starts_at, ends_at,
+        all_day, location, meeting_link, category, registration_enabled, capacity):
+    """Modifie les informations de calendrier sans altérer la fiche éditoriale.
+
+    L'opération est sérialisée et auditée. Elle ne déclenche pas une seconde annonce
+    e-mail : la règle produit ne notifie que la création d'un événement proche.
+    """
+    require(actor, "event.edit", event)
+    event = Event.objects.select_for_update().get(pk=event.pk)
+    if event.status != "PUBLISHED":
+        raise ValidationError("Cet événement n'est plus actif.")
+    if not title or not title.strip():
+        raise ValidationError("Le titre est obligatoire.")
+    if not starts_at:
+        raise ValidationError("La date et l'heure de début sont obligatoires.")
+    if ends_at and ends_at <= starts_at:
+        raise ValidationError("La fin doit être postérieure au début.")
+    if capacity is not None and capacity < 1:
+        raise ValidationError("La capacité doit être supérieure à zéro.")
+
+    from datetime import timedelta
+    event.title = title.strip()[:180]
+    event.summary = (description or "")[:500]
+    event.body = description or ""
+    event.starts_at = starts_at
+    event.ends_at = ends_at or starts_at + timedelta(hours=1)
+    event.all_day = bool(all_day)
+    event.location = (location or "")[:200]
+    event.meeting_link = meeting_link or ""
+    event.category = category
+    event.registration_enabled = bool(registration_enabled)
+    event.capacity = capacity if registration_enabled else None
+    event.meta_title = event.title
+    event.meta_description = event.summary[:300]
+    event.updated_by = actor
+    event.full_clean()
+    event.save()
+    audit(actor, "event.updated_from_calendar", event)
+    return event
+
+
+@transaction.atomic
+def cancel_calendar_event(*, actor, event):
+    """Retire l'événement du calendrier en préservant son historique relationnel."""
+    require(actor, "event.edit", event)
+    event = Event.objects.select_for_update().get(pk=event.pk)
+    if event.status != "PUBLISHED":
+        raise ValidationError("Cet événement est déjà annulé ou retiré.")
+    event.status = "ARCHIVED"
+    event.updated_by = actor
+    event.full_clean()
+    event.save(update_fields=["status", "updated_by", "updated_at"])
+    audit(actor, "event.cancelled_from_calendar", event)
+    return event
+
+
+@transaction.atomic
 def notify_event_created(event):
     """Une annonce par événement/destinataire ; jamais d'annonce à chaque modification."""
     from datetime import timedelta

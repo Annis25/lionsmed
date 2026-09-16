@@ -87,3 +87,26 @@ def revoke_access(*, actor, grant):
     document = grant.document
     grant.delete()
     audit(actor, "document.grant_revoked", document)
+
+
+@transaction.atomic
+def delete_document(*, actor, document):
+    """Retire un document et son fichier privé tout en conservant sa trace d'audit.
+
+    La ligne métier est conservée avec le statut DELETED : les références historiques
+    restent explicables, mais tous les selectors d'accès l'excluent immédiatement.
+    Le fichier n'est effacé qu'après validation de la transaction SQL.
+    """
+    require(actor, "document.manage")
+    document = Document.objects.select_for_update().get(pk=document.pk)
+    if document.status == Document.Status.DELETED:
+        raise ValidationError("Ce document est déjà supprimé.")
+    storage_key = document.storage_key
+    document.grants.all().delete()
+    document.status = Document.Status.DELETED
+    document.full_clean()
+    document.save(update_fields=["status", "updated_at"])
+    audit(actor, "document.deleted", document)
+    storage = document_storage()
+    transaction.on_commit(lambda: storage.delete(storage_key), robust=True)
+    return document

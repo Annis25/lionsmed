@@ -13,8 +13,9 @@ from apps.core.permissions import capability_required, can
 from apps.members.models import MemberProfile
 from .models import Event, Registration
 from .selectors import upcoming_events, event_by_id, own_registration, attendance_rows, require, events_in_range, calendar_feed_events
-from .services import set_registration, record_attendance, create_calendar_event, ensure_calendar_token, regenerate_calendar_token
-from .forms import QuickEventForm
+from .services import (set_registration, record_attendance, create_calendar_event,
+    update_calendar_event, cancel_calendar_event, ensure_calendar_token, regenerate_calendar_token)
+from .forms import QuickEventForm, CalendarEventEditForm
 from .ics import build_calendar
 
 TUNIS = timezone.get_default_timezone()
@@ -59,6 +60,7 @@ def _event_row(request, event):
     if remaining is not None:
         remaining_label = f"{remaining} place{'s' if remaining != 1 else ''} restante{'s' if remaining != 1 else ''}."
     rsvp_url = reverse("agenda_private:rsvp", args=[event.pk])
+    can_manage = can(request.user, "event.edit", event)
     return {
         "event": event, "registration": registration, "confirmed": confirmed, "remaining": remaining,
         "rsvp_url": rsvp_url,
@@ -69,6 +71,9 @@ def _event_row(request, event):
             "remaining_label": remaining_label,
             "registration_status": registration.status if registration else None,
             "rsvp_url": rsvp_url,
+            "can_manage": can_manage,
+            "edit_url": reverse("agenda_private:calendar_event_edit", args=[event.pk]) if can_manage else "",
+            "cancel_url": reverse("agenda_private:calendar_event_cancel", args=[event.pk]) if can_manage else "",
         },
     }
 
@@ -223,6 +228,38 @@ def calendar_event_add(request):
             messages.error(request, " ".join(error.messages) if hasattr(error, "messages") else str(error))
     else:
         messages.error(request, "Formulaire invalide : " + " ".join(f"{k} : {', '.join(v)}" for k, v in form.errors.items()))
+    return redirect(_safe_return_url(request) or "agenda_private:calendar")
+
+
+@capability_required("event.edit")
+@require_http_methods(["GET", "POST"])
+def calendar_event_edit(request, event_id):
+    event = get_object_or_404(Event, pk=event_id, status="PUBLISHED")
+    if not can(request.user, "event.edit", event):
+        raise PermissionDenied
+    form = CalendarEventEditForm(request.POST or None,
+        initial=CalendarEventEditForm.initial_for(event))
+    if request.method == "POST" and form.is_valid():
+        try:
+            update_calendar_event(actor=request.user, event=event, **form.cleaned_data)
+        except ValidationError as error:
+            form.add_error(None, error)
+        else:
+            messages.success(request, "Événement modifié.")
+            return redirect("agenda_private:calendar")
+    return render(request, "espace/calendar_event_edit.html", {"event": event, "form": form})
+
+
+@capability_required("event.edit")
+@require_http_methods(["POST"])
+def calendar_event_cancel(request, event_id):
+    event = get_object_or_404(Event, pk=event_id, status="PUBLISHED")
+    try:
+        cancel_calendar_event(actor=request.user, event=event)
+    except ValidationError as error:
+        messages.error(request, " ".join(error.messages))
+    else:
+        messages.success(request, "Événement annulé et retiré du calendrier.")
     return redirect(_safe_return_url(request) or "agenda_private:calendar")
 
 

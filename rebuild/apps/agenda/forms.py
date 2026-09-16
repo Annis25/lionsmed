@@ -18,6 +18,52 @@ class QuickEventForm(StyledFields, forms.Form):
     ends_at = forms.DateTimeField(required=False, label="Fin", widget=forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"))
     location = forms.CharField(max_length=200, required=False, label="Lieu")
     meeting_link = forms.URLField(max_length=300, required=False, label="Lien de réunion (facultatif)")
+
+
+class CalendarEventEditForm(StyledFields, forms.Form):
+    """Modification opérationnelle d'un événement depuis le calendrier privé.
+
+    La fiche éditoriale publique conserve son propre formulaire : celui-ci ne touche
+    ni au slug, ni aux images, ni à la visibilité publique.
+    """
+
+    title = forms.CharField(max_length=180, label="Titre")
+    description = forms.CharField(max_length=5000, required=False, widget=forms.Textarea(attrs={"rows": 4}), label="Description")
+    all_day = forms.BooleanField(required=False, label="Journée entière")
+    starts_at = forms.DateTimeField(label="Début", widget=forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"))
+    ends_at = forms.DateTimeField(required=False, label="Fin", widget=forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"))
+    location = forms.CharField(max_length=200, required=False, label="Lieu")
+    meeting_link = forms.URLField(max_length=300, required=False, label="Lien de réunion (facultatif)")
+    category = forms.ChoiceField(choices=Event._meta.get_field("category").choices, label="Catégorie")
+    registration_enabled = forms.BooleanField(required=False, label="Permettre aux membres de confirmer leur participation")
+    capacity = forms.IntegerField(required=False, min_value=1, label="Nombre de places (facultatif)")
+
+    def clean(self):
+        cleaned = super().clean()
+        starts_at = cleaned.get("starts_at")
+        ends_at = cleaned.get("ends_at")
+        if starts_at and ends_at and ends_at <= starts_at:
+            self.add_error("ends_at", "La fin doit être postérieure au début.")
+        if not cleaned.get("registration_enabled"):
+            cleaned["capacity"] = None
+        return cleaned
+
+    @classmethod
+    def initial_for(cls, event):
+        return {
+            "title": event.title,
+            "description": event.body or event.summary,
+            "all_day": event.all_day,
+            "starts_at": event.starts_at,
+            "ends_at": event.ends_at,
+            "location": event.location,
+            "meeting_link": event.meeting_link,
+            "category": event.category,
+            "registration_enabled": event.registration_enabled,
+            "capacity": event.capacity,
+        }
+
+
 class EventForm(StyledFields, forms.ModelForm):
     class Meta:
         model=Event

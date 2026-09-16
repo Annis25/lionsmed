@@ -449,6 +449,9 @@
 .cal-dialog--view .badge { margin-bottom: var(--e3); }
 .cal-dialog__rsvp { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); padding-top: var(--e3); border-top: 1px solid var(--bord); }
 .cal-dialog__rsvp p { margin: 0; width: 100%; font-size: .8125rem; }
+.cal-dialog__manage { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); margin-top: var(--e3); padding-top: var(--e3); border-top: 1px solid var(--bord); }
+.btn--danger { border: 1px solid #B3243B; background: #B3243B; color: var(--blanc); }
+.btn--danger:hover { background: #8F1D30; border-color: #8F1D30; }
 .cal-add-form__row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--e3); }
 .cal-dialog__actions { display: flex; justify-content: flex-end; gap: var(--e2); margin-top: var(--e2); }
 .cal-sync-actions { display: flex; flex-wrap: wrap; gap: var(--e2); margin-bottom: var(--e3); }

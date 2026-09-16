@@ -116,6 +116,10 @@
     <form method="post" data-form="confirm"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"><input type="hidden" name="next" value="{{ request.get_full_path }}"><input type="hidden" name="action" value="confirm"><button class="btn btn--solid btn--sm" type="submit">Je participe</button></form>
     <form method="post" data-form="cancel"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"><input type="hidden" name="next" value="{{ request.get_full_path }}"><input type="hidden" name="action" value="cancel"><button class="btn btn--ghost btn--sm" type="submit">Je ne participe pas</button></form>
   </div>
+  <div class="cal-dialog__manage" data-manage-block hidden>
+    <a class="btn btn--outline btn--sm" data-action="edit">Modifier</a>
+    <form method="post" data-form="event-cancel" data-confirm="Annuler cet événement ? Il sera retiré du calendrier, mais son historique sera conservé."><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"><input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn btn--danger btn--sm" type="submit">Annuler l’événement</button></form>
+  </div>
 </dialog>
 
 {% if can_create %}

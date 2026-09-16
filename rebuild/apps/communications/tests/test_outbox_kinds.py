@@ -36,24 +36,46 @@ class EventReminderOutboxTests(TestCase):
         from django.core.management import call_command
         call_command("send_event_reminders")
 
-    def test_confirmed_registrant_gets_reminder_delivered(self):
+    def test_all_eligible_members_get_reminder_delivered_regardless_of_rsvp(self):
         self._run_command()
         self.assertTrue(OutboxMessage.objects.filter(kind="EVENT_REMINDER", recipient=self.member.email, state="PENDING").exists())
         report = deliver_batch(limit=5)
-        self.assertEqual(report, {"sent": 1, "failed": 0, "disabled": False})
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].to, [self.member.email])
-        self.assertIn(self.event.title, mail.outbox[0].subject + mail.outbox[0].alternatives[0].content)
+        self.assertEqual(report, {"sent": 2, "failed": 0, "disabled": False})
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual({message.to[0] for message in mail.outbox}, {self.president.email, self.member.email})
+        self.assertTrue(all(self.event.title in message.subject + message.alternatives[0].content for message in mail.outbox))
 
     def test_running_command_twice_does_not_duplicate(self):
         self._run_command()
         self._run_command()
-        self.assertEqual(OutboxMessage.objects.filter(kind="EVENT_REMINDER").count(), 1)
+        self.assertEqual(OutboxMessage.objects.filter(kind="EVENT_REMINDER").count(), 2)
 
-    def test_non_registered_member_gets_no_reminder(self):
+    def test_no_response_and_cancelled_members_still_get_reminder(self):
         other = account("other-reminder@example.invalid", role=Role.MEMBRE)
+        cancelled = account("cancelled-reminder@example.invalid", role=Role.MEMBRE)
+        agenda_services.set_registration(actor=cancelled, event=self.event, status=Registration.Status.CANCELLED)
         self._run_command()
-        self.assertFalse(OutboxMessage.objects.filter(kind="EVENT_REMINDER", recipient=other.email).exists())
+        self.assertTrue(OutboxMessage.objects.filter(kind="EVENT_REMINDER", recipient=other.email).exists())
+        self.assertTrue(OutboxMessage.objects.filter(kind="EVENT_REMINDER", recipient=cancelled.email).exists())
+
+    def test_guest_and_inactive_account_get_no_reminder(self):
+        guest = account("guest-reminder@example.invalid", role=Role.INVITE)
+        inactive = account("inactive-reminder@example.invalid", role=Role.MEMBRE, is_active=False)
+        self._run_command()
+        self.assertFalse(OutboxMessage.objects.filter(kind="EVENT_REMINDER", recipient=guest.email).exists())
+        self.assertFalse(OutboxMessage.objects.filter(kind="EVENT_REMINDER", recipient=inactive.email).exists())
+
+    def test_recipient_deactivated_after_queueing_is_not_sent_or_retried(self):
+        self._run_command()
+        item = OutboxMessage.objects.get(kind="EVENT_REMINDER", recipient=self.member.email)
+        self.member.is_active = False
+        self.member.save(update_fields=["is_active"])
+        report = deliver_batch(limit=5)
+        item.refresh_from_db()
+        self.assertEqual(report["sent"], 1)  # le président reste éligible
+        self.assertEqual(item.state, "FAILED")
+        self.assertEqual(item.error_code, "not_applicable")
+        self.assertEqual(item.attempts, 1)
 
     def test_vanished_target_is_skipped_without_retry(self):
         """Un événement avec inscriptions confirmées ne peut pas être supprimé (clé

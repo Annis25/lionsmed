@@ -51,18 +51,20 @@ def _mail_parts(item):
     user = notification.recipient
     if item.kind in ("EVENT_REMINDER", "EVENT_CREATED"):
         from apps.agenda.models import Event
+        from apps.core.permissions import can
         event = Event.objects.filter(pk=notification.target_id).first()
         # Un objet disparu ne doit jamais partir sous forme d'e-mail à moitié vide.
         if event is None:
             return None
-        if item.kind == "EVENT_CREATED":
-            from apps.core.permissions import can
-            if event.status != "PUBLISHED" or not event.starts_at or event.starts_at <= timezone.now() or not can(user, "event.register", event):
-                return None
+        # Le RSVP ne conditionne jamais l'e-mail. En revanche, un compte devenu
+        # inactif/inéligible ou un événement annulé/passe ne doit plus être notifié.
+        if (event.status != "PUBLISHED" or not event.starts_at
+                or event.starts_at <= timezone.now() or not can(user, "event.register", event)):
+            return None
         return render_transactional(item.kind, user=user, event=event)
     if item.kind == "DOCUMENT":
         from apps.documents.models import Document
-        document = Document.objects.filter(pk=notification.target_id).first()
+        document = Document.objects.filter(pk=notification.target_id, status=Document.Status.AVAILABLE).first()
         if document is None:
             return None
         return render_transactional(item.kind, user=user, document=document)

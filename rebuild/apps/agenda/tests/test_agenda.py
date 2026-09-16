@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from apps.core.tests.test_foundations import account
 from apps.core.permissions import can
+from apps.core.models import AuditEvent
 from apps.governance.models import Role
 from apps.editorial.publication import publish_content
 from .. import services
@@ -181,6 +182,100 @@ class CalendarQuickAddTests(TestCase):
             "next": "https://example.invalid/phishing",
         })
         self.assertRedirects(response, reverse("agenda_private:calendar"))
+
+
+class CalendarEventManagementTests(TestCase):
+    def setUp(self):
+        self.president = account("president-manage-event@example.invalid", role=Role.PRESIDENT)
+        self.secretary = account("secretary-manage-event@example.invalid", role=Role.SECRETAIRE)
+        self.member = account("member-manage-event@example.invalid", role=Role.MEMBRE)
+        self.event = event(self.president, title="Réunion à modifier")
+
+    def edit_data(self, **overrides):
+        data = {
+            "title": "Réunion modifiée",
+            "description": "Nouvel ordre du jour",
+            "all_day": "",
+            "starts_at": (timezone.now() + timedelta(days=4)).strftime("%Y-%m-%dT%H:%M"),
+            "ends_at": (timezone.now() + timedelta(days=4, hours=2)).strftime("%Y-%m-%dT%H:%M"),
+            "location": "Nouveau local",
+            "meeting_link": "https://example.invalid/reunion",
+            "category": "REUNION",
+            "registration_enabled": "on",
+            "capacity": "25",
+        }
+        data.update(overrides)
+        return data
+
+    def test_authorized_role_can_edit_and_action_is_audited(self):
+        self.client.force_login(self.secretary)
+        response = self.client.post(
+            reverse("agenda_private:calendar_event_edit", args=[self.event.pk]),
+            self.edit_data(),
+        )
+        self.assertRedirects(response, reverse("agenda_private:calendar"))
+        self.event.refresh_from_db()
+        self.assertEqual(self.event.title, "Réunion modifiée")
+        self.assertEqual(self.event.location, "Nouveau local")
+        self.assertEqual(self.event.capacity, 25)
+        self.assertTrue(AuditEvent.objects.filter(
+            actor=self.secretary,
+            action="event.updated_from_calendar",
+            object_id=str(self.event.pk),
+        ).exists())
+
+    def test_member_cannot_edit_even_with_direct_post(self):
+        before = AuditEvent.objects.count()
+        self.client.force_login(self.member)
+        response = self.client.post(
+            reverse("agenda_private:calendar_event_edit", args=[self.event.pk]),
+            self.edit_data(),
+        )
+        self.assertEqual(response.status_code, 403)
+        self.event.refresh_from_db()
+        self.assertEqual(self.event.title, "Réunion à modifier")
+        self.assertEqual(AuditEvent.objects.count(), before)
+
+    def test_cancel_archives_event_preserves_registration_and_audits(self):
+        registration = services.set_registration(
+            actor=self.member,
+            event=self.event,
+            status=Registration.Status.CONFIRMED,
+        )
+        self.client.force_login(self.president)
+        response = self.client.post(
+            reverse("agenda_private:calendar_event_cancel", args=[self.event.pk]),
+        )
+        self.assertRedirects(response, reverse("agenda_private:calendar"))
+        self.event.refresh_from_db()
+        self.assertEqual(self.event.status, "ARCHIVED")
+        self.assertTrue(Registration.objects.filter(pk=registration.pk).exists())
+        self.assertNotIn(self.event, list(upcoming_events(self.member)))
+        self.assertTrue(AuditEvent.objects.filter(
+            actor=self.president,
+            action="event.cancelled_from_calendar",
+            object_id=str(self.event.pk),
+        ).exists())
+
+    def test_member_cannot_cancel_and_get_is_not_allowed(self):
+        cancel_url = reverse("agenda_private:calendar_event_cancel", args=[self.event.pk])
+        self.client.force_login(self.member)
+        self.assertEqual(self.client.post(cancel_url).status_code, 403)
+        self.client.force_login(self.president)
+        self.assertEqual(self.client.get(cancel_url).status_code, 405)
+        self.event.refresh_from_db()
+        self.assertEqual(self.event.status, "PUBLISHED")
+
+    def test_modal_exposes_management_urls_only_to_authorized_roles(self):
+        self.client.force_login(self.president)
+        content = self.client.get(reverse("agenda_private:calendar")).content.decode()
+        self.assertIn(reverse("agenda_private:calendar_event_edit", args=[self.event.pk]), content)
+        self.assertIn(reverse("agenda_private:calendar_event_cancel", args=[self.event.pk]), content)
+
+        self.client.force_login(self.member)
+        content = self.client.get(reverse("agenda_private:calendar")).content.decode()
+        self.assertNotIn(reverse("agenda_private:calendar_event_edit", args=[self.event.pk]), content)
+        self.assertNotIn(reverse("agenda_private:calendar_event_cancel", args=[self.event.pk]), content)
 
 
 class CalendarIcsTests(TestCase):

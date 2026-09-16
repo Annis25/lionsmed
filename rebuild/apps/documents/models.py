@@ -20,6 +20,7 @@ class Document(models.Model):
         QUARANTINE = "QUARANTINE", "En quarantaine"
         AVAILABLE = "AVAILABLE", "Disponible"
         REJECTED = "REJECTED", "Rejeté"
+        DELETED = "DELETED", "Supprimé"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=180)
@@ -41,7 +42,7 @@ class Document(models.Model):
         constraints = [
             models.CheckConstraint(condition=models.Q(category__in=["GENERAL", "GOUVERNANCE", "FINANCIER", "DISTRICT", "AUTRE"]), name="document_category_valid"),
             models.CheckConstraint(condition=models.Q(visibility__in=["MEMBERS", "BUREAU", "RESPONSABLES"]), name="document_visibility_valid"),
-            models.CheckConstraint(condition=models.Q(status__in=["QUARANTINE", "AVAILABLE", "REJECTED"]), name="document_status_valid"),
+            models.CheckConstraint(condition=models.Q(status__in=["QUARANTINE", "AVAILABLE", "REJECTED", "DELETED"]), name="document_status_valid"),
         ]
 
 

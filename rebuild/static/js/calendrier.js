@@ -95,9 +95,24 @@
         } else {
           rsvpBlock.hidden = true;
         }
+        var manageBlock = viewDialog.querySelector('[data-manage-block]');
+        if (data.can_manage) {
+          manageBlock.hidden = false;
+          manageBlock.querySelector('[data-action="edit"]').href = data.edit_url;
+          manageBlock.querySelector('[data-form="event-cancel"]').action = data.cancel_url;
+        } else {
+          manageBlock.hidden = true;
+        }
         openDialog(viewDialog);
       });
     });
+
+    var cancelEventForm = viewDialog && viewDialog.querySelector('[data-form="event-cancel"]');
+    if (cancelEventForm) {
+      cancelEventForm.addEventListener('submit', function (event) {
+        if (!window.confirm(cancelEventForm.getAttribute('data-confirm'))) event.preventDefault();
+      });
+    }
 
     // Synchronisation : copie du lien privé sans jamais l'afficher en clair.
     var copyBtn = document.getElementById('copier-lien');
