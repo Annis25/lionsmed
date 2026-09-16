@@ -1,0 +1,14 @@
+<article class="{% if row.vote.status == 'OPEN' and not row.participation %}carte-action carte-action--urgent{% elif row.vote.status == 'OPEN' %}carte-action{% else %}carte-info{% endif %}" data-vote-card="{% if row.vote.status == 'OPEN' %}open{% else %}closed{% endif %}" data-vote-title="{{ row.vote.title|lower }}">
+<div class="carte-action__haut">
+<span class="carte-action__icone" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="m8 12 3 3 5-6"></path></svg></span>
+<div class="vote-card__title-row"><h3>{{ row.vote.title }}</h3><span class="badge {% if row.vote.status == 'OPEN' %}badge--present{% else %}badge--clos{% endif %}">{{ row.vote.get_status_display }}</span></div>
+</div>
+{% if row.vote.description %}<p>{{ row.vote.description }}</p>{% endif %}
+{% if row.participation %}<p>Votre bulletin a déjà été envoyé. Il est définitif.</p>{% elif row.vote.status == 'OPEN' %}<p>Votre avis compte : donnez votre voix avant la clôture.</p>{% endif %}
+<div class="vote-card__meta">
+<p class="carte-action__echeance"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Ouverture : {{ row.vote.opens_at|date:"d/m/Y H:i" }}</p>
+<p class="carte-action__echeance"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>{% if row.vote.closes_at %}Clôture : {{ row.vote.closes_at|date:"d/m/Y H:i" }}{% else %}Clôture manuelle — aucune échéance programmée{% endif %}</p>
+</div>
+{% if row.vote.status == 'OPEN' and not row.participation %}<a class="btn btn--solid btn--sm" href="{% url 'voting:member_detail' row.vote.pk %}">Participer au vote</a>
+{% elif row.can_view_results %}<a class="link-arrow" href="{% url 'voting:results' row.vote.pk %}">Consulter les résultats<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>{% endif %}
+</article>

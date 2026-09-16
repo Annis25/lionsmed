@@ -1,3 +1,45 @@
 {% extends 'base/private.html' %}
 {% block title %}Gestion des votes — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>Gestion des votes</h1></div><section class="workspace-panel"><a class="btn btn--solid" href="{% url 'voting:manage_create' %}">Créer un vote</a><ul class="lot2-timeline">{% for vote in votes %}<li><a href="{% if vote.status == 'DRAFT' %}{% url 'voting:manage_detail' vote.pk %}{% elif vote.status == 'CLOSED' %}{% url 'voting:results' vote.pk %}{% else %}{% url 'voting:manage_track' vote.pk %}{% endif %}">{{ vote.title }}</a> <span class="badge">{{ vote.get_status_display }}</span></li>{% empty %}<li>Aucun scrutin créé.</li>{% endfor %}</ul></section>{% endblock %}
+{% block content %}
+<div class="bloc-titre">
+<div class="app-titre"><h1>Gestion des votes</h1><p class="app-titre__contexte">Créez, suivez et consultez les consultations du club.</p></div>
+<a class="btn btn--solid" href="{% url 'voting:manage_create' %}">Créer un vote<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+</div>
+
+<div class="kpi-grid">
+<div class="kpi-card"><span class="kpi-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg></span><div><p class="kpi-card__value">{{ open_count }}</p><p class="kpi-card__label">Vote{{ open_count|pluralize }} ouvert{{ open_count|pluralize }}</p></div></div>
+<div class="kpi-card"><span class="kpi-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg></span><div><p class="kpi-card__value">{{ closed_count }}</p><p class="kpi-card__label">Vote{{ closed_count|pluralize }} clôturé{{ closed_count|pluralize }}</p></div></div>
+<div class="kpi-card"><span class="kpi-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L18 10l-4-4L4 16v4Z"></path><path d="m14 6 4 4"></path></svg></span><div><p class="kpi-card__value">{{ draft_count }}</p><p class="kpi-card__label">Brouillon{{ draft_count|pluralize }}</p></div></div>
+<div class="kpi-card"><span class="kpi-card__icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="m8 12 3 3 5-6"></path></svg></span><div><p class="kpi-card__value">{{ votes|length }}</p><p class="kpi-card__label">Vote{{ votes|length|pluralize }} au total</p></div></div>
+</div>
+
+{% if votes %}
+<div class="satisfaction-period-list">
+{% for vote in votes %}
+<div class="satisfaction-period-card">
+<div>
+<span class="satisfaction-period-card__title">{{ vote.title }}</span>
+<span class="badge {% if vote.status == 'OPEN' %}badge--present{% elif vote.status == 'CLOSED' %}badge--clos{% else %}badge--en-cours{% endif %}">{{ vote.get_status_display }}</span>
+<span class="satisfaction-period-card__meta">Ouverture : {{ vote.opens_at|date:"d/m/Y H:i" }}{% if vote.closes_at %} · Clôture : {{ vote.closes_at|date:"d/m/Y H:i" }}{% elif vote.status != 'DRAFT' %} · Clôture manuelle{% endif %}{% if vote.status != 'DRAFT' %} · {{ vote.ballot_count }} bulletin{{ vote.ballot_count|pluralize }}{% endif %}</span>
+</div>
+<div class="satisfaction-period-card__actions vote-manage-card__actions">
+{% if vote.status == 'DRAFT' %}
+<a class="btn btn--outline btn--sm" href="{% url 'voting:manage_detail' vote.pk %}">Modifier</a>
+<form method="post" action="{% url 'voting:manage_open' vote.pk %}">{% csrf_token %}<button class="btn btn--solid btn--sm" type="submit">Publier</button></form>
+{% elif vote.status == 'OPEN' %}
+<a class="btn btn--outline btn--sm" href="{% url 'voting:manage_track' vote.pk %}">Suivi</a>
+{% else %}
+<a class="btn btn--outline btn--sm" href="{% url 'voting:results' vote.pk %}">Résultats</a>
+{% endif %}
+</div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="etat-vide">
+<span class="etat-vide__icone" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="m8 12 3 3 5-6"></path></svg></span>
+<h3>Aucun vote n’a encore été créé.</h3>
+<a class="btn btn--solid" href="{% url 'voting:manage_create' %}">Créer un vote</a>
+</div>
+{% endif %}
+{% endblock %}

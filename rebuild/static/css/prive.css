@@ -708,5 +708,110 @@ a.pagination__arrow:hover, a.pagination__page:hover { border-color: var(--bleu);
 .result-bar--3 .result-bar__fill { background: var(--bleu); }
 .result-bar--4 .result-bar__fill { background: #2F9E5E; }
 .result-bar--5 .result-bar__fill { background: #14603A; }
-.result-hidden { display: flex; align-items: flex-start; gap: var(--e3); padding: var(--e4); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); color: var(--gris); }
-.result-hidden svg { flex: none; margin-top: 2px; }
+.result-hidden, .notice-box { display: flex; align-items: flex-start; gap: var(--e3); padding: var(--e4); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); color: var(--gris); }
+.result-hidden svg, .notice-box svg { flex: none; margin-top: 2px; }
+
+/* Alerte de message générique (base/private.html) — seule la variante succès change de
+   forme : icône + texte au lieu du cadre bleu uniforme .form-errors, jamais utilisé pour
+   les erreurs afin de ne rien changer ailleurs dans l'application. Recette identique à
+   .satisfaction-already (réponse déjà enregistrée), combinée ici pour ne pas dupliquer. */
+.satisfaction-already, .alert--success { display: flex; align-items: flex-start; gap: var(--e3); padding: var(--e4); border: 1px solid #B9E0C9; border-radius: var(--r-carte); background: #EAF6EF; color: #14603A; margin-bottom: var(--e4); }
+.satisfaction-already svg, .alert--success svg { flex: none; margin-top: 2px; }
+.alert--success p { margin: 0; }
+.alert__dismiss { flex: none; margin-left: auto; display: inline-flex; padding: 4px; border-radius: 50%; color: inherit; opacity: .7; }
+.alert__dismiss:hover { opacity: 1; background: rgba(20,96,58,.14); }
+
+/* Votes — refonte des deux écrans membre (liste + participation à un scrutin ouvert).
+   Composants neufs uniquement : tout le reste (carte-action/carte-info, badge, btn,
+   link-arrow, champ, eyebrow, satisfaction-form) est réutilisé tel quel. */
+.vote-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e3); margin-bottom: var(--e4); }
+.vote-tabs { display: flex; gap: 2px; padding: 2px; background: var(--fond); border: 1px solid var(--bord); border-radius: var(--r-pilule); }
+.vote-tabs__btn { display: inline-flex; align-items: center; gap: var(--e1); min-height: 36px; padding: 6px var(--e4); border-radius: var(--r-pilule); font-size: .8125rem; font-weight: 600; color: var(--gris); transition: background var(--duree) var(--courbe), color var(--duree) var(--courbe); }
+.vote-tabs__btn:hover { color: var(--encre); }
+.vote-tabs__btn[aria-pressed="true"] { background: var(--blanc); color: var(--bleu); box-shadow: var(--ombre); }
+.vote-tabs__count { font-variant-numeric: tabular-nums; opacity: .75; }
+.vote-search { position: relative; flex: 0 1 260px; min-width: 180px; }
+.vote-search svg { position: absolute; left: var(--e3); top: 50%; transform: translateY(-50%); color: var(--gris); pointer-events: none; }
+.vote-search input { padding-left: var(--e7); }
+
+.vote-list { display: grid; gap: var(--e3); margin-bottom: var(--e5); }
+.vote-card__title-row { display: flex; align-items: center; justify-content: space-between; gap: var(--e3); flex: 1; min-width: 0; }
+.vote-card__title-row h3 { min-width: 0; overflow-wrap: anywhere; }
+.vote-card__meta { display: grid; gap: var(--e1); }
+
+.vote-steps { display: flex; align-items: center; list-style: none; margin: 0 0 var(--e5); padding: 0; }
+.vote-steps__step { display: flex; align-items: center; gap: var(--e2); flex: 1; min-width: 0; }
+.vote-steps__step:not(:last-child) { padding-right: var(--e2); }
+.vote-steps__step:not(:last-child)::after { content: ""; flex: 1; height: 2px; margin-left: var(--e2); background: var(--bord); }
+.vote-steps__num { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--fond-2); color: var(--gris); font-size: .75rem; font-weight: 700; }
+.vote-steps__label { font-size: .75rem; font-weight: 600; color: var(--gris); white-space: nowrap; }
+.vote-steps__step.is-active .vote-steps__num, .vote-steps__step.is-done .vote-steps__num { background: var(--navy); color: var(--blanc); }
+.vote-steps__step.is-active .vote-steps__num { box-shadow: 0 0 0 3px rgba(248,200,0,.4); }
+.vote-steps__step.is-active .vote-steps__label, .vote-steps__step.is-done .vote-steps__label { color: var(--encre); }
+
+.vote-choices { display: grid; gap: var(--e2); border: 0; margin: 0; padding: 0; min-width: 0; }
+.vote-choices > legend { padding: 0; margin-bottom: var(--e2); font-size: .875rem; font-weight: 600; color: var(--encre); }
+.vote-tile { position: relative; display: flex; align-items: flex-start; gap: var(--e3); min-height: 44px; padding: var(--e3) var(--e4); border: 1.5px solid var(--bord); border-radius: var(--r-carte); background: var(--blanc); cursor: pointer; transition: border-color var(--duree) var(--courbe), background-color var(--duree) var(--courbe), box-shadow var(--duree) var(--courbe); }
+.vote-tile:hover { border-color: var(--bleu); box-shadow: var(--ombre); }
+.vote-tile:has(input:checked) { border-color: var(--bleu); background: var(--fond-2); box-shadow: var(--ombre); }
+.vote-tile:focus-within { outline: 3px solid var(--or); outline-offset: 2px; }
+/* Vrai input, focusable et lu par un lecteur d'écran, jamais affiché : toute la tuile
+   sert de label cliquable (même recette que .smiley-option, voir satisfaction). Préfixé
+   .prive-dense pour battre .prive-dense .champ__input (StyledFields pose class=
+   "champ__input" sur tout widget non-checkbox, RadioSelect inclus). */
+.prive-dense .vote-tile input {
+  position: absolute; width: 1px; height: 1px; min-width: 0; min-height: 0; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.vote-tile__dot { flex: none; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; border: 2px solid var(--bord); position: relative; transition: border-color var(--duree) var(--courbe); }
+.vote-tile__dot--checkbox { border-radius: 6px; }
+.vote-tile:has(input:checked) .vote-tile__dot { border-color: var(--bleu); }
+.vote-tile:has(input:checked) .vote-tile__dot::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--bleu); }
+.vote-tile:has(input:checked) .vote-tile__dot--checkbox::after { border-radius: 3px; }
+.vote-tile__body { display: grid; gap: 2px; min-width: 0; }
+.vote-tile__label { font-size: .9375rem; font-weight: 600; color: var(--encre); }
+.vote-tile__sub { font-size: .8125rem; color: var(--gris); }
+.vote-tile__details { margin-top: var(--e1); font-size: .8125rem; }
+.vote-tile__details summary { cursor: pointer; color: var(--bleu); font-weight: 600; }
+.vote-tile--blank { border-style: dashed; }
+.vote-hint { display: flex; align-items: flex-start; gap: var(--e2); margin: var(--e1) 0 0; font-size: .8125rem; color: var(--gris); }
+.vote-hint svg { flex: none; margin-top: 1px; }
+
+.vote-form-actions { justify-content: flex-end; }
+.vote-form-actions .btn { display: inline-flex; align-items: center; gap: var(--e2); }
+
+.vote-recap { padding: var(--e4); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); margin-bottom: var(--e4); }
+.vote-recap__value { margin: 0; font-size: 1.0625rem; font-weight: 600; color: var(--encre); }
+.vote-recap__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--e1); font-size: 1.0625rem; font-weight: 600; color: var(--encre); }
+
+@media (max-width: 760px) {
+  .vote-search { display: none; }
+  .vote-toolbar { justify-content: flex-start; }
+}
+@media (max-width: 560px) {
+  .vote-steps__label { display: none; }
+  .vote-steps__step.is-active .vote-steps__label { display: block; }
+  .vote-form-actions { flex-direction: column-reverse; align-items: stretch; }
+  .vote-form-actions .btn { width: 100%; justify-content: center; }
+  .vote-tabs { width: 100%; }
+  .vote-tabs__btn { flex: 1; justify-content: center; }
+}
+
+/* Cartes KPI génériques (icône + grand chiffre + libellé) — d'abord pour la gestion et
+   les résultats des votes, réutilisable ailleurs (Satisfaction, Cotisations…) sans
+   dupliquer : c'est .metric qui manquait une variante "carte" avec fond/bord/ombre. */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%,200px), 1fr)); gap: var(--e3); margin-bottom: var(--e5); }
+.kpi-card { display: flex; align-items: flex-start; gap: var(--e3); padding: var(--e4); background: var(--blanc); border: 1px solid var(--bord); border-radius: var(--r-carte); box-shadow: var(--ombre-fine); }
+.kpi-card__icon { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; background: var(--fond-2); color: var(--bleu); }
+.kpi-card__value { margin: 0; font-family: var(--police-titre); font-size: 1.75rem; line-height: 1.15; font-variant-numeric: tabular-nums; color: var(--encre); }
+.kpi-card__label { margin: 2px 0 0; font-size: .8125rem; color: var(--gris); }
+
+/* Résultat en tête — accent discret, jamais par la seule couleur (le libellé "En tête"
+   porte l'information). */
+.result-bar--leading .result-bar__label { color: var(--encre); }
+.result-bar--leading .result-bar__fill { background: var(--navy); }
+.result-bar__tag { display: inline-flex; align-items: center; margin-left: var(--e2); padding: 1px var(--e2); border-radius: var(--r-pilule); background: var(--fond-2); color: var(--bleu); font-size: .6875rem; font-weight: 700; }
+
+/* Gestion des votes — liste (recette identique à .satisfaction-period-card, badge de
+   statut ajouté dans le titre). */
+.vote-manage-card__actions form { display: contents; }

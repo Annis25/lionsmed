@@ -3,6 +3,12 @@
   'use strict';
   document.documentElement.classList.add('js');
   document.querySelectorAll('[data-year], [data-annee]').forEach(function (el) { el.textContent = new Date().getFullYear(); });
+  document.querySelectorAll('[data-alert-dismiss]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var alert = button.closest('.alert--success');
+      if (alert) alert.remove();
+    });
+  });
   document.querySelectorAll('[data-oeil]').forEach(function (button) {
     button.addEventListener('click', function () {
       var input = document.getElementById(button.dataset.oeil);

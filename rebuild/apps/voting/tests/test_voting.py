@@ -310,6 +310,195 @@ class VotesNavigationTests(TestCase):
         self.assertEqual(nav["Votes"]["url"], reverse("voting:member_list"))
 
 
+class VoteMemberUIRedesignTests(TestCase):
+    """Refonte UI/UX des deux écrans membre (liste + participation). Aucune règle
+    métier testée ici au-delà de ce qui est déjà couvert par VoteLifecycleTests —
+    uniquement la structure/le contenu rendu et le respect des permissions à l'affichage."""
+
+    def setUp(self):
+        self.president = account("uiredesign-president@example.invalid", role=Role.PRESIDENT)
+        self.member = account("uiredesign-member@example.invalid", role=Role.MEMBRE)
+
+    def test_open_not_voted_shows_cta_and_no_inline_form_on_list(self):
+        vote = opened_vote(self.president)
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("voting:member_list"))
+        self.assertContains(response, "Participer au vote")
+        self.assertContains(response, 'href="%s"' % reverse("voting:member_detail", args=[vote.pk]))
+        self.assertNotContains(response, 'name="ballot_choice"')
+        self.assertContains(response, "badge--present")
+
+    def test_open_already_voted_shows_definitive_message_no_cta(self):
+        vote = opened_vote(self.president)
+        option = vote.options.first()
+        services.cast_vote(actor=self.member, vote=vote, option_ids=[option.pk])
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("voting:member_list"))
+        self.assertContains(response, "Votre bulletin a déjà été envoyé")
+        self.assertNotContains(response, "Participer au vote")
+
+    def test_closed_vote_shows_results_link_only(self):
+        vote = opened_vote(self.president)
+        services.close_vote(actor=self.president, vote=vote)
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("voting:member_list"))
+        self.assertContains(response, "Consulter les résultats")
+        self.assertContains(response, 'href="%s"' % reverse("voting:results", args=[vote.pk]))
+        self.assertContains(response, "badge--clos")
+        self.assertNotContains(response, "Participer au vote")
+
+    def test_filter_tab_counts_reflect_open_and_closed(self):
+        open_v = opened_vote(self.president)
+        closed_v = opened_vote(self.president)
+        services.close_vote(actor=self.president, vote=closed_v)
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("voting:member_list"))
+        self.assertEqual(response.context["open_count"], 1)
+        self.assertEqual(response.context["closed_count"], 1)
+        self.assertContains(response, "data-vote-filter=\"open\"")
+        self.assertContains(response, "data-vote-filter=\"closed\"")
+        self.assertIsNotNone(open_v)
+
+    def test_participation_screen_has_real_accessible_radios_and_step_indicator(self):
+        vote = opened_vote(self.president)
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("voting:member_detail", args=[vote.pk]))
+        self.assertContains(response, 'type="radio"', count=vote.options.count())
+        self.assertContains(response, "vote-tile")
+        self.assertContains(response, "vote-steps")
+        self.assertContains(response, "Continuer vers le récapitulatif")
+        self.assertContains(response, "Annuler")
+
+    def test_participation_screen_lists_other_votes(self):
+        vote = opened_vote(self.president)
+        other = opened_vote(self.president)
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("voting:member_detail", args=[vote.pk]))
+        self.assertContains(response, "Autres votes")
+        self.assertContains(response, 'href="%s"' % reverse("voting:member_detail", args=[other.pk]))
+
+    def test_confirm_screen_shows_recap_and_definitive_confirmation(self):
+        vote = opened_vote(self.president)
+        option = vote.options.first()
+        self.client.force_login(self.member)
+        response = self.client.post(reverse("voting:member_detail", args=[vote.pk]), {"ballot_choice": str(option.pk)})
+        self.assertTemplateUsed(response, "espace/vote_confirm.html")
+        self.assertContains(response, "Confirmer définitivement")
+        self.assertContains(response, "Modifier mon choix")
+        self.assertContains(response, option.label)
+
+    def test_success_message_renders_as_success_alert_after_casting(self):
+        vote = opened_vote(self.president)
+        option = vote.options.first()
+        self.client.force_login(self.member)
+        response = self.client.post(reverse("voting:member_confirm", args=[vote.pk]),
+            {"options": [str(option.pk)]}, follow=True)
+        self.assertContains(response, "alert--success")
+        self.assertContains(response, "définitif")
+
+    def test_closed_vote_without_close_date_shows_manual_closure_note(self):
+        vote = opened_vote(self.president, closes_at=None)
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("voting:member_list"))
+        self.assertContains(response, "Clôture manuelle")
+
+
+class VoteManagerUIRedesignTests(TestCase):
+    """Refonte UI/UX des pages « Gestion des votes » et « Résultats du vote » —
+    structure/contenu rendu et respect des permissions, aucune règle métier changée."""
+
+    def setUp(self):
+        self.president = account("manage-uiredesign-president@example.invalid", role=Role.PRESIDENT)
+        self.member = account("manage-uiredesign-member@example.invalid", role=Role.MEMBRE)
+
+    def test_gestion_list_shows_kpi_counts_per_status(self):
+        draft = draft_vote(self.president)
+        services.add_option(actor=self.president, vote=draft, label="A")
+        opened_vote(self.president)
+        closed = opened_vote(self.president)
+        services.close_vote(actor=self.president, vote=closed)
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("voting:manage_list"))
+        self.assertEqual(response.context["draft_count"], 1)
+        self.assertEqual(response.context["open_count"], 1)
+        self.assertEqual(response.context["closed_count"], 1)
+        self.assertContains(response, "badge--en-cours")  # brouillon
+        self.assertContains(response, "Créer un vote")
+
+    def test_gestion_list_shows_ballot_count_per_vote(self):
+        vote = opened_vote(self.president)
+        option = vote.options.first()
+        services.cast_vote(actor=self.member, vote=vote, option_ids=[option.pk])
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("voting:manage_list"))
+        self.assertContains(response, "1 bulletin")
+
+    def test_gestion_list_publish_button_posts_to_manage_open(self):
+        draft = draft_vote(self.president)
+        services.add_option(actor=self.president, vote=draft, label="A")
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("voting:manage_list"))
+        self.assertContains(response, 'action="%s"' % reverse("voting:manage_open", args=[draft.pk]))
+
+    def test_gestion_list_empty_state(self):
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("voting:manage_list"))
+        self.assertContains(response, "Aucun vote n’a encore été créé.")
+
+    def test_results_page_shows_kpis_and_leading_choice(self):
+        vote = opened_vote(self.president)
+        options = list(vote.options.all())
+        services.cast_vote(actor=self.member, vote=vote, option_ids=[options[0].pk])
+        services.close_vote(actor=self.president, vote=vote)
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("voting:results", args=[vote.pk]))
+        self.assertContains(response, "En tête")
+        self.assertContains(response, options[0].label)
+        self.assertEqual(response.context["leading_option"]["label"], options[0].label)
+        self.assertContains(response, "kpi-card")
+
+    def test_results_page_return_link_depends_on_manage_permission(self):
+        vote = opened_vote(self.president)
+        services.close_vote(actor=self.president, vote=vote)
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("voting:results", args=[vote.pk]))
+        self.assertContains(response, "Retour à la gestion des votes")
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("voting:results", args=[vote.pk]))
+        self.assertNotContains(response, "Retour à la gestion des votes")
+        self.assertContains(response, "Retour aux votes")
+
+    def test_results_page_shows_blank_bar_with_percentage(self):
+        vote = opened_vote(self.president, blank_allowed=True)
+        services.cast_vote(actor=self.member, vote=vote, option_ids=[], is_blank=True)
+        services.close_vote(actor=self.president, vote=vote)
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("voting:results", args=[vote.pk]))
+        self.assertContains(response, "Vote blanc")
+        self.assertContains(response, "1 voix")
+
+    def test_results_include_options_with_zero_votes(self):
+        # Bug réel confirmé lors de la refonte : un choix sans aucune voix disparaissait
+        # silencieusement de results["options"], au lieu d'apparaître avec 0 voix / 0 %.
+        vote = opened_vote(self.president, blank_allowed=False)
+        options = list(vote.options.all())
+        services.cast_vote(actor=self.member, vote=vote, option_ids=[options[0].pk])
+        services.close_vote(actor=self.president, vote=vote)
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("voting:results", args=[vote.pk]))
+        labels = {o["label"]: o["votes"] for o in response.context["results"]["options"]}
+        self.assertEqual(labels, {options[0].label: 1, options[1].label: 0})
+        self.assertContains(response, options[1].label)
+
+    def test_results_page_no_leading_choice_when_no_ballots(self):
+        vote = opened_vote(self.president)
+        services.close_vote(actor=self.president, vote=vote)
+        self.client.force_login(self.president)
+        response = self.client.get(reverse("voting:results", args=[vote.pk]))
+        self.assertIsNone(response.context["leading_option"])
+        self.assertNotContains(response, "En tête")
+
+
 class VoteManagerDesignationTests(TestCase):
     def setUp(self):
         self.president = account("president4@example.invalid", role=Role.PRESIDENT)

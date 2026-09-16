@@ -1,33 +1,78 @@
 {% extends 'base/private.html' %}
 {% load static %}
-{% block title %}{% if single %}Votre vote{% else %}Votes{% endif %} — Lions Club Sfax-Méditerranée{% endblock %}
+{% block title %}{% if single %}{{ votes.0.vote.title }} — Votes{% else %}Votes{% endif %} — Lions Club Sfax-Méditerranée{% endblock %}
 {% block content %}
-<div class="app-titre"><h1>{% if single %}Votre vote{% else %}Votes{% endif %}</h1></div>
-<section class="workspace-panel"><ul class="lot2-timeline">
-{% for row in votes %}<li>
-  <strong>{{ row.vote.title }}</strong> <span class="badge">{{ row.vote.get_status_display }}</span>
-  {% if row.vote.description %}<p>{{ row.vote.description }}</p>{% endif %}
-  <p class="app-note">Ouverture : {{ row.vote.opens_at|date:"d/m/Y H:i" }} · Clôture : {{ row.vote.closes_at|date:"d/m/Y H:i" }} (Tunis)</p>
-  {% if row.vote.status == 'CLOSED' %}
-    <a class="btn btn--solid btn--sm" href="{% url 'voting:results' row.vote.pk %}">Consulter les résultats</a>
-  {% elif row.participation %}
-    <p>Votre bulletin a déjà été envoyé. Il est définitif.</p>
-  {% elif row.vote.status == 'OPEN' %}
-    <form method="post" action="{% url 'voting:member_detail' row.vote.pk %}" class="formulaire" data-vote-ballot novalidate>
-      {% csrf_token %}
-      <fieldset class="groupe"><legend>Votre choix{% if row.vote.mode == 'MULTIPLE' %} — plusieurs réponses possibles{% endif %} (obligatoire)</legend>
-      {% for option in row.vote.options.all %}
-        <label class="choix"><input type="{% if row.vote.mode == 'MULTIPLE' %}checkbox{% else %}radio{% endif %}" name="{% if row.vote.mode == 'MULTIPLE' %}options{% else %}ballot_choice{% endif %}" value="{{ option.pk }}" data-vote-option>{{ option.label }}{% if option.presentation %}<details><summary>Présentation</summary><p>{{ option.presentation }}</p></details>{% endif %}</label>
-      {% endfor %}
-      {% if row.vote.blank_allowed %}
-        <label class="choix choix--blank"><input type="{% if row.vote.mode == 'MULTIPLE' %}checkbox{% else %}radio{% endif %}" name="{% if row.vote.mode == 'MULTIPLE' %}blank{% else %}ballot_choice{% endif %}" value="{% if row.vote.mode == 'MULTIPLE' %}1{% else %}__blank__{% endif %}" data-vote-blank>Vote blanc <span class="app-note">— aucun des choix proposés</span></label>
-      {% endif %}
-      </fieldset>
-      {% if row.vote.blank_allowed %}<p class="app-note">Un vote blanc signifie que vous participez au scrutin sans choisir de proposition.</p>{% endif %}
-      <button class="btn btn--solid" type="submit">Continuer vers le récapitulatif</button>
-    </form>
-  {% else %}<p>Ce scrutin n’est pas encore ouvert.</p>{% endif %}
-</li>{% empty %}<li>Aucun vote pour lequel vous êtes habilité.</li>{% endfor %}
-</ul></section>
+{% if single %}
+{% with entry=votes.0 %}
+<div class="app-titre"><h1>Votes</h1></div>
+<section class="workspace-panel lot2-reading vote-participate">
+<div class="vote-card__title-row"><h2>{{ entry.vote.title }}</h2><span class="badge {% if entry.vote.status == 'OPEN' %}badge--present{% else %}badge--clos{% endif %}">{{ entry.vote.get_status_display }}</span></div>
+<div class="vote-card__meta">
+<p class="carte-action__echeance"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Ouverture : {{ entry.vote.opens_at|date:"d/m/Y H:i" }}</p>
+<p class="carte-action__echeance"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>{% if entry.vote.closes_at %}Clôture : {{ entry.vote.closes_at|date:"d/m/Y H:i" }}{% else %}Clôture manuelle — aucune échéance programmée{% endif %}</p>
+</div>
+
+{% if entry.participation %}
+<div class="satisfaction-already"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg><div><strong>Votre bulletin a déjà été envoyé.</strong><p class="app-note">Il est définitif et ne peut plus être modifié.</p></div></div>
+{% elif entry.vote.status == 'OPEN' %}
+<ol class="vote-steps" aria-hidden="true">
+<li class="vote-steps__step is-active"><span class="vote-steps__num">1</span><span class="vote-steps__label">Votre choix</span></li>
+<li class="vote-steps__step"><span class="vote-steps__num">2</span><span class="vote-steps__label">Confirmation</span></li>
+<li class="vote-steps__step"><span class="vote-steps__num">3</span><span class="vote-steps__label">Enregistrement</span></li>
+</ol>
+{% if entry.vote.description %}<p>{{ entry.vote.description }}</p>{% endif %}
+<p class="satisfaction-intro">Veuillez sélectionner votre choix parmi les propositions suivantes. Votre vote est anonyme et définitif.</p>
+<form method="post" action="{% url 'voting:member_detail' entry.vote.pk %}" class="satisfaction-form" data-vote-ballot novalidate>
+{% csrf_token %}
+<fieldset class="vote-choices"><legend>Votre choix{% if entry.vote.mode == 'MULTIPLE' %} — plusieurs réponses possibles{% endif %} (obligatoire)</legend>
+{% for option in entry.vote.options.all %}
+<label class="vote-tile"><input type="{% if entry.vote.mode == 'MULTIPLE' %}checkbox{% else %}radio{% endif %}" name="{% if entry.vote.mode == 'MULTIPLE' %}options{% else %}ballot_choice{% endif %}" value="{{ option.pk }}" data-vote-option><span class="vote-tile__dot{% if entry.vote.mode == 'MULTIPLE' %} vote-tile__dot--checkbox{% endif %}" aria-hidden="true"></span><span class="vote-tile__body"><span class="vote-tile__label">{{ option.label }}</span>{% if option.presentation %}<details class="vote-tile__details"><summary>Présentation</summary><p>{{ option.presentation }}</p></details>{% endif %}</span></label>
+{% endfor %}
+{% if entry.vote.blank_allowed %}
+<label class="vote-tile vote-tile--blank"><input type="{% if entry.vote.mode == 'MULTIPLE' %}checkbox{% else %}radio{% endif %}" name="{% if entry.vote.mode == 'MULTIPLE' %}blank{% else %}ballot_choice{% endif %}" value="{% if entry.vote.mode == 'MULTIPLE' %}1{% else %}__blank__{% endif %}" data-vote-blank><span class="vote-tile__dot{% if entry.vote.mode == 'MULTIPLE' %} vote-tile__dot--checkbox{% endif %}" aria-hidden="true"></span><span class="vote-tile__body"><span class="vote-tile__label">Vote blanc</span><span class="vote-tile__sub">Aucun des choix proposés</span></span></label>
+{% endif %}
+</fieldset>
+{% if entry.vote.blank_allowed %}<p class="vote-hint"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8v.01"></path></svg>Un vote blanc signifie que vous participez au scrutin sans choisir de proposition.</p>{% endif %}
+<div class="lot2-actions vote-form-actions">
+<a class="btn btn--outline" href="{% url 'voting:member_list' %}">Annuler</a>
+<button class="btn btn--solid" type="submit">Continuer vers le récapitulatif<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+</div>
+</form>
+{% else %}<p>Ce scrutin n’est pas encore ouvert.</p>{% endif %}
+</section>
+
+{% if other_votes %}
+<section class="app-section">
+<div class="bloc-titre"><h2>Autres votes</h2></div>
+<p class="app-note">Consultez les autres votes en cours ou clôturés.</p>
+<div class="vote-list">{% for row in other_votes %}{% include 'components/private/vote_card.html' %}{% endfor %}</div>
+</section>
+{% endif %}
+{% endwith %}
+
+{% else %}
+<div class="app-titre"><h1>Votes</h1><p class="app-titre__contexte">Participez aux décisions du club et suivez les consultations en cours.</p></div>
+{% if votes %}
+<div class="vote-toolbar" data-vote-toolbar>
+<div class="vote-tabs">
+<button type="button" class="vote-tabs__btn" data-vote-filter="all" aria-pressed="true">Tous <span class="vote-tabs__count">({{ votes|length }})</span></button>
+<button type="button" class="vote-tabs__btn" data-vote-filter="open" aria-pressed="false">Ouverts <span class="vote-tabs__count">({{ open_count }})</span></button>
+<button type="button" class="vote-tabs__btn" data-vote-filter="closed" aria-pressed="false">Clôturés <span class="vote-tabs__count">({{ closed_count }})</span></button>
+</div>
+<div class="vote-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg><input type="search" class="champ__input" placeholder="Rechercher un vote…" aria-label="Rechercher un vote" data-vote-search></div>
+</div>
+<div class="vote-list">{% for row in votes %}{% include 'components/private/vote_card.html' %}{% endfor %}</div>
+<div class="etat-vide" data-vote-empty hidden>
+<span class="etat-vide__icone" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg></span>
+<h3>Aucun vote ne correspond</h3><p>Essayez un autre filtre ou une autre recherche.</p>
+</div>
+{% else %}
+<div class="etat-vide">
+<span class="etat-vide__icone" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="m8 12 3 3 5-6"></path></svg></span>
+<h3>Aucun vote pour le moment</h3><p>Aucun vote pour lequel vous êtes habilité n’est disponible actuellement.</p>
+</div>
+{% endif %}
+{% endif %}
 <script src="{% static 'js/vote_ballot.js' %}" defer></script>
+<script src="{% static 'js/votes.js' %}" defer></script>
 {% endblock %}

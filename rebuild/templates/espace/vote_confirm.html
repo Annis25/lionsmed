@@ -1,3 +1,27 @@
 {% extends 'base/private.html' %}
 {% block title %}Confirmer votre bulletin — Lions Club Sfax-Méditerranée{% endblock %}
-{% block content %}<div class="app-titre"><h1>Un choix définitif</h1></div><section class="workspace-panel lot2-reading"><h2>{{ vote.title }}</h2><p>Récapitulatif de votre bulletin :</p><ul class="lot2-timeline">{% if is_blank %}<li>Vote blanc</li>{% else %}{% for option in options %}<li>{{ option.label }}</li>{% endfor %}{% endif %}</ul><p>Une fois envoyé, votre bulletin ne pourra plus être modifié.</p><form method="post" action="{% url 'voting:member_confirm' vote.pk %}">{% csrf_token %}{% for option_id in option_ids %}<input type="hidden" name="options" value="{{ option_id }}">{% endfor %}{% if is_blank %}<input type="hidden" name="blank" value="1">{% endif %}<div class="lot2-actions"><button class="btn btn--solid" type="submit">Envoyer définitivement mon bulletin</button><a href="{% url 'voting:member_list' %}">Revenir sans envoyer</a></div></form></section>{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Votes</h1></div>
+<section class="workspace-panel lot2-reading">
+<h2>{{ vote.title }}</h2>
+<ol class="vote-steps" aria-hidden="true">
+<li class="vote-steps__step is-done"><span class="vote-steps__num">1</span><span class="vote-steps__label">Votre choix</span></li>
+<li class="vote-steps__step is-active"><span class="vote-steps__num">2</span><span class="vote-steps__label">Confirmation</span></li>
+<li class="vote-steps__step"><span class="vote-steps__num">3</span><span class="vote-steps__label">Enregistrement</span></li>
+</ol>
+<div class="vote-recap">
+<p class="eyebrow">Votre choix</p>
+{% if is_blank %}<p class="vote-recap__value">Vote blanc</p>{% else %}<ul class="vote-recap__list">{% for option in options %}<li>{{ option.label }}</li>{% endfor %}</ul>{% endif %}
+</div>
+<div class="notice-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8v.01"></path></svg><p>Votre vote est anonyme et définitif. Après confirmation, il ne pourra plus être modifié.</p></div>
+<form method="post" action="{% url 'voting:member_confirm' vote.pk %}">
+{% csrf_token %}
+{% for option_id in option_ids %}<input type="hidden" name="options" value="{{ option_id }}">{% endfor %}
+{% if is_blank %}<input type="hidden" name="blank" value="1">{% endif %}
+<div class="lot2-actions vote-form-actions">
+<a class="btn btn--outline" href="{% url 'voting:member_detail' vote.pk %}">Modifier mon choix</a>
+<button class="btn btn--solid" type="submit">Confirmer définitivement</button>
+</div>
+</form>
+</section>
+{% endblock %}

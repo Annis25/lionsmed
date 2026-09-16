@@ -4,7 +4,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods, require_safe
-from apps.core.permissions import capability_required
+from apps.core.permissions import capability_required, can
 from apps.members.selectors import directory_page, member_profile
 from .models import Vote, VoteOption
 from .selectors import votes_for_member, vote_for_member, own_participation, votes_for_manager, vote_for_manager, tracking_rows, vote_results, can_view_results, require
@@ -13,11 +13,23 @@ from .services import (add_option, remove_option, open_vote, close_vote, cast_vo
 from .forms import VoteForm, VoteOptionForm
 
 
+def _vote_row(actor, vote):
+    """Un vote, sa participation éventuelle et si le lien résultats est autorisé —
+    calculé ici pour que le template n'ait jamais à décider seul d'afficher ce lien
+    (respect strict des permissions existantes, voir can_view_results)."""
+    return {"vote": vote, "participation": own_participation(actor, vote),
+        "can_view_results": vote.status == Vote.Status.CLOSED and can_view_results(actor, vote)}
+
+
 @capability_required("vote.cast")
 @require_safe
 def member_list(request):
-    votes = [{"vote": vote, "participation": own_participation(request.user, vote)} for vote in votes_for_member(request.user)]
-    return render(request, "espace/votes.html", {"votes": votes})
+    votes = [_vote_row(request.user, vote) for vote in votes_for_member(request.user)]
+    open_count = sum(1 for row in votes if row["vote"].status == Vote.Status.OPEN)
+    closed_count = sum(1 for row in votes if row["vote"].status == Vote.Status.CLOSED)
+    return render(request, "espace/votes.html", {
+        "votes": votes, "open_count": open_count, "closed_count": closed_count,
+    })
 
 
 def _parse_choices(request):
@@ -67,8 +79,9 @@ def member_detail(request, vote_id):
             "vote": vote, "options": options, "is_blank": is_blank,
             "option_ids": [str(o) for o in option_ids],
         })
+    other_votes = [_vote_row(request.user, other) for other in votes_for_member(request.user).exclude(pk=vote.pk)]
     return render(request, "espace/votes.html", {
-        "votes": [{"vote": vote, "participation": participation}], "single": True,
+        "votes": [_vote_row(request.user, vote)], "single": True, "other_votes": other_votes,
     })
 
 
@@ -80,7 +93,7 @@ def member_confirm(request, vote_id):
     is_blank = request.POST.get("blank") == "1"
     try:
         cast_vote(actor=request.user, vote=vote, option_ids=option_ids, is_blank=is_blank)
-        messages.success(request, "Votre bulletin a été enregistré. Il est définitif.")
+        messages.success(request, "Votre bulletin a été enregistré. Il est définitif et ne peut plus être modifié.")
     except ValidationError as error:
         messages.error(request, " ".join(error.messages) if hasattr(error, "messages") else str(error))
     except PermissionDenied:
@@ -94,13 +107,26 @@ def results(request, vote_id):
     vote = get_object_or_404(Vote, pk=vote_id)
     if not can_view_results(request.user, vote):
         raise PermissionDenied
-    return render(request, "espace/vote_resultats.html", {"vote": vote, "results": vote_results(request.user, vote)})
+    results_data = vote_results(request.user, vote)
+    leading_votes = max((option["votes"] for option in results_data["options"]), default=0)
+    leading_option = next((o for o in results_data["options"] if o["votes"] == leading_votes and leading_votes > 0), None)
+    return render(request, "espace/vote_resultats.html", {
+        "vote": vote, "results": results_data, "leading_votes": leading_votes, "leading_option": leading_option,
+        "can_manage": can(request.user, "vote.manage"),
+    })
 
 
 @capability_required("vote.manage")
 @require_safe
 def manage_list(request):
-    return render(request, "espace/votes_gestion.html", {"votes": votes_for_manager(request.user)})
+    from django.db.models import Count
+    votes = list(votes_for_manager(request.user).annotate(ballot_count=Count("ballots")))
+    counts = {"OPEN": 0, "CLOSED": 0, "DRAFT": 0}
+    for vote in votes:
+        counts[vote.status] = counts.get(vote.status, 0) + 1
+    return render(request, "espace/votes_gestion.html", {
+        "votes": votes, "open_count": counts["OPEN"], "closed_count": counts["CLOSED"], "draft_count": counts["DRAFT"],
+    })
 
 
 @capability_required("vote.manage")

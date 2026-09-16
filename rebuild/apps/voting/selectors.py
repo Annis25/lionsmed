@@ -71,16 +71,19 @@ def vote_results(actor, vote):
     ballot_count = ballots.count()
     blank_count = ballots.filter(is_blank=True).count()
     expressed = ballot_count - blank_count
-    tallies = (BallotSelection.objects.filter(ballot__vote=vote).values("option_id", "option__label", "option__order")
-        .annotate(votes=Count("id")).order_by("option__order"))
+    # Décompte par option, puis parcours de TOUTES les options du scrutin (pas seulement
+    # celles ayant reçu au moins une voix) : un choix à 0 voix doit rester visible dans les
+    # résultats, jamais disparaître silencieusement de la liste.
+    tally_by_option = {row["option_id"]: row["votes"] for row in
+        BallotSelection.objects.filter(ballot__vote=vote).values("option_id").annotate(votes=Count("id"))}
     options = [{
-        "label": row["option__label"],
-        "votes": row["votes"],
+        "label": option.label,
+        "votes": tally_by_option.get(option.id, 0),
         # Convention : dénominateur = bulletins exprimés (non blancs). En choix multiple, la somme peut dépasser 100 %.
-        "percentage": round(row["votes"] * 100 / expressed, 1) if expressed else 0,
+        "percentage": round(tally_by_option.get(option.id, 0) * 100 / expressed, 1) if expressed else 0,
         # Chaîne non localisée pour l'attribut CSS width (les chiffres visibles restent localisés).
-        "percentage_width": f"{row['votes'] * 100 / expressed:.1f}" if expressed else "0",
-    } for row in tallies]
+        "percentage_width": f"{tally_by_option.get(option.id, 0) * 100 / expressed:.1f}" if expressed else "0",
+    } for option in vote.options.all()]
     return {
         "elector_count": elector_count,
         "participation_count": participation_count,
