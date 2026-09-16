@@ -124,63 +124,82 @@
   color: var(--bleu) !important;
 }
 
-/* ─── AXES — grille de cartes ────────────────────────────────────────────── */
-.axes { padding-block: var(--e9); }
-.axes .section-head { margin-bottom: var(--e7); }
-.axes__grille {
+/* ─── CAUSES — grille unifiée des 8 causes d'engagement ──────────────────── */
+/* Fusion des quatre axes prioritaires et de quatre grandes causes Lions en une
+   seule vitrine (recette utilisateur, refonte maquette) : ancien découpage
+   .axes/.causes remplacé. Seule la santé mentale et le bien-être garde le
+   traitement "bande secondaire, discrète" du skill §7 (.bandeau-cause plus bas). */
+.causes { padding-block: var(--e9); }
+.causes .section-head { margin-bottom: var(--e7); }
+
+/* En-tête avec la touche éditoriale "Servir avec cœur" à droite : Playfair
+   600 (pas d'italique chargée, pas de police manuscrite — skill §1), jamais
+   de glyphe décoratif. */
+.causes__signature {
+  align-self: end;
+  margin: 0;
+  font-family: var(--police-titre);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--bleu);
+  white-space: nowrap;
+}
+
+.causes__grille {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--e5);
 }
-.axe__media { border-radius: var(--r-carte) var(--r-carte) 0 0; }
-/* La pastille déborde sur le bas-gauche de la photo. Cette zone est réservée :
-   voir IMAGES.md, aucun visage ne doit y tomber. */
-.axe__pastille {
-  position: relative;
-  z-index: 2;
-  width: 52px;
-  height: 52px;
-  margin-top: calc(-1 * var(--e7));
-  border-radius: 50%;
-  border: 3px solid var(--blanc);
+.cause-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--blanc);
+  border-radius: 16px;
+  box-shadow: var(--ombre-fine);
+  transition: transform var(--duree) var(--courbe), box-shadow var(--duree) var(--courbe);
+}
+.cause-card:hover { transform: translateY(-2px); box-shadow: var(--ombre); }
+.cause-card__media { aspect-ratio: 3 / 4; }
+.cause-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: var(--e2);
+  padding: var(--e4) var(--e4) var(--e5);
+}
+.cause-card__body h3 { font-size: 1.0625rem; }
+/* Les descriptions ont des longueurs inégales : le lien reste ancré en bas. */
+.cause-card__body p { flex: 1; color: var(--gris); font-size: .9375rem; line-height: 1.6; }
+.cause-card__body .link-arrow { margin-top: 0; font-size: .875rem; }
+
+/* ─── BANDEAU SANTÉ MENTALE — cinquième grande cause, traitement discret ─── */
+.bandeau-cause {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e5);
+  margin-top: var(--e7);
+  padding: var(--e5) var(--e6);
+  background: var(--fond-2);
+  border-radius: var(--r-carte);
+}
+.bandeau-cause__icone {
+  flex: none;
+  width: 56px;
+  height: 56px;
   display: grid;
   place-items: center;
-  color: var(--blanc);
-  flex: none;
-}
-.axe__pastille--diabete     { background: var(--bleu); }
-.axe__pastille--environnement { background: var(--bleu); }
-.axe__pastille--humanitaire { background: var(--bleu); }
-.axe__pastille--jeunesse    { background: var(--bleu); }
-.axe h3 { margin-top: var(--e1); }
-/* Les descriptions ont des longueurs inégales : le lien reste ancré en bas. */
-.axe .card__body > p { flex: 1; }
-.axe .card__body > .link-arrow { margin-top: 0; }
-
-/* ─── CAUSES — bande basse, alignement horizontal, traitement discret ────── */
-/* Padding plus court que --section-y : c'est une bande, pas une section pleine.
-   Réduit d'autant le blanc qui la séparait de la grille des axes. */
-.causes { padding-block: var(--e7); }
-.causes .section-head { margin-bottom: var(--e5); }
-.causes__liste {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--e5);
-}
-.cause { text-align: center; display: grid; justify-items: center; gap: var(--e2); }
-.cause__rond {
-  width: 48px;
-  height: 48px;
   border-radius: 50%;
   background: var(--blanc);
-  box-shadow: var(--ombre-fine), 0 8px 20px rgba(14,46,94,.08);
-  display: grid;
-  place-items: center;
+  color: var(--bleu);
+  box-shadow: var(--ombre-fine);
 }
-/* Section secondaire : le titre ne doit jamais concurrencer « Nos 4 axes
-   prioritaires ». Taille réduite, deux lignes maximum, et pas de filet or. */
-.causes__titre { font-size: clamp(1.4rem, 2.2vw, 1.9rem); max-width: 30ch; line-height: 1.2; }
-.cause span { font-size: .875rem; font-weight: 500; color: var(--gris); line-height: 1.45; max-width: 16ch; }
+.bandeau-cause__texte { flex: 1 1 360px; min-width: 0; }
+.bandeau-cause__texte .eyebrow { margin-bottom: var(--e2); }
+.bandeau-cause__texte h3 { margin: 0 0 var(--e2); font-size: 1.1875rem; }
+.bandeau-cause__texte p { margin: 0; color: var(--gris); max-width: 62ch; }
+.bandeau-cause__cta { flex: none; }
 
 /* ─── CHIFFRES — bandeau navy, chiffres énormes ──────────────────────────── */
 .chiffres {
@@ -393,8 +412,7 @@
 /* ─── ≤ 1080 px ──────────────────────────────────────────────────────────── */
 @media (max-width: 1080px) {
   .hero__grille { grid-template-columns: 1fr; gap: var(--e7); }
-  .axes__grille { grid-template-columns: repeat(2, 1fr); }
-  .causes__liste { grid-template-columns: repeat(3, 1fr); row-gap: var(--e6); }
+  .causes__grille { grid-template-columns: repeat(2, 1fr); }
   /* .chiffres__stats est en display:contents : c'est la grille parente qui
      porte les colonnes. */
   .chiffres__grille { grid-template-columns: repeat(2, 1fr); gap: var(--e6) var(--e5); }
@@ -456,8 +474,10 @@
     justify-content: flex-start;
     text-align: left;
   }
-  .causes__liste { grid-template-columns: repeat(2, 1fr); }
-  .axes { padding-block: var(--e8); }
+  .causes { padding-block: var(--e8); }
+  .bandeau-cause { flex-direction: column; align-items: stretch; text-align: center; padding: var(--e5); }
+  .bandeau-cause__icone { margin-inline: auto; }
+  .bandeau-cause__cta { width: 100%; }
   .actions__grille { gap: var(--e5); }
   .brand,
   .nav-burger,
@@ -479,7 +499,7 @@
 
 /* ─── ≤ 520 px ───────────────────────────────────────────────────────────── */
 @media (max-width: 520px) {
-  .axes__grille { grid-template-columns: 1fr; }
+  .causes__grille { grid-template-columns: 1fr; }
   .actualites-bandeau { grid-template-columns: 1fr; gap: var(--e4); padding: var(--e4); }
   .actualites-bandeau__suite { grid-column: auto; }
   .actualite { grid-template-columns: 64px minmax(0, 1fr); }

@@ -17,13 +17,34 @@ from . import identity
 
 PAGE_INFO={"club":("Notre Club","Ancrés à Sfax, unis par une même volonté : servir."),"join":("Nous rejoindre","Rejoindre notre club, c’est choisir de servir, d’agir et de grandir avec d’autres."),"legal":("Mentions légales","Informations institutionnelles et mentions de publication."),"privacy":("Confidentialité","Comment nous utilisons les informations que vous nous confiez."),"sitemap":("Plan du site","Les pages publiques du Lions Club Sfax-Méditerranée.")}
 
+def _causes_engagement(axis_content):
+    """Fusionne les 4 axes prioritaires (avec substitution CMS existante via
+    EditorialSection, jamais perdue) et les 4 autres grandes causes en une seule liste
+    de 8, dans l'ordre éditorial demandé. Le lien pointe vers le filtre par axe déjà
+    existant sur la liste des actions quand il s'applique, sinon vers la liste complète —
+    jamais de nouvelle route créée."""
+    causes=[]
+    for entry in identity.CAUSES_ENGAGEMENT:
+        body=entry["body"]
+        link=reverse("actions:list")
+        if entry["axis"]:
+            section=axis_content.get("axis_"+entry["axis"].lower())
+            if section:body=section.body
+            link=link+"?axis="+entry["axis"]
+        causes.append({**entry,"body":body,"link":link})
+    return causes
+
 def public_context(request,title,description,**kwargs):
     axis_content=sections()
     public_axes=[choice for choice in Axis.choices if choice[0] != Axis.TOUT]
     context={"institution":institution(),"page_title":title,"lede":description,"axes":public_axes,
+        # "Notre Club" (components/public/priorities.html) — inchangé par cette refonte.
         "axis_sections":[{"value":value,"label":label,"section":axis_content.get("axis_"+value.lower()),
             "default_body":identity.AXES_DEFAULT_BODY.get(value)} for value,label in public_axes],
-        "axes_intro":identity.AXES_INTRO,"causes_lions":identity.CAUSES_LIONS}
+        "axes_intro":identity.AXES_INTRO,
+        # Accueil (components/public/causes.html) — nouvelle grille unifiée des 8 causes.
+        "causes_engagement":_causes_engagement(axis_content),
+        "causes_engagement_intro":identity.CAUSES_ENGAGEMENT_INTRO,"sante_mentale":identity.SANTE_MENTALE}
     context.update(metadata(request,title=title,description=description,**kwargs));return context
 
 @require_safe
