@@ -96,3 +96,100 @@ La source unique est `rebuild/apps/core/permissions.py`.
   uniquement dans l'espace « Documents ».
 
 Le détail, les priorités et la checklist sont dans `docs/AUDIT_FINAL_AVANT_PRODUCTION.md`.
+
+## Lot fonctionnel — 15 septembre 2026
+
+- Satisfaction : axes libres, notes par axe, modification protégée après premières
+  réponses et résultats graphiques agrégés ; permissions centrales existantes conservées.
+- Vote : double POST reproduit (2 scrutins), corrigé par clé unique et verrou serveur.
+- Téléphone : widget Tunisie +216, nettoyage frontend et validation/normalisation serveur.
+- Cotisations : workspace de tous les membres actifs, recherche/filtres/compteurs,
+  états explicites par tranche réservés au trésorier/SUPER_ADMIN.
+- Événement proche : annonce EVENT_CREATED en outbox si début futur dans ≤7 jours,
+  à la création calendrier/première publication ; idempotence et rappels préservés.
+- Documents : health check PING/VERSION, protocole et fail-closed renforcés.
+  **ClamAV absent/inactif localement : activation réelle et recette restent à faire.**
+- Quatre migrations créées, appliquées en tests seulement ; base locale non migrée.
+- Suite complète unique : 390 tests, 0 failure/error, 5 skips. Recette navigateur
+  séparée : 21 checks aux tailles 1440×900, 390×844 et 430×932, verts.
+- Aucun commit/push/déploiement ni changement mockups/legacy/SEO.
+
+Détails et procédure : `docs/FUNCTIONAL_CORRECTIONS_REPORT.md` et
+`docs/CLAMAV_PRODUCTION_CHECK.md`.
+
+### Extension des parcours fonctionnels — 15 septembre 2026
+
+- Ajout de `apps/core/tests/test_functional_journeys.py` : 14 tests HTTP de parcours
+  avec CSRF actif, vérifications des états en base, audits, refus et rejeux.
+- Satisfaction, documents/ACL/antivirus, vote jusqu’aux résultats, téléphone
+  profil/contact/candidature, cycle de cotisations et email événement couverts.
+- Matrice GET/POST des 14 rôles sur les trois interfaces de gestion testées
+  (84 contrôles), accès anonyme et POST sans CSRF ; refus sans mutation.
+- Scanner mocké et email locmem : aucune infrastructure production sollicitée.
+- Tests ciblés : 14 verts. Suite complète unique de cette extension : 404 tests,
+  0 failure, 0 error, 5 skips. Check Django et git diff --check propres.
+- Aucun changement de permission, modèle, migration ou code métier dans cette passe.
+- Matrice et limites explicites : `docs/FUNCTIONAL_SCENARIOS.md`.
+
+### Cadrage individuel des portraits — 15 septembre 2026
+
+- Éditeur privé dans Modifier mon profil : aperçu circulaire, zoom 1–4,
+  positions horizontale/verticale, glisser souris/tactile, recentrage ; curseurs
+  accessibles au clavier. JS vanilla, cadrage appliqué côté serveur avec Pillow.
+- Original normalisé conservé dans stockage privé et servi uniquement au
+  propriétaire (`members:photo_original`, private/no-store). Portrait carré JPEG
+  512 px réutilisé par les routes existantes partout, y compris profil public.
+- Nouveaux champs `photo_original_key` et `photo_crop`. Migration members `0009`
+  appliquée uniquement en local ; aucune conversion massive des photos existantes.
+  Ancienne photo conservée comme source lors de son premier recadrage.
+- Validation serveur des bornes et des valeurs non finies ; photo supprimée =
+  source/cadrage/portrait supprimés, nettoyage des nouveaux fichiers sur rollback.
+- 55 tests profils verts (1 skip), 4 tests cadrage verts ; Chrome : 24 contrôles
+  responsive et zoom/curseurs/reset verts à 1440/390/430 px. Capture mobile inspectée.
+- Aucun commit/push/déploiement ni changement de permission.
+- Suite complète unique finale : 417 tests en 55,924 s, 0 failure, 0 error,
+  5 skips. Check Django, détection des migrations et git diff --check propres ;
+  migrate --check local vert après la migration members 0009.
+
+### Présentation cotisations — 15 septembre 2026
+
+- Dashboard Trésorier/Super Admin : encaissé, restant et total attendu en TND,
+  progression textuelle, calcul sur membres actifs éligibles et tranches payées
+  au barème courant. Aucun total inventé si barème incomplet ; année active seule.
+- Accès protégé par `dues.manage`, pas de changement de rôle ou de permission.
+  Aucune migration. Tests ciblés : 6 verts ; navigateur : 24 contrôles à
+  1440/390/430 px verts, capture dashboard mobile inspectée.
+
+- Recherche avec suggestions natives de noms (`datalist`), liste complète des
+  membres actifs éligibles indépendante des filtres et de la pagination ; selector
+  partagé avec la liste cotisations. Noms uniquement, espace privé protégé.
+- Tests cotisations après cette extension : 3 verts, dont suggestions au-delà de
+  20 membres, filtres vides, exclusions et refus de permission.
+
+- Cartes membres avec initiales, badges d’état distincts et progression textuelle
+  des deux tranches (pas un pourcentage de montant encaissé).
+- Tranches repliables avec repères numérotés et formulaire vertical, bouton bleu.
+- Charte du skill Lionsmed reprise comme référence visuelle dans `rebuild/` ;
+  aucune modification des maquettes, permissions, modèles ou paiements.
+- Contrôle Chrome opt-in : 21 vérifications à 1440/390/430 px réussies ; capture
+  mobile inspectée, pas de débordement. Aucun commit/push/déploiement.
+
+### Rôle Marketing & Communication — 15 septembre 2026
+
+- Nouveau rôle `MARKETING_COMMUNICATION` (15 rôles au total), périmètre confirmé.
+- Groupe `CONTENT_MANAGERS` dédié : actions (création/modification/publication),
+  images et contenus institutionnels ; communications aux membres via l’outbox.
+- Aucun ajout à `MANAGERS` : pas de gestion des votes, satisfaction, documents,
+  cotisations, événements, membres/rôles, années, candidatures ou contacts.
+  Les accès personnels ordinaires d’un membre sont conservés.
+- Navigation et formulaires utilisent les capabilities et `Role.choices` existants.
+- Migration governance `0005` nécessaire pour la contrainte SQL et les choix du rôle ;
+  non appliquée à la base locale réelle. Aucun rôle attribué à un compte réel.
+- Quatre tests nouveaux : matrice exacte, routes autorisées, refus GET/POST sans
+  audit de réussite, rejeu communication ; 25 tests ciblés verts.
+- Suite complète unique : 408 tests, 5 skips, 0 erreur, 1 échec dans une ancienne
+  attente de permissions éditoriales. Test actualisé : Marketing autorisé pour
+  les actions uniquement, pas les événements. Recontrôle ciblé final : 5 tests
+  verts (matrice HTTP/services et nouveau rôle). Suite complète non relancée.
+- Check Django et détection des migrations propres ; `migrate --check` signale
+  les migrations en attente des lots récents. Aucun commit/push/déploiement.

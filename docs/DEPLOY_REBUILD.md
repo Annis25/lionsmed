@@ -38,7 +38,7 @@ dépôt** (échec fermé volontaire, voir `apps/documents/scanning.py`). Vérifi
 démarrage :
 
 ```sh
-echo "test" | nc -U /var/run/clamav/clamd.ctl  # ou PING via zINSTREAM applicatif
+.venv/bin/python manage.py check_antivirus --settings=config.settings.production
 ```
 
 ## 3. Migrations, statiques, comptes
