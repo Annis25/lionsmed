@@ -1,9 +1,12 @@
 Bonjour{% if first_name %} {{ first_name }}{% endif %},
 
 Un petit moment pour nous dire comment s’est passé ce mois ? Votre avis nous aide à améliorer la vie et le fonctionnement du club.
+
 {{ origin }}/espace/satisfaction/
+
 Merci pour votre retour,
 L’équipe du Lions Club Sfax-Méditerranée
 
+Lions Club Sfax-Méditerranée
 Sfax, Tunisie · District 414 Tunisie
 Nous servons.

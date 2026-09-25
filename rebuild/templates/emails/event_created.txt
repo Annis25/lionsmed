@@ -1,11 +1,17 @@
 Bonjour{% if first_name %} {{ first_name }}{% endif %},
 
 Un nouvel événement vient d’être ajouté au calendrier du Lions Club Sfax-Méditerranée.
+
 {{ event.title }}
-{{ event.starts_at|date:'l d F Y à H:i' }}
-{{ event.location }}
+{{ event.starts_at|date:'l d F Y à H:i' }}{% if event.location %}
+{{ event.location }}{% endif %}
 
 Consultez les détails et confirmez votre participation si nécessaire :
 {{ origin }}/espace/calendrier/
 
-Lions Club Sfax-Méditerranée — District 414 Tunisie
+À bientôt,
+L’équipe du Lions Club Sfax-Méditerranée
+
+Lions Club Sfax-Méditerranée
+Sfax, Tunisie · District 414 Tunisie
+Nous servons.

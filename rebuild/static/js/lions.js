@@ -2,10 +2,44 @@
 (function () {
   'use strict';
   document.documentElement.classList.add('js');
+
+  // Thème clair/sombre — l'attribut initial est posé dans <head> (base/site.html)
+  // avant la première peinture ; ici seulement la bascule et la synchronisation.
+  var root = document.documentElement;
+  var THEME_KEY = 'lionsmed-theme';
+  var systemDark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function storedTheme() { try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; } }
+  function applyTheme(theme) {
+    root.classList.add('theme-bascule');
+    root.setAttribute('data-theme', theme);
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
+      var dark = theme === 'dark';
+      button.setAttribute('aria-pressed', String(dark));
+      button.title = dark ? 'Passer en mode clair' : 'Passer en mode sombre';
+    });
+    window.requestAnimationFrame(function () { root.classList.remove('theme-bascule'); });
+  }
+  applyTheme(root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
+  document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* choix non mémorisé */ }
+      applyTheme(next);
+    });
+  });
+  if (systemDark && systemDark.addEventListener) {
+    systemDark.addEventListener('change', function (event) {
+      var saved = storedTheme();
+      if (saved !== 'light' && saved !== 'dark') applyTheme(event.matches ? 'dark' : 'light');
+    });
+  }
+  window.addEventListener('storage', function (event) {
+    if (event.key === THEME_KEY && (event.newValue === 'light' || event.newValue === 'dark')) applyTheme(event.newValue);
+  });
   document.querySelectorAll('[data-year], [data-annee]').forEach(function (el) { el.textContent = new Date().getFullYear(); });
   document.querySelectorAll('[data-alert-dismiss]').forEach(function (button) {
     button.addEventListener('click', function () {
-      var alert = button.closest('.alert--success');
+      var alert = button.closest('.alert');
       if (alert) alert.remove();
     });
   });

@@ -8,9 +8,12 @@ Résultats
 {% endfor %}
 {{ results.expressed_count }} votes exprimés
 {% endif %}
+
 {{ origin }}/espace/votes/
+
 Merci pour votre participation,
 L’équipe du Lions Club Sfax-Méditerranée
 
+Lions Club Sfax-Méditerranée
 Sfax, Tunisie · District 414 Tunisie
 Nous servons.

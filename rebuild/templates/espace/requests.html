@@ -5,13 +5,16 @@
 <div class="app-titre"><h1>{% if kind == 'application' %}Candidatures reçues{% else %}Messages de contact{% endif %}</h1></div>
 <section class="workspace-panel">
   <p class="app-note">{% if kind == 'application' %}Toutes les candidatures envoyées depuis le formulaire « Nous rejoindre » sont listées ici.{% else %}Tous les messages envoyés depuis le formulaire de contact sont listés ici.{% endif %}</p>
-  <ul class="lot2-timeline">
-    {% for item in page_obj %}
-      <li><a href="{% url 'communications:request' kind item.pk %}">{% if item.name %}{{ item.name }}{% else %}{{ item.first_name }} {{ item.last_name }}{% endif %}</a> · {{ item.get_state_display }} · {{ item.created_at|date:'d/m/Y' }}</li>
-    {% empty %}
-      <li>{% if kind == 'application' %}Aucune candidature reçue.{% else %}Aucun message de contact reçu.{% endif %}</li>
-    {% endfor %}
-  </ul>
+  {% if page_obj %}<div class="tableau-cadre"><table class="tableau">
+    <caption class="visually-hidden">{% if kind == 'application' %}Candidatures reçues{% else %}Messages de contact{% endif %}</caption>
+    <thead><tr><th scope="col">{% if kind == 'application' %}Candidat{% else %}Expéditeur{% endif %}</th><th scope="col">État</th><th scope="col">Reçu le</th></tr></thead>
+    <tbody>{% for item in page_obj %}<tr>
+      <td data-libelle="{% if kind == 'application' %}Candidat{% else %}Expéditeur{% endif %}"><a href="{% url 'communications:request' kind item.pk %}">{% if item.name %}{{ item.name }}{% else %}{{ item.first_name }} {{ item.last_name }}{% endif %}</a></td>
+      <td data-libelle="État"><span class="badge {% if item.state == 'RECEIVED' %}badge--en-cours{% elif item.state == 'CLOSED' %}badge--clos{% else %}badge--excuse{% endif %}">{{ item.get_state_display }}</span></td>
+      <td data-libelle="Reçu le" class="num">{{ item.created_at|date:'d/m/Y' }}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<div class="etat-vide"><span class="etat-vide__icone" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m4 7 8 6 8-6"></path></svg></span><p>{% if kind == 'application' %}Aucune candidature reçue.{% else %}Aucun message de contact reçu.{% endif %}</p></div>{% endif %}
   {% include 'components/private/pagination.html' %}
 </section>
 {% endblock %}

@@ -1,9 +1,12 @@
 Bonjour{% if first_name %} {{ first_name }}{% endif %},
 
 Petit rappel : votre prochain rendez-vous approche. Consultez votre calendrier privé pour le détail et l'heure exacte.
+
 {{ origin }}/espace/calendrier/
+
 À très bientôt,
 L’équipe du Lions Club Sfax-Méditerranée
 
+Lions Club Sfax-Méditerranée
 Sfax, Tunisie · District 414 Tunisie
 Nous servons.

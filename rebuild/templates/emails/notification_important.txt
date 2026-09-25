@@ -1,6 +1,14 @@
 Bonjour{% if first_name %} {{ first_name }}{% endif %},
 
-Une notification importante vous attend dans votre espace membre.
-{{ origin }}/espace/notifications/
+{{ notification.title|default:"Une notification importante vous attend dans votre espace membre." }}
+{% if notification.excerpt %}
+{{ notification.excerpt }}
+{% endif %}
+Consulter le message : {{ origin }}/espace/notifications/
+
+À bientôt,
+L’équipe du Lions Club Sfax-Méditerranée
+
+Lions Club Sfax-Méditerranée
 Sfax, Tunisie · District 414 Tunisie
 Nous servons.

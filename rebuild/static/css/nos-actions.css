@@ -57,7 +57,7 @@
 .action-detail__impact { display: grid; gap: var(--e4); margin: 0; padding: var(--e5); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); }
 .action-detail__impact > p { margin: 0; }
 .action-detail__impact > p:not(.eyebrow) { display: grid; gap: var(--e1); padding-top: var(--e4); border-top: 1px solid var(--bord); }
-.action-detail__impact strong { font-family: var(--police-titre); font-size: var(--t-h2); line-height: 1; color: var(--navy); font-variant-numeric: tabular-nums; }
+.action-detail__impact strong { font-family: var(--police-titre); font-size: var(--t-h2); line-height: 1; color: var(--encre); font-variant-numeric: tabular-nums; }
 .action-detail__impact span { color: var(--gris); font-size: var(--t-meta); }
 .action-detail > .action-detail__container > .link-arrow { display: inline-flex; margin-top: var(--e7); }
 @media (max-width:760px) {

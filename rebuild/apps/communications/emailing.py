@@ -4,6 +4,7 @@ Les modèles HTML et texte reçoivent toujours les mêmes données sûres. Les U
 construites depuis SITE_ORIGIN : aucune valeur HTTP contrôlée par un visiteur n'est
 utilisée.
 """
+import re
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -68,8 +69,20 @@ def render_transactional(kind, *, user=None, **extra):
     )
 
 
+# Salutation déjà écrite par l'auteur en tête de message : le modèle n'en ajoute pas
+# une seconde (« Bonjour Anis, » suivi de « Bonjour à tous, »). Le texte saisi n'est
+# jamais modifié ; seule la salutation automatique s'efface.
+GREETING = re.compile(r"^\s*(bonjour|bonsoir|salut|hello|coucou|chers?|chères?|mesdames|messieurs|madame|monsieur)\b",
+                      re.IGNORECASE)
+
+
+def starts_with_greeting(body):
+    return bool(GREETING.match(body or ""))
+
+
 def render_broadcast(campaign, *, user):
-    context = base_context(user, campaign=campaign, message_html=campaign.body)
+    context = base_context(user, campaign=campaign, message_html=campaign.body,
+                           body_has_greeting=starts_with_greeting(campaign.body))
     return (
         campaign.subject,
         render_to_string("emails/member_broadcast.txt", context),

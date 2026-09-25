@@ -1,3 +1,43 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="x-apple-disable-message-reformatting"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"><title>{% block title %}Lions Club Sfax-Méditerranée{% endblock %}</title></head>
-<body style="margin:0;padding:0;background:#F6F9FD;color:#12294D;font-family:Arial,Helvetica,sans-serif;"><div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">{% block preheader %}Informations de votre Lions Club Sfax-Méditerranée.{% endblock %}</div><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#F6F9FD;width:100%;"><tr><td align="center" style="padding:24px 12px;"><table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background:#ffffff;border:1px solid #E1E9F4;border-radius:10px;overflow:hidden;"><tr><td style="padding:18px 28px;background:#0E2E5E;color:#ffffff;"><table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr><td style="padding-right:12px;"><img src="{{ logo_url }}" width="40" height="40" alt="Lions Club Sfax-Méditerranée" style="display:block;border:0;width:40px;height:40px;"></td><td style="font-size:15px;line-height:20px;font-weight:bold;color:#ffffff;">Lions Club<br>Sfax-Méditerranée</td></tr></table></td></tr><tr><td style="padding:30px 28px 12px;">{% block greeting %}<p style="margin:0 0 18px;font-size:17px;line-height:26px;color:#0E2E5E;font-weight:bold;">Bonjour{% if first_name %} <span style="color:#184898;">{{ first_name }}</span>{% endif %},</p>{% endblock %}{% block content %}{% endblock %}<p style="margin:26px 0 0;font-size:15px;line-height:23px;color:#12294D;">{% block signature %}À bientôt,<br>L’équipe du Lions Club Sfax-Méditerranée{% endblock %}</p></td></tr><tr><td style="padding:18px 28px 22px;border-top:1px solid #E1E9F4;font-size:12px;line-height:18px;color:#5A6B85;">Lions Club Sfax-Méditerranée<br>Sfax, Tunisie · District 414 Tunisie<br><strong style="color:#0E2E5E;">Nous servons.</strong></td></tr></table></td></tr></table></body></html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="x-apple-disable-message-reformatting"><meta name="format-detection" content="telephone=no, date=no, address=no, email=no"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>{% block title %}Lions Club Sfax-Méditerranée{% endblock %}</title>
+{# Le rendu clair est entièrement porté par les styles en ligne : il reste correct dans #}
+{# les clients qui ignorent <style> (Gmail web retire les media queries sombres). Le #}
+{# bloc ci-dessous n'est qu'une amélioration : mode sombre pour Apple Mail, Outlook  #}
+{# (data-ogsc/data-ogsb) et les clients compatibles, marges resserrées sur mobile.    #}
+<style>
+:root { color-scheme: light dark; supported-color-schemes: light dark; }
+@media (max-width: 620px) {
+  .lm-pad { padding-left: 20px !important; padding-right: 20px !important; }
+  .lm-outer { padding: 12px 8px !important; }
+  .lm-h1 { font-size: 23px !important; line-height: 30px !important; }
+}
+@media (prefers-color-scheme: dark) {
+  .lm-body, .lm-outer { background: #0B1628 !important; }
+  .lm-card { background: #13233F !important; border-color: #263B5E !important; }
+  .lm-text, .lm-text p, .lm-text div { color: #E6EBF3 !important; }
+  .lm-title, .lm-greet { color: #FFFFFF !important; }
+  .lm-name { color: #8FB4F7 !important; }
+  .lm-muted, .lm-text .lm-muted { color: #A9B6CB !important; }
+  .lm-panel { background: #172B4C !important; border-color: #2F4A78 !important; color: #E6EBF3 !important; }
+  .lm-footer { border-color: #263B5E !important; color: #A9B6CB !important; }
+  .lm-motto { color: #F8C800 !important; }
+  .lm-link { color: #8FB4F7 !important; }
+  .lm-track { background: #263B5E !important; }
+  .lm-fill { background: #8FB4F7 !important; }
+}
+[data-ogsc] .lm-text, [data-ogsc] .lm-text p, [data-ogsc] .lm-text div { color: #E6EBF3 !important; }
+[data-ogsc] .lm-title, [data-ogsc] .lm-greet { color: #FFFFFF !important; }
+[data-ogsc] .lm-muted, [data-ogsc] .lm-text .lm-muted, [data-ogsc] .lm-footer { color: #A9B6CB !important; }
+[data-ogsb] .lm-body, [data-ogsb] .lm-outer { background: #0B1628 !important; }
+[data-ogsb] .lm-card { background: #13233F !important; }
+[data-ogsb] .lm-panel { background: #172B4C !important; }
+</style></head>
+<body class="lm-body" style="margin:0;padding:0;background:#F6F9FD;color:#12294D;font-family:'Segoe UI',Arial,Helvetica,sans-serif;-webkit-text-size-adjust:100%;"><div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">{% block preheader %}Informations de votre Lions Club Sfax-Méditerranée.{% endblock %}</div>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="lm-outer" style="background:#F6F9FD;width:100%;"><tr><td align="center" class="lm-outer" style="padding:28px 12px;">
+<table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" class="lm-card" style="width:100%;max-width:600px;background:#FFFFFF;border:1px solid #E1E9F4;border-radius:12px;overflow:hidden;">
+<tr><td class="lm-pad" bgcolor="#0E2E5E" style="padding:20px 32px;background:#0E2E5E;border-bottom:3px solid #F8C800;"><table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr><td style="padding-right:14px;vertical-align:middle;"><img src="{% if logo_url %}{{ logo_url }}{% else %}{{ site_origin }}/static/images/emblem-256.png{% endif %}" width="44" height="42" alt="Lions Club Sfax-Méditerranée" style="display:block;border:0;width:44px;height:42px;"></td><td style="vertical-align:middle;font-size:15px;line-height:20px;font-weight:bold;color:#FFFFFF;">Lions Club<br><span style="font-weight:normal;color:#DCE6F5;">Sfax-Méditerranée</span></td></tr></table></td></tr>
+<tr><td class="lm-pad lm-text" style="padding:32px 32px 8px;font-size:16px;line-height:25px;color:#12294D;">{% block greeting %}{% if not body_has_greeting %}<p class="lm-greet" style="margin:0 0 18px;font-size:17px;line-height:26px;color:#0E2E5E;font-weight:bold;">Bonjour{% firstof first_name user.first_name "" as name %}{% if name %} <span class="lm-name" style="color:#184898;">{{ name }}</span>{% endif %},</p>{% endif %}{% endblock %}{% block content %}{% endblock %}<p style="margin:28px 0 0;font-size:15px;line-height:23px;color:#12294D;">{% block signature %}À bientôt,<br>L’équipe du Lions Club Sfax-Méditerranée{% endblock %}</p></td></tr>
+<tr><td class="lm-pad" style="padding:24px 32px 0;"><div class="lm-footer" style="border-top:1px solid #E1E9F4;"></div></td></tr>
+<tr><td class="lm-pad lm-footer" style="padding:16px 32px 26px;font-size:12px;line-height:19px;color:#5A6B85;">Lions Club Sfax-Méditerranée<br>Sfax, Tunisie · District 414 Tunisie<br><strong class="lm-motto" style="color:#0E2E5E;">Nous servons.</strong></td></tr>
+</table>
+</td></tr></table></body></html>

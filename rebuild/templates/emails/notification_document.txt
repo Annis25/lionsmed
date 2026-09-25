@@ -1,9 +1,12 @@
 Bonjour{% if first_name %} {{ first_name }}{% endif %},
 
 Un nouveau document vient d’être ajouté à votre espace membre. Vous pouvez le consulter quand vous le souhaitez.
+
 {{ origin }}/espace/documents/
+
 Bonne consultation,
 L’équipe du Lions Club Sfax-Méditerranée
 
+Lions Club Sfax-Méditerranée
 Sfax, Tunisie · District 414 Tunisie
 Nous servons.

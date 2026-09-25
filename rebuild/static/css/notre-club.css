@@ -18,9 +18,9 @@
 .club-histoire__attente { max-width: 760px; padding: var(--e7); background: var(--fond); border-left: 3px solid var(--or); }
 .club-histoire__attente > p:not(.demo-note) { font-family: var(--police-titre); font-size: clamp(1.35rem, 2vw, 1.75rem); line-height: 1.35; color: var(--encre); max-width: 29ch; }
 .club-histoire__ligne { display: block; width: min(100%, 420px); height: 1px; margin-block: var(--e5); background: var(--bord); }
-.club-valeurs__grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e1); background: var(--blanc); }
+.club-valeurs__grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e1); background: var(--surface); }
 .club-valeurs__grille.reveal { opacity: 1; transform: none; }
-.club-valeurs__grille article { position: relative; min-height: 240px; padding: var(--e5); display: flex; flex-direction: column; justify-content: flex-end; background: var(--bleu); color: var(--sur-sombre); overflow: hidden; }
+.club-valeurs__grille article { position: relative; min-height: 240px; padding: var(--e5); display: flex; flex-direction: column; justify-content: flex-end; background: var(--primaire); color: var(--sur-sombre); overflow: hidden; }
 .club-valeurs__grille article:nth-child(3n+1) { background: var(--navy); }
 .club-valeurs__grille article:nth-child(3n+2) { background: var(--fond-2); color: var(--encre); }
 .club-valeurs__grille article::before { position: absolute; top: var(--e4); right: var(--e2); color: var(--sur-sombre); opacity: .18; font-family: var(--police); font-size: var(--t-meta); font-weight: 700; letter-spacing: .02em; writing-mode: vertical-rl; transform: rotate(180deg); }
@@ -39,7 +39,7 @@
 .club-bureau__entete { display: grid; gap: var(--e4); margin-bottom: var(--e6); }
 .club-bureau__entete > div > p { margin-top: var(--e3); }
 .club-bureau__grille { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--e4); }
-.club-bureau__grille article { display: grid; gap: var(--e3); padding: var(--e4); background: var(--blanc); border: 1px dashed var(--bord); border-radius: var(--r-carte); }
+.club-bureau__grille article { display: grid; gap: var(--e3); padding: var(--e4); background: var(--surface); border: 1px dashed var(--bord); border-radius: var(--r-carte); }
 .club-bureau__grille span { font-size: var(--t-meta); color: var(--gris); }
 .club-bureau__grille strong { font-size: .9375rem; color: var(--encre); }
 .club-bureau__silhouette { aspect-ratio: 4 / 3; background: var(--fond-2); border-radius: 6px; }
