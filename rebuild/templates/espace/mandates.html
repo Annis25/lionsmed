@@ -1,0 +1,50 @@
+{% extends 'base/private.html' %}
+{% block title %}Bureau et mandats — Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Bureau et mandats</h1><p class="app-titre__contexte">Source unique de « Notre bureau » sur le site public. Un mandat n’accorde aucun rôle ni aucune permission.</p><a class="btn btn--ghost btn--sm" href="{% url 'governance:members' %}">← Retour aux membres et mandats</a></div>
+
+<section class="workspace-panel">
+  <form method="get" class="lot2-filters" aria-label="Choisir l’Année Lions">
+    <div class="champ"><label class="champ__label" for="annee">Année Lions</label><select class="champ__input" id="annee" name="annee">{% for item in years %}<option value="{{ item.pk }}"{% if year and item.pk == year.pk %} selected{% endif %}>{{ item.label }}{% if active_year and item.pk == active_year.pk %} (active){% endif %}</option>{% endfor %}</select></div>
+    <button class="btn btn--outline" type="submit">Afficher</button>
+    {% if can_manage and year %}<a class="btn btn--solid" href="{% url 'governance:mandate_add' %}">Ajouter un mandat</a>{% endif %}
+  </form>
+  {% if not years %}<p class="app-note">Aucune Année Lions enregistrée : créez-la d’abord dans <a href="{% url 'governance:years' %}">Années Lions</a>.</p>{% endif %}
+</section>
+
+{% if year %}
+<section class="workspace-panel">
+  <h2>Mandats {{ year.label }}{% if active_year and year.pk == active_year.pk %} <span class="badge badge--paye">Année active</span>{% endif %}</h2>
+  <div class="tableau-cadre"><table class="tableau mandats-tableau">
+    <caption class="visually-hidden">Mandats de l’Année Lions {{ year.label }}, dans l’ordre du bureau</caption>
+    <colgroup><col class="mandats-tableau__fonction"><col><col><col><col>{% if can_manage %}<col class="mandats-tableau__actions">{% endif %}</colgroup><thead><tr><th scope="col">Fonction</th><th scope="col">Membre</th><th scope="col">Période</th><th scope="col">État</th><th scope="col">Site public</th>{% if can_manage %}<th scope="col"><span class="visually-hidden">Actions</span></th>{% endif %}</tr></thead>
+    <tbody>
+    {% for row in rows %}
+      <tr>
+        <td data-libelle="Fonction"><strong>{{ row.function }}</strong>{% if not row.recognised %}<br><span class="meta-ligne">Hors bureau : affichée après les sept fonctions</span>{% endif %}</td>
+        <td data-libelle="Membre"><a href="{% url 'governance:member' row.member_id %}">{{ row.member }}</a></td>
+        <td data-libelle="Période">{{ row.starts_on|date:'d/m/Y' }} — {{ row.last_day|date:'d/m/Y' }}</td>
+        <td data-libelle="État"><div class="mandat-actions">{% if row.period == 'ENDED' %}<span class="badge badge--clos">Terminé</span>{% elif row.period == 'UPCOMING' %}<span class="badge badge--excuse">À venir</span>{% else %}<span class="badge badge--paye">En cours</span>{% endif %} {% if row.validated %}<span class="badge badge--paye">Validé</span>{% else %}<span class="badge badge--en-cours">Non validé</span>{% endif %}</div></td>
+        <td data-libelle="Site public">{% if row.validated and row.public_authorized %}Autorisé{% elif row.public_authorized %}Autorisé, en attente de validation{% else %}Non affiché{% endif %}</td>
+        {% if can_manage %}<td data-libelle="Actions"><div class="mandat-actions"><a class="btn btn--outline btn--sm" href="{% url 'governance:mandate_edit' row.id %}">Modifier<span class="visually-hidden"> le mandat {{ row.function }} de {{ row.member }}</span></a>{% if row.can_end %}<form method="post" action="{% url 'governance:mandate_end' row.id %}">{% csrf_token %}<button class="btn btn--ghost btn--sm" type="submit">Terminer<span class="visually-hidden"> le mandat {{ row.function }} de {{ row.member }}</span></button></form>{% endif %}<a class="btn btn--ghost btn--sm" href="{% url 'governance:mandate_delete' row.id %}">Supprimer<span class="visually-hidden"> le mandat {{ row.function }} de {{ row.member }}</span></a></div></td>{% endif %}
+      </tr>
+    {% empty %}
+      <tr><td colspan="{% if can_manage %}6{% else %}5{% endif %}">Aucun mandat enregistré pour {{ year.label }}.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</section>
+
+{% if public %}
+<section class="workspace-panel lot2-reading">
+  <h2>Aperçu de « Notre bureau »</h2>
+  <p class="app-note">Exactement ce qu’affiche la page publique pour l’année active : mandats validés, autorisés, non terminés, dans l’ordre Past President, Président, 1er et 2e Vice-Président, Secrétaire, Trésorier, Protocole, puis les autres fonctions.</p>
+  {% if public.members %}
+  <ol class="lot2-timeline">{% for person in public.members %}<li><strong>{{ person.function }}</strong> — {{ person.name }}{% if person.note %} <span class="meta-ligne">(déduit : {{ person.note }})</span>{% endif %}{% if not person.photo_url %} <span class="meta-ligne">· sans photo publique</span>{% endif %}</li>{% endfor %}</ol>
+  {% else %}<p>La section « Notre bureau » est masquée sur le site tant qu’aucun mandat de l’année active n’est validé et autorisé.</p>{% endif %}
+  <p><a class="link-arrow" href="{% url 'editorial:club' %}#bureau" target="_blank" rel="noopener">Voir la page publique<span class="visually-hidden"> (nouvel onglet)</span></a></p>
+  <p class="app-note">Past President : un mandat « Past President » de l’année active est utilisé en priorité ; sinon, le président de l’Année Lions précédente est repris, seulement si son mandat est validé, autorisé et sans ambiguïté.</p>
+</section>
+{% endif %}
+{% endif %}
+{% endblock %}

@@ -347,6 +347,7 @@
 .cal-view-btn.is-active { background: var(--surface); color: var(--bleu); box-shadow: var(--ombre); }
 .cal-icon-btn { display: inline-flex; align-items: center; gap: var(--e2); padding: 6px var(--e3); border: 1px solid var(--bord); border-radius: var(--r-pilule); color: var(--encre); font-size: .8125rem; font-weight: 600; transition: background 150ms, border-color 150ms; }
 .cal-icon-btn:hover { background: var(--fond); border-color: var(--gris-clair); }
+@media (pointer: coarse), (max-width: 760px) { .cal-icon-btn { min-height: 44px; } }
 
 .cal-layout { display: grid; grid-template-columns: minmax(0,1fr) 280px; gap: var(--e5); align-items: start; }
 .cal-main { min-width: 0; }
@@ -450,8 +451,7 @@
 .cal-dialog__rsvp { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); padding-top: var(--e3); border-top: 1px solid var(--bord); }
 .cal-dialog__rsvp p { margin: 0; width: 100%; font-size: .8125rem; }
 .cal-dialog__manage { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); margin-top: var(--e3); padding-top: var(--e3); border-top: 1px solid var(--bord); }
-.btn--danger { border: 1px solid var(--danger-plein); background: var(--danger-plein); color: #FFFFFF; }
-.btn--danger:hover { background: var(--danger-survol); border-color: var(--danger-survol); color: #FFFFFF; }
+/* .btn--danger : mutualisé dans lions.css (§06 · Boutons). */
 .cal-add-form__row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--e3); }
 .cal-dialog__actions { display: flex; justify-content: flex-end; gap: var(--e2); margin-top: var(--e2); }
 .cal-sync-actions { display: flex; flex-wrap: wrap; gap: var(--e2); margin-bottom: var(--e3); }
@@ -907,3 +907,16 @@ a.pagination__arrow:hover, a.pagination__page:hover { border-color: var(--bleu);
   .dues-history__tranches { grid-template-columns: minmax(0,1fr); }
   .dues-tranche { flex-wrap: wrap; }
 }
+
+/* Bureau et mandats : actions de ligne compactes, sur une ou deux lignes au plus. */
+.mandats-tableau__fonction { width: 18%; }
+.mandats-tableau__actions { width: 22%; }
+.mandats-tableau .badge { white-space: nowrap; }
+.mandat-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2); }
+.mandat-actions form { margin: 0; }
+@media (max-width: 760px) { .mandats-tableau__fonction, .mandats-tableau__actions { width: auto; } }
+
+/* Vote nominatif : l'électeur est prévenu avant de choisir, sans confusion avec une erreur. */
+.notice-box--nominatif { margin-bottom: var(--e4); border-color: var(--alerte-bord); background: var(--alerte-fond); color: var(--encre); }
+.notice-box--nominatif svg { color: var(--alerte-texte); }
+.notice-box--nominatif p { margin: 0; }

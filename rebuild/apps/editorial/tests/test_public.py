@@ -137,8 +137,9 @@ class PublicationTests(TestCase):
                 ('contact', {Role.PRESIDENT, Role.SECRETAIRE}),
             ]:
                 request_access = role in allowed_roles
-                self.assertEqual(self.client.get(reverse('communications:inbox',kwargs={'kind':kind})).status_code,200 if request_access else 403)
-                self.assertEqual(can(user,kind+'.view'), request_access)
+                read_access = request_access or role == Role.SUPER_ADMIN  # consultation seule
+                self.assertEqual(self.client.get(reverse('communications:inbox',kwargs={'kind':kind})).status_code,200 if read_access else 403)
+                self.assertEqual(can(user,kind+'.view'), read_access)
                 self.assertEqual(can(user,kind+'.manage'), request_access)
         self.client.logout()
         self.assertEqual(self.client.get('/espace/contenu/').status_code,302)
@@ -277,7 +278,7 @@ class SubmissionTests(TestCase):
         allowed_roles={Role.PRESIDENT,Role.GMT}
         for role in Role.values:
             actor=account(role+'@example.invalid',role=role)
-            self.assertEqual(can(actor,'application.view'),role in allowed_roles)
+            self.assertEqual(can(actor,'application.view'),role in allowed_roles or role==Role.SUPER_ADMIN)
             self.assertEqual(can(actor,'application.manage'),role in allowed_roles)
             audits_before=AuditEvent.objects.filter(action='application.state_changed').count()
             state_before=obj.state
@@ -299,8 +300,9 @@ class SubmissionTests(TestCase):
         for role in Role.values:
             actor=account('http-'+role+'@example.invalid',role=role)
             self.client.force_login(actor)
-            expected=200 if role in allowed_roles else 403
+            expected=200 if role in allowed_roles or role==Role.SUPER_ADMIN else 403
             self.assertEqual(self.client.get(url).status_code,expected)
+            if role==Role.SUPER_ADMIN:self.assertNotContains(self.client.get(url),'name="state"')  # lecture seule
             audits_before=AuditEvent.objects.filter(action='application.state_changed').count()
             state_before=obj.state
             response=self.client.post(url,{'state':'FOLLOW_UP'})

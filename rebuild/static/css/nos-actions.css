@@ -79,3 +79,47 @@
   .action-viewer__tile:hover, .action-viewer__tile:focus-visible { transform: none; }
   .action-viewer__tile:hover img, .action-viewer__tile:focus-visible img { transform: none; }
 }
+
+/* ─── Refonte sept. 2026 ─────────────────────────────────────────────────── */
+/* Récit : besoin → action → impact. Trois temps numérotés, pas trois cartes. */
+.actions-recit__grille { display: grid; gap: var(--e5); }
+@media (min-width: 1081px) { .actions-recit__grille { grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr); column-gap: var(--e8); align-items: start; } }
+.actions-recit__etapes { display: grid; gap: var(--e5); counter-reset: etape; }
+@media (min-width: 761px) { .actions-recit__etapes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.actions-recit__etapes li { counter-increment: etape; padding-top: var(--e4); border-top: 1px solid var(--bord-fort); }
+.actions-recit__etapes li:last-child { border-top: 2px solid var(--or); }
+.actions-recit__etapes li::before { content: counter(etape, decimal-leading-zero); display: block; margin-bottom: var(--e3); font-family: var(--police-titre); font-size: 1.75rem; line-height: 1; color: var(--bleu); font-variant-numeric: tabular-nums; }
+.actions-recit__etapes h3 { font-size: 1.0625rem; }
+.actions-recit__etapes p { margin: var(--e2) 0 0; font-size: .9375rem; color: var(--gris); }
+
+/* Liste : titre + filtres par axe (liens explorables, état courant souligné d'or). */
+.actions-liste__entete { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--e4) var(--e6); margin-bottom: var(--e5); }
+.actions-liste__entete h2 { max-width: none; }
+.public-dense main .actions-liste__entete h2 { font-size: clamp(1.5rem, 2.4vw, 2rem); }
+.filtres__liste { display: flex; flex-wrap: wrap; gap: var(--e2); }
+.filtres__lien { display: inline-flex; align-items: center; min-height: 44px; padding: var(--e2) var(--e4); border: 1px solid var(--bord-fort); border-radius: var(--r-pilule); background: var(--surface); font-size: var(--t-meta); font-weight: 600; color: var(--encre); transition: border-color var(--duree) var(--courbe), color var(--duree) var(--courbe), background-color var(--duree) var(--courbe); }
+.filtres__lien:hover { border-color: var(--primaire); color: var(--bleu); }
+.filtres__lien[aria-current="page"] { background: var(--primaire); border-color: var(--primaire); color: var(--sur-primaire); box-shadow: inset 0 -3px 0 var(--or); }
+
+.actions-grille { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--e5); }
+.actions-grille .action-carte--vedette { grid-column: 1 / -1; }
+@media (min-width: 761px) {
+  .actions-grille .action-carte--vedette { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+  .actions-grille .action-carte--vedette .action-carte__media { aspect-ratio: auto; min-height: 320px; height: 100%; }
+  .actions-grille .action-carte--vedette .action-carte__corps { padding: var(--e6); justify-content: center; }
+}
+@media (max-width: 1080px) { .actions-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .actions-grille { grid-template-columns: minmax(0, 1fr); } }
+
+/* Fiche action : repères factuels, récit, impact. */
+.action-fiche { display: flex; flex-wrap: wrap; gap: var(--e3) var(--e6); margin: 0 0 var(--e6); padding: var(--e4) 0; border-block: 1px solid var(--bord); }
+.action-fiche > div { display: grid; gap: var(--e1); }
+.action-fiche dt { font-size: var(--t-eyebrow); font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gris); }
+.action-fiche dd { margin: 0; font-weight: 600; color: var(--encre); }
+.action-fiche a { color: var(--bleu); text-decoration: underline; text-decoration-color: var(--or); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.action-detail__titre { max-width: none; margin-bottom: var(--e3); }
+.public-dense main .action-detail__titre, .public-dense main .action-detail__partners h2 { font-size: clamp(1.375rem, 2vw, 1.75rem); }
+.action-detail__impact h2.eyebrow { font-family: var(--police); font-size: var(--t-eyebrow); margin: 0; }
+.public-dense main .action-detail__impact h2.eyebrow { font-size: var(--t-eyebrow); }
+.action-detail__impact .btn { justify-self: start; }
+.link-arrow--retour { margin-top: var(--e7); }

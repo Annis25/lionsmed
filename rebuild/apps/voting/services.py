@@ -5,7 +5,7 @@ from django.utils import timezone
 from apps.core.permissions import can, effective_role, MEMBERS
 from apps.core.models import AuditEvent
 from apps.members.models import MemberProfile
-from .models import Vote, VoteOption, Elector, Participation, Ballot, BallotSelection
+from .models import Vote, VoteOption, Elector, Participation, Ballot, BallotSelection, NominativeChoice
 
 
 def require(actor, capability, obj=None):
@@ -85,7 +85,8 @@ def set_vote_manager(*, actor, profile, enabled):
 
 
 @transaction.atomic
-def create_and_open_vote(*, actor, title, description, mode, blank_allowed, option_labels, creation_key=None):
+def create_and_open_vote(*, actor, title, description, mode, blank_allowed, option_labels, creation_key=None,
+                         disclosure=Vote.Disclosure.SECRET):
     """Création en un seul geste (recette V1) : le scrutin est actif dès la création,
     partagé avec tous les électeurs, fermeture uniquement manuelle (`closes_at` vide).
     Choix unique par défaut (`min_choices`/`max_choices` = 1, non éditable ici)."""
@@ -102,7 +103,10 @@ def create_and_open_vote(*, actor, title, description, mode, blank_allowed, opti
     if len(labels) < 1:
         raise ValidationError("Au moins un choix est requis.")
     now = timezone.now()
+    # Le caractère secret ou nominatif est fixé ici, avant l'ouverture, et n'est modifiable par
+    # aucun autre chemin : les électeurs le lisent avant de voter.
     vote = Vote(title=title[:180], description=(description or "")[:5000], mode=mode, creation_key=creation_key,
+        disclosure=disclosure,
         opens_at=now, closes_at=None, min_choices=1, max_choices=1,
         blank_allowed=blank_allowed, responsible=actor)
     vote.full_clean()
@@ -171,6 +175,11 @@ def cast_vote(*, actor, vote, option_ids, is_blank=False):
     try:
         BallotSelection.objects.bulk_create([BallotSelection(ballot=ballot, option_id=option_id) for option_id in option_ids])
         Participation.objects.create(elector=elector)
+        # Scrutin nominatif annoncé : trace électeur → choix, dans la même transaction que le
+        # bulletin anonyme. Jamais créée pour un scrutin secret.
+        if vote.disclosure == Vote.Disclosure.NOMINATIVE:
+            record = NominativeChoice.objects.create(elector=elector, is_blank=is_blank)
+            record.options.set(option_ids)
     except IntegrityError:
         raise ValidationError("Votre bulletin a déjà été enregistré.")
     # Reçu sans choix, hors transaction email : intention seulement.

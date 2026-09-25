@@ -322,17 +322,43 @@ p:last-child { margin-bottom: 0; }
 .meta svg { flex: none; }
 
 /* ─── 06 · BOUTONS ET LIENS ──────────────────────────────────────────────── */
+/* Hiérarchie des actions — une intention, une variante (harmonisation sept. 2026).
+   La couleur dit l'intention avant le libellé ; « principal » ne veut pas dire « or ».
+
+     .btn--primary  OR     L'ENGAGEMENT. Ce qui fait passer le visiteur de
+                           spectateur à acteur (nous rejoindre, candidater) et,
+                           dans l'espace membre, ce qui attend une action du
+                           membre (carte « À faire » urgente : voter, répondre).
+                           Au plus une action or par bloc : si elle est partout,
+                           elle ne signale plus rien.
+     .btn--solid    BLEU   L'action principale courante : valider un formulaire,
+                           se connecter, enregistrer, créer, publier.
+     .btn--outline  CONTOUR Secondaire : consulter, télécharger, modifier,
+                           filtrer, une alternative à l'action principale.
+     .btn--ghost    TEXTE  Tertiaire : annuler, retour, retirer, marquer comme lu,
+                           se déconnecter.
+     .btn--danger   ROUGE  Destructif ou risqué : supprimer, annuler un événement,
+                           désactiver une protection. Jamais pour autre chose.
+     .btn--light    CONTOUR BLANC  Secondaire posé sur un champ navy ou une photo,
+                           où le bleu plein manquerait de contraste.
+     .link-arrow           Navigation dans le contenu (« Toutes nos actions ») :
+                           un lien, pas un bouton.
+
+   Les boutons-icônes restent des composants dédiés à leur contexte (bascule de
+   thème, burger, œil du mot de passe, visionneuse), tous à 44 × 44 px. */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--e3);
+  min-height: 44px;                 /* cible tactile, quel que soit le libellé */
   padding: var(--e3) var(--e5);
   border: 1px solid transparent;
   border-radius: var(--r-pilule);
   font-size: .9375rem;
   font-weight: 600;
   line-height: 1.2;
+  text-align: center;
   cursor: pointer;
   transition: background-color var(--duree) var(--courbe),
               border-color var(--duree) var(--courbe),
@@ -351,20 +377,32 @@ p:last-child { margin-bottom: 0; }
 .btn--solid   { background: var(--primaire); color: var(--sur-primaire); }
 .btn--solid:hover { background: var(--primaire-survol); color: var(--sur-primaire); box-shadow: var(--ombre); }
 
-.btn--outline { border-color: var(--bord); color: var(--bleu); background: transparent; }
+/* Le contour reprend le filet appuyé dans les deux thèmes : le filet pâle
+   (--bord) laissait le bouton secondaire se dissoudre dans la page. */
+.btn--outline { border-color: var(--bord-fort); color: var(--bleu); background: transparent; }
 .btn--outline:hover { border-color: var(--primaire); background: var(--primaire); color: var(--sur-primaire); }
 
 .btn--light   { border-color: rgba(255,255,255,.45); color: var(--blanc); background: transparent; }
 .btn--light:hover { background: var(--blanc); color: var(--navy); border-color: var(--blanc); }
 
 /* Tertiaire — action discrète (« Se déconnecter », « Annuler ») : texte bleu,
-   sans aplat, contour qui n'apparaît qu'au survol. Utilisée par les gabarits
-   depuis longtemps mais jamais définie : elle retombait sur un simple texte. */
+   sans aplat, contour qui n'apparaît qu'au survol. */
 .btn--ghost { background: transparent; color: var(--bleu); border-color: transparent; }
 .btn--ghost:hover { background: var(--fond-2); border-color: var(--bord); }
 .btn--ghost:hover svg { transform: none; }
 
-.btn--sm    { padding: var(--e2) var(--e4); font-size: var(--t-meta); }
+/* Destructif — mutualisé ici (il ne vivait que dans prive.css) pour que toute
+   la hiérarchie des actions tienne en un seul endroit. */
+.btn--danger { border-color: var(--danger-plein); background: var(--danger-plein); color: #FFFFFF; }
+.btn--danger:hover { background: var(--danger-survol); border-color: var(--danger-survol); color: #FFFFFF; }
+.btn--danger:hover svg { transform: none; }
+
+/* Compact pour les listes denses au pointeur fin ; au doigt, la cible repasse
+   à 44 px sans changer la taille du texte. */
+.btn--sm    { min-height: 36px; padding: var(--e2) var(--e4); font-size: var(--t-meta); }
+@media (pointer: coarse), (max-width: 760px) {
+  .btn--sm { min-height: 44px; }
+}
 .btn:disabled, .btn[aria-disabled="true"] { transform: none; box-shadow: none; }
 .btn:disabled:hover svg { transform: none; }
 .btn--block { width: 100%; }
@@ -770,7 +808,7 @@ html:not(.theme-js) .theme-toggle { display: none; }
   justify-content: center;
   border: 0;
   border-radius: 50%;
-  background: var(--bleu);
+  background: var(--primaire);   /* --bleu s'éclaircit en sombre : icône blanche illisible */
   color: var(--sur-primaire);
   cursor: pointer;
   opacity: 0;
@@ -2182,9 +2220,137 @@ html:not(.js) .nav-burger, html:not(.js) .app-bascule, html:not(.js) .champ__oei
 .lot3-management .app-titre h1 { font-family: var(--police); }
 
 /* ─── Ajustements du thème sombre ───────────────────────────────────────── */
-/* Le contour pâle du bouton secondaire disparaît sur surface sombre : il
-   reprend le filet appuyé. Le pied navy se détache du fond de page par un filet. */
-[data-theme="dark"] .btn--outline { border-color: var(--bord-fort); }
-[data-theme="dark"] .btn--outline:hover { border-color: var(--primaire); }
+/* Le pied navy se détache du fond de page par un filet. (Le contour appuyé du
+   bouton secondaire est désormais porté par .btn--outline dans les deux thèmes.) */
 [data-theme="dark"] .site-footer { border-top: 1px solid var(--bord); }
 [data-theme="dark"] .site-header { border-bottom-color: var(--bord); }
+
+/* ─── 18 · COMPOSANTS ÉDITORIAUX PUBLICS (refonte sept. 2026) ────────────── */
+/* Partagés par plusieurs pages publiques : jetons uniquement, clair et sombre
+   sans surcharge, animations limitées à transform/opacity (neutralisées par
+   prefers-reduced-motion, §17). */
+
+/* Actions du bandeau d'ouverture des pages intérieures (« Nous rejoindre »). */
+.page-hero__actions { display: flex; flex-wrap: wrap; gap: var(--e3); margin-top: var(--e5); }
+
+/* Lien fléché de retour : la flèche précède le libellé et glisse vers la gauche. */
+.link-arrow--retour:hover svg { transform: translateX(-4px); }
+
+/* Carte d'identité du club — bande basse, une ligne de faits, pas de cartes. */
+.bande-faits { background: var(--fond-2); border-bottom: 1px solid var(--bord); }
+.bande-faits__liste { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; }
+.bande-faits__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: var(--e3);
+  align-items: center;
+  padding: var(--e5) var(--e5) var(--e5) 0;
+}
+.bande-faits__item + .bande-faits__item { padding-left: var(--e5); border-left: 1px solid var(--bord-fort); }
+.bande-faits__item svg { grid-row: 1 / span 2; color: var(--bleu); }
+.bande-faits__item dt { font-size: var(--t-meta); color: var(--gris); line-height: 1.4; }
+.bande-faits__item dd { margin: 0; font-weight: 600; color: var(--encre); line-height: 1.4; overflow-wrap: anywhere; }
+@media (max-width: 1080px) {
+  .bande-faits__liste { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bande-faits__item { padding: var(--e4) var(--e3) var(--e4) 0; }
+  .bande-faits__item + .bande-faits__item { padding-left: 0; border-left: 0; }
+  .bande-faits__item:nth-child(even) { padding-left: var(--e4); border-left: 1px solid var(--bord-fort); }
+  .bande-faits__item:nth-child(n+3) { border-top: 1px solid var(--bord-fort); }
+}
+@media (max-width: 359px) {
+  .bande-faits__liste { grid-template-columns: minmax(0, 1fr); }
+  .bande-faits__item:nth-child(even) { padding-left: 0; border-left: 0; }
+  .bande-faits__item + .bande-faits__item { border-top: 1px solid var(--bord-fort); }
+}
+
+/* Carte d'action — un seul lien (le titre) étendu à toute la carte. */
+.action-carte {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--bord);
+  border-radius: var(--r-carte);
+  overflow: hidden;
+  transition: transform var(--duree) var(--courbe), box-shadow var(--duree) var(--courbe);
+}
+.action-carte:hover { transform: translateY(-4px); box-shadow: var(--ombre-survol); }
+.action-carte:focus-within { outline: 3px solid var(--focus); outline-offset: 3px; }
+.action-carte__lien { color: inherit; }
+.action-carte__lien:focus-visible { outline: none; }
+.action-carte__lien::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.action-carte__media { aspect-ratio: 16 / 10; border-radius: 0; }
+.action-carte__media img { transition: transform .5s var(--courbe); }
+.action-carte:hover .action-carte__media img { transform: scale(1.03); }
+.action-carte__media--sans-photo { display: grid; place-items: center; background: var(--navy); }
+.action-carte__media--sans-photo img { width: 64px; height: auto; opacity: .92; }
+.action-carte__corps { display: flex; flex-direction: column; flex: 1; gap: var(--e2); padding: var(--e5); }
+.action-carte__axe { margin: 0; font-size: var(--t-eyebrow); font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--bleu); }
+.action-carte__titre { margin: 0; max-width: none; font-family: var(--police-titre); font-size: 1.375rem; line-height: 1.25; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.action-carte__meta { margin: 0; font-size: var(--t-meta); color: var(--gris); }
+.action-carte__resume { margin: 0; font-size: .9375rem; line-height: 1.65; color: var(--gris); }
+.action-carte__impact { margin: auto 0 0; padding-top: var(--e3); border-top: 1px solid var(--bord); font-size: .9375rem; color: var(--gris); }
+.action-carte__impact strong { font-family: var(--police-titre); font-size: 1.5rem; font-weight: 600; color: var(--encre); font-variant-numeric: tabular-nums; }
+.action-carte--vedette .action-carte__titre { font-size: clamp(1.5rem, 2.2vw, 2rem); }
+.action-carte--compacte { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: stretch; }
+.action-carte--compacte .action-carte__media { aspect-ratio: auto; height: 100%; min-height: 112px; }
+.action-carte--compacte .action-carte__corps { padding: var(--e4); gap: var(--e1); justify-content: center; }
+.action-carte--compacte .action-carte__titre { font-size: 1.0625rem; }
+.action-carte--compacte .action-carte__media--sans-photo img { width: 40px; }
+
+/* Appel final des pages intérieures — navy compact, une action or. */
+.appel { padding-block: var(--e8); background: var(--navy); }
+.appel__grille { display: grid; grid-template-columns: minmax(0, 1.4fr) auto; align-items: center; gap: var(--e6) var(--e8); }
+.appel h2 { max-width: 22ch; font-size: clamp(1.625rem, 2.6vw, 2.25rem); }
+.appel__texte > p { margin: var(--e4) 0 0; color: var(--sur-sombre-doux); max-width: 56ch; }
+.appel__actions { display: flex; flex-wrap: wrap; gap: var(--e3); }
+@media (max-width: 1080px) { .appel__grille { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .appel__actions .btn { width: 100%; } }
+
+/* État vide — sobre, jamais une section décorative. */
+.etat-vide { padding: var(--e6); background: var(--surface); border: 1px dashed var(--bord-fort); border-radius: var(--r-carte); }
+.etat-vide__titre { font-weight: 600; color: var(--encre); }
+.etat-vide p:not(.etat-vide__titre) { color: var(--gris); }
+
+/* Formulaires publics (contact, candidature) : formulaire dominant, colonne d'appui. */
+.formulaire-page__grille { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--e6); }
+@media (min-width: 1081px) { .formulaire-page__grille { grid-template-columns: minmax(0, 1.75fr) minmax(280px, 1fr); gap: var(--e8); align-items: start; } }
+.formulaire-page__titre { max-width: none; font-size: clamp(1.625rem, 2.4vw, 2rem); }
+.public-dense main .formulaire-page__titre { font-size: clamp(1.625rem, 2.4vw, 2rem); }
+.formulaire-page__intro { margin: var(--e3) 0 var(--e5); color: var(--gris); }
+.formulaire-page__aside { display: grid; gap: var(--e4); }
+.formulaire-page__aside .encadre { margin: 0; }
+.formulaire-page__aside .encadre + .encadre { margin-top: 0; }
+.formulaire-page__aside .encadre p { font-size: .9375rem; color: var(--gris); }
+.formulaire-page__aside .liste-info a { color: var(--bleu); overflow-wrap: anywhere; }
+.formulaire-page .lot3-form { max-width: none; }
+/* L'aide du téléphone reste dans le flux : en position absolue, sur deux lignes, elle
+   recouvrait le libellé du champ suivant (« Votre message »). */
+.formulaire-page .lot3-form-grid { align-items: start; }
+@media (min-width: 761px) {
+  .formulaire-page .lot3-form-grid > div:has(input[name="phone"]) .champ__aide { position: static; }
+}
+@media (min-width: 1081px) { .formulaire-page__aside { position: sticky; top: calc(var(--hauteur-nav) + var(--e5)); } }
+
+/* Confirmation d'envoi. */
+.confirmation__carte { max-width: 720px; padding: clamp(24px, 4vw, 48px); background: var(--surface); border: 1px solid var(--bord); border-top: 3px solid var(--succes-plein); border-radius: var(--r-carte); box-shadow: var(--ombre-fine); }
+.confirmation__icone { display: grid; place-items: center; width: 56px; height: 56px; margin-bottom: var(--e4); border-radius: 50%; background: var(--succes-fond); color: var(--succes-texte); }
+.confirmation__carte h2 { max-width: none; font-size: clamp(1.625rem, 2.4vw, 2rem); }
+.public-dense main .confirmation__carte h2 { font-size: clamp(1.625rem, 2.4vw, 2rem); }
+.confirmation__carte > p { margin-top: var(--e4); color: var(--gris); }
+.confirmation__actions { display: flex; flex-wrap: wrap; gap: var(--e3); margin-top: var(--e5); }
+
+@media (prefers-reduced-motion: reduce) {
+  .action-carte:hover { transform: none; }
+  .action-carte:hover .action-carte__media img, .link-arrow--retour:hover svg { transform: none; }
+}
+
+/* Cibles tactiles des liens fléchés et des liens de pied de page sur toutes les
+   pages publiques (la règle ne vivait que dans accueil.css). */
+@media (max-width: 760px), (pointer: coarse) {
+  .brand, .link-arrow, .footer-list a, .footer-bottom a, .portrait__lien, .action-carte__lien { min-height: 44px; }
+  .link-arrow, .footer-bottom a { display: inline-flex; align-items: center; }
+  .portrait__lien, .action-carte__lien { display: inline-flex; align-items: center; }
+}

@@ -34,7 +34,8 @@
 <div class="notice-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8v.01"></path></svg><p>Les résultats affichés sont agrégés. Aucun vote individuel n’est visible.{% if results.expressed_count and vote.max_choices > 1 %} En choix multiple, la somme des pourcentages peut dépasser 100 %.{% endif %}</p></div>
 
 <div class="lot2-actions">
-{% if can_manage %}<a class="btn btn--outline" href="{% url 'voting:manage_list' %}">Retour à la gestion des votes</a>
-{% else %}<a class="btn btn--outline" href="{% url 'voting:member_list' %}">Retour aux votes</a>{% endif %}
+{% if can_view_nominative %}<a class="btn btn--outline" href="{% url 'voting:nominative' vote.pk %}">Voir les choix nominatifs</a>{% endif %}
+{% if can_manage %}<a class="btn btn--ghost" href="{% url 'voting:manage_list' %}">Retour à la gestion des votes</a>
+{% else %}<a class="btn btn--ghost" href="{% url 'voting:member_list' %}">Retour aux votes</a>{% endif %}
 </div>
 {% endblock %}

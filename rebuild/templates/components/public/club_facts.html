@@ -1,0 +1,25 @@
+{% comment %} Carte d'identité du club, en clair dans le HTML (moteurs, assistants, lecteurs d'écran).
+   Uniquement des faits institutionnels fournis par le club (apps/editorial/identity.py) :
+   aucun chiffre, aucune date inventée. {% endcomment %}
+<section class="bande-faits" aria-label="Le club en bref">
+  <div class="container">
+    <dl class="bande-faits__liste">
+      <div class="bande-faits__item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <dt>Notre ancrage</dt><dd>{{ institution.city }}, {{ institution.country }}</dd>
+      </div>
+      <div class="bande-faits__item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4Z"></path><path d="M3 12l9 4 9-4"></path><path d="M3 17l9 4 9-4"></path></svg>
+        <dt>Notre district</dt><dd>{{ institution.district }}</dd>
+      </div>
+      <div class="bande-faits__item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18Z"></path></svg>
+        <dt>Notre mouvement</dt><dd>{{ institution.affiliation }}</dd>
+      </div>
+      <div class="bande-faits__item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 8.6a5.5 5.5 0 0 0-9.8-3.6 5.5 5.5 0 0 0-9.8 3.6c0 5.5 9.8 11 9.8 11s9.8-5.5 9.8-11Z"></path></svg>
+        <dt>Notre devise</dt><dd>{{ institution.motto|cut:"." }} <span lang="en">· We Serve</span></dd>
+      </div>
+    </dl>
+  </div>
+</section>

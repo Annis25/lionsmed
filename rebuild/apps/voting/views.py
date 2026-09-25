@@ -7,7 +7,7 @@ from django.views.decorators.http import require_http_methods, require_safe
 from apps.core.permissions import capability_required, can
 from apps.members.selectors import directory_page, member_profile
 from .models import Vote, VoteOption
-from .selectors import votes_for_member, vote_for_member, own_participation, votes_for_manager, vote_for_manager, tracking_rows, vote_results, can_view_results, require
+from .selectors import votes_for_member, vote_for_member, own_participation, votes_for_manager, vote_for_manager, tracking_rows, vote_results, can_view_results, require, nominative_rows
 from .services import (add_option, remove_option, open_vote, close_vote, cast_vote,
     create_and_open_vote, set_vote_manager, validate_vote_selection)
 from .forms import VoteForm, VoteOptionForm
@@ -113,7 +113,15 @@ def results(request, vote_id):
     return render(request, "espace/vote_resultats.html", {
         "vote": vote, "results": results_data, "leading_votes": leading_votes, "leading_option": leading_option,
         "can_manage": can(request.user, "vote.manage"),
+        "can_view_nominative": vote.disclosure == Vote.Disclosure.NOMINATIVE and can(request.user, "vote.view_nominative"),
     })
+
+
+@capability_required("vote.view_nominative")
+@require_safe
+def nominative(request, vote_id):
+    vote = get_object_or_404(Vote, pk=vote_id)
+    return render(request, "espace/vote_nominatif.html", {"vote": vote, "rows": nominative_rows(request.user, vote)})
 
 
 @capability_required("vote.manage")
@@ -192,7 +200,8 @@ def manage_open(request, vote_id):
 @require_safe
 def manage_track(request, vote_id):
     vote = vote_for_manager(request.user, vote_id)
-    return render(request, "espace/vote_suivi.html", {"vote": vote, "rows": tracking_rows(request.user, vote)})
+    return render(request, "espace/vote_suivi.html", {"vote": vote, "rows": tracking_rows(request.user, vote),
+        "can_view_nominative": vote.disclosure == Vote.Disclosure.NOMINATIVE and can(request.user, "vote.view_nominative")})
 
 
 @capability_required("management.access")

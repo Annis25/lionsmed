@@ -1,1 +1,49 @@
-{% extends 'public/base.html' %}{% block content %}{% include 'components/public/page_hero.html' %}<section class="section"><div class="container lot3-reading">{% if kind == 'contact' %}{% if institution.email or institution.phone or institution.address %}<aside aria-label="Coordonnées du club">{% if institution.email %}<p><a href="mailto:{{ institution.email }}">{{ institution.email }}</a></p>{% endif %}{% if institution.phone %}<p>{{ institution.phone }}</p>{% endif %}{% if institution.address %}<p>{{ institution.address }}</p>{% endif %}</aside>{% endif %}{% endif %}{% if limited %}<p role="alert">Trop de demandes rapprochées. Veuillez réessayer dans quinze minutes.</p>{% else %}<form method="post" class="formulaire lot3-form" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}{{ form.submission_token }}{{ form.submission_token.errors }}<div class="lot3-form-grid">{% for field in form.visible_fields %}<div class="{% if field.name == 'website' %}lot3-honeypot{% endif %}{% if field.name == 'message' or field.name == 'motivation' or field.name == 'consent' %} lot3-wide{% endif %}">{% include 'components/forms/field.html' %}</div>{% endfor %}</div><p class="champ__aide">Ces informations sont utilisées pour traiter votre demande et vous répondre. <a href="{% url 'editorial:privacy' %}">Notre politique de confidentialité</a>.</p><button class="btn btn--solid" type="submit">{% if kind == 'application' %}Envoyer ma candidature{% else %}Envoyer le message{% endif %}</button></form>{% endif %}</div></section>{% endblock %}
+{% extends 'public/base.html' %}
+{% block content %}
+{% include 'components/public/page_hero.html' %}
+<section class="section formulaire-page" aria-labelledby="titre-formulaire">
+  <div class="container formulaire-page__grille">
+    <div class="formulaire-page__principal">
+      <h2 class="formulaire-page__titre" id="titre-formulaire">{% if kind == 'application' %}Votre candidature{% else %}Écrivez-nous{% endif %}</h2>
+      <p class="formulaire-page__intro">{% if kind == 'application' %}Quelques informations suffisent pour un premier échange. Les champs marqués « obligatoire » sont nécessaires pour vous répondre.{% else %}Une question, une proposition de partenariat, une demande de la presse ou l’envie de nous rencontrer : votre message est transmis aux responsables du club.{% endif %}</p>
+      {% if limited %}
+      <div class="alerte alerte--info" role="alert"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg><p>Trop de demandes rapprochées. Veuillez réessayer dans quinze minutes.</p></div>
+      {% else %}
+      <form method="post" class="formulaire lot3-form" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}{{ form.submission_token }}{{ form.submission_token.errors }}<div class="lot3-form-grid">{% for field in form.visible_fields %}<div class="{% if field.name == 'website' %}lot3-honeypot{% endif %}{% if field.name == 'message' or field.name == 'motivation' or field.name == 'consent' %} lot3-wide{% endif %}">{% include 'components/forms/field.html' %}</div>{% endfor %}</div><p class="champ__aide">Ces informations sont utilisées pour traiter votre demande et vous répondre. <a href="{% url 'editorial:privacy' %}">Notre politique de confidentialité</a>.</p><div class="formulaire__actions">{% if kind == 'application' %}<button class="btn btn--primary" type="submit">Envoyer ma candidature</button>{% else %}<button class="btn btn--solid" type="submit">Envoyer le message</button>{% endif %}</div></form>
+      {% endif %}
+    </div>
+    <aside class="formulaire-page__aside" aria-label="{% if kind == 'application' %}Après votre candidature{% else %}Autres informations utiles{% endif %}">
+      {% if kind == 'application' %}
+      <div class="encadre">
+        <h3 class="encadre__titre">Après votre envoi</h3>
+        <ol class="liste-info liste-info--etapes" role="list">
+          <li>Vous recevez un accusé de réception par e-mail.</li>
+          <li>Les responsables du club prennent connaissance de votre candidature.</li>
+          <li>Nous revenons vers vous pour faire connaissance.</li>
+        </ol>
+      </div>
+      <div class="encadre">
+        <h3 class="encadre__titre">Une question avant de candidater&nbsp;?</h3>
+        <p>Vous pouvez aussi simplement nous écrire.</p>
+        <a class="link-arrow" href="{% url 'communications:contact' %}">Nous contacter<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+      </div>
+      {% else %}
+      <div class="encadre">
+        <h3 class="encadre__titre">Le club</h3>
+        <ul class="liste-info" role="list">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg><span>{% if institution.address %}{{ institution.address }}{% else %}{{ institution.city }}, {{ institution.country }}{% endif %}</span></li>
+          {% if institution.email %}<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m4 7 8 6 8-6"></path></svg><a href="mailto:{{ institution.email }}">{{ institution.email }}</a></li>{% endif %}
+          {% if institution.phone %}<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"></path></svg><a href="tel:{{ institution.phone|cut:' ' }}">{{ institution.phone }}</a></li>{% endif %}
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18Z"></path></svg><span>{{ institution.district }} · {{ institution.affiliation }}</span></li>
+        </ul>
+      </div>
+      <div class="encadre">
+        <h3 class="encadre__titre">Vous souhaitez devenir membre&nbsp;?</h3>
+        <p>Découvrez ce que signifie servir avec nous et comment se déroule la candidature.</p>
+        <a class="link-arrow" href="{% url 'editorial:join' %}">Nous rejoindre<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+      </div>
+      {% endif %}
+    </aside>
+  </div>
+</section>
+{% endblock %}

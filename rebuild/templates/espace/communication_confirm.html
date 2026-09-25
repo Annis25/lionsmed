@@ -17,7 +17,7 @@
 <form method="post" action="{% url 'communications:broadcast' %}">
 {% csrf_token %}{% for field in form %}{{ field.as_hidden }}{% endfor %}<input type="hidden" name="confirmed" value="yes">
 <div class="lot2-actions">
-<button class="btn btn--outline" type="submit" name="action" value="back">Retour</button>
+<button class="btn btn--ghost" type="submit" name="action" value="back">Retour</button>
 <button class="btn btn--solid" type="submit" name="action" value="send" data-confirm-send>Confirmer l’envoi</button>
 </div>
 </form>

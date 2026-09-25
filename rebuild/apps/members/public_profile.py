@@ -31,7 +31,10 @@ class MemberProfileSitemap(Sitemap):
     """Seuls les profils publics activés apparaissent, jamais un profil désactivé."""
     def items(self):
         if not settings.PUBLIC_INDEXING_ENABLED: return []
-        return MemberProfile.objects.filter(public_profile_enabled=True, public_slug__isnull=False, user__is_active=True).order_by("public_slug")
+        from apps.core.permissions import effective_role
+        from apps.governance.models import Role
+        profiles = MemberProfile.objects.filter(public_profile_enabled=True, public_slug__isnull=False, user__is_active=True).select_related("user").order_by("public_slug")
+        return [p for p in profiles if effective_role(p.user) != Role.SUPER_ADMIN]  # compte technique jamais exposé
 
     def location(self, profile):
         return f"/membres/{profile.public_slug}/"

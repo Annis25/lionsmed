@@ -11,12 +11,28 @@
     </section>
     {% endif %}
     <div class="action-detail__layout">
-      <div class="action-detail__reading"><p class="meta-ligne">{{ item.get_axis_display }} · {{ item.performed_on|date:'j F Y' }} · {{ item.location }}</p><div class="lot3-prose">{{ item.body|linebreaks }}</div>{% if item.partners %}<section class="action-detail__partners"><h2>Partenaires</h2><p>{{ item.partners|linebreaksbr }}</p></section>{% endif %}</div>
-      {% if item.beneficiaries is not None or item.hours_worked is not None %}<aside class="action-detail__impact" aria-label="Impact de l’action"><p class="eyebrow">Impact</p>{% if item.beneficiaries is not None %}<p><strong>{{ item.beneficiaries }}</strong><span>personnes accompagnées</span></p>{% endif %}{% if item.hours_worked is not None %}<p><strong>{{ item.hours_worked }}</strong><span>heures de travail</span></p>{% endif %}</aside>{% endif %}
+      <div class="action-detail__reading">
+        <dl class="action-fiche">
+          <div><dt>Axe</dt><dd>{% if item.axis == 'TOUT' %}Plusieurs axes{% else %}<a href="{{ list_url }}?axis={{ item.axis }}">{{ item.get_axis_display }}</a>{% endif %}</dd></div>
+          {% if item.performed_on %}<div><dt>Date</dt><dd><time datetime="{{ item.performed_on|date:'Y-m-d' }}">{{ item.performed_on|date:'j F Y' }}</time></dd></div>{% endif %}
+          {% if item.location or item.city %}<div><dt>Lieu</dt><dd>{{ item.location }}{% if item.city and item.city != item.location %}{% if item.location %}, {% endif %}{{ item.city }}{% endif %}{% if item.country %}, {{ item.country }}{% endif %}</dd></div>{% endif %}
+        </dl>
+        {% if item.body %}<h2 class="action-detail__titre">Notre action</h2><div class="lot3-prose">{{ item.body|linebreaks }}</div>{% endif %}
+        {% if item.partners %}<section class="action-detail__partners" aria-labelledby="titre-partenaires"><h2 id="titre-partenaires">Avec nos partenaires</h2><p>{{ item.partners|linebreaksbr }}</p></section>{% endif %}
+      </div>
+      {% if item.beneficiaries is not None or item.hours_worked is not None or item.instagram_url %}
+      <aside class="action-detail__impact" aria-labelledby="titre-impact-action">
+        <h2 class="eyebrow" id="titre-impact-action">L’impact</h2>
+        {% if item.beneficiaries is not None %}<p><strong>{{ item.beneficiaries }}</strong><span>{% if item.beneficiaries == 1 %}personne accompagnée{% else %}personnes accompagnées{% endif %}</span></p>{% endif %}
+        {% if item.hours_worked is not None %}<p><strong>{{ item.hours_worked }}</strong><span>heures de travail</span></p>{% endif %}
+        {% if item.instagram_url %}<a class="btn btn--outline btn--sm" href="{{ item.instagram_url }}" rel="noopener noreferrer">Voir sur Instagram<span class="visually-hidden"> (site externe)</span></a>{% endif %}
+      </aside>
+      {% endif %}
     </div>
-    <a class="link-arrow" href="{{ list_url }}">Revenir à la liste</a>
+    <a class="link-arrow link-arrow--retour" href="{{ list_url }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg>Toutes nos actions</a>
   </article>
 </section>
+{% include 'components/public/appel.html' with appel_surtitre="Agir avec nous" appel_titre="Envie de prendre part à la prochaine action ?" appel_texte="Rejoignez nos membres, ou écrivez-nous pour proposer une collaboration." %}
 {% else %}
 <section class="section"><article class="container lot3-reading">{% if item.cover.approved_at %}<figure class="lot3-cover">{% include 'components/public/image.html' with image=item.cover priority=True %}</figure>{% endif %}<p class="meta-ligne">{{ item.starts_at|date:'j F Y à H:i' }} — {{ item.ends_at|date:'j F Y à H:i' }} · {{ item.location }}</p><div class="lot3-prose">{{ item.body|linebreaks }}</div><a class="link-arrow" href="{{ list_url }}">Revenir à la liste</a></article></section>
 {% endif %}

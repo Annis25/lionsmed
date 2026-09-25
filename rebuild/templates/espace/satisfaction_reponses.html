@@ -1,0 +1,26 @@
+{% extends 'base/private.html' %}
+{% block title %}Réponses par personne — Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Réponses par personne</h1><p class="app-titre__contexte">{{ period.title|default:'Consultation' }} · accès réservé au Super administrateur</p></div>
+<section class="workspace-panel">
+  <p class="app-note">Vue nominative : à ne pas diffuser. Les responsables du club ne voient que les résultats agrégés.</p>
+  <div class="tableau-cadre"><table class="tableau">
+    <caption class="visually-hidden">Réponses nominatives à la consultation {{ period.title }}</caption>
+    <thead><tr><th scope="col">Membre</th><th scope="col">Note globale</th><th scope="col">Notes par axe</th><th scope="col">Commentaire</th><th scope="col">Reçue le</th></tr></thead>
+    <tbody>
+    {% for row in rows %}
+      <tr>
+        <td data-libelle="Membre"><strong>{{ row.name }}</strong></td>
+        <td data-libelle="Note globale">{{ row.score }} / 5</td>
+        <td data-libelle="Notes par axe">{% for axis in row.axes %}{{ axis.label }} : {% if axis.score %}{{ axis.score }} / 5{% else %}—{% endif %}{% if not forloop.last %}<br>{% endif %}{% empty %}—{% endfor %}</td>
+        <td data-libelle="Commentaire">{{ row.comment|default:'—'|linebreaksbr }}</td>
+        <td data-libelle="Reçue le">{{ row.submitted_at|date:'d/m/Y H:i' }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5">Aucune réponse pour cette consultation.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</section>
+<div class="lot2-actions"><a class="btn btn--ghost" href="{% url 'satisfaction:results' period.pk %}">Retour aux résultats</a></div>
+{% endblock %}

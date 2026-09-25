@@ -152,3 +152,20 @@
 @media(max-width:899px) {
  .public-dense .attente + .attente { padding-top: var(--e5); }
 }
+
+/* ─── Refonte sept. 2026 ─────────────────────────────────────────────────── */
+/* Ce que signifie servir : texte à gauche, les quatre axes en vignettes. */
+.servir__grille { display: grid; gap: var(--e6); }
+@media (min-width: 1081px) { .servir__grille { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--e8); align-items: center; } }
+.servir__entete { margin-bottom: 0; }
+.servir__entete > p { margin-top: var(--e4); color: var(--gris); }
+.servir__entete .link-arrow { margin-top: var(--e2); }
+.servir__axes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e4); }
+.servir__axe { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: center; gap: var(--e4); padding: var(--e3); background: var(--surface); border: 1px solid var(--bord); border-radius: var(--r-carte); }
+.servir__vignette { aspect-ratio: 1 / 1; border-radius: 8px; }
+.servir__vignette img { object-position: 50% 100%; }  /* garde le pictogramme de la cause, en bas de l'image */
+.servir__axe h3 { margin: 0 0 var(--e1); font-family: var(--police-titre); font-size: 1.1875rem; }
+.servir__axe .link-arrow { font-size: var(--t-meta); }
+@media (max-width: 520px) { .servir__axes { grid-template-columns: minmax(0, 1fr); } }
+.raisons li:first-child { border-top: 1px solid var(--bord); }
+@media (max-width: 520px) { .conversion__actions .btn, .page-hero__actions .btn { width: 100%; } }

@@ -1,1 +1,57 @@
-{% extends 'public/base.html' %}{% block content %}{% include 'components/public/page_hero.html' %}<section class="section"><div class="container"><form method="get" class="lot3-filters" role="search">{% if kind == 'action' %}<div class="champ"><label for="axis">Filtrer par axe</label><select class="champ__input" id="axis" name="axis"><option value="">Toutes</option>{% for code,label in axes %}<option value="{{ code }}"{% if request.GET.axis == code %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>{% else %}<div class="champ"><label for="q">Rechercher</label><input class="champ__input" id="q" type="search" name="q" maxlength="100" value="{{ request.GET.q }}"></div>{% endif %}{% if kind == 'event' %}<div class="champ"><label for="archive">Période</label><select class="champ__input" name="archive" id="archive"><option value="">À venir</option><option value="1"{% if request.GET.archive == '1' %} selected{% endif %}>Archives</option></select></div>{% endif %}<button type="submit" class="btn btn--solid">Filtrer</button></form><div class="editorial-grid">{% for item in page_obj %}{% include 'components/public/card.html' %}{% empty %}<p>Aucun contenu publié ne correspond à ces critères.</p>{% endfor %}</div>{% include 'components/public/pagination.html' %}</div></section>{% endblock %}
+{% extends 'public/base.html' %}
+{% block content %}
+{% include 'components/public/page_hero.html' %}
+{% if kind == 'action' %}
+<section class="section actions-recit" aria-labelledby="titre-recit">
+  <div class="container actions-recit__grille">
+    <div class="section-head">
+      <span class="eyebrow">Notre façon de servir</span>
+      <h2 id="titre-recit">Un besoin, une action, un impact.</h2>
+    </div>
+    <ol class="actions-recit__etapes" role="list">
+      <li><h3>Le besoin</h3><p>Chaque action part d’une situation concrète : une campagne de dépistage à organiser, des familles à soutenir, un site à préserver, des jeunes à accompagner.</p></li>
+      <li><h3>Notre action</h3><p>Nos membres, nos bénévoles et nos partenaires se mobilisent pour y répondre, sur le terrain.</p></li>
+      <li><h3>L’impact</h3><p>Nous documentons ce qui a été fait : la date, le lieu et, lorsque nous pouvons les compter, les personnes accompagnées.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section section--fond actions-liste" aria-labelledby="titre-liste">
+  <div class="container">
+    <div class="actions-liste__entete">
+      <h2 id="titre-liste">{% if axis_current %}Nos actions : {{ axis_current_label }}{% else %}Toutes nos actions{% endif %}</h2>
+      <nav class="filtres" aria-label="Filtrer les actions par axe">
+        <ul class="filtres__liste" role="list">
+          <li><a class="filtres__lien" href="{% url 'actions:list' %}"{% if not axis_current %} aria-current="page"{% endif %}>Tous les axes</a></li>
+          {% for code,label in axes %}<li><a class="filtres__lien" href="{% url 'actions:list' %}?axis={{ code }}"{% if axis_current == code %} aria-current="page"{% endif %}>{{ label }}</a></li>{% endfor %}
+        </ul>
+      </nav>
+    </div>
+    {% if page_obj.object_list %}
+    <div class="actions-grille">
+      {% for item in page_obj %}
+        {% if forloop.first and page_obj.number == 1 %}{% include 'components/public/action_card.html' with featured=True heading='h3' %}{% else %}{% include 'components/public/action_card.html' with heading='h3' %}{% endif %}
+      {% endfor %}
+    </div>
+    {% include 'components/public/pagination.html' %}
+    {% else %}
+    <div class="etat-vide">
+      <p class="etat-vide__titre">{% if axis_current %}Aucune action publiée pour l’axe {{ axis_current_label|lower }} pour le moment.{% else %}Aucune action publiée pour le moment.{% endif %}</p>
+      <p>Nos réalisations sont ajoutées ici au fil de l’année, une fois documentées.</p>
+      {% if axis_current %}<a class="link-arrow" href="{% url 'actions:list' %}">Voir toutes nos actions<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% include 'components/public/appel.html' with appel_surtitre="Agir avec nous" appel_titre="Ces actions ont besoin de bras, d’idées et de cœur." appel_texte="Rejoignez nos membres sur le terrain, ou écrivez-nous pour proposer un partenariat ou une action." %}
+{% else %}
+<section class="section">
+  <div class="container">
+    <form method="get" class="lot3-filters" role="search"><div class="champ"><label for="q">Rechercher</label><input class="champ__input" id="q" type="search" name="q" maxlength="100" value="{{ request.GET.q }}"></div><div class="champ"><label for="archive">Période</label><select class="champ__input" name="archive" id="archive"><option value="">À venir</option><option value="1"{% if request.GET.archive == '1' %} selected{% endif %}>Archives</option></select></div><button type="submit" class="btn btn--outline">Filtrer</button></form>
+    <div class="editorial-grid">{% for item in page_obj %}{% include 'components/public/card.html' %}{% empty %}<p>Aucun événement publié ne correspond à ces critères.</p>{% endfor %}</div>
+    {% include 'components/public/pagination.html' %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

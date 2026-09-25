@@ -67,3 +67,19 @@ def period_results(actor, period):
     return {"axes": axes, "count": count, "hidden": False, "threshold": period.threshold, "average": round(average, 1) if average else None,
         "distribution": {score: distribution.get(score, 0) for score in range(1, 6)},
         "eligible_count": eligible, "participation_rate": round(100 * count / eligible, 1) if eligible else None}
+
+
+def individual_responses(actor, period):
+    """Réponses nominatives d'une consultation — Super administrateur uniquement
+    (satisfaction.view_individual). Aucun seuil : c'est précisément une vue par personne."""
+    require(actor, "satisfaction.view_individual")
+    axes = list(period.axes.all())
+    rows = []
+    for response in (SatisfactionResponse.objects.filter(period=period).select_related("profile__user")
+                     .prefetch_related("axis_scores").order_by("profile__user__last_name", "profile__user__first_name", "submitted_at")):
+        scores = {item.axis_id: item.score for item in response.axis_scores.all()}
+        user = response.profile.user
+        rows.append({"name": user.get_full_name().strip() or user.email, "score": response.score,
+            "axes": [{"label": axis.label, "score": scores.get(axis.pk)} for axis in axes],
+            "comment": response.comment, "submitted_at": response.submitted_at})
+    return rows

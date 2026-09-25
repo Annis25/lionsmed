@@ -12,7 +12,7 @@
 <div class="satisfaction-already"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg><div><strong>Merci, votre avis a déjà été enregistré{% if entry.period.title %} pour « {{ entry.period.title }} »{% endif %}.</strong><p class="app-note">Votre réponse pour cette consultation est prise en compte. Aucune nouvelle réponse n’est proposée pour cette période.</p></div></div>
 {% else %}
 <h2>Votre avis compte !</h2>
-<p class="satisfaction-intro">Aidez-nous à faire grandir notre club en partageant votre ressenti. Vos retours sont précieux pour améliorer nos actions, nos services et la vie de notre club.</p>
+<p class="satisfaction-intro">Aidez-nous à faire grandir notre club en partageant votre ressenti. Vos retours sont précieux pour améliorer nos actions, nos services et la vie de notre club.</p><p class="app-note">Confidentialité : les responsables du club ne consultent que des résultats d’ensemble, jamais votre réponse seule. L’administrateur technique du site peut, lui, voir les réponses de chaque personne.</p>
 <p class="satisfaction-period"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Période d’évaluation — du {{ entry.period.opens_at|date:"d/m/Y" }} au {{ entry.period.closes_at|date:"d/m/Y" }}</p>
 {% if entry.period.title %}<h3>{{ entry.period.title }}</h3>{% endif %}
 <form method="post" class="satisfaction-form" novalidate>

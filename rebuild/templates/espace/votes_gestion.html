@@ -19,7 +19,7 @@
 <div class="satisfaction-period-card">
 <div>
 <span class="satisfaction-period-card__title">{{ vote.title }}</span>
-<span class="badge {% if vote.status == 'OPEN' %}badge--present{% elif vote.status == 'CLOSED' %}badge--clos{% else %}badge--en-cours{% endif %}">{{ vote.get_status_display }}</span>
+<span class="badge {% if vote.status == 'OPEN' %}badge--present{% elif vote.status == 'CLOSED' %}badge--clos{% else %}badge--en-cours{% endif %}">{{ vote.get_status_display }}</span>{% if vote.disclosure == 'NOMINATIVE' %} <span class="badge badge--en-cours">Nominatif</span>{% endif %}
 <span class="satisfaction-period-card__meta">Ouverture : {{ vote.opens_at|date:"d/m/Y H:i" }}{% if vote.closes_at %} · Clôture : {{ vote.closes_at|date:"d/m/Y H:i" }}{% elif vote.status != 'DRAFT' %} · Clôture manuelle{% endif %}{% if vote.status != 'DRAFT' %} · {{ vote.ballot_count }} bulletin{{ vote.ballot_count|pluralize }}{% endif %}</span>
 </div>
 <div class="satisfaction-period-card__actions vote-manage-card__actions">

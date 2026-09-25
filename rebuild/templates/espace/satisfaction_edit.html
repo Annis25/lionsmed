@@ -10,7 +10,7 @@
 <form method="post" class="satisfaction-form" novalidate>
 {% csrf_token %}{% if form.non_field_errors %}<div class="form-errors form-errors--compact" role="alert">{{ form.non_field_errors }}</div>{% endif %}
 <div class="lot2-form-grid">{% for field in form %}<div>{% include 'components/forms/field.html' %}</div>{% endfor %}</div>
-<div class="lot2-actions"><button class="btn btn--solid" type="submit">Enregistrer</button><a class="btn btn--outline" href="{% url 'satisfaction:manage_list' %}">Retour à la liste</a></div>
+<div class="lot2-actions"><button class="btn btn--solid" type="submit">Enregistrer</button><a class="btn btn--ghost" href="{% url 'satisfaction:manage_list' %}">Retour à la liste</a></div>
 </form>
 </section>
 

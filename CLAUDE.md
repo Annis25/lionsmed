@@ -220,6 +220,14 @@ timestamp précis**). L'absence de lien applicatif Participation→Ballot est in
 oubli. Toute évolution de ce module doit préserver cette séparation ; ne jamais ajouter de FK ou de
 log reliant un bulletin à son auteur.
 
+**Seule exception, décidée par le propriétaire (sept. 2026) : le scrutin nominatif.** `Vote.disclosure`
+vaut `SECRET` (défaut, tous les scrutins antérieurs) ou `NOMINATIVE`, fixé à la création et annoncé
+aux électeurs avant le vote (carte, récapitulatif, notification, e-mail). Pour un scrutin nominatif
+uniquement, `cast_vote` enregistre en plus un `NominativeChoice` (électeur → options), sans aucun
+lien avec `Ballot`, qui reste anonyme et seule source du décompte. Consultation : capability
+`vote.view_nominative` (SUPER_ADMIN seul), après clôture. Un scrutin `SECRET` ne doit jamais
+produire de `NominativeChoice`.
+
 ### Tests
 
 - `TestCase`/`TransactionTestCase` standard Django. Helper commun :

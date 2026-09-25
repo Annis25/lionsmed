@@ -34,7 +34,7 @@
 <div class="satisfaction-period-card__actions">
 {% if document|is_previewable %}<a class="btn btn--outline btn--sm" href="{% url 'documents:preview' document.pk %}" target="_blank" rel="noopener">Visualiser</a>{% endif %}
 <a class="btn btn--outline btn--sm" href="{% url 'documents:download' document.pk %}">Télécharger</a>
-<a class="btn btn--solid btn--sm" href="{% url 'documents:manage_detail' document.pk %}">Gérer</a>
+<a class="btn btn--outline btn--sm" href="{% url 'documents:manage_detail' document.pk %}">Gérer</a>
 </div>
 </div>
 {% endfor %}

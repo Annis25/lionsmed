@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_safe
 from apps.service_actions.models import Action,Axis
 from apps.agenda.models import Event
-from apps.governance.models import Mandate
+from apps.governance.selectors import public_bureau
 from apps.core.models import PublicImage
 from .models import EditorialSection,ImpactMetric,Redirect
 from .selectors import public_qs,sections,institution,image_is_public
@@ -16,6 +16,10 @@ from .images import storage
 from . import identity
 
 PAGE_INFO={"club":("Notre Club","Ancrés à Sfax, unis par une même volonté : servir."),"join":("Nous rejoindre","Rejoindre notre club, c’est choisir de servir, d’agir et de grandir avec d’autres."),"legal":("Mentions légales","Informations institutionnelles et mentions de publication."),"privacy":("Confidentialité","Comment nous utilisons les informations que vous nous confiez."),"sitemap":("Plan du site","Les pages publiques du Lions Club Sfax-Méditerranée.")}
+
+# Visuel de chaque axe prioritaire : celui de la cause correspondante (une seule source,
+# identity.CAUSES_ENGAGEMENT), jamais une seconde liste d'images.
+AXIS_VISUALS={entry["axis"]:{"image":entry["image"],"alt":entry["alt"]} for entry in identity.CAUSES_ENGAGEMENT if entry["axis"]}
 
 def _causes_engagement(axis_content):
     """Fusionne les 4 axes prioritaires (avec substitution CMS existante via
@@ -40,7 +44,7 @@ def public_context(request,title,description,**kwargs):
     context={"institution":institution(),"page_title":title,"lede":description,"axes":public_axes,
         # "Notre Club" (components/public/priorities.html) — inchangé par cette refonte.
         "axis_sections":[{"value":value,"label":label,"section":axis_content.get("axis_"+value.lower()),
-            "default_body":identity.AXES_DEFAULT_BODY.get(value)} for value,label in public_axes],
+            "default_body":identity.AXES_DEFAULT_BODY.get(value),**AXIS_VISUALS.get(value,{})} for value,label in public_axes],
         "axes_intro":identity.AXES_INTRO,
         # Accueil (components/public/causes.html) — nouvelle grille unifiée des 8 causes.
         "causes_engagement":_causes_engagement(axis_content),
@@ -60,12 +64,19 @@ def home(request):
 @require_safe
 def page(request,page):
     title,description=PAGE_INFO[page];content=sections()
-    context=public_context(request,title,description,indexable=page not in {"legal","privacy"} or page in content)
+    schema=None
+    if page=="club":
+        # « Notre bureau » : projection publique des mandats (apps.governance.selectors),
+        # jamais une seconde liste saisie pour le site ni une lecture des rôles applicatifs.
+        bureau=public_bureau()
+        organisation={"@type":"NGO","@id":settings.SITE_ORIGIN+"/#organisation","name":identity.NAME,"url":settings.SITE_ORIGIN+"/"}
+        if bureau["members"]:
+            organisation["member"]=[{"@type":"OrganizationRole","roleName":person["function"],"member":{"@type":"Person","name":person["name"]}} for person in bureau["members"]]
+        schema=[{"@type":"AboutPage","url":settings.SITE_ORIGIN+request.path,"about":{"@id":organisation["@id"]}},organisation]
+    context=public_context(request,title,description,indexable=page not in {"legal","privacy"} or page in content,schema=schema)
     context.update(sections=content,page_kind=page,page_css={"club":"css/notre-club.css","join":"css/rejoindre.css"}.get(page))
     if page=="club":
-        context["valeurs"]=identity.VALEURS
-        today=timezone.localdate()
-        context["bureau"]=[{"name":m.profile.user.get_full_name(),"function":m.function,"year":m.lions_year.label} for m in Mandate.objects.filter(validated_at__isnull=False,public_authorized=True,starts_on__lte=today,ends_on__gt=today,profile__user__is_active=True).select_related("profile__user","lions_year") if m.profile.user.get_full_name()]
+        context.update(valeurs=identity.VALEURS,bureau=bureau["members"],bureau_year=bureau["year"])
     return render(request,"public/"+page+".html",context)
 
 @require_safe
@@ -83,6 +94,10 @@ def listing(request,kind):
     context=public_context(request,title,description)
     context["page_css"]="css/nos-actions.css" if kind=="action" else None
     context.update(page_obj=Paginator(qs,9).get_page(request.GET.get("page")),kind=kind)
+    if kind=="action":
+        axis=request.GET.get("axis")
+        labels=dict(context["axes"])
+        context.update(axis_current=axis if axis in labels else "",axis_current_label=labels.get(axis,""))
     return render(request,"public/list.html",context)
 
 @require_safe

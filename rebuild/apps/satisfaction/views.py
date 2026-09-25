@@ -2,8 +2,8 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods, require_safe
-from apps.core.permissions import capability_required
-from .selectors import open_periods, own_response, periods_for_manager, period_for_manager, period_results
+from apps.core.permissions import capability_required, can
+from .selectors import open_periods, own_response, periods_for_manager, period_for_manager, period_results, individual_responses
 from .services import submit_satisfaction, create_period, update_period, add_axis, update_axis, delete_axis, move_axis
 from .forms import SatisfactionForm, PeriodForm, AxisForm
 from .models import SatisfactionAxis, SatisfactionPeriod
@@ -144,4 +144,12 @@ def axis_move(request, period_id, axis_id):
 @require_safe
 def results(request, period_id):
     period = get_object_or_404(SatisfactionPeriod, pk=period_id)
-    return render(request, "espace/satisfaction_resultats.html", {"period": period, "results": period_results(request.user, period)})
+    return render(request, "espace/satisfaction_resultats.html", {"period": period, "results": period_results(request.user, period),
+        "can_view_individual": can(request.user, "satisfaction.view_individual")})
+
+
+@capability_required("satisfaction.view_individual")
+@require_safe
+def individual(request, period_id):
+    period = get_object_or_404(SatisfactionPeriod, pk=period_id)
+    return render(request, "espace/satisfaction_reponses.html", {"period": period, "rows": individual_responses(request.user, period)})

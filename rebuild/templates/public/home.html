@@ -1,1 +1,97 @@
-{% extends 'public/base.html' %}{% load static %}{% block content %}<section class="hero on-dark is-ready"><div class="hero__photo"><picture><source media="(max-width: 760px)" srcset="{% static 'images/hero-principal-640.webp' %}"><img src="{% static 'images/hero-principal-1600.webp' %}" srcset="{% static 'images/hero-principal-1100.webp' %} 1100w, {% static 'images/hero-principal-1600.webp' %} 1600w" sizes="100vw" width="1600" height="900" fetchpriority="high" decoding="async" alt="Groupe réuni en extérieur, en gilets jaunes, autour de la bannière du club."></picture></div><div class="hero__voile"></div>{% include 'components/public/hero_arcs.html' %}<div class="container hero__grille"><div><p class="eyebrow">{{ institution.name }}</p><h1 class="hero__titre">Depuis Sfax, nous servons.</h1><p class="hero__lede">Des femmes et des hommes engagés pour agir concrètement là où les besoins se font sentir.</p><div class="hero__actions"><a class="btn btn--primary" href="{% url 'editorial:club' %}">Découvrir notre club</a><a class="btn btn--light" href="{% url 'actions:list' %}">Nos actions</a></div></div></div><div class="hero__lieu"><div><strong>Sfax, Tunisie</strong><em>notre ancrage</em></div></div></section><section class="section intro"><div class="container"><div class="section-head"><span class="eyebrow">Qui sommes-nous</span><h2>Un club ancré à Sfax, engagé au-delà.</h2></div><p>Le {{ institution.name }} est un club Lions basé à Sfax, en Tunisie, rattaché au {{ institution.district }}. Ses quatre axes prioritaires sont le diabète, l’environnement, l’humanitaire et la jeunesse.</p>{% if sections.club_intro %}<p>{{ sections.club_intro.body|linebreaksbr }}</p>{% endif %}<a class="link-arrow" href="{% url 'editorial:club' %}">Découvrir notre club</a></div></section>{% include 'components/public/causes.html' %}{% if metrics %}<section class="section"><div class="container"><div class="section-head"><h2>Notre impact documenté</h2></div><div class="editorial-grid">{% for metric in metrics %}<article><h3>{{ metric.value }} {{ metric.label }}</h3><p>{{ metric.starts_on|date:'d/m/Y' }} — {{ metric.ends_on|date:'d/m/Y' }}</p></article>{% endfor %}</div></div></section>{% endif %}{% if actions %}<section class="section"><div class="container"><div class="section-head"><h2>Sur le terrain</h2></div><div class="editorial-grid">{% for item in actions %}{% include 'components/public/card.html' %}{% endfor %}</div><a class="link-arrow" href="{% url 'actions:list' %}">Toutes nos actions</a></div></section>{% endif %}{% if articles %}<section class="section section--fond"><div class="container"><div class="section-head"><h2>La vie du club</h2></div><div class="editorial-grid">{% for item in articles %}{% include 'components/public/card.html' %}{% endfor %}</div></div></section>{% endif %}{% if events %}<section class="section"><div class="container"><div class="section-head"><h2>Nos prochains rendez-vous</h2></div><div class="editorial-grid">{% for item in events %}{% include 'components/public/card.html' %}{% endfor %}</div></div></section>{% endif %}{% include 'components/public/home_join_cta.html' %}{% endblock %}
+{% extends 'public/base.html' %}{% load static %}
+{% block content %}
+{% comment %} Rythme — deux voisines ne partagent jamais fond ET structure :
+   hero navy photo · bande de faits (fond-2, ligne) · intro blanche deux colonnes ·
+   causes (fond clair, grille) · chiffres validés (navy, s'il en existe) ·
+   terrain (blanc, action dominante) · rendez-vous (fond-2, s'il en existe) · rejoindre (navy, arche). {% endcomment %}
+<section class="hero on-dark is-ready" aria-labelledby="titre-accueil">
+  <div class="hero__photo"><picture><source media="(max-width: 760px)" srcset="{% static 'images/hero-principal-640.webp' %}"><img src="{% static 'images/hero-principal-1600.webp' %}" srcset="{% static 'images/hero-principal-1100.webp' %} 1100w, {% static 'images/hero-principal-1600.webp' %} 1600w" sizes="100vw" width="1600" height="900" fetchpriority="high" decoding="async" alt="Groupe réuni en extérieur, en gilets jaunes, autour de la bannière du club."></picture></div>
+  <div class="hero__voile"></div>
+  {% include 'components/public/hero_arcs.html' %}
+  <div class="container hero__grille">
+    <div>
+      <p class="eyebrow">{{ institution.name }} · {{ institution.district }}</p>
+      <h1 class="hero__titre" id="titre-accueil">Depuis Sfax, nous servons.</h1>
+      <p class="hero__lede">Des femmes et des hommes engagés, membres du mouvement Lions, qui agissent concrètement là où les besoins se font sentir — à Sfax et au-delà.</p>
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="{% url 'editorial:join' %}">Nous rejoindre<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+        <a class="btn btn--light" href="{% url 'editorial:club' %}">Découvrir notre club</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero__lieu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg><div><strong>{{ institution.city }}, {{ institution.country }}</strong><em>notre ancrage</em></div></div>
+</section>
+
+{% include 'components/public/club_facts.html' %}
+
+<section class="section intro" aria-labelledby="titre-intro">
+  <div class="container intro__grille">
+    <div class="section-head intro__titre">
+      <span class="eyebrow">Qui sommes-nous</span>
+      <h2 id="titre-intro">Un club ancré à Sfax, engagé au-delà.</h2>
+    </div>
+    <div class="intro__texte">
+      <p class="intro__accroche">Le {{ institution.name }} est un club Lions basé à Sfax, en Tunisie, rattaché au {{ institution.district }}. Ses quatre axes prioritaires sont le diabète, l’environnement, l’humanitaire et la jeunesse.</p>
+      {% if sections.club_intro %}<p>{{ sections.club_intro.body|linebreaksbr }}</p>{% endif %}
+      <p>Membres de {{ institution.affiliation }}, nous partageons sa devise — « We Serve », nous servons — et la traduisons en actions concrètes : dépister, sensibiliser, soutenir, préserver, accompagner.</p>
+      <a class="link-arrow" href="{% url 'editorial:club' %}">Découvrir notre club<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+    </div>
+  </div>
+</section>
+
+{% include 'components/public/causes.html' %}
+
+{% if metrics %}
+<section class="section chiffres on-dark" aria-labelledby="titre-impact">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Notre impact</span>
+      <h2 id="titre-impact">Ce que nos actions ont permis.</h2>
+    </div>
+    <dl class="chiffres__grille chiffres__grille--libre">
+      {% for metric in metrics %}
+      <div class="stat">
+        <dt class="stat__label">{{ metric.label }}</dt>
+        <dd class="stat__valeur">{{ metric.value }}</dd>
+        <dd class="stat__periode">Du {{ metric.starts_on|date:'j F Y' }} au {{ metric.ends_on|date:'j F Y' }}</dd>
+      </div>
+      {% endfor %}
+    </dl>
+    <p class="chiffres__devise">WE SERVE<span>Chiffres validés par le club, période indiquée.</span></p>
+  </div>
+</section>
+{% endif %}
+
+{% if actions %}
+<section class="section terrain" aria-labelledby="titre-terrain">
+  <div class="container">
+    <div class="section-head section-head--split">
+      <div>
+        <span class="eyebrow">Sur le terrain</span>
+        <h2 id="titre-terrain">Nos dernières actions</h2>
+      </div>
+      <a class="link-arrow" href="{% url 'actions:list' %}">Toutes nos actions<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+    </div>
+    <div class="terrain__grille{% if actions|length == 1 %} terrain__grille--seule{% endif %}">
+      {% for item in actions %}
+        {% if forloop.first %}{% include 'components/public/action_card.html' with featured=True heading='h3' %}{% else %}{% include 'components/public/action_card.html' with compact=True heading='h3' %}{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if events %}
+<section class="section section--fond-2" aria-labelledby="titre-rendez-vous">
+  <div class="container">
+    <div class="section-head section-head--split">
+      <div><span class="eyebrow">Agenda</span><h2 id="titre-rendez-vous">Nos prochains rendez-vous</h2></div>
+      <a class="link-arrow" href="{% url 'agenda:list' %}">Tous les événements<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+    </div>
+    <div class="editorial-grid">{% for item in events %}{% include 'components/public/card.html' with heading='h3' %}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% include 'components/public/home_join_cta.html' %}
+{% endblock %}

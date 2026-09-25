@@ -1,0 +1,18 @@
+{% load static %}
+{% comment %} Carte d'action — un seul lien (le titre), étendu à toute la carte : une cible, un nom
+   accessible, pas de doublon image/titre/« Lire la suite ». Variantes : featured (action
+   dominante), compact (liste secondaire). heading : 'h2' (liste) ou 'h3' (sous un h2). {% endcomment %}
+<article class="action-carte{% if featured %} action-carte--vedette{% elif compact %} action-carte--compacte{% endif %}">
+  {% if item.cover.approved_at %}
+  <div class="action-carte__media media">{% include 'components/public/image.html' with image=item.cover %}</div>
+  {% else %}
+  <div class="action-carte__media action-carte__media--sans-photo" aria-hidden="true"><img src="{% static 'images/emblem-256.png' %}" width="256" height="243" alt="" loading="lazy" decoding="async"></div>
+  {% endif %}
+  <div class="action-carte__corps">
+    <p class="action-carte__axe">{% if item.axis == 'TOUT' %}Plusieurs axes{% else %}{{ item.get_axis_display }}{% endif %}</p>
+    {% if heading == 'h3' %}<h3 class="action-carte__titre">{% else %}<h2 class="action-carte__titre">{% endif %}<a class="action-carte__lien" href="{{ item.get_absolute_url }}">{{ item.title }}</a>{% if heading == 'h3' %}</h3>{% else %}</h2>{% endif %}
+    {% if item.performed_on or item.location %}<p class="action-carte__meta">{% if item.performed_on %}<time datetime="{{ item.performed_on|date:'Y-m-d' }}">{{ item.performed_on|date:'j F Y' }}</time>{% endif %}{% if item.performed_on and item.location %} · {% endif %}{% if item.location %}{{ item.location }}{% endif %}</p>{% endif %}
+    {% if not compact and item.summary %}<p class="action-carte__resume">{{ item.summary }}</p>{% endif %}
+    {% if not compact and item.beneficiaries %}<p class="action-carte__impact"><strong>{{ item.beneficiaries }}</strong> {% if item.beneficiaries == 1 %}personne accompagnée{% else %}personnes accompagnées{% endif %}</p>{% endif %}
+  </div>
+</article>

@@ -47,7 +47,8 @@ def profile_data(actor, profile, *, own=False, management=False):
     if visible:
         mandates = profile.mandates.select_related("lions_year")
         if not own and not management: mandates = mandates.filter(validated_at__isnull=False)
-        dto["mandates"] = [{"function":m.function,"year":m.lions_year.label,"starts_on":m.starts_on,"ends_on":m.ends_on,"validated":bool(m.validated_at)} for m in mandates]
+        dto["mandates"] = [{"function":m.function,"year":m.lions_year.label,"starts_on":m.starts_on,"ends_on":m.ends_on,"validated":bool(m.validated_at),
+            **({"id":m.pk,"public_authorized":m.public_authorized} if management else {})} for m in mandates]
     if own or management:
         dto.update(status=profile.get_status_display(), account_active=profile.user.is_active)
     if own: dto["directory_visible"] = profile.directory_visible

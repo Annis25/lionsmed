@@ -290,12 +290,15 @@ class GovernanceTests(TestCase):
         self.actor=account();self.year=LionsYear.objects.create(starts_on=date(2020,1,1),ends_on=date(2021,1,1))
         self.data={"profile":self.actor.member_profile,"function":"Président","lions_year":self.year,"starts_on":date(2020,2,1),"ends_on":date(2020,12,1)}
 
-    def test_all_roles_cannot_mutate_mandates_or_email(self):
+    def test_only_managers_mutate_mandates_and_nobody_changes_email(self):
+        # Mandats : délégués aux seuls responsables de « Membres et mandats » (MANAGERS).
         for role in Role.values:
             u=account(role.lower()+"@example.invalid",role=role)
-            with self.assertRaises(PermissionDenied):save_mandate(actor=u,data=self.data)
+            if role in MANAGERS:save_mandate(actor=u,data=self.data)
+            else:
+                with self.assertRaises(PermissionDenied):save_mandate(actor=u,data=self.data)
             with self.assertRaises(PermissionDenied):request_email_change(actor=u,user=u,new_email="new@example.invalid")
-        self.assertEqual(Mandate.objects.count(),0)
+        self.assertEqual(Mandate.objects.count(),len(MANAGERS))
 
     def test_mandate_has_no_permission_effect(self):
         mandate=Mandate.objects.create(**self.data)

@@ -13,6 +13,11 @@ def _public_profile_or_404(slug):
     profile = MemberProfile.objects.select_related("user").filter(public_slug=slug, public_profile_enabled=True).first()
     if not profile or not profile.user.is_active:
         raise Http404
+    # Le compte Super administrateur est technique : jamais exposé sur le site public.
+    from apps.core.permissions import effective_role
+    from apps.governance.models import Role
+    if effective_role(profile.user) == Role.SUPER_ADMIN:
+        raise Http404
     return profile
 
 
@@ -20,7 +25,7 @@ def _public_profile_or_404(slug):
 def detail(request, slug):
     profile = _public_profile_or_404(slug)
     name = profile.user.get_full_name() or "Membre"
-    title = f"{name} | {identity.NAME}"
+    title = name  # metadata() ajoute « — Lions Club Sfax-Méditerranée » ; le nom seul nourrit aussi le fil d’Ariane
     role_label = profile.public_title or "membre"
     description = (profile.bio or f"{name}, {role_label} du {identity.NAME}.")[:300]
     person = {"@type": "Person", "name": name, "memberOf": {"@type": "Organization", "name": identity.NAME}}

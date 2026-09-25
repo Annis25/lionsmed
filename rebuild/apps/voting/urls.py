@@ -10,6 +10,7 @@ urlpatterns = [
     path("votes/<uuid:vote_id>/", views.member_detail, name="member_detail"),
     path("votes/<uuid:vote_id>/envoyer/", views.member_confirm, name="member_confirm"),
     path("votes/<uuid:vote_id>/resultats/", views.results, name="results"),
+    path("votes/<uuid:vote_id>/nominatif/", views.nominative, name="nominative"),
     path("votes/<uuid:vote_id>/gestion/", views.manage_detail, name="manage_detail"),
     path("votes/<uuid:vote_id>/gestion/options/<uuid:option_id>/retirer/", views.manage_option_remove, name="manage_option_remove"),
     path("votes/<uuid:vote_id>/ouvrir/", views.manage_open, name="manage_open"),

@@ -13,7 +13,7 @@
 <p class="eyebrow">Votre choix</p>
 {% if is_blank %}<p class="vote-recap__value">Vote blanc</p>{% else %}<ul class="vote-recap__list">{% for option in options %}<li>{{ option.label }}</li>{% endfor %}</ul>{% endif %}
 </div>
-<div class="notice-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8v.01"></path></svg><p>Votre vote est anonyme et définitif. Après confirmation, il ne pourra plus être modifié.</p></div>
+<div class="notice-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8v.01"></path></svg><p>{% if vote.disclosure == "NOMINATIVE" %}<strong>Vote nominatif :</strong> votre choix sera visible par l’administrateur du site après la clôture. Il est définitif : après confirmation, il ne pourra plus être modifié.{% else %}Votre vote est anonyme et définitif. Après confirmation, il ne pourra plus être modifié.{% endif %}</p></div>
 <form method="post" action="{% url 'voting:member_confirm' vote.pk %}">
 {% csrf_token %}
 {% for option_id in option_ids %}<input type="hidden" name="options" value="{{ option_id }}">{% endfor %}

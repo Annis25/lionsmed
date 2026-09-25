@@ -35,8 +35,10 @@ CAPABILITIES = {
     "action.create": CONTENT_MANAGERS, "action.edit": CONTENT_MANAGERS, "action.publish": CONTENT_MANAGERS,
     "event.create": MANAGERS, "event.edit": MANAGERS, "event.publish": MANAGERS,
     "editorial.manage": CONTENT_MANAGERS, "image.manage": CONTENT_MANAGERS,
-    "application.view": APPLICATION_INBOX_ROLES, "application.manage": APPLICATION_INBOX_ROLES,
-    "contact.view": CONTACT_INBOX_ROLES, "contact.manage": CONTACT_INBOX_ROLES,
+    # Boîtes de traitement : le Super administrateur les consulte en lecture seule (décision du
+    # propriétaire, sept. 2026) ; changer l'état d'une demande reste réservé aux responsables.
+    "application.view": APPLICATION_INBOX_ROLES | {Role.SUPER_ADMIN}, "application.manage": APPLICATION_INBOX_ROLES,
+    "contact.view": CONTACT_INBOX_ROLES | {Role.SUPER_ADMIN}, "contact.manage": CONTACT_INBOX_ROLES,
     "profile.view_own": PERSONAL, "profile.edit_own": PERSONAL,
     "experience.manage_own": PERSONAL,
     "directory.view": MEMBERS, "member.view": MEMBERS,
@@ -52,11 +54,23 @@ CAPABILITIES = {
     "statistics.view": MANAGERS,
     # Votes et satisfaction (Phase B). INVITE jamais électeur ; DIRECTEUR/BUREAU sans gestion.
     "vote.manage": MANAGERS, "vote.cast": MEMBERS, "vote.view_results": MEMBERS,
+    # Choix de chaque électeur, pour les seuls scrutins annoncés « nominatifs » et après
+    # clôture : Super administrateur uniquement (décision du propriétaire, sept. 2026). Un
+    # scrutin secret ne produit aucune donnée nominative, même pour lui.
+    "vote.view_nominative": frozenset({Role.SUPER_ADMIN}),
     "satisfaction.respond": MEMBERS, "satisfaction.manage": MANAGERS, "satisfaction.view_results": MANAGERS,
+    # Réponses nominatives (nom, notes, commentaire) : Super administrateur uniquement, décision
+    # du propriétaire (sept. 2026). Les membres en sont avertis sur la page de réponse ; les
+    # responsables du club ne voient que les agrégats soumis au seuil de confidentialité.
+    "satisfaction.view_individual": frozenset({Role.SUPER_ADMIN}),
     # MFA (Phase C) : mêmes comptes que les capacités de gestion sensibles.
     "mfa.manage_own": MANAGERS,
-    # Services présents, mais aucune délégation de mutation validée.
-    "mandate.manage": frozenset(), "account.change_email": frozenset(),
+    # Mandats (« Notre bureau ») : mêmes responsables que « Membres et mandats » et les Années
+    # Lions (members.manage, year.manage) — la délégation différée au lot 2 avec statuts, rôles et
+    # années, tranchée pour eux au profit de MANAGERS. Un mandat n'accorde jamais de rôle.
+    "mandate.manage": MANAGERS,
+    # Service présent, mais aucune délégation de mutation validée.
+    "account.change_email": frozenset(),
 }
 
 

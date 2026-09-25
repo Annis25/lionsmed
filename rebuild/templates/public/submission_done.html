@@ -1,1 +1,21 @@
-{% extends 'public/base.html' %}{% block content %}{% include 'components/public/page_hero.html' %}<section class="section"><div class="container lot3-reading"><h2>Merci pour votre démarche</h2><p>{% if kind == 'application' %}Votre candidature a été reçue. Cet accusé ne vaut pas acceptation.{% else %}Votre message a été reçu et enregistré.{% endif %}</p><a href="{% url 'core:home' %}" class="btn btn--solid">Retour à l’accueil</a></div></section>{% endblock %}
+{% extends 'public/base.html' %}
+{% block content %}
+{% include 'components/public/page_hero.html' %}
+<section class="section confirmation" aria-labelledby="titre-confirmation">
+  <div class="container">
+    <div class="confirmation__carte" role="status">
+      <span class="confirmation__icone" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"></path></svg></span>
+      <h2 id="titre-confirmation">Merci pour votre démarche</h2>
+      {% if kind == 'application' %}
+      <p>Votre candidature a été reçue. Cet accusé ne vaut pas acceptation : les responsables du club en prennent connaissance et reviennent vers vous pour faire connaissance.</p>
+      {% else %}
+      <p>Votre message a été reçu et enregistré. Il est transmis aux responsables du club.</p>
+      {% endif %}
+      <div class="confirmation__actions">
+        {% if kind == 'application' %}<a class="btn btn--outline" href="{% url 'editorial:club' %}">Découvrir notre club</a>{% else %}<a class="btn btn--outline" href="{% url 'actions:list' %}">Découvrir nos actions</a>{% endif %}
+        <a class="btn btn--ghost" href="{% url 'core:home' %}">Retour à l’accueil</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

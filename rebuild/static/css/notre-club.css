@@ -48,3 +48,85 @@
 @media (min-width: 761px) { .club-mouvement__grille, .club-priorites__entete, .club-bureau__entete { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1081px) { .club-intro__grille { grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr); align-items: center; column-gap: var(--e9); } .club-intro__texte { grid-column: 1; grid-row: 1; } .club-intro__visuel { grid-column: 2; grid-row: 1 / span 2; } .club-devise { grid-column: 1; grid-row: 2; max-width: 420px; } .club-valeurs__grille { grid-template-columns: repeat(6, minmax(0, 1fr)); } .club-valeurs__grille article { min-height: 360px; } }
 @media (max-width: 520px) { .club-valeurs__grille, .club-bureau__grille { grid-template-columns: minmax(0, 1fr); } .club-valeurs__grille article { min-height: 0; } .club-histoire__attente { padding: var(--e5); } }
+
+/* ─── Refonte sept. 2026 ─────────────────────────────────────────────────── */
+/* Qui sommes-nous : récit à gauche, fiche d'identité navy à droite (élément dominant). */
+.club-intro__grille { align-items: start; }
+@media (min-width: 1081px) { .club-intro__grille { grid-template-columns: minmax(0, 1.3fr) minmax(300px, .9fr); column-gap: var(--e9); } }
+.club-intro__texte p:not(.club-intro__lede) { color: var(--gris); }
+.club-ancre { display: block; }
+.club-fiche { position: relative; overflow: hidden; padding: var(--e6); background: var(--navy); border-radius: var(--r-carte); box-shadow: var(--ombre); }
+.club-fiche__embleme { width: 56px; height: auto; margin-bottom: var(--e4); }
+.club-fiche__titre { margin-bottom: var(--e4); font-size: var(--t-eyebrow); font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--or); }
+.club-fiche__liste { display: grid; margin: 0; }
+.club-fiche__liste > div { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: var(--e3); padding-block: var(--e3); border-top: 1px solid var(--sur-sombre-filet); }
+.club-fiche__liste dt { font-size: var(--t-meta); color: var(--sur-sombre-doux); }
+.club-fiche__liste dd { margin: 0; font-weight: 600; color: var(--sur-sombre); line-height: 1.5; overflow-wrap: anywhere; }
+.club-fiche__devise { margin: var(--e5) 0 0; padding-top: var(--e5); border-top: 1px solid var(--sur-sombre-filet); font-family: var(--police-titre); font-size: clamp(1.5rem, 2.2vw, 1.875rem); line-height: 1.1; color: var(--sur-sombre); }
+.club-fiche__devise span { display: block; margin-top: var(--e2); font-family: var(--police); font-size: var(--t-meta); font-weight: 700; letter-spacing: .3em; color: var(--or); }
+@media (max-width: 420px) { .club-fiche { padding: var(--e5); } .club-fiche__liste > div { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+.club-histoire__texte { max-width: 70ch; }
+.club-histoire__texte p { font-size: 1.0625rem; color: var(--encre); }
+
+/* Trois échelles : l'international, le district, notre club. Le filet de tête
+   passe du bleu à l'or à mesure qu'on se rapproche du club. */
+.club-mouvement__grille { counter-reset: niveau; }
+@media (min-width: 761px) and (max-width: 899px) { .club-mouvement__grille { grid-template-columns: minmax(0, 1fr); } }
+@media (min-width: 900px) { .club-mouvement__grille { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.club-mouvement__niveau { display: flex; flex-direction: column; gap: var(--e2); padding: var(--e5); background: var(--surface); border-top: 3px solid var(--bleu); border-radius: 0 0 var(--r-carte) var(--r-carte); box-shadow: var(--ombre-fine); }
+.club-mouvement__niveau--club { border-top-color: var(--or); }
+.club-mouvement__niveau h3 { margin: 0; font-family: var(--police-titre); font-size: 1.375rem; line-height: 1.25; }
+.club-mouvement__niveau p { margin: 0; color: var(--gris); font-size: .9375rem; }
+.club-mouvement__niveau .link-arrow { margin-top: auto; padding-top: var(--e3); }
+.club-mouvement__echelle { font-size: var(--t-eyebrow); font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--bleu); }
+.club-mouvement__texte { margin-top: var(--e6); max-width: 70ch; }
+.club-mouvement article { border: 0; padding: 0; } /* ancien gabarit */
+
+.club-valeurs__texte { margin-top: var(--e6); max-width: 70ch; }
+.club-valeurs__texte h3 { margin-bottom: var(--e3); }
+
+/* Axes prioritaires — quatre rangées image + texte, deux par ligne sur grand écran. */
+.axes__entete { display: grid; gap: var(--e4); }
+.axes__entete::before { grid-column: 1 / -1; margin-bottom: 0; }
+@media (min-width: 1081px) { .axes__entete { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); column-gap: var(--e8); align-items: end; } }
+.axes__entete .axes__intro { margin: 0; color: var(--gris); font-size: .9375rem; }
+.axes__liste { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--e4); }
+@media (min-width: 900px) { .axes__liste { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e5); } }
+.axe { display: grid; grid-template-columns: 132px minmax(0, 1fr); background: var(--surface); border: 1px solid var(--bord); border-radius: var(--r-carte); overflow: hidden; }
+.axe__media { height: 100%; min-height: 176px; border-radius: 0; }
+/* Ancrage bas-gauche : quel que soit le recadrage, le pictogramme intégré en bas à
+   gauche de l'image de la cause reste entier. */
+.axe__media img { object-position: 0% 100%; }
+.axe__corps { display: flex; flex-direction: column; gap: var(--e2); padding: var(--e5); }
+.axe__numero { font-family: var(--police-titre); font-size: 1.125rem; line-height: 1; color: var(--bleu); font-variant-numeric: tabular-nums; }
+.axe h3 { margin: 0; font-family: var(--police-titre); font-size: 1.375rem; }
+.axe p { margin: 0; color: var(--gris); font-size: .9375rem; line-height: 1.65; }
+.axe .link-arrow { margin-top: auto; padding-top: var(--e2); }
+.axes__suite { margin: var(--e5) 0 0; }
+@media (max-width: 520px) { .axe { grid-template-columns: 96px minmax(0, 1fr); } .axe__corps { padding: var(--e4); } .axe h3 { font-size: 1.1875rem; } }
+
+/* Notre bureau — portraits sobres, la fonction lisible d'un coup d'œil. */
+.bureau__entete .lede { max-width: 52ch; }
+.bureau__grille { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--e6) var(--e5); }
+.portrait { position: relative; display: flex; flex-direction: column; min-width: 0; border-radius: var(--r-carte); }
+.portrait:focus-within { outline: 3px solid var(--focus); outline-offset: 4px; }
+.portrait__media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--fond-2); border-radius: var(--r-carte); box-shadow: var(--ombre-fine); }
+.portrait__media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; transition: transform .5s var(--courbe); }
+.portrait:hover .portrait__media img { transform: scale(1.03); }
+/* Sans photo publique : monogramme, jamais une silhouette générique. */
+.portrait__initiales { display: grid; place-items: center; width: 100%; height: 100%; font-family: var(--police-titre); font-size: clamp(2.5rem, 5vw, 3.75rem); letter-spacing: .02em; color: var(--bleu); }
+.portrait__initiales::after { content: ""; position: absolute; left: 50%; bottom: 28%; width: 40px; height: 2px; margin-left: -20px; background: var(--or); }
+.portrait__corps { padding-top: var(--e4); }
+.portrait__nom { margin: 0; font-family: var(--police-titre); font-size: 1.25rem; line-height: 1.25; overflow-wrap: anywhere; hyphens: auto; }
+.portrait__lien { color: inherit; }
+.portrait__lien:focus-visible { outline: none; }
+.portrait__lien::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.portrait__lien:hover { color: var(--bleu); }
+.portrait__fonction { margin: var(--e2) 0 0; padding-top: var(--e2); border-top: 2px solid var(--or); display: inline-block; font-size: .9375rem; font-weight: 600; line-height: 1.4; color: var(--bleu); }
+.portrait__note { margin: var(--e1) 0 0; font-size: var(--t-meta); color: var(--gris); }
+@media (max-width: 1080px) { .bureau__grille { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .bureau__grille { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e5) var(--e4); } .portrait__nom { font-size: 1.0625rem; } .portrait__fonction { font-size: .875rem; } }
+@media (max-width: 339px) { .bureau__grille { grid-template-columns: minmax(0, 1fr); } }
+
+@media (prefers-reduced-motion: reduce) { .portrait:hover .portrait__media img { transform: none; } }

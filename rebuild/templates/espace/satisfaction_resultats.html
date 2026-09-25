@@ -28,5 +28,5 @@
 <p class="app-note">Agrégats uniquement, sans identité ni commentaire individuel.{% if results.participation_rate %} Taux de participation calculé sur l’effectif actuellement éligible ({{ results.eligible_count }}) — approximation, pas un effectif figé au moment de l’ouverture.{% endif %}</p>
 {% endif %}
 </section>
-<a class="btn btn--outline" href="{% url 'satisfaction:manage_list' %}">Retour aux consultations</a>
+<div class="lot2-actions">{% if can_view_individual %}<a class="btn btn--outline" href="{% url 'satisfaction:individual' period.pk %}">Réponses par personne</a>{% endif %}<a class="btn btn--ghost" href="{% url 'satisfaction:manage_list' %}">Retour aux consultations</a></div>
 {% endblock %}

@@ -1,0 +1,3 @@
+{% extends 'base/private.html' %}
+{% block title %}Supprimer un mandat — Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}<div class="app-titre"><h1>Supprimer un mandat</h1></div><section class="workspace-panel lot2-reading"><p>Supprimer le mandat « {{ mandate.function }} » de {{ member_name }} pour {{ mandate.lions_year.label }} ?</p><p class="app-note">À réserver à une saisie erronée. Pour une fin de fonction réelle, utilisez plutôt « Terminer » : l’historique est conservé.</p><form method="post" class="lot2-actions">{% csrf_token %}<button class="btn btn--danger" type="submit">Confirmer la suppression</button><a class="btn btn--ghost" href="{% url 'governance:mandates' %}?annee={{ mandate.lions_year_id }}">Annuler</a></form></section>{% endblock %}

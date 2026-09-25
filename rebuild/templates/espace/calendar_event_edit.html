@@ -7,7 +7,7 @@
     {% csrf_token %}
     {% include 'components/forms/errors.html' %}
     <div class="lot2-form-grid">{% for field in form %}<div>{% include 'components/forms/field.html' %}</div>{% endfor %}</div>
-    <div class="lot2-actions"><button class="btn btn--solid" type="submit">Enregistrer les modifications</button><a class="btn btn--outline" href="{% url 'agenda_private:calendar' %}">Retour au calendrier</a></div>
+    <div class="lot2-actions"><button class="btn btn--solid" type="submit">Enregistrer les modifications</button><a class="btn btn--ghost" href="{% url 'agenda_private:calendar' %}">Retour au calendrier</a></div>
   </form>
 </section>
 {% endblock %}

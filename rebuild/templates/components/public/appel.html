@@ -1,0 +1,18 @@
+{% comment %}
+Appel final des pages intérieures : une seule action or (l'engagement), une alternative
+claire. Bandeau navy compact, sans arche (l'arche reste le bloc majeur de l'accueil et de
+« Nous rejoindre »).
+{% endcomment %}
+<section class="appel on-dark" aria-labelledby="titre-appel">
+  <div class="container appel__grille">
+    <div class="appel__texte">
+      <span class="eyebrow">{{ appel_surtitre|default:"Rejoignez-nous" }}</span>
+      <h2 id="titre-appel">{{ appel_titre }}</h2>
+      {% if appel_texte %}<p>{{ appel_texte }}</p>{% endif %}
+    </div>
+    <div class="appel__actions">
+      <a class="btn btn--primary" href="{% url 'editorial:join' %}">Nous rejoindre<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+      <a class="btn btn--light" href="{% url 'communications:contact' %}">Nous contacter</a>
+    </div>
+  </div>
+</section>

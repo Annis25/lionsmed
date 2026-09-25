@@ -1,0 +1,24 @@
+{% extends 'base/private.html' %}
+{% block title %}Choix nominatifs — {{ vote.title }} — Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Choix nominatifs</h1><p class="app-titre__contexte">{{ vote.title }} · <span class="badge">Vote nominatif</span> · accès réservé au Super administrateur</p></div>
+<section class="workspace-panel">
+  <p class="app-note">Scrutin annoncé comme nominatif aux électeurs avant le vote. Vue à ne pas diffuser : les responsables du club ne voient que la participation et les résultats d’ensemble.</p>
+  <div class="tableau-cadre"><table class="tableau">
+    <caption class="visually-hidden">Choix de chaque électeur pour le scrutin {{ vote.title }}</caption>
+    <thead><tr><th scope="col">Électeur</th><th scope="col">Choix</th><th scope="col">Déposé le</th></tr></thead>
+    <tbody>
+    {% for row in rows %}
+      <tr>
+        <td data-libelle="Électeur"><strong>{{ row.name }}</strong></td>
+        <td data-libelle="Choix">{% if not row.voted %}<span class="badge badge--clos">N’a pas voté</span>{% elif row.is_blank %}Vote blanc{% else %}{{ row.choices|join:", " }}{% endif %}</td>
+        <td data-libelle="Déposé le">{% if row.submitted_at %}{{ row.submitted_at|date:'d/m/Y H:i' }}{% else %}—{% endif %}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="3">Aucun électeur habilité.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</section>
+<div class="lot2-actions"><a class="btn btn--ghost" href="{% url 'voting:results' vote.pk %}">Retour aux résultats</a></div>
+{% endblock %}

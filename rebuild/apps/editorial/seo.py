@@ -16,7 +16,7 @@ def metadata(request,*,title,description,path=None,indexable=True,image=None,sch
     if request.path!="/":crumbs.append({"name":title.split(" — ")[0],"url":request.path})
     graph=[]
     if request.path!="/":graph.append({"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":c["name"],"item":settings.SITE_ORIGIN+c["url"]} for i,c in enumerate(crumbs)]})
-    if schema:graph.append(schema)
+    if schema:graph.extend(schema if isinstance(schema,list) else [schema])
     raw=json.dumps({"@context":"https://schema.org","@graph":graph},ensure_ascii=False)
     raw=raw.replace("<",r"\u003C").replace(">",r"\u003E").replace("&",r"\u0026")
     return {"seo_title":title,"seo_description":description[:300],"canonical_url":canonical,"seo_robots":"index, follow" if indexable else "noindex, follow", "seo_image":settings.SITE_ORIGIN+(image.get_absolute_url() if image and image.approved_at else static("images/emblem-256.png")),"structured_json":raw,"breadcrumbs":crumbs}

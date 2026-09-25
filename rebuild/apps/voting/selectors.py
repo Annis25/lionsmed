@@ -3,7 +3,7 @@ from django.db.models import Count
 from django.http import Http404
 from django.utils import timezone
 from apps.core.permissions import can
-from .models import Vote, Elector, Participation, Ballot, BallotSelection
+from .models import Vote, Elector, Participation, Ballot, BallotSelection, NominativeChoice
 
 
 def require(actor, capability, obj=None):
@@ -93,3 +93,24 @@ def vote_results(actor, vote):
         "blank_count": blank_count,
         "options": options,
     }
+
+
+def nominative_rows(actor, vote):
+    """Qui a choisi quoi — scrutin NOMINATIF clôturé, Super administrateur uniquement.
+    Un scrutin secret n'a aucune donnée à montrer : 404 plutôt qu'une page vide ambiguë."""
+    require(actor, "vote.view_nominative")
+    if vote.disclosure != Vote.Disclosure.NOMINATIVE:
+        raise Http404
+    if vote.status != Vote.Status.CLOSED:
+        raise PermissionDenied("Les choix nominatifs sont consultables après la clôture du scrutin.")
+    choices = {choice.elector_id: choice for choice in
+               NominativeChoice.objects.filter(elector__vote=vote).prefetch_related("options")}
+    rows = []
+    for elector in Elector.objects.filter(vote=vote).select_related("profile__user").order_by("profile__user__last_name", "profile__user__first_name"):
+        choice = choices.get(elector.pk)
+        user = elector.profile.user
+        rows.append({"name": user.get_full_name().strip() or user.email, "voted": choice is not None,
+            "is_blank": bool(choice and choice.is_blank),
+            "choices": sorted((option.label for option in choice.options.all()), key=str.lower) if choice else [],
+            "submitted_at": choice.submitted_at if choice else None})
+    return rows

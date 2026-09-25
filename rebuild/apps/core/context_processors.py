@@ -68,6 +68,7 @@ def shell(request):
         private_navigation.append({"label": "Messages de contact", "url": reverse("communications:inbox", args=["contact"])})
     private_navigation += entries([
         ("Membres et mandats", "governance:members", "members.view_management"),
+        ("Bureau et mandats", "governance:mandates", "members.view_management"),
         ("Authentification forte", "accounts:mfa_setup", "mfa.manage_own"),
         ("Années Lions", "governance:years", "year.view"),
     ])

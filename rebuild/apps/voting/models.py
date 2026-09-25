@@ -14,12 +14,20 @@ class Vote(models.Model):
         MULTIPLE = "MULTIPLE", "Choix multiple"
         ELECTION = "ELECTION", "Élection"
 
+    class Disclosure(models.TextChoices):
+        # SECRET : personne, pas même le Super administrateur, ne peut savoir qui a voté quoi.
+        # NOMINATIVE : choisi à la création, annoncé aux électeurs avant qu'ils votent ; seul le
+        # Super administrateur voit le choix de chacun (voir NominativeChoice).
+        SECRET = "SECRET", "Vote secret"
+        NOMINATIVE = "NOMINATIVE", "Vote nominatif"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=180)
     creation_key = models.UUIDField(null=True, blank=True, unique=True, editable=False)
     description = models.TextField(max_length=5000, blank=True)
     status = models.CharField(max_length=8, choices=Status.choices, default=Status.DRAFT)
     mode = models.CharField(max_length=10, choices=Mode.choices, default=Mode.SINGLE)
+    disclosure = models.CharField(max_length=10, choices=Disclosure.choices, default=Disclosure.SECRET)
     opens_at = models.DateTimeField()
     closes_at = models.DateTimeField(null=True, blank=True, help_text="Vide : le scrutin ne se ferme que manuellement.")
     min_choices = models.PositiveSmallIntegerField(default=1)
@@ -43,6 +51,7 @@ class Vote(models.Model):
             models.CheckConstraint(condition=models.Q(min_choices__gte=1) & models.Q(max_choices__gte=models.F("min_choices")), name="vote_cardinality_valid"),
             models.CheckConstraint(condition=models.Q(status__in=["DRAFT", "OPEN", "CLOSED"]), name="vote_status_valid"),
             models.CheckConstraint(condition=models.Q(mode__in=["SINGLE", "MULTIPLE", "ELECTION"]), name="vote_mode_valid"),
+            models.CheckConstraint(condition=models.Q(disclosure__in=["SECRET", "NOMINATIVE"]), name="vote_disclosure_valid"),
         ]
 
 
@@ -93,3 +102,15 @@ class BallotSelection(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["ballot", "option"], name="ballotselection_unique_ballot_option")]
+
+
+class NominativeChoice(models.Model):
+    """Scrutins NOMINATIFS uniquement : ce qu'un électeur a choisi, consultable par le seul
+    Super administrateur (capability vote.view_nominative). N'existe jamais pour un scrutin
+    secret. Aucun lien avec Ballot : le bulletin anonyme reste la seule source du décompte
+    et la séparation Participation/Ballot est inchangée."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    elector = models.OneToOneField(Elector, on_delete=models.PROTECT, related_name="nominative_choice")
+    is_blank = models.BooleanField(default=False)
+    options = models.ManyToManyField(VoteOption, blank=True, related_name="nominative_choices")
+    submitted_at = models.DateTimeField(auto_now_add=True)

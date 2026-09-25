@@ -1,6 +1,8 @@
 Bonjour{% if first_name %} {{ first_name }}{% endif %},
 
-Un nouveau vote est maintenant ouvert dans votre espace membre. Votre participation contribue à la vie et aux décisions du club. Une fois votre bulletin validé, il ne pourra plus être modifié.
+Un nouveau vote est maintenant ouvert dans votre espace membre. Votre participation contribue à la vie et aux décisions du club. Une fois votre bulletin validé, il ne pourra plus être modifié.{% if vote.disclosure == 'NOMINATIVE' %}
+
+Il s’agit d’un vote nominatif : votre choix sera visible par l’administrateur du site après la clôture.{% endif %}
 
 {{ origin }}/espace/votes/
 

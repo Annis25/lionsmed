@@ -1,0 +1,32 @@
+{% comment %}
+« Notre bureau » — projection publique des mandats (apps.governance.selectors.public_bureau) :
+aucun nom saisi ici, aucune seconde liste. N'affiche que nom, fonction, photo et lien de
+profil public quand le membre a lui-même activé son profil public. Jamais de coordonnées.
+{% endcomment %}
+<section class="section bureau" id="bureau" aria-labelledby="titre-bureau">
+  <div class="container">
+    <div class="section-head bureau__entete">
+      {% if bureau_year %}<span class="eyebrow">Année Lions {{ bureau_year.label }}</span>{% endif %}
+      <h2 id="titre-bureau">Notre bureau</h2>
+      <p class="lede">Les membres qui conduisent la vie du club et portent nos engagements pour l’année en cours.</p>
+    </div>
+    <ul class="bureau__grille" role="list">
+      {% for person in bureau %}
+      <li class="portrait">
+        <div class="portrait__media">
+          {% if person.photo_url %}
+          <img src="{{ person.photo_url }}" width="512" height="512" loading="lazy" decoding="async" alt="Portrait de {{ person.name }}.">
+          {% else %}
+          <span class="portrait__initiales" aria-hidden="true">{{ person.initials }}</span>
+          {% endif %}
+        </div>
+        <div class="portrait__corps">
+          <h3 class="portrait__nom">{% if person.profile_url %}<a class="portrait__lien" href="{{ person.profile_url }}">{{ person.name }}</a>{% else %}{{ person.name }}{% endif %}</h3>
+          <p class="portrait__fonction">{{ person.function }}</p>
+          {% if person.note %}<p class="portrait__note">{{ person.note }}</p>{% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>

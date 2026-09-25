@@ -6,12 +6,13 @@
 
    Rythme des sections — deux voisines ne partagent jamais fond ET structure :
      hero      champ navy, composition asymétrique, arcs monumentaux
+     faits     bande fond-2, une ligne de faits (lions.css, .bande-faits)
      intro     blanc, deux colonnes déséquilibrées, texte dominant
-     axes      fond clair, grille de cartes
-     causes    bande basse fond-2, alignement horizontal, discret
-     chiffres  bandeau navy pleine largeur, chiffres énormes
-     agenda    blanc, deux colonnes de densités différentes
-     rejoindre split arche/navy, un seul appel à l'action
+     causes    fond clair, grille de huit causes + bandeau santé mentale
+     chiffres  bandeau navy, seulement si des chiffres validés existent
+     terrain   blanc, une action dominante et deux compactes
+     agenda    fond-2, seulement s'il existe des rendez-vous publics
+     rejoindre split arche/navy, une action or, une alternative
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ─── HERO ───────────────────────────────────────────────────────────────── */
@@ -98,7 +99,7 @@
   gap: var(--e2);
   text-align: right;
 }
-.hero__lieu svg { color: var(--or); margin-top: var(--e1); }
+.hero__lieu svg { flex: none; color: var(--or); margin-top: var(--e1); }
 .hero__lieu strong { display: block; font-size: .9375rem; color: var(--sur-sombre); font-weight: 600; }
 .hero__lieu em { display: block; font-size: var(--t-meta); color: var(--sur-sombre-doux); font-style: italic; }
 
@@ -113,6 +114,7 @@
   .intro__grille { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: var(--e9); align-items: start; }
 }
 .intro__titre { margin-bottom: 0; }
+.intro__texte .intro__accroche { font-size: var(--t-lede); line-height: 1.6; color: var(--encre); }
 .intro__texte p { color: var(--gris); }
 .intro__texte p + p { margin-top: var(--e4); }
 .intro__texte .link-arrow { margin-top: var(--e5); }
@@ -160,7 +162,9 @@
   transition: transform var(--duree) var(--courbe), box-shadow var(--duree) var(--courbe);
 }
 .cause-card:hover { transform: translateY(-2px); box-shadow: var(--ombre); }
-.cause-card__media { aspect-ratio: 3 / 4; }
+.cause-card__media { aspect-ratio: 3 / 4; border-radius: 0; }  /* ratio natif : le pictogramme intégré en bas de l'image reste entier */
+.cause-card__media img { transition: transform .6s var(--courbe); }
+.cause-card:hover .cause-card__media img { transform: scale(1.04); }
 .cause-card__body {
   display: flex;
   flex-direction: column;
@@ -168,10 +172,11 @@
   gap: var(--e2);
   padding: var(--e4) var(--e4) var(--e5);
 }
-.cause-card__body h3 { font-size: 1.0625rem; }
+.cause-card__body h3 { font-family: var(--police-titre); font-size: 1.25rem; line-height: 1.25; }
 /* Les descriptions ont des longueurs inégales : le lien reste ancré en bas. */
 .cause-card__body p { flex: 1; color: var(--gris); font-size: .9375rem; line-height: 1.6; }
 .cause-card__body .link-arrow { margin-top: 0; font-size: .875rem; }
+.causes .section-head .eyebrow { margin-bottom: var(--e3); }
 
 /* ─── BANDEAU SANTÉ MENTALE — cinquième grande cause, traitement discret ─── */
 .bandeau-cause {
@@ -260,6 +265,15 @@
   letter-spacing: 0;
   color: var(--sur-sombre-doux);
 }
+/* Chiffres de la base (ImpactMetric validés) : nombre variable, valeur en tête,
+   période toujours affichée. */
+.chiffres .section-head { margin-bottom: var(--e6); }
+.chiffres__grille--libre { grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); align-items: start; margin: 0; }
+.chiffres__grille--libre .stat { display: flex; flex-direction: column; gap: var(--e2); padding-top: var(--e4); border-top: 1px solid var(--sur-sombre-filet); }
+.chiffres__grille--libre dd { margin: 0; }
+.chiffres__grille--libre .stat__valeur { order: -1; }
+.stat__periode { font-size: var(--t-meta); color: var(--sur-sombre-doux); }
+.chiffres__grille--libre + .chiffres__devise { margin-top: var(--e6); padding: var(--e5) 0 0; border-left: 0; border-top: 1px solid var(--sur-sombre-filet); white-space: normal; }
 /* Datation puis réserve : un chiffre sans période devient faux tout seul. */
 .chiffres__note { margin-top: var(--e6); display: grid; gap: var(--e1); }
 .chiffres__note p { max-width: none; margin: 0; }
@@ -343,6 +357,20 @@
   .actions__grille { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
 }
 
+/* ─── TERRAIN — action dominante, deux actions compactes ─────────────────── */
+.terrain__grille { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--e4); }
+@media (min-width: 1081px) {
+  .terrain__grille { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); align-items: start; }
+  .terrain__grille .action-carte--vedette { grid-row: span 3; }
+}
+/* Une seule action : elle prend toute la largeur, image et récit côte à côte. */
+@media (min-width: 761px) {
+  .terrain__grille--seule { grid-template-columns: minmax(0, 1fr); }
+  .terrain__grille--seule .action-carte--vedette { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+  .terrain__grille--seule .action-carte--vedette .action-carte__media { aspect-ratio: auto; min-height: 320px; height: 100%; }
+  .terrain__grille--seule .action-carte--vedette .action-carte__corps { padding: var(--e6); justify-content: center; }
+}
+
 /* ─── REJOINDRE — emploi structurel de l'arc ─────────────────────────────── */
 .rejoindre { padding-block: var(--e8); background: var(--navy); overflow: hidden; }
 .rejoindre__grille {
@@ -372,7 +400,11 @@
   inset: 0;
   background: linear-gradient(90deg, transparent 44%, rgba(14,46,94,.42) 78%, var(--navy) 100%);
 }
-.rejoindre__texte .lede { color: var(--sur-sombre-doux); margin: var(--e5) 0 var(--e7); }
+.rejoindre__texte .lede { color: var(--sur-sombre-doux); margin: var(--e5) 0 var(--e5); }
+.rejoindre__points { display: grid; gap: var(--e3); margin-bottom: var(--e6); }
+.rejoindre__points li { display: flex; align-items: flex-start; gap: var(--e3); color: var(--sur-sombre); font-size: 1rem; line-height: 1.5; }
+.rejoindre__points svg { flex: none; margin-top: 2px; color: var(--or); }
+.rejoindre__actions { display: flex; flex-wrap: wrap; gap: var(--e3); }
 
 /* Ajouter ?capture=final à l'URL masque uniquement l'avertissement de
    développement pour les captures de validation publique. */
@@ -478,7 +510,14 @@
 
 /* ─── ≤ 520 px ───────────────────────────────────────────────────────────── */
 @media (max-width: 520px) {
-  .causes__grille { grid-template-columns: 1fr; }
+  .causes__grille { grid-template-columns: 1fr; gap: var(--e3); }
+  .cause-card { display: grid; grid-template-columns: 104px minmax(0, 1fr); border-radius: var(--r-carte); }
+  .cause-card__media { aspect-ratio: auto; height: 100%; min-height: 128px; }
+  .cause-card__media img { object-position: 0% 100%; }  /* pictogramme entier */
+  .cause-card__body { padding: var(--e3) var(--e4); }
+  .cause-card__body h3 { font-size: 1.0625rem; }
+  .cause-card__body p { font-size: .875rem; line-height: 1.55; }
+  .rejoindre__actions .btn { width: 100%; }
   .actualites-bandeau { grid-template-columns: 1fr; gap: var(--e4); padding: var(--e4); }
   .actualites-bandeau__suite { grid-column: auto; }
   .actualite { grid-template-columns: 64px minmax(0, 1fr); }
@@ -488,6 +527,7 @@
 
 /* ─── ANIMATIONS RÉDUITES ────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+  .cause-card:hover, .cause-card:hover .cause-card__media img { transform: none; }
   .js .hero [data-seq],
   .js .hero.is-ready [data-seq] { opacity: 1 !important; animation: none !important; transform: none !important; }
   .js .hero .hero__arcs,

@@ -158,6 +158,9 @@ def dashboard(request):
     # Messages de contact en attente : compteur unique, réservé à qui a déjà accès à la
     # boîte de réception (contact.view) — jamais calculé, donc jamais affiché, sinon.
     contact_pending_count = ContactRequest.objects.filter(state="RECEIVED").count() if can(request.user, "contact.view") else None
+    # La carte « À faire » n'apparaît qu'à qui peut traiter (contact.manage) : le Super
+    # administrateur consulte la boîte sans que cela devienne une tâche pour lui.
+    contact_to_process = contact_pending_count if can(request.user, "contact.manage") else None
 
     # Aperçu des dernières notifications : seulement sur le dashboard Membre (les autres
     # rôles gardent le compteur existant + CTA, déjà suffisant à leur échelle).
@@ -181,7 +184,7 @@ def dashboard(request):
             recent_documents = None
 
     dues_to_regularize = bool(current_dues and current_dues.status != "PAID")
-    has_todo = bool(votes_to_complete or satisfaction_to_complete or contact_pending_count or dues_to_regularize)
+    has_todo = bool(votes_to_complete or satisfaction_to_complete or contact_to_process or dues_to_regularize)
 
     context = {
         "effective_role_label": Role(role).label if role else None,
@@ -195,7 +198,7 @@ def dashboard(request):
         "current_dues": current_dues,
         "votes_to_complete": votes_to_complete,
         "satisfaction_to_complete": satisfaction_to_complete,
-        "contact_pending_count": contact_pending_count,
+        "contact_pending_count": contact_to_process,
         "recent_documents": recent_documents,
         "dues_to_regularize": dues_to_regularize,
         "has_todo": has_todo,

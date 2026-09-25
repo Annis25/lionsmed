@@ -7,25 +7,29 @@
   <div class="container">
     <div class="section-head section-head--split reveal">
       <div>
+        <span class="eyebrow">Ce qui nous engage</span>
         <h2 id="titre-causes">Nos causes d’engagement</h2>
         <p class="lede">{{ causes_engagement_intro }}</p>
       </div>
       <p class="causes__signature" aria-hidden="true">Servir avec cœur</p>
     </div>
-    <div class="causes__grille reveal">
+    <ul class="causes__grille" role="list">
       {% for cause in causes_engagement %}
-      <article class="cause-card">
+      <li class="cause-card">
         <div class="cause-card__media media">
           <img src="{% static cause.image %}" width="380" height="508" loading="lazy" decoding="async" alt="{{ cause.alt }}">
         </div>
         <div class="cause-card__body">
           <h3>{{ cause.title }}</h3>
           <p>{{ cause.body }}</p>
-          <a class="link-arrow" href="{{ cause.link }}">Découvrir nos actions<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+          {% comment %} Lien seulement quand la cause correspond à un axe réel des actions : il mène
+             alors à la liste filtrée. Sans axe, un lien vers la liste complète promettait
+             des actions « cancer infantile » qui n'y sont pas classées. {% endcomment %}
+          {% if cause.axis %}<a class="link-arrow" href="{{ cause.link }}">Nos actions<span class="visually-hidden"> : {{ cause.title }}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>{% endif %}
         </div>
-      </article>
+      </li>
       {% endfor %}
-    </div>
+    </ul>
 
     <div class="bandeau-cause reveal">
       <span class="bandeau-cause__icone" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.6a5.5 5.5 0 0 0-9.8-3.6 5.5 5.5 0 0 0-9.8 3.6c0 5.5 9.8 11 9.8 11s9.8-5.5 9.8-11Z"></path><path d="M5.5 12h2.5l1.5-3 2 6 1.5-3h2.5"></path></svg></span>
