@@ -2,70 +2,104 @@
 {% load static %}
 {% block title %}Communication · Lions Club Sfax-Méditerranée{% endblock %}
 {% block content %}
-<div class="app-titre"><h1>Communication</h1><p class="app-titre__contexte">Envoyez une information aux membres du club ou à des destinataires supplémentaires.</p></div>
-<form method="post" novalidate id="communication-form">
-{% csrf_token %}{% include 'components/forms/errors.html' %}{{ form.campaign_key }}
+<div class="app-titre"><h1>Communication</h1><p class="app-titre__contexte">Écrivez aux membres du club, à des adresses externes, ou aux deux.</p></div>
+{% include 'components/private/communication_tabs.html' with active='compose' %}
+{% include 'components/private/communication_steps.html' with step=1 %}
+<form method="post" novalidate id="communication-form" data-communication-form>
+{% csrf_token %}{{ form.campaign_key }}
+{% if form.errors %}<div class="form-errors" role="alert" tabindex="-1"><p>Vérifiez les informations du formulaire.</p>{{ form.non_field_errors }}<ul>
+{% if form.members.errors %}<li><a href="#destinataires">Membres du club : {{ form.members.errors|striptags }}</a></li>{% endif %}
+{% if form.extra_emails.errors %}<li><a href="#adresses-externes">Adresses externes : {{ form.extra_emails.errors|striptags }}</a></li>{% endif %}
+{% if form.subject.errors %}<li><a href="#{{ form.subject.id_for_label }}">Objet : {{ form.subject.errors|striptags }}</a></li>{% endif %}
+{% if form.body.errors %}<li><a href="#{{ form.body.id_for_label }}">Message : {{ form.body.errors|striptags }}</a></li>{% endif %}
+{% if form.campaign_key.errors %}<li>Formulaire expiré : rechargez la page avant de réessayer.</li>{% endif %}
+</ul></div>{% endif %}
 <div class="communication-layout">
 <div class="communication-layout__main">
 
-<section class="workspace-panel">
-<h2>1. Destinataires</h2>
-<fieldset class="groupe">
-<legend class="champ__label">Groupe de destinataires</legend>
-{% for option in audience_options %}<label class="choix"><input type="radio" name="{{ form.audience.html_name }}" value="{{ option.value }}" data-count="{{ option.count }}" data-label="{{ option.label }}"{% if option.value == form.audience.value %} checked{% endif %} data-audience-radio><span>{{ option.label }} · <span data-audience-count>{{ option.count }} destinataire{{ option.count|pluralize }}</span></span></label>{% endfor %}
+<section class="workspace-panel com-destinataires" id="destinataires" tabindex="-1" aria-labelledby="destinataires-titre">
+<h2 id="destinataires-titre">À qui souhaitez-vous écrire ?</h2>
+
+<fieldset class="groupe com-membres" data-member-picker>
+<legend class="com-sous-titre">Membres du club</legend>
+{% if member_rows %}
+<div class="com-membres__outils" data-member-tools hidden>
+<div class="champ"><label class="champ__label" for="recherche-membre">Rechercher un membre</label><input class="champ__input" id="recherche-membre" type="search" placeholder="Prénom, nom ou adresse e-mail" autocomplete="off" aria-controls="liste-membres" data-member-search></div>
+<div class="com-raccourcis" role="group" aria-label="Sélection rapide">
+<button type="button" class="btn btn--outline btn--sm" data-select="all">Tout sélectionner</button>
+{% if responsible_count %}<button type="button" class="btn btn--outline btn--sm" data-select="responsibles">Responsables</button>{% endif %}
+<button type="button" class="btn btn--ghost btn--sm" data-select="none">Tout désélectionner</button>
+</div>
+</div>
+<ul class="com-membres__liste" id="liste-membres" data-member-list>
+{% for member in member_rows %}<li class="com-membre" data-member-row><label class="com-membre__ligne"><input type="checkbox" name="{{ form.members.html_name }}" value="{{ member.id }}" data-member data-email="{{ member.email }}"{% if member.responsible %} data-responsible{% endif %}{% if member.checked %} checked{% endif %}><span class="com-membre__texte"><span class="com-membre__nom">{{ member.name }}</span>{% if member.name != member.email %}<span class="com-membre__email">{{ member.email }}</span>{% endif %}</span>{% if member.role %}<span class="com-membre__role">{{ member.role }}</span>{% endif %}</label></li>
+{% endfor %}</ul>
+<p class="com-membres__vide" data-member-empty role="status" hidden>Aucun membre ne correspond à cette recherche.</p>
+<p class="com-compteur com-js-seul" data-member-count>{{ counts.internal }} membre{{ counts.internal|pluralize }} sélectionné{{ counts.internal|pluralize }} sur {{ member_rows|length }}</p>
+{% else %}
+<p class="notice-box">Aucun membre actif ne peut recevoir de communication pour l’instant. Vous pouvez tout de même écrire à des adresses externes.</p>
+{% endif %}
+{{ form.members.errors }}
 </fieldset>
-{{ form.audience.errors }}
-<div class="champ">
-<label class="champ__label" for="{{ form.extra_emails.id_for_label }}">Destinataires supplémentaires</label>
-<div class="email-picker" data-email-picker>
+
+<div class="com-externes" id="adresses-externes" tabindex="-1" data-email-picker>
+<h3 class="com-sous-titre">Adresses externes</h3>
+<p class="champ__aide">Partenaires, invités, autres clubs. Ces adresses sont indépendantes de la sélection ci-dessus : sans membre coché, elles seules reçoivent le message.</p>
+<div class="champ{% if form.extra_emails.errors %} champ--erreur{% endif %}" data-email-fallback>
+<label class="champ__label" for="{{ form.extra_emails.id_for_label }}">Adresses e-mail externes</label>
 {{ form.extra_emails }}
-<div class="email-picker__row" data-email-picker-row hidden><input type="email" class="champ__input" data-email-picker-input placeholder="adresse@exemple.com" aria-label="Ajouter une adresse email"><button type="button" class="btn btn--outline btn--sm" data-email-picker-add>+ Ajouter</button></div>
-<p class="email-picker__error" data-email-picker-error role="alert" hidden></p>
-<div class="email-chips" data-email-chips hidden></div>
-</div>
 <div class="champ__aide">{{ form.extra_emails.help_text }}</div>
-{{ form.extra_emails.errors }}
 </div>
-<p class="app-note" data-total-summary>{{ counts.total }} destinataire{{ counts.total|pluralize }} au total{% if counts.external %} (dont {{ counts.external }} adresse{{ counts.external|pluralize }} supplémentaire{{ counts.external|pluralize }}){% endif %}</p>
+<div class="champ" data-email-picker-row hidden>
+<label class="champ__label" for="externe-saisie">Adresse e-mail à ajouter</label>
+<div class="email-picker__row"><input type="email" class="champ__input" id="externe-saisie" placeholder="adresse@exemple.com" autocomplete="off" inputmode="email" aria-describedby="externe-erreur" data-email-picker-input><button type="button" class="btn btn--outline" data-email-picker-add><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Ajouter</button></div>
+<p class="email-picker__error" id="externe-erreur" data-email-picker-error role="alert" hidden></p>
+</div>
+{{ form.extra_emails.errors }}
+<ul class="com-externes__liste" data-email-list hidden></ul>
+<p class="com-compteur com-js-seul" data-external-count>{{ counts.external }} adresse{{ counts.external|pluralize }} externe{{ counts.external|pluralize }}</p>
+</div>
 </section>
 
-<section class="workspace-panel">
-<h2>2. Message</h2>
+<section class="workspace-panel com-message" aria-labelledby="message-titre">
+<h2 id="message-titre">Rédigez votre message</h2>
 <div class="lot2-form-grid">
 <div class="lot2-wide">{% include 'components/forms/field.html' with field=form.subject %}</div>
 <div class="lot2-wide">{% include 'components/forms/field.html' with field=form.body %}</div>
 </div>
-<p class="app-note">Le message est envoyé individuellement à chaque destinataire, personnalisé avec son prénom lorsqu’il est connu.</p>
+<p class="app-note">Chaque destinataire reçoit un e-mail individuel. Pour les membres du club, le message est automatiquement personnalisé avec leur prénom.</p>
 </section>
 
-{% if preview_html %}<section class="workspace-panel" id="apercu">
-<h2>Aperçu du rendu personnalisé</h2>
-<p class="app-note">Aucun e-mail n’a été envoyé.</p>
+{% if preview_html %}<section class="workspace-panel" id="apercu" tabindex="-1" aria-labelledby="apercu-titre">
+<h2 id="apercu-titre">Aperçu du message</h2>
+<p class="champ__aide">Aucun e-mail n’a été envoyé. Rendu pour un membre, ici avec votre prénom.</p>
 <iframe title="Aperçu de l’e-mail pour un membre" sandbox srcdoc="{{ preview_html|force_escape }}" class="email-preview-frame"></iframe>
-{% if preview_external_html %}<h3>Aperçu pour une adresse externe</h3><p class="app-note">Sans prénom connu, la salutation reste générique.</p><iframe title="Aperçu de l’e-mail pour une adresse externe" sandbox srcdoc="{{ preview_external_html|force_escape }}" class="email-preview-frame"></iframe>{% endif %}
+{% if preview_external_html %}<h3 class="com-sous-titre">Aperçu pour une adresse externe</h3><p class="champ__aide">Sans prénom connu, la salutation reste générique.</p><iframe title="Aperçu de l’e-mail pour une adresse externe" sandbox srcdoc="{{ preview_external_html|force_escape }}" class="email-preview-frame"></iframe>{% endif %}
 <details><summary>Version texte</summary><pre class="email-preview-text">{{ preview_text }}</pre></details>
 </section>{% endif %}
 
 </div>
 <aside class="communication-layout__aside">
-<section class="workspace-panel">
-<h2>Résumé de l’envoi</h2>
-<dl class="paire-liste">
-<div><dt>Audience</dt><dd data-summary-audience>{% for option in audience_options %}{% if option.value == form.audience.value %}{{ option.label }}{% endif %}{% endfor %}</dd></div>
-<div><dt>Membres</dt><dd data-summary-internal>{{ counts.internal }}</dd></div>
-<div><dt>Adresses supplémentaires</dt><dd data-summary-external>{{ counts.external }}</dd></div>
-{% if counts.duplicates %}<div><dt>Doublons retirés</dt><dd data-summary-duplicates>{{ counts.duplicates }}</dd></div>{% endif %}
-<div><dt>Total</dt><dd data-summary-total>{{ counts.total }}</dd></div>
+<section class="workspace-panel com-resume" aria-labelledby="resume-titre">
+<h2 id="resume-titre">Résumé de l’envoi</h2>
+<dl class="com-resume__lignes com-js-seul">
+<div><dt>Membres sélectionnés</dt><dd data-summary-internal>{{ counts.internal }}</dd></div>
+<div><dt>Adresses externes</dt><dd data-summary-external>{{ counts.external }}</dd></div>
+<div class="com-resume__total"><dt>Total</dt><dd data-summary-total>{{ counts.total }}</dd></div>
 </dl>
-<div class="lot2-actions">
-<button class="btn btn--outline btn--sm" type="submit" name="action" value="preview">Aperçu</button>
-<button class="btn btn--outline btn--sm" type="submit" name="action" value="test">Envoyer un test</button>
-<button class="btn btn--solid" type="submit" name="action" value="confirm">Continuer</button>
+<p class="com-resume__note com-js-seul" data-summary-note>{% if counts.total %}{{ counts.total }} destinataire{{ counts.total|pluralize }} recevr{{ counts.total|pluralize:"a,ont" }} chacun un e-mail individuel.{% else %}Aucun destinataire pour l’instant.{% endif %}</p>
+<p class="visually-hidden" aria-live="polite" data-summary-live></p>
+<noscript><p class="com-resume__note">Le nombre de destinataires est calculé et affiché à l’étape de vérification, avant tout envoi.</p></noscript>
+<div class="com-resume__actions">
+<button class="btn btn--outline" type="submit" name="action" value="preview">Aperçu</button>
+<button class="btn btn--outline" type="submit" name="action" value="test">Envoyer un test</button>
 </div>
+<p class="champ__aide">Le test n’est envoyé qu’à votre propre adresse.</p>
+<button class="btn btn--solid btn--block" type="submit" name="action" value="confirm">Vérifier l’envoi</button>
+<p class="champ__aide">Rien n’est envoyé avant votre confirmation à l’étape suivante.</p>
 </section>
 </aside>
 </div>
 </form>
-<p><a href="{% url 'communications:broadcast_history' %}">Historique des envois</a></p>
 <script src="{% static 'js/communication.js' %}" defer></script>
 {% endblock %}

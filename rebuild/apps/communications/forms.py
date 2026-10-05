@@ -8,7 +8,8 @@ import uuid
 from apps.accounts.forms import StyledFields
 from apps.accounts.models import normalize_email
 from apps.members.models import MembershipApplication
-from .models import ContactRequest, MemberEmailCampaign
+from .models import ContactRequest
+from .services import INELIGIBLE_EXTERNAL_MESSAGE, ineligible_known_addresses
 
 EXTRA_EMAILS_MAX = 50
 _EMAIL_SPLIT_RE = re.compile(r"[,;\s]+")
@@ -54,14 +55,28 @@ class ImportantNotificationForm(StyledFields,forms.Form):
 
 
 class MemberBroadcastForm(StyledFields, forms.Form):
+    """Destinataires = membres cochés + adresses externes, deux listes indépendantes.
+
+    `eligible` (services.eligible_broadcast_members) fixe les seuls identifiants de
+    membres acceptés : un identifiant fabriqué, ou celui d'un compte devenu inéligible,
+    est rejeté ici avant même d'atteindre le service. `require_recipients` n'est vrai que
+    pour vérifier ou envoyer : un aperçu ou un test ne demandent aucun destinataire."""
     campaign_key = forms.UUIDField(widget=forms.HiddenInput, required=True)
     subject = forms.CharField(max_length=180, label="Objet")
     body = forms.CharField(max_length=8000, label="Message", widget=forms.Textarea(attrs={"rows": 12}))
-    audience = forms.ChoiceField(choices=MemberEmailCampaign.Audience.choices, widget=forms.RadioSelect,
-        initial=MemberEmailCampaign.Audience.ALL_ACTIVE, label="Destinataires")
-    extra_emails = forms.CharField(required=False, label="Destinataires supplémentaires",
+    members = forms.MultipleChoiceField(required=False, label="Membres du club", widget=forms.CheckboxSelectMultiple,
+        error_messages={"invalid_choice": "Un membre sélectionné n’est plus disponible pour la communication. Vérifiez la sélection.",
+                        "invalid_list": "Sélection de membres invalide."})
+    extra_emails = forms.CharField(required=False, label="Adresses externes",
         widget=forms.Textarea(attrs={"rows": 3, "placeholder": "adresse@exemple.com"}),
         help_text="Une adresse par ligne, ou séparées par une virgule.")
+
+    def __init__(self, *args, eligible=(), require_recipients=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.require_recipients = require_recipients
+        self.eligible = list(eligible)
+        self.fields["members"].choices = [(str(user.pk), user.get_full_name() or user.email) for user, _ in self.eligible]
+        self.extra_emails_submitted = 0
 
     def clean_subject(self):
         value = " ".join(strip_tags(self.cleaned_data["subject"]).replace("\r", "").replace("\n", " ").split())
@@ -81,6 +96,8 @@ class MemberBroadcastForm(StyledFields, forms.Form):
     def clean_extra_emails(self):
         raw = self.cleaned_data.get("extra_emails", "")
         tokens = [token.strip() for token in _EMAIL_SPLIT_RE.split(raw) if token.strip()]
+        # Nombre d'adresses réellement saisies : sert à annoncer les doublons ignorés.
+        self.extra_emails_submitted = len(tokens)
         deduped, seen = [], set()
         for token in tokens:
             key = token.lower()
@@ -96,5 +113,17 @@ class MemberBroadcastForm(StyledFields, forms.Form):
         if invalid:
             raise forms.ValidationError("Adresse(s) invalide(s) : " + ", ".join(invalid))
         if len(deduped) > EXTRA_EMAILS_MAX:
-            raise forms.ValidationError(f"{EXTRA_EMAILS_MAX} adresses supplémentaires maximum ({len(deduped)} saisies).")
+            raise forms.ValidationError(f"{EXTRA_EMAILS_MAX} adresses externes maximum ({len(deduped)} saisies).")
+        blocked = ineligible_known_addresses(deduped, self.eligible)
+        if blocked:
+            raise forms.ValidationError(INELIGIBLE_EXTERNAL_MESSAGE % ", ".join(blocked))
         return deduped
+
+    def clean(self):
+        cleaned = super().clean()
+        # Seulement si les deux listes sont elles-mêmes valides : une adresse mal saisie
+        # porte déjà sa propre erreur, inutile d'y ajouter « aucun destinataire ».
+        if (self.require_recipients and "members" in cleaned and "extra_emails" in cleaned
+                and not cleaned["members"] and not cleaned["extra_emails"]):
+            raise forms.ValidationError("Sélectionnez au moins un membre ou ajoutez une adresse externe.")
+        return cleaned

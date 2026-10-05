@@ -1,0 +1,1 @@
+<span class="badge{% if tracking.status == 'termine' %} badge--paye{% elif tracking.status == 'en_cours' %} badge--en-cours{% elif tracking.status == 'erreurs' %} badge--partiel{% else %} badge--a-regulariser{% endif %}">{{ tracking.status_label }}</span>

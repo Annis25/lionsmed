@@ -1,26 +1,48 @@
 {% extends 'base/private.html' %}
 {% load static %}
-{% block title %}Confirmer l’envoi · Lions Club Sfax-Méditerranée{% endblock %}
+{% block title %}Vérifier l’envoi · Lions Club Sfax-Méditerranée{% endblock %}
 {% block content %}
-<div class="app-titre"><h1>Confirmer l’envoi</h1><p class="app-titre__contexte">Vous êtes sur le point d’envoyer ce message à {{ counts.total }} destinataire{{ counts.total|pluralize }}.</p></div>
-<section class="workspace-panel lot2-reading">
-<dl class="paire-liste">
-<div><dt>Objet</dt><dd>{{ form.cleaned_data.subject }}</dd></div>
-<div><dt>Audience</dt><dd>{{ audience_label }}</dd></div>
-<div><dt>Membres</dt><dd>{{ counts.internal }}</dd></div>
-<div><dt>Adresses supplémentaires</dt><dd>{{ counts.external }}{% if external_emails %} ({{ external_emails|join:", " }}){% endif %}</dd></div>
-{% if counts.duplicates %}<div><dt>Doublons retirés</dt><dd>{{ counts.duplicates }}</dd></div>{% endif %}
-<div><dt>Total</dt><dd><strong>{{ counts.total }} destinataire{{ counts.total|pluralize }}</strong></dd></div>
-</dl>
-<p class="champ__label">Message</p>
-<p>{{ form.cleaned_data.body|linebreaksbr }}</p>
-<form method="post" action="{% url 'communications:broadcast' %}">
-{% csrf_token %}{% for field in form %}{{ field.as_hidden }}{% endfor %}<input type="hidden" name="confirmed" value="yes">
-<div class="lot2-actions">
-<button class="btn btn--ghost" type="submit" name="action" value="back">Retour</button>
-<button class="btn btn--solid" type="submit" name="action" value="send" data-confirm-send>Confirmer l’envoi</button>
+<div class="app-titre"><h1>Vérifier l’envoi</h1><p class="app-titre__contexte">Rien n’a encore été envoyé. Relisez les destinataires et le message avant de confirmer.</p></div>
+{% include 'components/private/communication_steps.html' with step=2 %}
+{% if not delivery_enabled %}<div class="alert alert--warning"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 4.2 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z"></path><path d="M12 9.5v4M12 17h.01"></path></svg><p>L’envoi d’e-mails est désactivé sur cet environnement : après confirmation, les messages resteront en attente dans la file.</p></div>{% endif %}
+<div class="communication-layout">
+<div class="communication-layout__main">
+
+<section class="workspace-panel" aria-labelledby="verif-destinataires">
+<h2 id="verif-destinataires">Destinataires</h2>
+<div class="com-verif-groupes">
+{% if members %}<div><h3 class="com-sous-titre">{{ counts.internal }} membre{{ counts.internal|pluralize }} sélectionné{{ counts.internal|pluralize }}</h3>
+<ul class="com-verif-liste">{% for member in members %}<li><span class="com-membre__nom">{{ member.get_full_name|default:member.email }}</span>{% if member.get_full_name %}<span class="com-membre__email">{{ member.email }}</span>{% endif %}</li>{% endfor %}</ul></div>{% endif %}
+{% if external_emails %}<div><h3 class="com-sous-titre">{{ counts.external }} adresse{{ counts.external|pluralize }} externe{{ counts.external|pluralize }}</h3>
+<ul class="com-verif-liste">{% for email in external_emails %}<li><span class="com-membre__nom">{{ email }}</span></li>{% endfor %}</ul></div>{% endif %}
 </div>
+{% if counts.duplicates %}<p class="app-note">{{ counts.duplicates }} adresse{{ counts.duplicates|pluralize }} en double ignorée{{ counts.duplicates|pluralize }} : personne ne reçoit le message deux fois.</p>{% endif %}
+</section>
+
+<section class="workspace-panel" aria-labelledby="verif-apercu">
+<h2 id="verif-apercu">Aperçu du message</h2>
+<p class="champ__aide">{% if members %}Rendu pour un membre, ici avec votre prénom : chaque membre reçoit le sien.{% if external_emails %} Les adresses externes reçoivent le même message avec une salutation sans prénom.{% endif %}{% else %}Rendu pour une adresse externe : la salutation reste sans prénom.{% endif %}</p>
+<iframe title="Aperçu de l’e-mail" sandbox srcdoc="{{ preview_html|force_escape }}" class="email-preview-frame"></iframe>
+</section>
+
+</div>
+<aside class="communication-layout__aside">
+<section class="workspace-panel com-resume" aria-labelledby="verif-titre">
+<h2 id="verif-titre">Votre message est prêt à être envoyé</h2>
+<dl class="com-resume__lignes">
+<div class="com-resume__objet"><dt>Objet</dt><dd>{{ form.cleaned_data.subject }}</dd></div>
+<div><dt>Membres sélectionnés</dt><dd>{{ counts.internal }}</dd></div>
+<div><dt>Adresses externes</dt><dd>{{ counts.external }}</dd></div>
+<div class="com-resume__total"><dt>Total</dt><dd>{{ counts.total }}</dd></div>
+</dl>
+<p class="com-resume__note">Un e-mail individuel par destinataire, sans copie ni liste visible.</p>
+<form method="post" action="{% url 'communications:broadcast' %}" class="com-resume__envoi" data-submit-once>
+{% csrf_token %}{% for field in form %}{{ field.as_hidden }}{% endfor %}<input type="hidden" name="confirmed" value="yes">
+<button class="btn btn--primary btn--block" type="submit" name="action" value="send" data-submit-once-button data-busy-label="Envoi en cours…">Envoyer à {{ counts.total }} destinataire{{ counts.total|pluralize }}</button>
+<button class="btn btn--ghost btn--block" type="submit" name="action" value="back">Modifier</button>
 </form>
 </section>
+</aside>
+</div>
 <script src="{% static 'js/communication.js' %}" defer></script>
 {% endblock %}

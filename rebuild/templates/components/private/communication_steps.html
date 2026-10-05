@@ -1,0 +1,5 @@
+<ol class="com-etapes" aria-label="Étapes de l’envoi">
+<li{% if step == 1 %} aria-current="step"{% else %} class="est-faite"{% endif %}>Rédaction{% if step > 1 %}<span class="visually-hidden"> (terminée)</span>{% endif %}</li>
+<li{% if step == 2 %} aria-current="step"{% endif %}>Vérification</li>
+<li>Envoi</li>
+</ol>

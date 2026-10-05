@@ -72,6 +72,12 @@ def shell(request):
         ("Authentification forte", "accounts:mfa_setup", "mfa.manage_own"),
         ("Années Lions", "governance:years", "year.view"),
     ])
+    # « Communication » regroupe rédaction, historique et suivi d'une campagne : l'entrée
+    # reste surlignée sur ses sous-pages (les autres se comparent à l'URL exacte).
+    communication_url = reverse("communications:broadcast")
+    for item in private_navigation:
+        if item.get("url") == communication_url:
+            item["section_active"] = request.path.startswith(communication_url)
     # Pilotage a rejoint le tableau de bord (voir apps.core.views.dashboard) ; la page
     # dédiée est supprimée. Statistiques et Présences restent accessibles par URL directe
     # mais sont volontairement masquées du menu pour l'instant.

@@ -193,7 +193,8 @@ class MemberBroadcastSkipTests(TestCase):
         from uuid import uuid4
         president = account("president-broadcast-skip@example.invalid", role=Role.PRESIDENT)
         member = account("member-broadcast-skip@example.invalid", role=Role.MEMBRE)
-        campaign, created = queue_member_broadcast(actor=president, subject="Info", body="Contenu", idempotency_key=uuid4())
+        campaign, created = queue_member_broadcast(actor=president, subject="Info", body="Contenu",
+            idempotency_key=uuid4(), member_ids=[president.pk, member.pk])
         self.assertTrue(created)
         member.is_active = False
         member.save(update_fields=["is_active"])

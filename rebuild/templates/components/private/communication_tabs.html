@@ -1,0 +1,4 @@
+<nav class="com-onglets" aria-label="Sections de la communication"><ul>
+<li><a href="{% url 'communications:broadcast' %}"{% if active == 'compose' %} aria-current="page"{% endif %}>Nouveau message</a></li>
+<li><a href="{% url 'communications:broadcast_history' %}"{% if active == 'history' %} aria-current="page"{% endif %}>Historique</a></li>
+</ul></nav>

@@ -1,0 +1,118 @@
+"""Lectures de la page Communication : liste des membres sélectionnables et suivi des envois.
+
+Le suivi est toujours recalculé depuis l'outbox, seule source de vérité de l'état d'un
+message : aucun statut n'est dupliqué pour l'affichage, et « Envoyé » ne signifie jamais
+autre chose que « accepté par le serveur de messagerie » (état SENT de l'outbox)."""
+from uuid import UUID
+
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db.models import Count
+
+from apps.governance.models import Role
+from .models import OutboxMessage
+from .services import RETRYABLE_ERROR_CODES, is_responsible
+
+BROADCAST_KIND = "MEMBER_BROADCAST"
+
+# Raisons lisibles, construites à partir des seuls codes fixes de l'outbox : jamais de
+# réponse SMTP brute ni de trace technique (elles pourraient contenir des données
+# nominatives et restent du ressort des journaux d'exploitation).
+FAILURE_REASONS = {
+    "recipient_refused": "Adresse refusée par le serveur de messagerie : elle est peut-être inexistante ou mal saisie.",
+    "delivery_failed": "Le serveur de messagerie n’a pas pu prendre en charge le message.",
+    "attempt_limit": "Nombre maximal de tentatives atteint.",
+    "not_applicable": "Compte désactivé ou adresse modifiée avant l’envoi : le message n’a pas été envoyé.",
+}
+RETRY_REASONS = {
+    "recipient_refused": "Adresse refusée par le serveur de messagerie, nouvelle tentative programmée.",
+    "delivery_failed": "Serveur de messagerie momentanément indisponible, nouvelle tentative programmée.",
+}
+
+
+def delivery_enabled():
+    """Faux tant que l'envoi réel est coupé (backend factice) : rien ne quitte alors la file."""
+    return not settings.EMAIL_BACKEND.endswith("dummy.EmailBackend")
+
+
+def selectable_members(eligible, selected_ids=()):
+    """Lignes de la liste de sélection, dans l'ordre alphabétique de l'éligibilité."""
+    selected = {str(value) for value in selected_ids}
+    roles = dict(Role.choices)
+    return [{
+        "id": str(user.pk),
+        "name": user.get_full_name() or user.email,
+        "email": user.email,
+        "responsible": is_responsible(role),
+        "role": roles.get(role, "") if is_responsible(role) else "",
+        "checked": str(user.pk) in selected,
+    } for user, role in eligible]
+
+
+def _overall(sent, pending, failed):
+    if pending:
+        return "en_cours", "En cours"
+    if not failed:
+        return "termine", "Terminé"
+    if not sent:
+        return "echec", "Échec"
+    return "erreurs", "Terminé avec erreurs"
+
+
+def _tracking(sent, pending, failed):
+    code, label = _overall(sent, pending, failed)
+    return {"sent": sent, "pending": pending, "failed": failed, "total": sent + pending + failed,
+            "status": code, "status_label": label}
+
+
+def with_tracking(campaigns):
+    """Ajoute à chaque campagne ses compteurs réels (une seule requête pour toute la page)."""
+    campaigns = list(campaigns)
+    counts = {campaign.pk: {"SENT": 0, "PENDING": 0, "SENDING": 0, "FAILED": 0} for campaign in campaigns}
+    rows = (OutboxMessage.objects.filter(kind=BROADCAST_KIND, object_id__in=list(counts))
+            .values_list("object_id", "state").annotate(total=Count("id")))
+    for object_id, state, total in rows:
+        counts[object_id][state] = total
+    for campaign in campaigns:
+        states = counts[campaign.pk]
+        campaign.tracking = _tracking(states["SENT"], states["PENDING"] + states["SENDING"], states["FAILED"])
+        campaign.external_count = len(campaign.external_emails)
+    return campaigns
+
+
+def _member_id(item):
+    # Clés posées par services.queue_member_broadcast : « broadcast:<campagne>:<compte> »
+    # pour un membre, « broadcast:<campagne>:ext:<empreinte> » pour une adresse externe.
+    if ":ext:" in item.event_key:
+        return None
+    try:
+        return UUID(item.event_key.rsplit(":", 1)[-1])
+    except ValueError:
+        return None
+
+
+def campaign_recipients(campaign):
+    """Un état par destinataire : les problèmes d'abord, puis les attentes, puis les envois."""
+    items = list(OutboxMessage.objects.filter(kind=BROADCAST_KIND, object_id=campaign.pk))
+    member_ids = {item.pk: _member_id(item) for item in items}
+    users = get_user_model().objects.in_bulk([value for value in member_ids.values() if value])
+    rows = []
+    for item in items:
+        user = users.get(member_ids[item.pk])
+        row = {"name": user.get_full_name() if user else "", "email": item.recipient,
+               "external": member_ids[item.pk] is None, "attempts": item.attempts,
+               "at": None, "reason": "", "retryable": False}
+        if item.state == "SENT":
+            row.update(state="sent", label="Envoyé", at=item.sent_at, order=2)
+        elif item.state == "FAILED":
+            row.update(state="failed", label="Échec", order=0,
+                       reason=FAILURE_REASONS.get(item.error_code, "L’envoi a échoué."),
+                       retryable=item.error_code in RETRYABLE_ERROR_CODES)
+        elif item.state == "SENDING":
+            row.update(state="pending", label="Envoi en cours", order=1)
+        else:
+            row.update(state="pending", label="En attente", order=1,
+                       reason=RETRY_REASONS.get(item.error_code, "") if item.attempts else "")
+        rows.append(row)
+    rows.sort(key=lambda row: (row["order"], (row["name"] or row["email"]).lower()))
+    return rows

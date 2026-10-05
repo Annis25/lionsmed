@@ -1,0 +1,5 @@
+<ul class="com-compteurs">
+<li class="com-etat com-etat--sent{% if not tracking.sent %} est-nul{% endif %}">{% include 'components/private/communication_state_icon.html' with state='sent' %}<span>{{ tracking.sent }} envoyé{{ tracking.sent|pluralize }}</span></li>
+<li class="com-etat com-etat--pending{% if not tracking.pending %} est-nul{% endif %}">{% include 'components/private/communication_state_icon.html' with state='pending' %}<span>{{ tracking.pending }} en attente</span></li>
+<li class="com-etat com-etat--failed{% if not tracking.failed %} est-nul{% endif %}">{% include 'components/private/communication_state_icon.html' with state='failed' %}<span>{{ tracking.failed }} échec{{ tracking.failed|pluralize }}</span></li>
+</ul>

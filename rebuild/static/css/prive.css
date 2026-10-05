@@ -519,32 +519,156 @@
   .qr-dialog .lot2-actions { flex-direction: column; align-items: stretch; }
 }
 
-/* Communication — composition (deux colonnes desktop), destinataires supplémentaires,
-   aperçu et historique. */
+/* Communication — rédaction (deux colonnes desktop, résumé collant), sélection des
+   membres, adresses externes, vérification, historique et suivi par destinataire.
+   Uniquement les jetons de lions.css : le thème sombre suit sans surcharge. */
 .communication-layout { display: grid; grid-template-columns: minmax(0,1fr) 340px; grid-template-areas: "main aside"; gap: var(--e5); align-items: start; }
-.communication-layout__main { grid-area: main; display: grid; gap: var(--e5); min-width: 0; }
-.communication-layout__aside { grid-area: aside; position: sticky; top: var(--e5); }
-.communication-layout__aside .lot2-actions { flex-direction: column; align-items: stretch; margin-block: var(--e4) 0; }
+.communication-layout__main { grid-area: main; display: grid; gap: var(--e4); min-width: 0; }
+/* L'en-tête applicatif reste collant sur desktop : le résumé se cale juste dessous. */
+.communication-layout__aside { grid-area: aside; position: sticky; top: calc(var(--h-entete) + var(--e4)); min-width: 0; }
+.prive-dense .communication-layout .workspace-panel { margin: 0; }
 @media (max-width: 1080px) {
-  .communication-layout { grid-template-columns: minmax(0,1fr); grid-template-areas: "main" "aside"; }
+  .communication-layout { grid-template-columns: minmax(0,1fr); grid-template-areas: "main" "aside"; gap: var(--e4); }
   .communication-layout__aside { position: static; }
 }
 
-.email-picker__row { display: flex; gap: var(--e2); margin-top: var(--e2); }
+/* Onglets « Nouveau message / Historique » : deux routes, une seule navigation. */
+.com-onglets { margin-bottom: var(--e4); border-bottom: 1px solid var(--bord); }
+.com-onglets ul { display: flex; gap: var(--e5); }
+.com-onglets a { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: -1px; border-bottom: 2px solid transparent; font-size: .875rem; font-weight: 600; color: var(--gris); transition: color var(--duree) var(--courbe), border-color var(--duree) var(--courbe); }
+.com-onglets a:hover { color: var(--bleu); }
+.com-onglets a[aria-current="page"] { color: var(--bleu); border-bottom-color: var(--bleu); }
+
+/* Rédaction → Vérification → Envoi. Le numéro est un compteur CSS, pas un glyphe. */
+.com-etapes { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e2) var(--e3); margin-bottom: var(--e4); counter-reset: etape; }
+.com-etapes li { counter-increment: etape; display: inline-flex; align-items: center; gap: var(--e2); font-size: .8125rem; font-weight: 600; color: var(--gris); }
+.com-etapes li::before { content: counter(etape); display: grid; place-items: center; width: 24px; height: 24px; flex: none; border: 1px solid var(--bord-fort); border-radius: 50%; font-size: .75rem; font-variant-numeric: tabular-nums; }
+.com-etapes li:not(:last-child)::after { content: ""; width: var(--e5); height: 1px; margin-left: var(--e1); background: var(--bord-fort); }
+.com-etapes li[aria-current="step"] { color: var(--encre); }
+.com-etapes li[aria-current="step"]::before { background: var(--marque-fort); border-color: var(--marque-fort); color: var(--sur-primaire); }
+.com-etapes li.est-faite::before { background: var(--succes-fond); border-color: var(--succes-bord); color: var(--succes-texte); }
+
+.prive-dense .com-sous-titre { margin: 0 0 var(--e2); padding: 0; font-size: .9375rem; font-weight: 600; line-height: 1.4; color: var(--encre); }
+/* Compteurs tenus à jour par communication.js : sans JavaScript ils seraient figés, donc
+   faux dès la première case cochée — le total est alors donné à l'étape de vérification. */
+html:not(.js) .com-js-seul { display: none; }
+.com-compteur { font-size: .8125rem; font-weight: 600; color: var(--encre); font-variant-numeric: tabular-nums; }
+.prive-dense .app-shell .com-compteur { margin: var(--e3) 0 0; }
+
+/* Membres du club : recherche, sélection rapide, liste à hauteur bornée (défilement
+   interne) pour rester lisible quand le club grandit. Vraies cases à cocher. */
+.com-membres__outils { display: grid; gap: var(--e3); margin-bottom: var(--e3); }
+.com-raccourcis { display: flex; flex-wrap: wrap; gap: var(--e2); }
+.com-membres__liste { max-height: 344px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--surface); }
+.com-membre + .com-membre { border-top: 1px solid var(--bord); }
+.com-membre__ligne { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: var(--e3); min-height: 56px; padding: var(--e2) var(--e4); cursor: pointer; transition: background-color var(--duree) var(--courbe); }
+.com-membre__ligne:hover { background: var(--fond); }
+.com-membre__ligne:has(input:checked) { background: var(--fond-2); }
+.com-membre__ligne:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: -3px; }
+.com-membre__ligne input { width: 20px; height: 20px; margin: 0; accent-color: var(--primaire); }
+.com-membre__ligne input:focus-visible { outline: none; }
+.com-membre__texte { display: grid; min-width: 0; }
+.com-membre__nom { font-size: .875rem; font-weight: 600; line-height: 1.4; color: var(--encre); overflow-wrap: anywhere; }
+.com-membre__email { font-size: .75rem; line-height: 1.4; color: var(--gris); overflow-wrap: anywhere; }
+.com-membre__role { padding: var(--e1) var(--e2); border: 1px solid var(--bord); border-radius: var(--r-pilule); background: var(--surface); font-size: .6875rem; font-weight: 600; line-height: 1.4; color: var(--gris); white-space: nowrap; }
+.prive-dense .app-shell .com-membres__vide { margin: var(--e3) 0 0; font-size: .8125rem; color: var(--gris); }
+
+/* Adresses externes : bloc séparé, indépendant de la sélection des membres. */
+.com-externes { margin-top: var(--e5); padding-top: var(--e5); border-top: 1px solid var(--bord); display: grid; gap: var(--e3); }
+.prive-dense .app-shell .com-externes > p { margin: 0; }
+.email-picker__row { display: flex; gap: var(--e2); }
 .email-picker__row input { flex: 1 1 auto; min-width: 0; }
-.email-picker__row button { flex: none; white-space: nowrap; }
-.email-picker__error { margin: var(--e2) 0 0; font-size: var(--t-meta); color: var(--danger-texte); }
-.email-chips { display: flex; flex-wrap: wrap; gap: var(--e2); margin-top: var(--e3); }
-.email-chip { display: inline-flex; align-items: center; gap: var(--e1); max-width: 100%; padding: var(--e1) var(--e1) var(--e1) var(--e3); border: 1px solid var(--bord); border-radius: var(--r-pilule); background: var(--fond-2); font-size: .8125rem; color: var(--encre); }
-.email-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.email-chip button { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; color: var(--gris); font-size: 1rem; line-height: 1; }
-.email-chip button:hover { background: var(--danger-fond); color: var(--danger-texte); }
+.email-picker__row .btn { flex: none; white-space: nowrap; }
+.email-picker__row .btn:hover svg { transform: none; }
+.prive-dense .app-shell .email-picker__error { margin: 0; font-size: var(--t-meta); font-weight: 500; color: var(--danger-texte); }
+.com-externes__liste { border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--surface); }
+.com-externe { display: flex; align-items: center; justify-content: space-between; gap: var(--e3); min-height: 44px; padding-left: var(--e4); }
+.com-externe + .com-externe { border-top: 1px solid var(--bord); }
+.com-externe span { min-width: 0; font-size: .875rem; color: var(--encre); overflow-wrap: anywhere; }
+.com-externe button { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--gris); cursor: pointer; transition: background-color var(--duree) var(--courbe), color var(--duree) var(--courbe); }
+.com-externe button:hover { background: var(--danger-fond); color: var(--danger-texte); }
+
+.prive-dense .com-message textarea.champ__input { height: 240px; min-height: 160px; }
+
+/* Résumé de l'envoi (colonne de droite) : chiffres alignés, total mis en avant. */
+.com-resume { display: grid; gap: var(--e3); }
+.prive-dense .com-resume > h2 { margin: 0; }
+.prive-dense .app-shell .com-resume p { margin: 0; }
+.com-resume__lignes { display: grid; gap: var(--e2); margin: 0; }
+.com-resume__lignes > div { display: flex; align-items: baseline; justify-content: space-between; gap: var(--e3); }
+.com-resume__lignes dt { font-size: .8125rem; color: var(--gris); }
+.com-resume__lignes dd { margin: 0; min-width: 0; font-size: .875rem; font-weight: 600; color: var(--encre); font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+.com-resume__lignes > .com-resume__objet { display: grid; gap: 0; }
+.com-resume__objet dd { text-align: left; }
+.com-resume__total { margin-top: var(--e1); padding-top: var(--e3); border-top: 1px solid var(--bord); }
+.com-resume__total dt { font-weight: 600; color: var(--encre); }
+.com-resume__total dd { font-size: 1.5rem; font-weight: 700; line-height: 1; }
+.com-resume__note { font-size: .8125rem; color: var(--gris); }
+.com-resume__actions { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--e2); }
+.com-resume__envoi { display: grid; gap: var(--e2); }
+
+/* Vérification avant envoi : les destinataires réels, relus par l'auteur. */
+.com-verif-groupes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: var(--e4); }
+.com-verif-liste { max-height: 248px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--bord); border-radius: var(--r-carte); }
+.com-verif-liste li { display: grid; padding: var(--e2) var(--e3); }
+.com-verif-liste li + li { border-top: 1px solid var(--bord); }
+.prive-dense .app-shell .workspace-panel > .app-note { margin: var(--e3) 0 0; max-width: none; }
+
+/* Historique : une carte par communication, compteurs réels lus dans l'outbox. */
+.com-historique { display: grid; gap: var(--e3); }
+.com-campagne { display: grid; gap: var(--e2); padding: var(--e4); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--surface); }
+.com-campagne__tete { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e2) var(--e3); }
+.prive-dense .app-shell .com-campagne__tete h2 { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.prive-dense .app-shell .com-campagne p { margin: 0; max-width: none; }
+.com-campagne__meta { font-size: .8125rem; color: var(--gris); }
+.com-campagne__audience { font-size: .875rem; color: var(--encre); }
+.com-campagne__lien { justify-self: start; margin-top: var(--e1); }
+.prive-dense .app-shell .com-aide-statut { margin: var(--e4) 0 0; max-width: 72ch; font-size: .75rem; color: var(--gris); }
+.badge--partiel { background: var(--orange-fond); border-color: var(--orange-bord); color: var(--orange-texte); }
+
+/* État d'un message : toujours une icône dessinée et un libellé, jamais la couleur seule. */
+.com-compteurs { display: flex; flex-wrap: wrap; gap: var(--e2) var(--e4); }
+.com-etat { display: inline-flex; align-items: center; gap: var(--e1); font-size: .8125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.com-etat svg { flex: none; }
+.com-etat--sent { color: var(--succes-texte); }
+.com-etat--pending { color: var(--alerte-texte); }
+.com-etat--failed { color: var(--danger-texte); }
+.com-etat.est-nul { color: var(--gris); font-weight: 400; }
+
+/* Suivi par destinataire. */
+.com-suivi { border: 1px solid var(--bord); border-radius: var(--r-carte); }
+.com-suivi__ligne { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: var(--e1) var(--e4); align-items: center; padding: var(--e3) var(--e4); }
+.com-suivi__ligne + .com-suivi__ligne { border-top: 1px solid var(--bord); }
+.com-suivi__qui { display: grid; min-width: 0; }
+.com-suivi__etat { display: grid; justify-items: end; gap: 0; }
+.com-suivi__detail { font-size: .75rem; color: var(--gris); font-variant-numeric: tabular-nums; }
+.prive-dense .app-shell .com-suivi__raison { grid-column: 1 / -1; margin: 0; max-width: none; font-size: .8125rem; color: var(--gris); }
+.prive-dense .app-shell .com-message-envoye { margin: 0; max-width: 72ch; overflow-wrap: anywhere; }
 
 .email-preview-frame { display: block; width: 100%; height: 640px; margin-top: var(--e3); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); }
 .email-preview-text { margin-top: var(--e2); padding: var(--e3); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); white-space: pre-wrap; font-size: .8125rem; line-height: 1.6; }
 
 @media (max-width: 760px) {
+  .com-membres__liste { max-height: min(344px, 56vh); }
+  .com-onglets ul { gap: var(--e4); }
+  .email-preview-frame { height: 480px; }
+}
+@media (max-width: 560px) {
   .email-picker__row { flex-direction: column; align-items: stretch; }
+  .com-raccourcis .btn { flex: 1 1 auto; }
+  .com-membre__ligne { padding-inline: var(--e3); }
+  .com-membre__ligne { grid-template-columns: auto minmax(0,1fr); }
+  .com-membre__role { grid-column: 2; justify-self: start; }
+  .com-suivi__ligne { grid-template-columns: minmax(0,1fr); }
+  .com-suivi__etat { justify-items: start; grid-auto-flow: column; justify-content: start; align-items: center; gap: var(--e2); }
+  .com-campagne__lien { justify-self: stretch; }
+  .com-etapes { gap: var(--e2); }
+  .com-etapes li { gap: var(--e1); }
+  .com-etapes li::before { width: 20px; height: 20px; }
+  .com-etapes li:not(:last-child)::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .com-onglets a, .com-membre__ligne, .com-externe button { transition: none; }
 }
 
 /* Pagination partagée (components/private/pagination.html) — toutes les listes de

@@ -49,8 +49,12 @@ class MemberEmailCampaign(models.Model):
         PARTIAL = "PARTIAL", "Envoi partiel"
 
     class Audience(models.TextChoices):
+        # Libellé descriptif de la sélection réellement envoyée, déduit côté serveur au
+        # moment de la mise en file (voir services.queue_member_broadcast) : il ne pilote
+        # plus l'envoi, dont les destinataires sont les lignes de l'outbox.
         ALL_ACTIVE = "ALL_ACTIVE", "Tous les membres actifs"
         RESPONSIBLES = "RESPONSIBLES", "Responsables uniquement"
+        SELECTION = "SELECTION", "Sélection de membres"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     idempotency_key = models.UUIDField(unique=True)
@@ -61,10 +65,11 @@ class MemberEmailCampaign(models.Model):
     status = models.CharField(max_length=8, choices=Status.choices, default=Status.QUEUED)
     audience = models.CharField(max_length=12, choices=Audience.choices, default=Audience.ALL_ACTIVE)
     # Nombre de membres internes atteints (sous-ensemble de recipient_count) ; le nombre
-    # d'adresses supplémentaires se lit avec len(external_emails). Adresses normalisées
-    # (recadrées, en minuscules, dédupliquées) : nécessaires pour l'audit opérationnel
-    # (historique, distinction membre/externe à l'envoi) — jamais affichées en clair
-    # dans les vues générales, jamais journalisées ailleurs.
+    # d'adresses externes se lit avec len(external_emails). Adresses recadrées et
+    # dédupliquées sans tenir compte de la casse : nécessaires pour l'audit opérationnel
+    # (historique, distinction membre/externe à l'envoi) — affichées uniquement à l'auteur
+    # avant l'envoi et dans le suivi détaillé d'une campagne, jamais dans la liste générale
+    # de l'historique, jamais journalisées ailleurs.
     internal_recipient_count = models.PositiveIntegerField(default=0)
     external_emails = models.JSONField(default=list, blank=True)
     recipient_count = models.PositiveIntegerField(default=0)

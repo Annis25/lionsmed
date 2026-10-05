@@ -60,7 +60,7 @@ class MarketingRoleTests(TestCase):
 
     def test_broadcast_double_submission_creates_one_campaign(self):
         payload = {"subject": "Vie du club", "body": "Information aux membres.",
-                   "campaign_key": str(uuid4()), "action": "send", "confirmed": "yes", "audience": "ALL_ACTIVE"}
+                   "campaign_key": str(uuid4()), "action": "send", "confirmed": "yes", "members": [str(self.user.pk)]}
         url = reverse("communications:broadcast")
         self.assertEqual(self.client.post(url, payload).status_code, 302)
         self.assertEqual(self.client.post(url, payload).status_code, 302)

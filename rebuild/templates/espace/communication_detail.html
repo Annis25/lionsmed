@@ -1,0 +1,51 @@
+{% extends 'base/private.html' %}
+{% load static %}
+{% block title %}Suivi de l’envoi · Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Suivi de l’envoi</h1><p class="app-titre__contexte">{{ campaign.subject }}</p></div>
+{% include 'components/private/communication_tabs.html' with active='history' %}
+{% if not delivery_enabled and campaign.tracking.pending %}<div class="alert alert--warning"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 4.2 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z"></path><path d="M12 9.5v4M12 17h.01"></path></svg><p>L’envoi d’e-mails est désactivé sur cet environnement : les messages en attente ne partiront pas tant qu’il n’est pas réactivé.</p></div>{% endif %}
+<div class="communication-layout">
+<div class="communication-layout__main">
+
+<section class="workspace-panel" aria-labelledby="suivi-titre">
+<h2 id="suivi-titre">Suivi par destinataire</h2>
+<ul class="com-suivi">
+{% for row in recipients %}<li class="com-suivi__ligne">
+<div class="com-suivi__qui"><span class="com-membre__nom">{{ row.name|default:row.email }}</span>{% if row.name %}<span class="com-membre__email">{{ row.email }}</span>{% elif row.external %}<span class="com-membre__email">Adresse externe</span>{% endif %}</div>
+<div class="com-suivi__etat">{% include 'components/private/communication_state.html' with state=row.state label=row.label %}{% if row.at %}<span class="com-suivi__detail">{{ row.at|date:"d/m/Y H:i" }}</span>{% elif row.attempts %}<span class="com-suivi__detail">{{ row.attempts }} tentative{{ row.attempts|pluralize }}</span>{% endif %}</div>
+{% if row.reason %}<p class="com-suivi__raison">{{ row.reason }}</p>{% endif %}
+</li>
+{% empty %}<li class="com-suivi__ligne"><p class="com-suivi__raison">Aucun message n’est associé à cette communication.</p></li>
+{% endfor %}</ul>
+<p class="app-note">« Envoyé » signifie que le serveur de messagerie a accepté le message. La livraison finale dépend ensuite du serveur destinataire : aucune confirmation de réception n’est disponible.</p>
+</section>
+
+<section class="workspace-panel" aria-labelledby="message-envoye">
+<h2 id="message-envoye">Message envoyé</h2>
+<p class="com-message-envoye">{{ campaign.body|linebreaksbr }}</p>
+</section>
+
+</div>
+<aside class="communication-layout__aside">
+<section class="workspace-panel com-resume" aria-labelledby="resume-suivi">
+<div class="com-campagne__tete"><h2 id="resume-suivi">Résumé</h2>{% include 'components/private/communication_status.html' with tracking=campaign.tracking %}</div>
+<dl class="com-resume__lignes">
+<div class="com-resume__objet"><dt>Objet</dt><dd>{{ campaign.subject }}</dd></div>
+<div class="com-resume__objet"><dt>Envoyé par</dt><dd>{{ campaign.created_by.get_full_name|default:campaign.created_by.email }}</dd></div>
+<div class="com-resume__objet"><dt>Date</dt><dd>{{ campaign.created_at|date:"d/m/Y" }} à {{ campaign.created_at|date:"H:i" }}</dd></div>
+<div><dt>Membres</dt><dd>{{ campaign.internal_recipient_count }}</dd></div>
+<div><dt>Adresses externes</dt><dd>{{ campaign.external_count }}</dd></div>
+<div class="com-resume__total"><dt>Total</dt><dd>{{ campaign.tracking.total }}</dd></div>
+</dl>
+{% include 'components/private/communication_counts.html' with tracking=campaign.tracking %}
+{% if retryable_count and can_send %}<form method="post" class="com-resume__envoi" data-submit-once>{% csrf_token %}
+<button class="btn btn--outline btn--block" type="submit" data-submit-once-button data-busy-label="Relance en cours…">{% if retryable_count == 1 %}Réessayer l’échec{% else %}Réessayer les {{ retryable_count }} échecs{% endif %}</button>
+<p class="champ__aide">Seuls les échecs de livraison sont remis en file. Les messages déjà envoyés ne sont jamais renvoyés. Exceptionnellement, un destinataire peut recevoir le message en double si son serveur l’avait accepté sans que la confirmation nous parvienne.</p>
+</form>{% endif %}
+<a class="btn btn--ghost btn--block" href="{% url 'communications:broadcast_history' %}">Retour à l’historique</a>
+</section>
+</aside>
+</div>
+<script src="{% static 'js/communication.js' %}" defer></script>
+{% endblock %}

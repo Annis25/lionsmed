@@ -1,23 +1,21 @@
 {% extends 'base/private.html' %}
 {% block title %}Historique des communications · Lions Club Sfax-Méditerranée{% endblock %}
 {% block content %}
-<div class="app-titre"><h1>Historique des communications</h1><p class="app-titre__contexte">Les messages déjà envoyés sont conservés à titre d’audit et ne sont pas modifiables.</p></div>
-<section class="workspace-panel">
-<div class="tableau-cadre"><table class="tableau">
-<caption class="visually-hidden">Communications envoyées aux membres</caption>
-<thead><tr><th scope="col">Objet</th><th scope="col">Date</th><th scope="col">Auteur</th><th scope="col">Audience</th><th scope="col">Destinataires</th><th scope="col">Envoyés</th><th scope="col">Échecs</th><th scope="col">Statut</th></tr></thead>
-<tbody>{% for campaign in page_obj %}<tr>
-<td data-libelle="Objet">{{ campaign.subject }}</td>
-<td data-libelle="Date">{{ campaign.created_at|date:"d/m/Y H:i" }}</td>
-<td data-libelle="Auteur">{{ campaign.created_by.get_full_name|default:campaign.created_by.email }}</td>
-<td data-libelle="Audience">{{ campaign.get_audience_display }}{% if campaign.external_emails %} + {{ campaign.external_emails|length }} externe{{ campaign.external_emails|length|pluralize }}{% endif %}</td>
-<td data-libelle="Destinataires">{{ campaign.recipient_count }}</td>
-<td data-libelle="Envoyés">{{ campaign.sent_count }}</td>
-<td data-libelle="Échecs">{{ campaign.failed_count }}</td>
-<td data-libelle="Statut"><span class="badge{% if campaign.status == 'SENT' %} badge--paye{% elif campaign.status == 'PARTIAL' %} badge--a-regulariser{% else %} badge--en-cours{% endif %}">{{ campaign.get_status_display }}</span></td>
-</tr>{% empty %}<tr><td colspan="8">Aucune communication envoyée.</td></tr>{% endfor %}</tbody>
-</table></div>
+<div class="app-titre"><h1>Communication</h1><p class="app-titre__contexte">Les messages envoyés sont conservés à titre d’audit et ne sont pas modifiables.</p></div>
+{% include 'components/private/communication_tabs.html' with active='history' %}
+{% if campaigns %}
+<ul class="com-historique">
+{% for campaign in campaigns %}<li class="com-campagne">
+<div class="com-campagne__tete"><h2>{{ campaign.subject }}</h2>{% include 'components/private/communication_status.html' with tracking=campaign.tracking %}</div>
+<p class="com-campagne__meta">{{ campaign.created_at|date:"d/m/Y" }} à {{ campaign.created_at|date:"H:i" }} · {{ campaign.created_by.get_full_name|default:campaign.created_by.email }}</p>
+<p class="com-campagne__audience"><strong>{{ campaign.tracking.total }} destinataire{{ campaign.tracking.total|pluralize }}</strong>{% if campaign.internal_recipient_count %} · {% if campaign.audience == 'SELECTION' %}{{ campaign.internal_recipient_count }} membre{{ campaign.internal_recipient_count|pluralize }}{% else %}{{ campaign.get_audience_display }} ({{ campaign.internal_recipient_count }}){% endif %}{% elif not campaign.external_count %} · {{ campaign.get_audience_display }}{% endif %}{% if campaign.external_count %} · {{ campaign.external_count }} adresse{{ campaign.external_count|pluralize }} externe{{ campaign.external_count|pluralize }}{% endif %}</p>
+{% include 'components/private/communication_counts.html' with tracking=campaign.tracking %}
+<a class="btn btn--outline btn--sm com-campagne__lien" href="{% url 'communications:broadcast_detail' campaign.pk %}">Voir le détail<span class="visually-hidden"> de « {{ campaign.subject }} »</span></a>
+</li>
+{% endfor %}</ul>
 {% include 'components/private/pagination.html' %}
-</section>
-<p><a href="{% url 'communications:broadcast' %}">Envoyer un e-mail</a></p>
+<p class="com-aide-statut">« Envoyé » signifie que le serveur de messagerie a accepté le message. La livraison finale dépend ensuite du serveur destinataire.</p>
+{% else %}
+<div class="etat-vide"><p class="etat-vide__titre">Aucune communication envoyée pour l’instant.</p><p>Vos envois apparaîtront ici, avec leur suivi par destinataire.</p><a class="btn btn--solid" href="{% url 'communications:broadcast' %}">Écrire un message</a></div>
+{% endif %}
 {% endblock %}

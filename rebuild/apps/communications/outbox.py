@@ -1,3 +1,4 @@
+import smtplib
 from datetime import timedelta
 from uuid import uuid4
 from django.conf import settings
@@ -105,7 +106,7 @@ def deliver_batch(limit=20):
             item.state="SENDING";item.attempts+=1;item.lease_token=uuid4();item.lease_until=now+timedelta(minutes=5);item.save()
             lease=item.lease_token
         # SMTP hors transaction ; identifiant stable, jamais de secret dans le journal.
-        ok=False;not_applicable=False
+        ok=False;not_applicable=False;refused=False
         try:
             parts = _mail_parts(item)
             if parts is None:
@@ -118,6 +119,10 @@ def deliver_batch(limit=20):
                 message=EmailMultiAlternatives(subject,text_body,settings.DEFAULT_FROM_EMAIL,[item.recipient],headers={"Message-ID":f"<{item.pk}@lionsmed-outbox.invalid>"})
                 message.attach_alternative(html_body,"text/html")
                 ok=message.send()==1
+        except smtplib.SMTPRecipientsRefused:
+            # Adresse rejetée par le serveur de messagerie : code distinct pour le suivi par
+            # destinataire, même politique de reprise que tout autre échec de livraison.
+            refused=True
         except Exception:
             pass  # Code d'échec fixe ci-dessous, aucun message SMTP potentiellement nominatif.
         with transaction.atomic():
@@ -129,7 +134,7 @@ def deliver_batch(limit=20):
                 current.state="FAILED";current.error_code="not_applicable"
             else:
                 current.state="FAILED" if current.attempts>=5 else "PENDING"
-                current.error_code="delivery_failed"
+                current.error_code="recipient_refused" if refused else "delivery_failed"
             current.sent_at=timezone.now() if ok else None
             current.available_at=timezone.now()+timedelta(minutes=2**current.attempts)
             current.lease_token=None;current.lease_until=None;current.save()
