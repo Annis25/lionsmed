@@ -20,13 +20,18 @@ def bad_request(request, exception):
     from django.http import HttpResponseBadRequest
     from django.template import loader
     from django.utils.http import url_has_allowed_host_and_scheme
+    from apps.documents.services import MAX_BYTES as DOCUMENT_MAX_BYTES
+    from apps.members.uploads import MAX_BYTES as PHOTO_MAX_BYTES
     reason = "too_big" if isinstance(exception, RequestDataTooBig) else "too_many_files" if isinstance(exception, TooManyFilesSent) else ""
+    # Le filtre d'envoi peut préciser que la limite dépassée est celle des documents, pas des photos.
+    document = bool(getattr(exception, "document", False))
+    megabytes = (DOCUMENT_MAX_BYTES if document else PHOTO_MAX_BYTES) // (1024 * 1024)
     back = ""
     if reason:
         referer = request.META.get("HTTP_REFERER", "")
         if url_has_allowed_host_and_scheme(referer, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
             back = referer
-    return HttpResponseBadRequest(loader.render_to_string("400.html", {"reason": reason, "back": back}))
+    return HttpResponseBadRequest(loader.render_to_string("400.html", {"reason": reason, "back": back, "document": document, "megabytes": megabytes}))
 
 
 def _management_overview(request, state):
