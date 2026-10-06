@@ -24,3 +24,6 @@ urlpatterns = [
     path("", include("apps.accounts.urls")),
     path("admin/", admin.site.urls),
 ]
+
+# Page 400 lisible (photo trop lourde, trop de fichiers) à la place du « Bad Request (400) » brut.
+handler400 = "apps.core.views.bad_request"

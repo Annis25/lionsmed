@@ -1,7 +1,7 @@
 <article class="{% if row.vote.status == 'OPEN' and not row.participation %}carte-action carte-action--urgent{% elif row.vote.status == 'OPEN' %}carte-action{% else %}carte-info{% endif %}" data-vote-card="{% if row.vote.status == 'OPEN' %}open{% else %}closed{% endif %}" data-vote-title="{{ row.vote.title|lower }}">
 <div class="carte-action__haut">
 <span class="carte-action__icone" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="m8 12 3 3 5-6"></path></svg></span>
-<div class="vote-card__title-row"><h3>{{ row.vote.title }}</h3><span class="badge {% if row.vote.status == 'OPEN' %}badge--present{% else %}badge--clos{% endif %}">{{ row.vote.get_status_display }}</span>{% if row.vote.disclosure == 'NOMINATIVE' %}<span class="badge badge--en-cours">Vote nominatif</span>{% endif %}</div>
+<div class="vote-card__title-row"><h2>{{ row.vote.title }}</h2><span class="badge {% if row.vote.status == 'OPEN' %}badge--present{% else %}badge--clos{% endif %}">{{ row.vote.get_status_display }}</span>{% if row.vote.disclosure == 'NOMINATIVE' %}<span class="badge badge--en-cours">Vote nominatif</span>{% endif %}</div>
 </div>
 {% if row.vote.description %}<p>{{ row.vote.description }}</p>{% endif %}
 {% if row.participation %}<p>Votre bulletin a déjà été envoyé. Il est définitif.</p>{% elif row.vote.status == 'OPEN' %}<p>Votre avis compte : donnez votre voix avant la clôture.</p>{% endif %}

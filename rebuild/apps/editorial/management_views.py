@@ -1,3 +1,4 @@
+from django.http import FileResponse,Http404
 from django.shortcuts import render,redirect,get_object_or_404
 from django.views.decorators.http import require_http_methods,require_safe
 from django.core.exceptions import ValidationError
@@ -14,7 +15,8 @@ from apps.agenda.forms import EventForm
 from .models import EditorialSection,ClubIdentity,ImpactMetric
 from .management_forms import ImageForm,SectionForm,IdentityForm,MetricForm
 from .publication import require,save_content,publish_content,withdraw_content,audit
-from .images import upload_image
+from .images import upload_image,storage
+from apps.core.image_processing import MAX_BYTES
 
 TYPES={"action":(Action,ActionForm,"Actions"),"event":(Event,EventForm,"Événements")}
 
@@ -31,17 +33,60 @@ def dashboard(request):
 @capability_required("public_content.access_management")
 @require_safe
 def content_list(request,kind):
-    from django.http import Http404
     if kind not in TYPES:raise Http404
     Model,Form,title=TYPES[kind];require(request.user,kind+".edit")
     queryset=Model.objects.select_related("cover") if kind=="action" else Model.objects.all()
     template="espace/action_management_list.html" if kind=="action" else "espace/content_list.html"
     return render(request,template,{"page_obj":Paginator(queryset,20).get_page(request.GET.get("page")),"kind":kind,"page_title":title})
 
+ACTION_IMAGE_SOURCE="Photo fournie par le Lions Club Sfax-Méditerranée"
+
+def _store_action_images(actor,obj,cleaned):
+    """Dépose les images choisies ; une image refusée n'empêche pas les autres et laisse l'action intacte."""
+    added=0;refused=[]
+    uploads=[(True,cleaned.get("main_image_upload"))]+[(False,upload) for upload in cleaned.get("gallery_uploads",[])]
+    for is_cover,upload in uploads:
+        if not upload:continue
+        try:
+            image=upload_image(actor=actor,upload=upload,alt="Image de l’action : "+obj.title,source=ACTION_IMAGE_SOURCE,approved=True)
+            if is_cover:
+                obj.cover=image;obj.save(update_fields=["cover","updated_at"])
+            else:
+                with transaction.atomic():
+                    position=(obj.photos.order_by("-position").values_list("position",flat=True).first() or 0)+1
+                    ActionPhoto.objects.create(action=obj,image=image,position=position)
+        except ValidationError as error:
+            refused.append("« "+upload.name+" » : "+" ".join(error.messages));continue
+        except IntegrityError:
+            refused.append("« "+upload.name+" » : l’enregistrement a échoué, déposez-la de nouveau.");continue
+        added+=1
+    return added,refused
+
+def _save_action(request,form,*,was_published):
+    """Enregistre, dépose les images, publie si demandé. Une fois l'action enregistrée, tout
+    refus (image, publication) est rapporté sur sa page de modification : jamais de brouillon
+    caché derrière un formulaire de création réaffiché."""
+    intent=request.POST.get("intent","draft")
+    obj=save_content(actor=request.user,form=form,kind="action",keep_published=was_published and intent=="update")
+    added,refused=_store_action_images(request.user,obj,form.cleaned_data)
+    blocked=""
+    if intent=="publish":
+        if refused:blocked="Une image a été refusée."
+        else:
+            try:publish_content(actor=request.user,obj=obj,kind="action")
+            except ValidationError as error:blocked=" ".join(error.messages)
+    images=" "+("1 image ajoutée." if added==1 else f"{added} images ajoutées.") if added else ""
+    if intent=="publish" and not blocked:messages.success(request,"Action publiée. Elle est visible sur le site public."+images)
+    elif intent=="publish":messages.error(request,"Votre action est enregistrée en brouillon, mais elle n’est pas encore publiée. "+blocked)
+    elif obj.status=="PUBLISHED":messages.success(request,"Modifications enregistrées. L’action reste publiée."+images)
+    else:messages.success(request,"Brouillon enregistré. L’action n’est pas visible sur le site public."+images)
+    if blocked and images:messages.info(request,images.strip())
+    for line in refused:messages.error(request,"Image non ajoutée — "+line)
+    return obj
+
 @capability_required("public_content.access_management")
 @require_http_methods(["GET","POST"])
 def content_edit(request,kind,object_id=None):
-    from django.http import Http404
     if kind not in TYPES:raise Http404
     Model,Form,title=TYPES[kind];obj=get_object_or_404(Model,pk=object_id) if object_id else None
     require(request.user,kind+(".edit" if obj else ".create"),obj)
@@ -55,34 +100,30 @@ def content_edit(request,kind,object_id=None):
     if request.method=="POST":
         try:
             if form.is_valid():
-                intent=request.POST.get("intent","draft")
-                obj=save_content(actor=request.user,form=form,kind=kind,keep_published=kind=="action" and was_published and intent=="update")
-                if kind == "action":
-                    source = "Photo fournie par le Lions Club Sfax-Méditerranée"
-                    uploaded_images = 0
-                    if form.cleaned_data.get("main_image_upload"):
-                        image = upload_image(actor=request.user, upload=form.cleaned_data["main_image_upload"], alt="Image de l’action : "+obj.title, source=source, approved=True)
-                        obj.cover = image
-                        obj.save(update_fields=["cover", "updated_at"])
-                        uploaded_images += 1
-                    for upload in form.cleaned_data.get("gallery_uploads", []):
-                        image = upload_image(actor=request.user, upload=upload, alt="Image de l’action : "+obj.title, source=source, approved=True)
-                        position = (obj.photos.order_by("-position").values_list("position", flat=True).first() or 0) + 1
-                        ActionPhoto.objects.create(action=obj, image=image, position=position)
-                        uploaded_images += 1
-                    if intent=="publish":
-                        publish_content(actor=request.user,obj=obj,kind=kind)
-                    messages.success(request, ("Action publiée." if intent=="publish" else "Action enregistrée.") + (f" {uploaded_images} image(s) ajoutée(s)." if uploaded_images else ""))
-                return redirect("editorial_management:edit",kind=kind,object_id=obj.pk)
+                if kind=="action":saved=_save_action(request,form,was_published=was_published)
+                else:saved=save_content(actor=request.user,form=form,kind=kind)
+                return redirect("editorial_management:edit",kind=kind,object_id=saved.pk)
         except (ValidationError,IntegrityError) as error:
             form.add_error(None,error if isinstance(error,ValidationError) else "Ce contenu entre en conflit avec une autre modification.")
-    template = "espace/action_form.html" if kind == "action" else "espace/content_form.html"
-    return render(request,template,{"form":form,"kind":kind,"item":obj,"page_title":"Préparer : "+title,"gallery":obj.photos.select_related("image") if kind=="action" and obj else []})
+    if kind!="action":
+        return render(request,"espace/content_form.html",{"form":form,"kind":kind,"item":obj,"page_title":"Préparer : "+title})
+    return render(request,"espace/action_form.html",{
+        "form":form,"kind":kind,"item":obj,"page_title":"Modifier l’action" if obj else "Nouvelle action",
+        "gallery":obj.photos.select_related("image") if obj else [],
+        "photo_max_bytes":MAX_BYTES,
+    })
+
+TRANSITION_DONE={
+    ("action","publish"):"Action publiée. Elle est visible sur le site public.",
+    ("action","draft"):"Action remise en brouillon. Elle n’est plus visible sur le site public.",
+    ("action","withdraw"):"Action retirée du site public.",
+    ("event","publish"):"Événement publié.",
+    ("event","withdraw"):"Événement retiré.",
+}
 
 @capability_required("public_content.access_management")
 @require_http_methods(["POST"])
 def transition(request,kind,object_id,operation):
-    from django.http import Http404
     if kind not in TYPES:raise Http404
     obj=get_object_or_404(TYPES[kind][0],pk=object_id)
     try:
@@ -90,18 +131,34 @@ def transition(request,kind,object_id,operation):
         elif operation=="draft":
             require(request.user,kind+".publish",obj);obj.status="DRAFT";obj.save(update_fields=["status","updated_at"]);audit(request.user,kind+".drafted",obj)
         else:withdraw_content(actor=request.user,obj=obj,kind=kind)
-        messages.success(request,"État de publication enregistré.")
-    except ValidationError as error:messages.error(request," ".join(error.messages))
+        messages.success(request,TRANSITION_DONE.get((kind,operation),"État de publication enregistré."))
+    except ValidationError as error:messages.error(request,"Publication impossible : "+" ".join(error.messages))
     return redirect("editorial_management:edit",kind=kind,object_id=obj.pk)
 
 @capability_required("action.edit")
 @require_http_methods(["POST"])
 def action_delete(request,object_id):
+    if request.POST.get("confirmed")!="yes":
+        # Sans la case cochée (JavaScript coupé, requête forgée), rien n'est supprimé.
+        obj=get_object_or_404(Action,pk=object_id);require(request.user,"action.edit",obj)
+        messages.error(request,"Suppression non confirmée : cochez la case de confirmation avant de supprimer.")
+        return redirect("editorial_management:edit",kind="action",object_id=obj.pk)
     with transaction.atomic():
         obj=get_object_or_404(Action.objects.select_for_update(),pk=object_id);require(request.user,"action.edit",obj)
         obj.photos.all().delete();audit(request.user,"action.deleted",obj);obj.delete()
-    messages.success(request,"Action supprimée.")
+    messages.success(request,"Action supprimée définitivement.")
     return redirect("editorial_management:list",kind="action")
+
+@capability_required("public_content.access_management")
+@require_safe
+def image_preview(request,image_id,size):
+    """Aperçu réservé à l'espace de gestion : la route publique `editorial:image` ne sert une
+    image que lorsqu'elle illustre un contenu publié, donc jamais celles d'un brouillon."""
+    item=get_object_or_404(PublicImage,pk=image_id)
+    if size not in {480,1024}:raise Http404
+    try:handle=storage().open(item.small_key if size==480 else item.large_key,"rb")
+    except FileNotFoundError:raise Http404
+    return FileResponse(handle,content_type="image/webp")
 
 @capability_required("image.manage")
 @require_http_methods(["GET","POST"])
@@ -117,16 +174,16 @@ def image_upload(request):
 @capability_required("action.edit")
 @require_http_methods(["POST"])
 def gallery(request,object_id):
+    from uuid import UUID
     with transaction.atomic():
         obj=get_object_or_404(Action.objects.select_for_update(),pk=object_id);require(request.user,"action.edit",obj)
-        from django.http import Http404
-        from uuid import UUID
         try:
             if request.POST.get("remove"):int(request.POST["remove"])
             else:UUID(request.POST.get("image", ""))
         except (ValueError,TypeError):raise Http404
         if request.POST.get("remove"):
             get_object_or_404(ActionPhoto,pk=request.POST["remove"],action=obj).delete()
+            done="Image retirée."
         else:
             if obj.photos.count() >= 9:
                 messages.error(request, "Une action peut avoir au plus neuf images supplémentaires, en plus de l’image principale.")
@@ -135,7 +192,11 @@ def gallery(request,object_id):
             from django.db.models import Max
             position=(obj.photos.aggregate(p=Max("position"))["p"] or 0)+1
             ActionPhoto.objects.get_or_create(action=obj,image=image,defaults={"position":position,"caption":request.POST.get("caption","")[:300]})
-        obj.status="DRAFT";obj.save(update_fields=["status","updated_at"]);audit(request.user,"action.gallery_changed",obj)
+            done="Image ajoutée."
+        # Une galerie ne contient que des images autorisées : la modifier ne remet pas en cause
+        # la publication (même règle que le bouton « Modifier » d'une action publiée).
+        obj.save(update_fields=["updated_at"]);audit(request.user,"action.gallery_changed",obj)
+    messages.success(request,done+(" L’action reste publiée." if obj.status=="PUBLISHED" else ""))
     return redirect("editorial_management:edit",kind="action",object_id=obj.pk)
 
 @capability_required("editorial.manage")

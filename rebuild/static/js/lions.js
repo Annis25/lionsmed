@@ -123,6 +123,13 @@
   var errors = document.querySelector('.form-errors');
   if (errors) errors.focus();
 
+  /* Page « fichier trop lourd » : le retour navigateur conserve ce qui avait été saisi. */
+  document.querySelectorAll('[data-history-back]').forEach(function (link) {
+    link.addEventListener('click', function (event) {
+      if (window.history.length > 1) { event.preventDefault(); window.history.back(); }
+    });
+  });
+
   document.querySelectorAll('[data-action-gallery]').forEach(function (gallery) {
     var main = gallery.querySelector('[data-gallery-main]');
     var frame = gallery.querySelector('.action-lightbox__frame');

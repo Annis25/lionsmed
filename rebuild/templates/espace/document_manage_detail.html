@@ -53,7 +53,7 @@
 </section>
 
 <section class="workspace-panel lot2-reading document-danger-zone">
-<h2>Danger zone</h2>
+<h2>Zone de danger</h2>
 <h3>Supprimer le document</h3>
 <p class="app-titre__contexte">Le document ne sera plus accessible et son fichier privé sera supprimé. La trace d’audit sera conservée.</p>
 <form method="post" action="{% url 'documents:manage_delete' document.pk %}" data-confirm-delete="Supprimer définitivement « {{ document.title|escapejs }} » ?">

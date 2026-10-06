@@ -218,7 +218,9 @@ def statistics(request):
     dues_counts={}
     for record in DuesRecord.objects.only("tranche1_paid","tranche2_paid"):
         dues_counts[record.status]=dues_counts.get(record.status,0)+1
-    document_counts=list(Document.objects.filter(status="AVAILABLE").values("category").annotate(total=Count("id")))
+    categories=dict(Document.Category.choices)
+    document_counts=[{"category":categories.get(row["category"],row["category"]),"total":row["total"]}
+        for row in Document.objects.filter(status="AVAILABLE").values("category").annotate(total=Count("id")).order_by("category")]
     return render(request,"espace/statistics.html",{
         "attendance_counts":attendance_counts,"dues_counts":dues_counts,"document_counts":document_counts,
         "events_with_attendance":Event.objects.filter(attendances__isnull=False).distinct().count(),

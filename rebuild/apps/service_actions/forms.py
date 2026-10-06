@@ -27,7 +27,7 @@ class ActionForm(StyledFields, forms.ModelForm):
         model=Action
         fields=["title","summary","body"]+["axis","performed_on","location","city","country","beneficiaries","hours_worked","partners","instagram_url"]
         labels={"title":"Titre","summary":"Résumé","body":"Récit / description","performed_on":"Date de réalisation","location":"Lieu","city":"Ville","country":"Pays","axis":"Axe","beneficiaries":"Bénéficiaires (si validés)","hours_worked":"Heures de travail","partners":"Partenaires validés","instagram_url":"Lien de la publication Instagram"}
-        widgets={"performed_on":forms.DateInput(attrs={"type":"date"},format="%Y-%m-%d"),"starts_at":forms.DateTimeInput(attrs={"type":"datetime-local"},format="%Y-%m-%dT%H:%M"),"ends_at":forms.DateTimeInput(attrs={"type":"datetime-local"},format="%Y-%m-%dT%H:%M"),"body":forms.Textarea(attrs={"rows":6}),"summary":forms.Textarea(attrs={"rows":3})}
+        widgets={"performed_on":forms.DateInput(attrs={"type":"date"},format="%Y-%m-%d"),"starts_at":forms.DateTimeInput(attrs={"type":"datetime-local"},format="%Y-%m-%dT%H:%M"),"ends_at":forms.DateTimeInput(attrs={"type":"datetime-local"},format="%Y-%m-%dT%H:%M"),"body":forms.Textarea(attrs={"rows":12}),"summary":forms.Textarea(attrs={"rows":3})}
     def __init__(self,*args,actor,**kwargs):
         instance=kwargs.get("instance")
         if not can(actor,"action.edit" if instance else "action.create",instance):raise PermissionDenied

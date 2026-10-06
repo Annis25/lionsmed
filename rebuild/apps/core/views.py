@@ -12,6 +12,23 @@ def home(request):
     return render(request, "public/home.html")
 
 
+def bad_request(request, exception):
+    """Page 400 lisible. Un envoi de fichier refusé (trop lourd, trop de fichiers) arrive ici
+    avant toute vue : on dit pourquoi, et comment revenir au formulaire. Rendu sans contexte
+    de requête, comme la page 400 par défaut de Django (l'hôte peut être invalide)."""
+    from django.core.exceptions import RequestDataTooBig, TooManyFilesSent
+    from django.http import HttpResponseBadRequest
+    from django.template import loader
+    from django.utils.http import url_has_allowed_host_and_scheme
+    reason = "too_big" if isinstance(exception, RequestDataTooBig) else "too_many_files" if isinstance(exception, TooManyFilesSent) else ""
+    back = ""
+    if reason:
+        referer = request.META.get("HTTP_REFERER", "")
+        if url_has_allowed_host_and_scheme(referer, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+            back = referer
+    return HttpResponseBadRequest(loader.render_to_string("400.html", {"reason": reason, "back": back}))
+
+
 def _management_overview(request, state):
     from django.db.models import Q
     from apps.dues.models import DuesRecord
@@ -162,13 +179,11 @@ def dashboard(request):
     # administrateur consulte la boîte sans que cela devienne une tâche pour lui.
     contact_to_process = contact_pending_count if can(request.user, "contact.manage") else None
 
-    # Aperçu des dernières notifications : seulement sur le dashboard Membre (les autres
-    # rôles gardent le compteur existant + CTA, déjà suffisant à leur échelle).
-    recent_notifications = None
-    if variant == "member":
-        from apps.communications.private_views import resolve_target
-        recent_notifications = [{"notification": n, "url": resolve_target(request.user, n)}
-            for n in Notification.objects.filter(recipient=request.user)[:3]]
+    # Aperçu des trois dernières notifications, pour tous les profils (décision d'oct. 2026 :
+    # la carte ne montrait qu'un compteur et restait vide aux deux tiers).
+    from apps.communications.private_views import resolve_target
+    recent_notifications = [{"notification": n, "url": resolve_target(request.user, n)}
+        for n in Notification.objects.filter(recipient=request.user)[:3]]
 
     # Documents récents : demandés explicitement pour Secrétaire, en option pour Membre.
     # Président/Trésorier n'en ont pas besoin sur leur dashboard (hors périmètre demandé).
@@ -195,6 +210,8 @@ def dashboard(request):
         "upcoming_events": upcoming,
         "unread_notifications": Notification.objects.filter(recipient=request.user, read_at__isnull=True).count(),
         "recent_notifications": recent_notifications,
+        # Un invité n'a pas accès au calendrier : le lien ne lui est pas proposé.
+        "can_calendar": can(request.user, "event.register"),
         "current_dues": current_dues,
         "votes_to_complete": votes_to_complete,
         "satisfaction_to_complete": satisfaction_to_complete,

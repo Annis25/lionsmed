@@ -47,6 +47,12 @@ def done(request,kind):
     context["kind"]=kind
     return render(request,"public/submission_done.html",context)
 
+def _request_context(request,obj,kind):
+    # « Origine » est stockée sous forme de code : on affiche le libellé du formulaire public.
+    origins=dict(ApplicationForm.base_fields["origin"].choices)
+    return {"item":obj,"kind":kind,"can_manage":can(request.user,kind+".manage",obj),"states":ContactRequest.STATES,
+        "origin_label":origins.get(getattr(obj,"origin",""),getattr(obj,"origin",""))}
+
 @capability_required("account.access_private_area")
 @require_http_methods(["GET","POST"])
 def inbox(request,kind,object_id=None):
@@ -61,8 +67,8 @@ def inbox(request,kind,object_id=None):
             except ValidationError as error:
                 from django.contrib import messages
                 messages.error(request," ".join(error.messages))
-                return render(request,"espace/request_detail.html",{"item":obj,"kind":kind,"can_manage":can(request.user,kind+".manage",obj),"states":ContactRequest.STATES},status=400)
-        return render(request,"espace/request_detail.html",{"item":obj,"kind":kind,"can_manage":can(request.user,kind+".manage",obj),"states":ContactRequest.STATES})
+                return render(request,"espace/request_detail.html",_request_context(request,obj,kind),status=400)
+        return render(request,"espace/request_detail.html",_request_context(request,obj,kind))
     if request.method=="POST":
         from django.http import HttpResponseNotAllowed
         return HttpResponseNotAllowed(["GET"])

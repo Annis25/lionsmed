@@ -97,7 +97,7 @@
   --surface:          #FFFFFF;   /* cartes, panneaux, champs */
   --surface-elevee:   #FFFFFF;   /* menus, dialogues */
   --bord-fort:        #C3D0E2;   /* séparateurs appuyés */
-  --bord-champ:       #8494AC;   /* contour de champ : 3,1:1, seuil WCAG 1.4.11 */
+  --bord-champ:       #7B8CA6;   /* contour de champ : 3,4:1 sur blanc, 3,2:1 sur --fond (seuil WCAG 1.4.11 : 3:1) */
   --primaire:         #184898;   /* aplat d'action (bouton plein, page courante) */
   --primaire-survol:  #1B54AF;
   --sur-primaire:     #FFFFFF;
@@ -182,7 +182,9 @@ body {
 img, svg, video { display: block; max-width: 100%; }
 img { height: auto; }
 a { color: inherit; text-decoration: none; }
-button { font: inherit; color: inherit; }
+/* Un bouton sans classe de style ne doit jamais montrer le fond gris et la bordure en
+   relief du navigateur : chaque composant pose ensuite son propre fond et sa bordure. */
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 ul, ol { list-style: none; margin: 0; padding: 0; }
 
 /* Focus clavier — jamais supprimé */
@@ -190,6 +192,9 @@ ul, ol { list-style: none; margin: 0; padding: 0; }
   outline: 3px solid var(--or);
   outline-offset: 3px;
   border-radius: 2px;
+  /* Liseré foncé entre l'élément et l'anneau or (décision d'oct. 2026) : l'or seul ne fait
+     que 1,4 à 1,6:1 sur fond clair. */
+  box-shadow: 0 0 0 3px var(--marque-fort);
 }
 
 /* Lien d'évitement */
@@ -396,6 +401,10 @@ p:last-child { margin-bottom: 0; }
 .btn--danger { border-color: var(--danger-plein); background: var(--danger-plein); color: #FFFFFF; }
 .btn--danger:hover { background: var(--danger-survol); border-color: var(--danger-survol); color: #FFFFFF; }
 .btn--danger:hover svg { transform: none; }
+.btn--ghost.btn--danger { background: transparent; border-color: transparent; color: var(--danger-texte); }
+.btn--ghost.btn--danger:hover { background: var(--danger-fond); border-color: var(--danger-bord); color: var(--danger-texte); }
+/* Icône d'action (plus, croix…) : elle ne glisse pas au survol comme une flèche. */
+.btn:hover .btn__icone { transform: none; }
 
 /* Compact pour les listes denses au pointeur fin ; au doigt, la cible repasse
    à 44 px sans changer la taille du texte. */
@@ -1011,7 +1020,7 @@ html:not(.theme-js) .theme-toggle { display: none; }
               box-shadow var(--duree) var(--courbe);
 }
 /* --gris et non --gris-clair : un exemple de saisie reste un texte lisible. */
-.champ__input::placeholder { color: var(--gris); opacity: .85; }
+.champ__input::placeholder { color: var(--gris); opacity: 1; }
 .champ__input:disabled, .champ__input[readonly] { background: var(--fond); color: var(--gris); border-style: dashed; cursor: not-allowed; }
 /* Survol et focus sont distincts : le survol épaissit le trait, le focus pose
    le contour or du système. */
@@ -1560,8 +1569,8 @@ select.champ__input {
   background: var(--fond-2);
   color: var(--bleu);
 }
-.carte-action h3,
-.carte-info h3 { font-size: 1rem; font-weight: 600; }
+.carte-action :is(h2, h3),
+.carte-info :is(h2, h3) { font-size: 1rem; font-weight: 600; }
 .carte-action p,
 .carte-info p { margin: 0; font-size: .9375rem; color: var(--gris); }
 .carte-action__echeance {
@@ -1599,15 +1608,20 @@ select.champ__input {
   background: var(--fond-2);
   border-color: var(--bord);
   color: var(--encre);
+  /* Jamais étiré par une grille ou une colonne : la pastille épouse son texte. */
+  width: fit-content;
 }
 .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
 
 .badge--paye,
+.badge--publie,
 .badge--present        { background: var(--succes-fond); border-color: var(--succes-bord); color: var(--succes-texte); }
 .badge--a-regulariser  { background: var(--danger-fond); border-color: var(--danger-bord); color: var(--danger-texte); }
 .badge--absent         { background: var(--fond);   border-color: var(--bord); color: var(--gris); }
 .badge--excuse         { background: var(--info-fond); border-color: var(--info-bord); color: var(--info-texte); }
+.badge--brouillon,
 .badge--en-cours       { background: var(--alerte-fond); border-color: var(--alerte-bord); color: var(--alerte-texte); }
+.badge--retire,
 .badge--clos           { background: var(--fond);   border-color: var(--bord); color: var(--gris); }
 
 /* ─── 07 · TABLEAUX ──────────────────────────────────────────────────────── */
@@ -1682,7 +1696,7 @@ select.champ__input {
   background: var(--fond-2);
   color: var(--bleu);
 }
-.etat-vide h3 { font-size: 1rem; font-weight: 600; }
+.etat-vide :is(h2, h3) { font-size: 1rem; font-weight: 600; }
 .etat-vide p { margin: 0; max-width: 46ch; font-size: .9375rem; color: var(--gris); }
 
 /* ─── 09 · JAUGE ─────────────────────────────────────────────────────────── */
@@ -1739,7 +1753,7 @@ select.champ__input {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.bloc-date__jour span { font-size: var(--t-meta); color: var(--sur-sombre-doux); }
+.bloc-date__jour span { font-size: var(--t-meta); color: var(--sur-primaire); }
 
 /* Liste de notifications — porte elle-même l'habillage de carte : son titre
    vit au-dessus, sur le fond de l'application, aligné sur celui du tableau. */
@@ -2217,7 +2231,6 @@ html:not(.js) .nav-burger, html:not(.js) .app-bascule, html:not(.js) .champ__oei
 .lot3-form .champ--choix input { grid-column: 1; grid-row: 1; width: 24px; height: 24px; }
 .lot3-form .champ--choix label { grid-column: 2; }
 
-.lot3-management .app-titre h1 { font-family: var(--police); }
 
 /* ─── Ajustements du thème sombre ───────────────────────────────────────── */
 /* Le pied navy se détache du fond de page par un filet. (Le contour appuyé du
@@ -2353,4 +2366,5 @@ html:not(.js) .nav-burger, html:not(.js) .app-bascule, html:not(.js) .champ__oei
   .brand, .link-arrow, .footer-list a, .footer-bottom a, .portrait__lien, .action-carte__lien { min-height: 44px; }
   .link-arrow, .footer-bottom a { display: inline-flex; align-items: center; }
   .portrait__lien, .action-carte__lien { display: inline-flex; align-items: center; }
+  .fil-ariane a { display: inline-flex; align-items: center; min-height: 44px; }
 }

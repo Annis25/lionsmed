@@ -399,3 +399,22 @@ class CalendarResponsiveViewsTests(TestCase):
             with self.subTest(view=view):
                 response = self.client.get(reverse("agenda_private:calendar"), {"view": view})
                 self.assertEqual(response.status_code, 200)
+
+
+class CalendarFrenchLabelTests(TestCase):
+    """Le libellé de la période affichée suit la langue du site, pas celle du serveur."""
+
+    def test_period_label_is_written_in_french(self):
+        from django.utils.formats import date_format
+        from datetime import date
+        self.client.force_login(account("calendar-label@example.invalid"))
+        url = reverse("agenda_private:calendar")
+        month = self.client.get(url, {"view": "month", "date": "2026-10-06"})
+        self.assertContains(month, "Octobre 2026")
+        day = self.client.get(url, {"view": "day", "date": "2026-10-06"})
+        self.assertContains(day, "Mardi 6 octobre 2026")
+        week = self.client.get(url, {"view": "week", "date": "2026-10-06"})
+        self.assertContains(week, f"{date_format(date(2026, 10, 5), 'j M')} – {date_format(date(2026, 10, 11), 'j M Y')}")
+        for response in (month, day, week):
+            for english in ("October", "Tuesday"):
+                self.assertNotContains(response, english)

@@ -16,7 +16,7 @@
 {% for document in page_obj %}
 <article class="carte-info doc-card" data-doc-card data-doc-title="{{ document.title|lower }}">
 <div class="carte-info__haut"><span class="carte-info__icone" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"></path><path d="M14 3v4h4M9 13h6M9 17h6"></path></svg></span></div>
-<div class="card-title-row"><h3><a href="{% url 'documents:detail' document.pk %}">{{ document.title }}</a></h3><span class="badge badge--excuse">{{ document.get_category_display }}</span></div>
+<div class="card-title-row"><h2><a href="{% url 'documents:detail' document.pk %}">{{ document.title }}</a></h2><span class="badge badge--excuse">{{ document.get_category_display }}</span></div>
 {% if document.description %}<p>{{ document.description|truncatechars:140 }}</p>{% endif %}
 <div class="card-meta">
 <span class="carte-action__echeance">Visibilité : {{ document.get_visibility_display }}</span>
@@ -31,13 +31,13 @@
 </div>
 <div class="etat-vide" data-doc-empty hidden>
 <span class="etat-vide__icone" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg></span>
-<h3>Aucun document ne correspond</h3><p>Essayez un autre filtre ou une autre recherche.</p>
+<h2>Aucun document ne correspond</h2><p>Essayez un autre filtre ou une autre recherche.</p>
 </div>
 {% include 'components/private/pagination.html' %}
 {% else %}
 <div class="etat-vide">
 <span class="etat-vide__icone" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 3h9l3 3v15H6z"></path><path d="M14 3v4h4M9 13h6M9 17h6"></path></svg></span>
-<h3>Aucun document disponible</h3><p>Les documents auxquels vous aurez accès apparaîtront ici.</p>
+<h2>Aucun document disponible</h2><p>Les documents auxquels vous aurez accès apparaîtront ici.</p>
 </div>
 {% endif %}
 <script src="{% static 'js/documents.js' %}" defer></script>

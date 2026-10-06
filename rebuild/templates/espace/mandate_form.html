@@ -1,7 +1,7 @@
 {% extends 'base/private.html' %}
 {% block title %}{% if mandate %}Modifier un mandat{% else %}Ajouter un mandat{% endif %} — Lions Club Sfax-Méditerranée{% endblock %}
 {% block content %}
-<div class="app-titre"><h1>{% if mandate %}Modifier un mandat{% else %}Ajouter un mandat{% endif %}</h1><a class="btn btn--ghost btn--sm" href="{% url 'governance:mandates' %}">← Retour au bureau et aux mandats</a></div>
+<div class="app-titre"><h1>{% if mandate %}Modifier un mandat{% else %}Ajouter un mandat{% endif %}</h1><a class="btn btn--ghost btn--sm" href="{% url 'governance:mandates' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Retour au bureau et aux mandats</a></div>
 <section class="workspace-panel lot2-reading">
   <form method="post" class="formulaire" novalidate>{% csrf_token %}{% include 'components/forms/errors.html' %}
     <div class="lot2-form-grid">

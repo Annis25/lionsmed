@@ -24,9 +24,10 @@ def save_content(*,actor,form,kind,keep_published=False):
     if not new:previous=type(obj).objects.select_for_update().get(pk=obj.pk)
     old_path=previous.get_absolute_url() if previous else None
     if not obj.slug:obj.slug=slugify(obj.title)[:190] or str(obj.pk)
-    if type(obj).objects.exclude(pk=obj.pk).filter(slug=obj.slug).exists():raise ValidationError("Ce slug est déjà utilisé.")
+    # Une action n'a pas de champ « slug » : son adresse vient du titre, le message parle donc du titre.
+    if type(obj).objects.exclude(pk=obj.pk).filter(slug=obj.slug).exists():raise ValidationError("Une autre action porte déjà ce titre. Modifiez légèrement le titre pour les distinguer." if kind=="action" else "Ce slug est déjà utilisé.")
     if new or previous.slug!=obj.slug:
-        if Redirect.objects.filter(old_path=obj.get_absolute_url()).exists():raise ValidationError("Ce chemin est réservé par une ancienne URL.")
+        if Redirect.objects.filter(old_path=obj.get_absolute_url()).exists():raise ValidationError("Ce titre correspond à une ancienne adresse du site. Modifiez légèrement le titre." if kind=="action" else "Ce chemin est réservé par une ancienne URL.")
     obj.created_by=previous.created_by if previous else actor
     obj.updated_by=actor
     obj.status="PUBLISHED" if previous and previous.status=="PUBLISHED" and keep_published else "DRAFT"
@@ -45,11 +46,11 @@ def publish_content(*,actor,obj,kind):
     actor=get_user_model().objects.select_for_update().get(pk=actor.pk)
     obj=type(obj).objects.select_for_update().get(pk=obj.pk)
     require(actor,kind+".publish",obj)
-    if not obj.title or not obj.summary or not obj.body or not obj.slug:raise ValidationError("Titre, slug, résumé et récit sont obligatoires pour publier.")
+    if not obj.title or not obj.summary or not obj.body or not obj.slug:raise ValidationError("Pour publier, renseignez le titre, le résumé et le récit.")
     for image in [obj.cover,obj.social_image]:
         if image and (not image.approved_at or not image.alt):raise ValidationError("Image non autorisée à publication.")
     if kind=="action":
-        if not obj.performed_on or obj.performed_on>timezone.localdate() or not obj.location:raise ValidationError("Une réalisation exige une date passée ou actuelle et un lieu.")
+        if not obj.performed_on or obj.performed_on>timezone.localdate() or not obj.location:raise ValidationError("Pour publier, indiquez le lieu et une date de réalisation qui n’est pas dans le futur.")
         if obj.photos.filter(image__approved_at__isnull=True).exists():raise ValidationError("La galerie contient une image non autorisée.")
     if kind=="event":
         # Visibilité PRIVATE incluse : un rendez-vous interne doit pouvoir alimenter le calendrier privé.

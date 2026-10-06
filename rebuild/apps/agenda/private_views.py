@@ -17,6 +17,8 @@ from .services import (set_registration, record_attendance, create_calendar_even
     update_calendar_event, cancel_calendar_event, ensure_calendar_token, regenerate_calendar_token)
 from .forms import QuickEventForm, CalendarEventEditForm
 from .ics import build_calendar
+from django.utils.formats import date_format
+from django.utils.text import capfirst
 
 TUNIS = timezone.get_default_timezone()
 
@@ -146,7 +148,7 @@ def calendar(request):
         placed, all_day = _layout_day_timeline(events, ref)
         context.update(prev_date=ref - timedelta(days=1), next_date=ref + timedelta(days=1),
             day_rows=[_event_row(request, e) for e in events], timeline=placed, all_day_events=all_day,
-            label=ref.strftime("%A %d %B %Y"), all_events=events)
+            label=capfirst(date_format(ref, "l j F Y")), all_events=events)
     elif view == "week":
         monday = ref - timedelta(days=ref.weekday())
         start = _aware(monday)
@@ -163,7 +165,7 @@ def calendar(request):
         selected_day = next((d for d in days if d["date"] == selected), days[0])
         context.update(prev_date=monday - timedelta(days=7), next_date=monday + timedelta(days=7),
             week_days=days, selected_date=selected, selected_day=selected_day,
-            label=f"{monday.strftime('%d %b')} – {(monday+timedelta(days=6)).strftime('%d %b %Y')}", all_events=events)
+            label=f"{date_format(monday, 'j M')} – {date_format(monday + timedelta(days=6), 'j M Y')}", all_events=events)
     else:
         first_of_month = ref.replace(day=1)
         cal = calendar_module.Calendar(firstweekday=0)
@@ -197,7 +199,7 @@ def calendar(request):
         else:
             next_month = ref.replace(month=ref.month + 1, day=1)
         context.update(prev_date=prev_month, next_date=next_month, weeks=weeks,
-            label=first_of_month.strftime("%B %Y"), all_events=events,
+            label=capfirst(date_format(first_of_month, "F Y")), all_events=events,
             selected_date=selected, selected_events=by_day.get(selected, []))
 
     context["detail_rows"] = [_event_row(request, e) for e in context.get("all_events", [])]
