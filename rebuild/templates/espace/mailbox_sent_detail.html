@@ -1,0 +1,32 @@
+{% extends 'base/private.html' %}
+{% load static %}
+{% block title %}{{ outgoing.subject }} · Envoyés · Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Message envoyé</h1><p class="app-titre__contexte">Envoyé depuis {{ mailbox.address }}</p></div>
+{% include 'components/private/mailbox_head.html' %}
+{% if not delivery_enabled and row.tracking.pending %}<div class="alert alert--warning"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 4.2 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z"></path><path d="M12 9.5v4M12 17h.01"></path></svg><p>L’envoi d’e-mails est désactivé sur cet environnement : ce message ne partira pas tant qu’il n’est pas réactivé.</p></div>{% endif %}
+<article class="workspace-panel msg-detail">
+<div class="com-campagne__tete"><h2 class="msg-detail__objet">{{ outgoing.subject }}</h2>{% include 'components/private/communication_status.html' with tracking=row.tracking %}</div>
+<dl class="paire-liste msg-entetes">
+<div><dt>De</dt><dd>{{ mailbox.address }}</dd></div>
+<div><dt>Écrit par</dt><dd>{{ outgoing.author.get_full_name|default:outgoing.author.email }}</dd></div>
+<div><dt>Date</dt><dd><time datetime="{{ outgoing.created_at|date:'c' }}">{{ outgoing.created_at|date:"l j F Y à H:i" }}</time></dd></div>
+{% if outgoing.in_reply_to %}<div><dt>En réponse à</dt><dd><a class="msg-lien" href="{% url 'mailboxes:message' mailbox.key outgoing.in_reply_to.pk %}">{{ outgoing.in_reply_to.subject|default:"(sans objet)" }}</a></dd></div>{% endif %}
+</dl>
+<h3 class="msg-sous-titre">Destinataires</h3>
+<ul class="com-suivi">
+{% for item in recipients %}<li class="com-suivi__ligne">
+<div class="com-suivi__qui"><span class="com-membre__nom">{{ item.email }}</span>{% if item.role %}<span class="com-membre__email">{{ item.role }}</span>{% endif %}</div>
+<div class="com-suivi__etat">{% include 'components/private/communication_state.html' with state=item.state label=item.label %}{% if item.at %}<span class="com-suivi__detail">{{ item.at|date:"d/m/Y H:i" }}</span>{% elif item.attempts %}<span class="com-suivi__detail">{{ item.attempts }} tentative{{ item.attempts|pluralize }}</span>{% endif %}</div>
+{% if item.reason %}<p class="com-suivi__raison">{{ item.reason }}</p>{% endif %}
+</li>{% endfor %}</ul>
+<p class="com-aide-statut">« Envoyé » signifie que le serveur de messagerie a accepté le message. Aucune confirmation de réception n’est disponible.</p>
+<h3 class="msg-sous-titre">Message</h3>
+<div class="msg-corps"><p>{{ outgoing.body|linebreaksbr }}</p></div>
+<div class="lot2-actions msg-actions">
+{% if retryable_count %}<form method="post" data-submit-once>{% csrf_token %}<button class="btn btn--outline" type="submit" data-submit-once-button data-busy-label="Relance en cours…">{% if retryable_count == 1 %}Réessayer l’envoi en échec{% else %}Réessayer les {{ retryable_count }} envois en échec{% endif %}</button></form>{% endif %}
+<a class="btn btn--ghost" href="{% url 'mailboxes:sent' mailbox.key %}">Retour aux messages envoyés</a>
+</div>
+</article>
+<script src="{% static 'js/communication.js' %}" defer></script>
+{% endblock %}

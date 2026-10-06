@@ -1,0 +1,23 @@
+{% extends 'base/private.html' %}
+{% block title %}Messagerie · {{ mailbox.address }} · Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Messagerie</h1><p class="app-titre__contexte">Boîte de la fonction « {{ mailbox.label }} »{% if mailbox.shared %}, commune à ses titulaires{% endif %} : {{ mailbox.address }}</p></div>
+{% include 'components/private/mailbox_head.html' with listing=True %}
+{% if sync.failing %}<div class="alert alert--warning" role="status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 4.2 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z"></path><path d="M12 9.5v4M12 17h.01"></path></svg><p>Impossible de synchroniser la boîte pour le moment. {% if sync.last_success_at %}Les messages affichés sont ceux reçus jusqu’au {{ sync.last_success_at|date:"d/m/Y à H:i" }} ; les suivants apparaîtront dès que la liaison sera rétablie.{% else %}Les messages apparaîtront dès que la liaison sera établie.{% endif %}</p></div>
+{% elif sync.waiting %}<div class="alert alert--info" role="status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5.5M12 7.5h.01"></path></svg><p>La première synchronisation de cette boîte n’a pas encore eu lieu. Les messages apparaîtront ici automatiquement.</p></div>{% endif %}
+{% if rows %}
+<ul class="msg-liste">
+{% for row in rows %}<li class="msg-ligne{% if not row.email.read_at %} est-non-lu{% endif %}"><a class="msg-ligne__lien" href="{% url 'mailboxes:message' mailbox.key row.email.pk %}">
+<span class="msg-ligne__point" aria-hidden="true"></span>
+<span class="msg-ligne__qui">{{ row.sender }}</span>
+<span class="msg-ligne__meta">{% if row.email.attachments %}<span class="msg-ligne__pj"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m20 11.5-8.2 8.2a5 5 0 0 1-7-7l8.4-8.5a3.3 3.3 0 0 1 4.7 4.7L9.6 17.3a1.7 1.7 0 0 1-2.4-2.4l7.6-7.6"></path></svg>{{ row.email.attachments|length }}<span class="visually-hidden"> pièce{{ row.email.attachments|length|pluralize }} jointe{{ row.email.attachments|length|pluralize }}</span></span>{% endif %}<time datetime="{{ row.email.received_at|date:'c' }}">{{ row.when }}</time></span>
+<span class="msg-ligne__objet">{% if not row.email.read_at %}<span class="badge badge--excuse">Non lu</span> {% endif %}{{ row.email.subject|default:"(sans objet)" }}</span>
+{% if row.email.preview %}<span class="msg-ligne__apercu">{{ row.email.preview|truncatechars:110 }}</span>{% endif %}
+</a></li>
+{% endfor %}</ul>
+{% include 'components/private/pagination.html' %}
+{% if sync.last_success_at and not sync.failing %}<p class="com-aide-statut">Dernière synchronisation avec le serveur de messagerie : {{ sync.last_success_at|date:"d/m/Y à H:i" }}.</p>{% endif %}
+{% else %}
+<div class="etat-vide"><span class="etat-vide__icone" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l1.5 3h5L16 13h5"></path><path d="M5.5 5h13L21 13v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5z"></path></svg></span><p class="etat-vide__titre">Aucun message reçu pour l’instant.</p><p>Les messages envoyés à {{ mailbox.address }} apparaîtront ici.</p></div>
+{% endif %}
+{% endblock %}

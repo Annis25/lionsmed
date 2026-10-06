@@ -12,7 +12,13 @@ from .services import refresh_campaign_status
 
 
 def _mail_parts(item):
-    """Construit uniquement le contexte permis au destinataire de l'outbox."""
+    """Construit uniquement le contexte permis au destinataire de l'outbox.
+
+    Renvoie (objet, texte, HTML), suivi d'un dictionnaire d'en-têtes pour les deux types liés
+    aux boîtes institutionnelles ; None quand le message n'a plus lieu d'être envoyé."""
+    if item.kind == "MAILBOX_MESSAGE":
+        from apps.mailboxes.outbox import message_parts
+        return message_parts(item)
     user = recipient_for_email(item.recipient)
     if item.kind == "MEMBER_BROADCAST":
         campaign = MemberEmailCampaign.objects.get(pk=item.object_id)
@@ -50,6 +56,9 @@ def _mail_parts(item):
         return render_transactional(item.kind, user=user, reference=str(contact.pk), contact_subject=contact.get_subject_display())
     notification = Notification.objects.select_related("recipient").get(pk=item.object_id)
     user = notification.recipient
+    if item.kind == "MAILBOX_NOTICE":
+        from apps.mailboxes.outbox import notice_parts
+        return notice_parts(item, notification)
     if item.kind in ("EVENT_REMINDER", "EVENT_CREATED"):
         from apps.agenda.models import Event
         from apps.core.permissions import can
@@ -91,9 +100,19 @@ def _mail_parts(item):
         return render_transactional(item.kind, user=user, period=period)
     return render_transactional(item.kind, user=user, notification=notification)
 
+def _sender(item):
+    """(expéditeur, connexion) : l'adresse générale du site, ou la boîte institutionnelle
+    fixée à la mise en file — avec ses propres identifiants, jamais ceux d'une autre."""
+    if not item.sender_mailbox:
+        return settings.DEFAULT_FROM_EMAIL, None
+    from apps.mailboxes.transport import connection_for
+    return connection_for(item.sender_mailbox)
+
+
 def deliver_batch(limit=20):
     if settings.EMAIL_BACKEND.endswith("dummy.EmailBackend"):
         return {"sent":0,"failed":0,"disabled":True}
+    from apps.mailboxes.transport import SenderUnavailable
     sent=failed=0
     for _ in range(min(max(limit,1),100)):
         with transaction.atomic():
@@ -106,7 +125,7 @@ def deliver_batch(limit=20):
             item.state="SENDING";item.attempts+=1;item.lease_token=uuid4();item.lease_until=now+timedelta(minutes=5);item.save()
             lease=item.lease_token
         # SMTP hors transaction ; identifiant stable, jamais de secret dans le journal.
-        ok=False;not_applicable=False;refused=False
+        ok=False;not_applicable=False;refused=False;no_sender=False
         try:
             parts = _mail_parts(item)
             if parts is None:
@@ -115,14 +134,23 @@ def deliver_batch(limit=20):
                 # nouvel essai ne changera jamais l'issue, donc pas de retry inutile.
                 not_applicable=True
             else:
-                subject, text_body, html_body = parts
-                message=EmailMultiAlternatives(subject,text_body,settings.DEFAULT_FROM_EMAIL,[item.recipient],headers={"Message-ID":f"<{item.pk}@lionsmed-outbox.invalid>"})
+                subject, text_body, html_body = parts[:3]
+                headers={"Message-ID":f"<{item.pk}@lionsmed-outbox.invalid>"}
+                if len(parts)>3:headers.update(parts[3])
+                sender, connection = _sender(item)
+                # L'enveloppe ne contient que le destinataire de cette ligne ; « To » et « Cc »
+                # éventuels des en-têtes décrivent le message tel que chacun le reçoit.
+                message=EmailMultiAlternatives(subject,text_body,sender,[item.recipient],headers=headers,connection=connection)
                 message.attach_alternative(html_body,"text/html")
                 ok=message.send()==1
         except smtplib.SMTPRecipientsRefused:
             # Adresse rejetée par le serveur de messagerie : code distinct pour le suivi par
             # destinataire, même politique de reprise que tout autre échec de livraison.
             refused=True
+        except SenderUnavailable:
+            # Boîte institutionnelle non reliée : le message attend, il ne part jamais
+            # sous une autre identité.
+            no_sender=True
         except Exception:
             pass  # Code d'échec fixe ci-dessous, aucun message SMTP potentiellement nominatif.
         with transaction.atomic():
@@ -134,7 +162,7 @@ def deliver_batch(limit=20):
                 current.state="FAILED";current.error_code="not_applicable"
             else:
                 current.state="FAILED" if current.attempts>=5 else "PENDING"
-                current.error_code="recipient_refused" if refused else "delivery_failed"
+                current.error_code="recipient_refused" if refused else "sender_unavailable" if no_sender else "delivery_failed"
             current.sent_at=timezone.now() if ok else None
             current.available_at=timezone.now()+timedelta(minutes=2**current.attempts)
             current.lease_token=None;current.lease_until=None;current.save()

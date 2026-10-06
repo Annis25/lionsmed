@@ -131,6 +131,7 @@ def _broadcast_action(request, form, action, members, external, context):
                 actor=request.user, subject=draft.subject, body=draft.body,
                 idempotency_key=form.cleaned_data["campaign_key"],
                 member_ids=[member.pk for member in members], extra_emails=external,
+                sender_mailbox=form.cleaned_data.get("sender_mailbox", ""),
             )
         except ValidationError as error:
             form.add_error(None, error)
@@ -151,11 +152,18 @@ def member_broadcast(request):
     Aperçu et test ne diffusent rien. À chaque POST, le serveur reconstitue le véritable
     ensemble de destinataires depuis les membres cochés et les adresses externes validées
     — jamais depuis un total ou une liste calculés par le navigateur."""
+    from apps.mailboxes import catalog
+    from apps.mailboxes.access import mailboxes_for
     eligible = eligible_broadcast_members()
+    senders = mailboxes_for(request.user)
     action = request.POST.get("action", "")
     form = MemberBroadcastForm(request.POST or None, initial={"campaign_key": uuid4()},
-        eligible=eligible, require_recipients=action in {"confirm", "send"})
-    context = {"form": form, "counts": _draft_counts(form, eligible)}
+        eligible=eligible, require_recipients=action in {"confirm", "send"}, senders=senders)
+    # Adresse d'envoi annoncée à l'auteur : sa boîte institutionnelle (la seule, ou celle
+    # choisie parmi les siennes), sinon l'adresse générale du site.
+    chosen = catalog.get(form["sender_mailbox"].value() or "") if len(senders) > 1 else (senders[0] if senders else None)
+    context = {"form": form, "counts": _draft_counts(form, eligible),
+               "sender_mailbox": chosen if chosen in senders else None}
 
     if request.method == "POST" and form.is_valid():
         try:
@@ -198,8 +206,9 @@ def member_broadcast_detail(request, campaign_id):
         return redirect("communications:broadcast_detail", campaign_id=campaign.pk)
     recipients = campaign_recipients(campaign)
     with_tracking([campaign])
+    from apps.mailboxes import catalog
     return render(request, "espace/communication_detail.html", {
-        "campaign": campaign, "recipients": recipients,
+        "campaign": campaign, "recipients": recipients, "sender_mailbox": catalog.get(campaign.sender_mailbox),
         "retryable_count": sum(1 for row in recipients if row["retryable"]),
         "can_send": can(request.user, "communication.send_member_broadcast"),
         "delivery_enabled": delivery_enabled(),

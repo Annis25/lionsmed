@@ -25,6 +25,9 @@ def resolve_target(actor, notification):
             return reverse("voting:member_list")
         if notification.target_kind == "satisfaction":
             return reverse("satisfaction:respond")
+        if notification.target_kind == "mailbox":
+            from apps.mailboxes.selectors import message_url_for
+            return message_url_for(actor, notification.target_id)
     except Exception:
         return None
     return None

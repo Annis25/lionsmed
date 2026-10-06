@@ -1,0 +1,21 @@
+{% extends 'base/private.html' %}
+{% block title %}Envoyés · {{ mailbox.address }} · Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Messagerie</h1><p class="app-titre__contexte">Messages écrits dans Lionsmed depuis {{ mailbox.address }}</p></div>
+{% include 'components/private/mailbox_head.html' with listing=True %}
+{% if rows %}
+<ul class="msg-liste">
+{% for row in rows %}<li class="msg-ligne"><a class="msg-ligne__lien" href="{% url 'mailboxes:sent_detail' mailbox.key row.outgoing.pk %}">
+<span class="msg-ligne__point" aria-hidden="true"></span>
+<span class="msg-ligne__qui">À : {{ row.to }}</span>
+<span class="msg-ligne__meta">{% include 'components/private/communication_status.html' with tracking=row.tracking %}<time datetime="{{ row.outgoing.created_at|date:'c' }}">{{ row.when }}</time></span>
+<span class="msg-ligne__objet">{{ row.outgoing.subject }}</span>
+<span class="msg-ligne__apercu">Par {{ row.outgoing.author.get_full_name|default:row.outgoing.author.email }}</span>
+</a></li>
+{% endfor %}</ul>
+{% include 'components/private/pagination.html' %}
+<p class="com-aide-statut">« Envoyé » signifie que le serveur de messagerie a accepté le message. La livraison finale dépend ensuite du serveur destinataire. Les messages envoyés depuis un autre logiciel de messagerie n’apparaissent pas ici.</p>
+{% else %}
+<div class="etat-vide"><p class="etat-vide__titre">Aucun message envoyé depuis Lionsmed pour l’instant.</p><p>Vos envois apparaîtront ici, avec leur état.</p><a class="btn btn--solid" href="{% url 'mailboxes:compose' mailbox.key %}">Écrire un message</a></div>
+{% endif %}
+{% endblock %}

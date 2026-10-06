@@ -19,12 +19,14 @@ BROADCAST_KIND = "MEMBER_BROADCAST"
 # réponse SMTP brute ni de trace technique (elles pourraient contenir des données
 # nominatives et restent du ressort des journaux d'exploitation).
 FAILURE_REASONS = {
+    "sender_unavailable": "La boîte d’envoi n’est pas reliée à Lionsmed : le message n’est pas parti.",
     "recipient_refused": "Adresse refusée par le serveur de messagerie : elle est peut-être inexistante ou mal saisie.",
     "delivery_failed": "Le serveur de messagerie n’a pas pu prendre en charge le message.",
     "attempt_limit": "Nombre maximal de tentatives atteint.",
     "not_applicable": "Compte désactivé ou adresse modifiée avant l’envoi : le message n’a pas été envoyé.",
 }
 RETRY_REASONS = {
+    "sender_unavailable": "Boîte d’envoi momentanément indisponible, nouvelle tentative programmée.",
     "recipient_refused": "Adresse refusée par le serveur de messagerie, nouvelle tentative programmée.",
     "delivery_failed": "Serveur de messagerie momentanément indisponible, nouvelle tentative programmée.",
 }
@@ -65,19 +67,42 @@ def _tracking(sent, pending, failed):
             "status": code, "status_label": label}
 
 
-def with_tracking(campaigns):
-    """Ajoute à chaque campagne ses compteurs réels (une seule requête pour toute la page)."""
-    campaigns = list(campaigns)
-    counts = {campaign.pk: {"SENT": 0, "PENDING": 0, "SENDING": 0, "FAILED": 0} for campaign in campaigns}
-    rows = (OutboxMessage.objects.filter(kind=BROADCAST_KIND, object_id__in=list(counts))
+def tracking_for(kind, object_ids):
+    """{objet: compteurs réels} pour des envois suivis dans l'outbox (une seule requête)."""
+    counts = {object_id: {"SENT": 0, "PENDING": 0, "SENDING": 0, "FAILED": 0} for object_id in object_ids}
+    rows = (OutboxMessage.objects.filter(kind=kind, object_id__in=list(counts))
             .values_list("object_id", "state").annotate(total=Count("id")))
     for object_id, state, total in rows:
         counts[object_id][state] = total
+    return {object_id: _tracking(states["SENT"], states["PENDING"] + states["SENDING"], states["FAILED"])
+            for object_id, states in counts.items()}
+
+
+def with_tracking(campaigns):
+    """Ajoute à chaque campagne ses compteurs réels (une seule requête pour toute la page)."""
+    campaigns = list(campaigns)
+    tracking = tracking_for(BROADCAST_KIND, [campaign.pk for campaign in campaigns])
     for campaign in campaigns:
-        states = counts[campaign.pk]
-        campaign.tracking = _tracking(states["SENT"], states["PENDING"] + states["SENDING"], states["FAILED"])
+        campaign.tracking = tracking[campaign.pk]
         campaign.external_count = len(campaign.external_emails)
     return campaigns
+
+
+def delivery_state(item):
+    """État lisible d'une ligne d'outbox : libellé, date, raison et possibilité de relance."""
+    row = {"attempts": item.attempts, "at": None, "reason": "", "retryable": False}
+    if item.state == "SENT":
+        row.update(state="sent", label="Envoyé", at=item.sent_at, order=2)
+    elif item.state == "FAILED":
+        row.update(state="failed", label="Échec", order=0,
+                   reason=FAILURE_REASONS.get(item.error_code, "L’envoi a échoué."),
+                   retryable=item.error_code in RETRYABLE_ERROR_CODES)
+    elif item.state == "SENDING":
+        row.update(state="pending", label="Envoi en cours", order=1)
+    else:
+        row.update(state="pending", label="En attente", order=1,
+                   reason=RETRY_REASONS.get(item.error_code, "") if item.attempts else "")
+    return row
 
 
 def _member_id(item):
@@ -99,20 +124,7 @@ def campaign_recipients(campaign):
     rows = []
     for item in items:
         user = users.get(member_ids[item.pk])
-        row = {"name": user.get_full_name() if user else "", "email": item.recipient,
-               "external": member_ids[item.pk] is None, "attempts": item.attempts,
-               "at": None, "reason": "", "retryable": False}
-        if item.state == "SENT":
-            row.update(state="sent", label="Envoyé", at=item.sent_at, order=2)
-        elif item.state == "FAILED":
-            row.update(state="failed", label="Échec", order=0,
-                       reason=FAILURE_REASONS.get(item.error_code, "L’envoi a échoué."),
-                       retryable=item.error_code in RETRYABLE_ERROR_CODES)
-        elif item.state == "SENDING":
-            row.update(state="pending", label="Envoi en cours", order=1)
-        else:
-            row.update(state="pending", label="En attente", order=1,
-                       reason=RETRY_REASONS.get(item.error_code, "") if item.attempts else "")
-        rows.append(row)
+        rows.append({"name": user.get_full_name() if user else "", "email": item.recipient,
+                     "external": member_ids[item.pk] is None, **delivery_state(item)})
     rows.sort(key=lambda row: (row["order"], (row["name"] or row["email"]).lower()))
     return rows

@@ -1,0 +1,22 @@
+{% extends 'base/private.html' %}
+{% load static %}
+{% block title %}{% if original %}Répondre{% else %}Nouveau message{% endif %} · Messagerie · Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>{% if original %}Répondre{% else %}Nouveau message{% endif %}</h1><p class="app-titre__contexte">Envoyé depuis {{ mailbox.address }}</p></div>
+{% include 'components/private/mailbox_head.html' %}
+{% if not delivery_enabled %}<div class="alert alert--warning"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 4.2 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z"></path><path d="M12 9.5v4M12 17h.01"></path></svg><p>L’envoi d’e-mails est désactivé sur cet environnement : le message restera en attente dans la file.</p></div>{% endif %}
+<section class="workspace-panel lot2-reading">
+<form method="post" class="formulaire msg-redaction" novalidate data-submit-once>{% csrf_token %}{{ form.message_key }}{% include 'components/forms/errors.html' %}
+<dl class="paire-liste msg-entetes"><div><dt>De</dt><dd>{{ mailbox.address }} <span class="msg-adresse">adresse de la fonction, non modifiable</span></dd></div></dl>
+<div class="lot2-form-grid">
+<div class="lot2-wide">{% include 'components/forms/field.html' with field=form.to %}</div>
+<div class="lot2-wide">{% include 'components/forms/field.html' with field=form.cc %}</div>
+<div class="lot2-wide">{% include 'components/forms/field.html' with field=form.subject %}</div>
+<div class="lot2-wide">{% include 'components/forms/field.html' with field=form.body %}</div>
+</div>
+<p class="app-note">Le message part tel que vous l’écrivez, sans pièce jointe, et apparaît ensuite dans « Envoyés » avec son état d’envoi.</p>
+<div class="lot2-actions"><button class="btn btn--solid" type="submit" data-submit-once-button data-busy-label="Envoi en cours…">Envoyer</button><a class="btn btn--ghost" href="{% if original %}{% url 'mailboxes:message' mailbox.key original.pk %}{% else %}{% url 'mailboxes:inbox' mailbox.key %}{% endif %}">Annuler</a></div>
+</form>
+</section>
+<script src="{% static 'js/communication.js' %}" defer></script>
+{% endblock %}

@@ -1,0 +1,17 @@
+[Unit]
+Description=LionsMed Institutional Mailboxes Sync (IMAP, read-only)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=www-data
+WorkingDirectory=/var/www/lionsmed/rebuild
+EnvironmentFile=/var/www/lionsmed/rebuild/.env
+Environment=DJANGO_SETTINGS_MODULE=config.settings.production
+ExecStart=/var/www/lionsmed/rebuild/.venv/bin/python manage.py sync_mailboxes
+# Dix boîtes relevées l'une après l'autre, 20 s de délai réseau au plus par échange.
+TimeoutStartSec=600
+NoNewPrivileges=true
+PrivateTmp=true

@@ -1,0 +1,19 @@
+{% autoescape off %}Bonjour{% if first_name %} {{ first_name }}{% endif %},
+
+Un nouveau message a été reçu sur :
+{{ mailbox.address }}
+
+De :
+{{ sender|default:"expéditeur inconnu" }}
+
+Objet :
+{{ email.subject|default:"(sans objet)" }}
+
+Ouvrir dans Lionsmed : {{ url }}
+
+Vous recevez cet avis parce que vous tenez actuellement cette fonction au sein du club.
+Ceci est un message automatique : merci de ne pas y répondre.
+
+Lions Club Sfax-Méditerranée
+Sfax, Tunisie · District 414 Tunisie
+Nous servons.{% endautoescape %}

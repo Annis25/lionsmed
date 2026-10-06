@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres", "django.contrib.sitemaps", "axes",
     "django_otp", "django_otp.plugins.otp_totp", "django_otp.plugins.otp_static",
     "apps.editorial", "apps.service_actions", "apps.agenda", "apps.communications", "apps.accounts", "apps.members",
-    "apps.governance", "apps.documents", "apps.dues", "apps.voting", "apps.satisfaction", "apps.core",
+    "apps.governance", "apps.documents", "apps.dues", "apps.voting", "apps.satisfaction", "apps.mailboxes", "apps.core",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -142,6 +142,29 @@ FILE_UPLOAD_HANDLERS = [
 CLAMD_SOCKET = os.environ.get("LIONSMED_CLAMD_SOCKET") or None
 CLAMD_HOST = os.environ.get("LIONSMED_CLAMD_HOST") or None
 CLAMD_PORT = os.environ.get("LIONSMED_CLAMD_PORT") or None
+
+# Boîtes e-mail institutionnelles (Messagerie, apps.mailboxes). Le serveur et les ports sont
+# communs aux dix boîtes ; seul le mot de passe de chacune est secret et ne vit que dans
+# l'environnement du serveur (.env), jamais en base ni dans le dépôt. Une variable par boîte :
+# LIONSMED_MAILBOX_PASSWORD_<CLÉ>, la clé étant celle du catalogue en majuscules avec des « _ »
+# (PRESIDENT, VICE_PRESIDENT, MARKETING_COMMUNICATION…). Une boîte sans mot de passe est inactive.
+# L'identifiant de connexion est l'adresse de la boîte, sauf LIONSMED_MAILBOX_USER_<CLÉ>.
+def _mailbox_env(prefix):
+    return {name[len(prefix):].lower().replace("_", "-"): value.strip()
+            for name, value in os.environ.items() if name.startswith(prefix) and value.strip()}
+
+MAILBOX_HOST = os.environ.get("LIONSMED_MAILBOX_HOST") or "mail.lionsmed.tn"
+MAILBOX_IMAP_PORT = int(os.environ.get("LIONSMED_MAILBOX_IMAP_PORT") or "993")
+MAILBOX_SMTP_PORT = int(os.environ.get("LIONSMED_MAILBOX_SMTP_PORT") or "465")
+MAILBOX_PASSWORDS = _mailbox_env("LIONSMED_MAILBOX_PASSWORD_")
+MAILBOX_USERNAMES = _mailbox_env("LIONSMED_MAILBOX_USER_")
+MAILBOX_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+MAILBOX_TIMEOUT = 20
+# Synchronisation : messages repris au premier passage, messages par boîte et par passage,
+# taille au-delà de laquelle seuls les en-têtes d'un message sont lus.
+MAILBOX_INITIAL_IMPORT = 200
+MAILBOX_SYNC_BATCH = 50
+MAILBOX_MAX_MESSAGE_BYTES = 15 * 1024 * 1024
 
 PUBLIC_INDEXING_ENABLED = False
 CONTACT_RECIPIENT = os.environ.get("LIONSMED_CONTACT_RECIPIENT", "")

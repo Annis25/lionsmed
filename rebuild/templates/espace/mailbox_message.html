@@ -1,0 +1,30 @@
+{% extends 'base/private.html' %}
+{% block title %}{{ email.subject|default:"(sans objet)" }} · Messagerie · Lions Club Sfax-Méditerranée{% endblock %}
+{% block content %}
+<div class="app-titre"><h1>Message reçu</h1><p class="app-titre__contexte">Reçu sur {{ mailbox.address }}</p></div>
+{% include 'components/private/mailbox_head.html' %}
+<article class="workspace-panel msg-detail">
+<h2 class="msg-detail__objet">{{ email.subject|default:"(sans objet)" }}</h2>
+<dl class="paire-liste msg-entetes">
+<div><dt>De</dt><dd>{% if email.sender_name %}{{ email.sender_name }} <span class="msg-adresse">{{ email.sender_address }}</span>{% else %}{{ email.sender_address|default:"Expéditeur inconnu" }}{% endif %}</dd></div>
+{% if email.reply_to %}<div><dt>Répondre à</dt><dd>{{ email.reply_to }}</dd></div>{% endif %}
+<div><dt>À</dt><dd>{% for row in email.recipients %}{% if row.name %}{{ row.name }} <span class="msg-adresse">{{ row.address }}</span>{% else %}{{ row.address }}{% endif %}{% if not forloop.last %}, {% endif %}{% empty %}{{ mailbox.address }}{% endfor %}</dd></div>
+{% if email.copies %}<div><dt>Copie</dt><dd>{% for row in email.copies %}{% if row.name %}{{ row.name }} <span class="msg-adresse">{{ row.address }}</span>{% else %}{{ row.address }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</dd></div>{% endif %}
+<div><dt>Date</dt><dd><time datetime="{{ email.received_at|date:'c' }}">{{ email.received_at|date:"l j F Y à H:i" }}</time></dd></div>
+</dl>
+{% if email.partial %}<div class="alert alert--warning"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 4.2 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z"></path><path d="M12 9.5v4M12 17h.01"></path></svg><p>Ce message n’a pas pu être repris en entier dans Lionsmed.</p></div>{% endif %}
+<div class="msg-corps">{% if body_html %}{{ body_html }}{% elif email.body_text %}<p>{{ email.body_text|urlize|linebreaksbr }}</p>{% else %}<p class="msg-corps__vide">Ce message ne contient pas de texte.</p>{% endif %}</div>
+{% if email.attachments %}<section class="msg-pieces" aria-labelledby="pieces-titre">
+<h3 id="pieces-titre">{{ email.attachments|length }} pièce{{ email.attachments|length|pluralize }} jointe{{ email.attachments|length|pluralize }}</h3>
+<ul>{% for item in email.attachments %}<li><span class="msg-pieces__nom">{{ item.name }}</span><span class="msg-pieces__poids">{{ item.size|filesizeformat }}</span></li>{% endfor %}</ul>
+<p class="app-note">Les pièces jointes ne sont pas encore consultables dans Lionsmed. Pour les ouvrir, consultez cette boîte depuis votre logiciel de messagerie habituel.</p>
+</section>{% endif %}
+<div class="lot2-actions msg-actions">
+<a class="btn btn--solid" href="{% url 'mailboxes:compose' mailbox.key %}?reponse={{ email.pk }}">Répondre</a>
+{% if reply_all %}<a class="btn btn--outline" href="{% url 'mailboxes:compose' mailbox.key %}?reponse={{ email.pk }}&amp;tous=1">Répondre à tous</a>{% endif %}
+<form method="post" action="{% url 'mailboxes:unread' mailbox.key email.pk %}">{% csrf_token %}<button class="btn btn--ghost" type="submit">Marquer comme non lu</button></form>
+<a class="btn btn--ghost" href="{% url 'mailboxes:inbox' mailbox.key %}">Retour à la boîte de réception</a>
+</div>
+{% if readers %}<p class="com-aide-statut">Ouvert par {% for reader in readers %}{{ reader.name }} le {{ reader.at|date:"d/m/Y à H:i" }}{% if not forloop.last %}, {% endif %}{% endfor %}.</p>{% endif %}
+</article>
+{% endblock %}

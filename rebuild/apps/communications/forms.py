@@ -70,11 +70,20 @@ class MemberBroadcastForm(StyledFields, forms.Form):
     extra_emails = forms.CharField(required=False, label="Adresses externes",
         widget=forms.Textarea(attrs={"rows": 3, "placeholder": "adresse@exemple.com"}),
         help_text="Une adresse par ligne, ou séparées par une virgule.")
+    # Présent seulement pour qui tient plusieurs boîtes institutionnelles : les choix sont
+    # les siennes, fixées par le serveur. Une seule boîte (ou aucune) : rien à choisir.
+    sender_mailbox = forms.ChoiceField(label="Envoyer depuis",
+        error_messages={"invalid_choice": "Cette adresse d’envoi ne vous est pas attribuée."})
 
-    def __init__(self, *args, eligible=(), require_recipients=False, **kwargs):
+    def __init__(self, *args, eligible=(), require_recipients=False, senders=(), **kwargs):
         super().__init__(*args, **kwargs)
         self.require_recipients = require_recipients
         self.eligible = list(eligible)
+        if len(senders) > 1:
+            self.fields["sender_mailbox"].choices = [(mailbox.key, mailbox.address) for mailbox in senders]
+            self.fields["sender_mailbox"].initial = senders[0].key
+        else:
+            del self.fields["sender_mailbox"]
         self.fields["members"].choices = [(str(user.pk), user.get_full_name() or user.email) for user, _ in self.eligible]
         self.extra_emails_submitted = 0
 

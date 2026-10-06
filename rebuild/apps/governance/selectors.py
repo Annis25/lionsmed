@@ -15,7 +15,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from apps.core.permissions import can
 from apps.members.models import MemberProfile
-from .functions import function_key, function_rank, normalize_function
+from .functions import UNRANKED, function_key, function_rank, normalize_function
 from .models import ClubState, LionsYear, Mandate
 
 
@@ -121,7 +121,7 @@ def year_mandates(actor, year, today=None):
             "starts_on": mandate.starts_on, "last_day": mandate.ends_on - timedelta(days=1), "period": period,
             "validated": bool(mandate.validated_at), "public_authorized": mandate.public_authorized,
             "can_end": mandate.starts_on < today < mandate.ends_on,
-            "recognised": function_key(mandate.function) is not None,
+            "recognised": function_rank(mandate.function) != UNRANKED,
             "_sort": (function_rank(mandate.function), normalize_function(mandate.function), mandate.starts_on,
                       user.last_name.lower(), user.first_name.lower()),
         })

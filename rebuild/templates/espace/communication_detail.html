@@ -33,6 +33,7 @@
 <dl class="com-resume__lignes">
 <div class="com-resume__objet"><dt>Objet</dt><dd>{{ campaign.subject }}</dd></div>
 <div class="com-resume__objet"><dt>Envoyé par</dt><dd>{{ campaign.created_by.get_full_name|default:campaign.created_by.email }}</dd></div>
+{% if sender_mailbox %}<div class="com-resume__objet"><dt>Envoyé depuis</dt><dd>{{ sender_mailbox.address }}</dd></div>{% endif %}
 <div class="com-resume__objet"><dt>Date</dt><dd>{{ campaign.created_at|date:"d/m/Y" }} à {{ campaign.created_at|date:"H:i" }}</dd></div>
 <div><dt>Membres</dt><dd>{{ campaign.internal_recipient_count }}</dd></div>
 <div><dt>Adresses externes</dt><dd>{{ campaign.external_count }}</dd></div>

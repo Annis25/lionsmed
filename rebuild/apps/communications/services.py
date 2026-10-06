@@ -170,11 +170,16 @@ def _external_event_key(campaign_id, email):
 
 
 @transaction.atomic
-def queue_member_broadcast(*, actor, subject, body, idempotency_key, member_ids=(), extra_emails=()):
+def queue_member_broadcast(*, actor, subject, body, idempotency_key, member_ids=(), extra_emails=(), sender_mailbox=""):
     """Met en file un e-mail individuel par destinataire : membres cochés et adresses
-    externes, jamais un groupe implicite. Sans member_ids, aucun membre ne reçoit rien."""
+    externes, jamais un groupe implicite. Sans member_ids, aucun membre ne reçoit rien.
+
+    L'expéditeur est décidé ici : la boîte institutionnelle de l'auteur s'il en tient une
+    (apps.mailboxes.access.sender_for), sinon l'adresse générale du site. `sender_mailbox`
+    ne sert qu'à choisir entre plusieurs boîtes tenues ; toute autre valeur est refusée."""
     if not can(actor, "communication.send_member_broadcast"):
         raise PermissionDenied
+    from apps.mailboxes.access import sender_for
     from django.contrib.auth import get_user_model
     # Verrou sur l'auteur : deux soumissions simultanées du même formulaire s'exécutent
     # l'une après l'autre, la seconde retrouve la campagne créée par la première.
@@ -186,20 +191,22 @@ def queue_member_broadcast(*, actor, subject, body, idempotency_key, member_ids=
     members, external, eligible = _resolve_selection(member_ids, extra_emails)
     if not members and not external:
         raise ValidationError("Sélectionnez au moins un membre ou ajoutez une adresse externe.")
+    mailbox = sender_for(actor, sender_mailbox or "")
+    sender = mailbox.key if mailbox else ""
     campaign, created = MemberEmailCampaign.objects.get_or_create(
         idempotency_key=idempotency_key,
-        defaults={"subject": subject, "body": body, "created_by": actor,
+        defaults={"subject": subject, "body": body, "created_by": actor, "sender_mailbox": sender,
                   "audience": _audience_label(members, eligible), "external_emails": external},
     )
     if not created:
         return campaign, False
     messages = [OutboxMessage(
         event_key=f"broadcast:{campaign.pk}:{recipient.pk}", kind="MEMBER_BROADCAST",
-        recipient=recipient.email, object_id=campaign.pk,
+        recipient=recipient.email, object_id=campaign.pk, sender_mailbox=sender,
     ) for recipient in members]
     messages += [OutboxMessage(
         event_key=_external_event_key(campaign.pk, email), kind="MEMBER_BROADCAST",
-        recipient=email, object_id=campaign.pk,
+        recipient=email, object_id=campaign.pk, sender_mailbox=sender,
     ) for email in external]
     OutboxMessage.objects.bulk_create(messages, ignore_conflicts=True)
     campaign.recipient_count = campaign.queued_count = len(messages)
@@ -231,7 +238,7 @@ def refresh_campaign_status(campaign_id):
 
 # Échecs de livraison uniquement. « not_applicable » (compte désactivé ou adresse
 # modifiée avant l'envoi) est un refus métier définitif : le relancer ne changerait rien.
-RETRYABLE_ERROR_CODES = frozenset({"delivery_failed", "recipient_refused", "attempt_limit"})
+RETRYABLE_ERROR_CODES = frozenset({"delivery_failed", "recipient_refused", "attempt_limit", "sender_unavailable"})
 
 
 @transaction.atomic

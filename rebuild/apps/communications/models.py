@@ -26,7 +26,8 @@ class OutboxMessage(models.Model):
     kind=models.CharField(max_length=20,choices=[("APPLICATION","Accusé candidature"),("CONTACT","Avis contact interne"),
         ("EVENT_CREATED","Nouvel événement"),("EVENT_REMINDER","Rappel de rendez-vous"),("IMPORTANT","Notification importante"),("DOCUMENT","Nouveau document"),
         ("VOTE_OPENED","Ouverture d'un vote"),("VOTE_RESULTS","Résultats d'un vote"),("SATISFACTION_OPENED","Ouverture satisfaction"),
-        ("MEMBER_BROADCAST", "Communication aux membres"), ("ACTIVATION", "Invitation membre")])
+        ("MEMBER_BROADCAST", "Communication aux membres"), ("ACTIVATION", "Invitation membre"),
+        ("MAILBOX_MESSAGE", "Message d'une boîte institutionnelle"), ("MAILBOX_NOTICE", "Avis de nouveau message")])
     recipient=models.EmailField()
     object_id=models.UUIDField()
     attempts=models.PositiveSmallIntegerField(default=0)
@@ -37,6 +38,9 @@ class OutboxMessage(models.Model):
     created_at=models.DateTimeField(auto_now_add=True)
     sent_at=models.DateTimeField(null=True,blank=True)
     error_code=models.CharField(max_length=32,blank=True)
+    # Clé de la boîte institutionnelle qui envoie (apps.mailboxes.catalog) ; vide = adresse
+    # générale du site. Fixée à la mise en file, jamais déduite au moment de l'envoi.
+    sender_mailbox=models.CharField(max_length=40,blank=True,default="")
     class Meta:
         indexes=[models.Index(fields=["state","available_at"],name="outbox_ready_idx")]
 
@@ -77,6 +81,8 @@ class MemberEmailCampaign(models.Model):
     sent_count = models.PositiveIntegerField(default=0)
     failed_count = models.PositiveIntegerField(default=0)
     sent_at = models.DateTimeField(null=True, blank=True)
+    # Boîte institutionnelle depuis laquelle la campagne est partie ; vide = adresse générale.
+    sender_mailbox = models.CharField(max_length=40, blank=True, default="")
 
     class Meta:
         ordering = ["-created_at", "id"]
@@ -90,6 +96,7 @@ class Notification(models.Model):
         IMPORTANT="IMPORTANT","Importante"
         VOTE="VOTE","Vote"
         SATISFACTION="SATISFACTION","Satisfaction"
+        MESSAGE="MESSAGE","Messagerie"
     id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     recipient=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.PROTECT,related_name="notifications")
     event_key=models.CharField(max_length=150,unique=True)

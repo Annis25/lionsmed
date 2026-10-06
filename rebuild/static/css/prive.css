@@ -1123,3 +1123,82 @@ a.pagination__arrow:hover, a.pagination__page:hover { border-color: var(--bleu);
 .notice-box--nominatif { margin-bottom: var(--e4); border-color: var(--alerte-bord); background: var(--alerte-fond); color: var(--encre); }
 .notice-box--nominatif svg { color: var(--alerte-texte); }
 .notice-box--nominatif p { margin: 0; }
+
+/* ══ Messagerie — boîtes e-mail institutionnelles ══
+   Une liste de messages et une page de lecture, rien d'un client de messagerie complet.
+   Les onglets réutilisent .com-onglets, les états d'envoi .com-suivi et .com-etat. */
+.msg-boites { margin-bottom: var(--e4); }
+.msg-boites ul { display: flex; flex-wrap: wrap; gap: var(--e2); }
+.msg-boites a { display: inline-flex; align-items: center; gap: var(--e2); min-height: 44px; max-width: 100%; padding: var(--e1) var(--e4); border: 1px solid var(--bord-fort); border-radius: var(--r-pilule); background: var(--surface); font-size: .875rem; font-weight: 600; color: var(--encre); overflow-wrap: anywhere; transition: border-color var(--duree) var(--courbe), color var(--duree) var(--courbe); }
+.msg-boites a:hover { border-color: var(--bleu); color: var(--bleu); }
+.msg-boites a[aria-current] { border-color: var(--primaire); background: var(--primaire); color: var(--sur-primaire); }
+.msg-pastille { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 var(--e1); border-radius: var(--r-pilule); background: var(--info-fond); border: 1px solid var(--info-bord); font-size: .75rem; font-weight: 700; line-height: 1; color: var(--info-texte); font-variant-numeric: tabular-nums; }
+.msg-boites a[aria-current] .msg-pastille { background: var(--sur-primaire); border-color: var(--sur-primaire); color: var(--primaire); }
+
+.msg-barre { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--e2) var(--e4); margin-bottom: var(--e4); border-bottom: 1px solid var(--bord); }
+.msg-barre .com-onglets { margin-bottom: 0; border-bottom: 0; }
+.msg-barre .com-onglets a { gap: var(--e2); }
+.msg-barre .com-onglets a[aria-current="true"] { color: var(--bleu); border-bottom-color: var(--bleu); }
+.msg-barre > .btn { margin-bottom: var(--e2); }
+
+/* Liste : chaque ligne est un seul lien. Un message non lu se reconnaît à son texte en gras,
+   à son point et à l'étiquette « Non lu » — jamais à la seule couleur. Aucun texte n'est coupé :
+   expéditeur et objet passent à la ligne, l'aperçu est raccourci côté serveur. */
+.msg-liste { border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--surface); overflow: hidden; }
+.msg-ligne + .msg-ligne { border-top: 1px solid var(--bord); }
+.msg-ligne__lien { display: grid; grid-template-columns: 8px minmax(0, 220px) minmax(0, 1fr) auto; grid-template-areas: "point qui objet meta" "point qui apercu meta"; align-items: start; gap: var(--e1) var(--e3); min-height: 44px; padding: var(--e3) var(--e4); color: var(--encre); transition: background-color var(--duree) var(--courbe); }
+.msg-ligne__lien:hover { background: var(--fond); }
+.msg-ligne__lien:focus-visible { outline-offset: -3px; }
+.msg-ligne__point { grid-area: point; margin-top: 7px; width: 8px; height: 8px; border-radius: 50%; background: transparent; }
+.est-non-lu .msg-ligne__point { background: var(--bleu); }
+.msg-ligne__qui { grid-area: qui; min-width: 0; font-size: .875rem; line-height: 1.45; color: var(--gris); overflow-wrap: anywhere; }
+.msg-ligne__objet { grid-area: objet; min-width: 0; font-size: .9375rem; line-height: 1.45; overflow-wrap: anywhere; }
+.msg-ligne__objet .badge { margin-right: var(--e1); vertical-align: 1px; }
+.msg-ligne__apercu { grid-area: apercu; min-width: 0; font-size: .8125rem; line-height: 1.45; color: var(--gris); overflow-wrap: anywhere; }
+.msg-ligne__meta { grid-area: meta; display: flex; flex-direction: column; align-items: flex-end; gap: var(--e1); font-size: .75rem; line-height: 1.75; color: var(--gris); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.msg-ligne__pj { display: inline-flex; align-items: center; gap: var(--e1); }
+.est-non-lu .msg-ligne__qui, .est-non-lu .msg-ligne__objet { font-weight: 700; color: var(--encre); }
+
+/* Lecture d'un message. Le corps vient du nettoyeur (balises simples, sans style d'origine) :
+   toute sa mise en forme est décidée ici, d'où le mode sombre automatique. */
+.prive-dense .app-shell .msg-detail__objet { margin: 0 0 var(--e4); overflow-wrap: anywhere; }
+.msg-entetes { padding-bottom: var(--e4); margin-bottom: var(--e4); border-bottom: 1px solid var(--bord); gap: var(--e2); }
+.msg-entetes > div { grid-template-columns: 96px minmax(0, 1fr); }
+.msg-entetes dd { overflow-wrap: anywhere; }
+.msg-adresse { color: var(--gris); font-size: .8125rem; }
+.msg-corps { max-width: 76ch; font-size: .9375rem; line-height: 1.65; color: var(--encre); overflow-wrap: anywhere; }
+.prive-dense .app-shell .msg-corps :is(p, div, ul, ol, blockquote, pre) { margin: 0 0 var(--e3); max-width: none; }
+.prive-dense .app-shell .msg-corps > :last-child { margin-bottom: 0; }
+.msg-corps a { color: var(--bleu); text-decoration: underline; text-underline-offset: 2px; }
+.msg-corps ul { list-style: disc; padding-left: var(--e5); }
+.msg-corps ol { list-style: decimal; padding-left: var(--e5); }
+.msg-corps blockquote { padding-left: var(--e3); border-left: 3px solid var(--bord-fort); color: var(--gris); }
+.msg-corps pre { padding: var(--e3); border: 1px solid var(--bord); border-radius: var(--r-carte); background: var(--fond); font-size: .8125rem; white-space: pre-wrap; }
+.msg-corps hr { margin: var(--e4) 0; border: 0; border-top: 1px solid var(--bord); }
+.msg-corps__vide { color: var(--gris); }
+.msg-pieces { margin-top: var(--e5); padding-top: var(--e4); border-top: 1px solid var(--bord); }
+.prive-dense .app-shell .msg-pieces h3, .prive-dense .app-shell .msg-sous-titre { margin: var(--e5) 0 var(--e3); font-size: .9375rem; }
+.prive-dense .app-shell .msg-pieces h3 { margin-top: 0; }
+.msg-pieces ul { display: grid; gap: var(--e1); margin-bottom: var(--e3); }
+.msg-pieces li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--e1) var(--e3); padding: var(--e2) var(--e3); border: 1px solid var(--bord); border-radius: var(--r-carte); font-size: .875rem; }
+.msg-pieces__nom { min-width: 0; overflow-wrap: anywhere; }
+.msg-pieces__poids { color: var(--gris); font-size: .8125rem; font-variant-numeric: tabular-nums; }
+.msg-actions { margin-top: var(--e5); padding-top: var(--e4); border-top: 1px solid var(--bord); margin-bottom: 0; }
+.msg-actions form { margin: 0; }
+/* Rédaction : la zone de message est le cœur de la page, pas un champ parmi d'autres. */
+.prive-dense .msg-redaction textarea[name="body"].champ__input { height: 320px; min-height: 160px; }
+.msg-lien { display: inline-flex; align-items: center; min-height: 44px; color: var(--bleu); text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 760px) {
+  .msg-barre { align-items: stretch; }
+  .msg-barre > .btn { width: 100%; justify-content: center; }
+  .msg-ligne__lien { grid-template-columns: 8px minmax(0, 1fr) auto; grid-template-areas: "point qui meta" "point objet objet" "point apercu apercu"; }
+  .msg-ligne__meta { flex-direction: row-reverse; align-items: center; gap: var(--e2); }
+  .msg-entetes > div { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .msg-actions { flex-direction: column; align-items: stretch; }
+  .msg-actions .btn { width: 100%; justify-content: center; }
+}
+/* Très petit écran : l'expéditeur prend toute la largeur, la date passe sous l'aperçu. */
+@media (max-width: 420px) {
+  .msg-ligne__lien { grid-template-columns: 8px minmax(0, 1fr); grid-template-areas: "point qui" "point objet" "point apercu" "point meta"; }
+  .msg-ligne__meta { justify-content: flex-end; }
+}

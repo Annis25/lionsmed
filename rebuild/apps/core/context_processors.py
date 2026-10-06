@@ -57,8 +57,13 @@ def shell(request):
         private_navigation.append({"label": "Cotisations", "children": dues_children})
     else:
         private_navigation += entries([("Cotisations", "dues:own", "dues.view_own")])
+    private_navigation += entries([("Notifications", "notifications:list", "notification.view_own")])
+    # « Messagerie » n'apparaît que pour qui tient au moins une boîte institutionnelle
+    # (mandat validé en cours) ; chaque page revérifie cet accès, le menu n'est qu'un raccourci.
+    from apps.mailboxes.access import mailboxes_for
+    if mailboxes_for(request.user):
+        private_navigation.append({"label": "Messagerie", "url": reverse("mailboxes:home")})
     private_navigation += entries([
-        ("Notifications", "notifications:list", "notification.view_own"),
         ("Communication", "communications:broadcast", "communication.view_member_broadcast"),
         ("Contenu public", "editorial_management:dashboard", "public_content.access_management"),
     ])
@@ -75,9 +80,10 @@ def shell(request):
     # « Communication » regroupe rédaction, historique et suivi d'une campagne : l'entrée
     # reste surlignée sur ses sous-pages (les autres se comparent à l'URL exacte).
     communication_url = reverse("communications:broadcast")
+    mailbox_url = reverse("mailboxes:home")
     for item in private_navigation:
-        if item.get("url") == communication_url:
-            item["section_active"] = request.path.startswith(communication_url)
+        if item.get("url") in (communication_url, mailbox_url):
+            item["section_active"] = request.path.startswith(item["url"])
     # Pilotage a rejoint le tableau de bord (voir apps.core.views.dashboard) ; la page
     # dédiée est supprimée. Statistiques et Présences restent accessibles par URL directe
     # mais sont volontairement masquées du menu pour l'instant.

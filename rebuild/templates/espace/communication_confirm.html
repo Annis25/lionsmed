@@ -31,6 +31,7 @@
 <h2 id="verif-titre">Votre message est prêt à être envoyé</h2>
 <dl class="com-resume__lignes">
 <div class="com-resume__objet"><dt>Objet</dt><dd>{{ form.cleaned_data.subject }}</dd></div>
+{% if sender_mailbox %}<div class="com-resume__objet"><dt>Envoyé depuis</dt><dd>{{ sender_mailbox.address }}</dd></div>{% endif %}
 <div><dt>Membres sélectionnés</dt><dd>{{ counts.internal }}</dd></div>
 <div><dt>Adresses externes</dt><dd>{{ counts.external }}</dd></div>
 <div class="com-resume__total"><dt>Total</dt><dd>{{ counts.total }}</dd></div>

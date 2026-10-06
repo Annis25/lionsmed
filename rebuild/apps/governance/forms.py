@@ -65,7 +65,7 @@ class MandateForm(StyledFields, forms.Form):
 
     def __init__(self, *args, mandate=None, default_year=None, default_profile_id=None, **kwargs):
         from datetime import timedelta
-        from .functions import canonical_label, selectable_labels
+        from .functions import canonical_label, responsibility_labels, selectable_labels
         from .models import LionsYear
         from .selectors import mandate_candidates
         initial = kwargs.setdefault("initial", {})
@@ -84,6 +84,7 @@ class MandateForm(StyledFields, forms.Form):
         self.fields["profile"].label_from_instance = lambda p: f"{p.user.last_name} {p.user.first_name}".strip() or p.user.email
         self.fields["function_choice"].choices = [("", "Sélectionner…"),
             ("Fonctions du bureau", [(label, label) for label in selectable_labels()]),
+            ("Autres responsabilités", [(label, label) for label in responsibility_labels()]),
             (self.OTHER, "Autre fonction…")]
         self.fields["lions_year"].queryset = LionsYear.objects.all()
 
