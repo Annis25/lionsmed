@@ -47,6 +47,10 @@ démarrage :
 rebuild/.venv/bin/python rebuild/manage.py check --deploy --settings=config.settings.production
 rebuild/.venv/bin/python rebuild/manage.py migrate --settings=config.settings.production
 rebuild/.venv/bin/python rebuild/manage.py collectstatic --noinput --settings=config.settings.production
+# Toujours avec --settings=config.settings.production : sans lui, manage.py utilise settings.local,
+# copie les fichiers mais ne régénère ni les fichiers versionnés ni staticfiles.json. Le site garde
+# alors l'ancien affichage avec le nouveau HTML (incident du 5 octobre 2026). Puis redémarrer le
+# service applicatif : le manifeste des statiques n'est lu qu'au démarrage.
 rebuild/.venv/bin/python rebuild/manage.py createsuperuser --settings=config.settings.production
 ```
 
@@ -100,6 +104,7 @@ server {
     server_name lionsmed.tn;
     ssl_certificate     /etc/letsencrypt/live/lionsmed.tn/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/lionsmed.tn/privkey.pem;
+    client_max_body_size 60m;
 
     location /static/ { alias /srv/lionsmed/rebuild/runtime/staticfiles/; }
     location / {
@@ -110,6 +115,11 @@ server {
 }
 server { listen 80; server_name lionsmed.tn; return 301 https://$host$request_uri; }
 ```
+
+`client_max_body_size` : sans cette ligne, Nginx refuse tout envoi de plus de 1 Mo (page
+« 413 Request Entity Too Large ») avant même que l'application ne le voie — donc toute photo de
+téléphone. 60 Mo couvrent une action avec ses dix photos de 5 Mo. Vérifier la valeur en service :
+`sudo nginx -T 2>/dev/null | grep client_max_body_size`.
 
 `SECURE_PROXY_SSL_HEADER` n'est **pas** activé dans `config/settings/production.py` tant que
 ce proxy exact n'est pas en place : l'activer sans un proxy qui garantit `X-Forwarded-Proto`
@@ -145,6 +155,49 @@ inoffensif (pas de verrou externe nécessaire). Superviser via
 (compteurs par état, âge du plus ancien `PENDING`, jamais de destinataire ni de contenu) :
 messages `FAILED` en hausse, `PENDING` anormalement ancien, ou timer `inactive`/absent de
 `systemctl list-timers`.
+
+### Boîtes e-mail institutionnelles (Messagerie)
+
+Les dix boîtes existent déjà chez l'hébergeur de messagerie (`mail.lionsmed.tn`, IMAP 993 et SMTP 465
+en SSL/TLS) : on ne crée aucun compte, on relie seulement Lionsmed à celles qui doivent l'être.
+
+1. **Migrations** (deux nouvelles : `mailboxes.0001`, `communications.0010`) :
+   `python manage.py migrate --settings=config.settings.production`.
+2. **Mots de passe**, dans `/var/www/lionsmed/rebuild/.env` uniquement — une ligne par boîte, valeur entre
+   apostrophes pour que les caractères spéciaux soient lus de la même façon par le site et par systemd
+   (si un mot de passe contient lui-même une apostrophe, le changer d'abord chez l'hébergeur) :
+
+   ```
+   LIONSMED_MAILBOX_PASSWORD_PRESIDENT='…'
+   LIONSMED_MAILBOX_PASSWORD_VICE_PRESIDENT='…'
+   LIONSMED_MAILBOX_PASSWORD_SECRETARIAT='…'
+   LIONSMED_MAILBOX_PASSWORD_TRESORIER='…'
+   LIONSMED_MAILBOX_PASSWORD_PRESIDENT_FONDATEUR='…'
+   LIONSMED_MAILBOX_PASSWORD_DIRECTEUR='…'
+   LIONSMED_MAILBOX_PASSWORD_GMT='…'
+   LIONSMED_MAILBOX_PASSWORD_GST='…'
+   LIONSMED_MAILBOX_PASSWORD_LCIF='…'
+   LIONSMED_MAILBOX_PASSWORD_MARKETING_COMMUNICATION='…'
+   ```
+
+   Une boîte sans ligne reste inactive : elle n'apparaît pour personne et n'est pas relevée. On peut donc
+   commencer par une seule boîte. Le fichier doit rester lisible par son seul propriétaire (`chmod 600 .env`).
+   Le serveur et les ports ont de bonnes valeurs par défaut ; `LIONSMED_MAILBOX_HOST` ne sert que si le
+   certificat du serveur de messagerie est émis pour un autre nom que `mail.lionsmed.tn`.
+3. **Redémarrer** le site (`sudo systemctl restart lionsmed`), puis un premier essai à la main :
+   `python manage.py sync_mailboxes --settings=config.settings.production`, et
+   `python manage.py mailbox_status --settings=config.settings.production`. Un `auth_failed` signale un mot
+   de passe erroné : le corriger avant d'activer le timer (les tentatives s'espacent d'elles-mêmes).
+4. **Timer** : copier et activer `lionsmed-mailboxes.service/.timer` (voir `rebuild/deploy/systemd/README.md`).
+5. **Rôles** : rien à saisir. Tenir le rôle d'une fonction ouvre sa boîte (Président, Vice-président,
+   Secrétaire, Trésorier, Président fondateur, Directeur, GMT, GST, LCIF, Marketing & Communication) ; les
+   rôles se règlent comme d'habitude dans « Membres et mandats ». Avant la mise en service, repasser au
+   rôle « Membre » les comptes de test qui portent un de ces rôles : ils liraient la vraie boîte et en
+   recevraient les avis. Les deux vice-présidents doivent tous deux porter le rôle « Vice-président ».
+
+La première relève reprend les 200 messages les plus récents de chaque boîte, sans notifier personne ;
+seuls les messages arrivés ensuite déclenchent un avis. Lionsmed ne modifie rien sur le serveur de
+messagerie : les boîtes restent utilisables comme avant depuis un téléphone ou un webmail.
 
 ## 8. Sauvegardes / restauration
 
@@ -187,3 +240,22 @@ Vérifier ensuite `/robots.txt` (`Allow: /`) et `/sitemap.xml` (uniquement conte
 - Application : `systemctl stop lionsmed-rebuild`, redéployer la révision précédente, `migrate` n'est pas automatiquement réversible pour toutes les migrations — vérifier au cas par cas avant `migrate <app> <migration_précédente>`.
 - Base : restaurer le dump précédent (procédure §8) sur une base neuve, basculer `DB_NAME`, ne jamais écraser une base contenant des écritures plus récentes sans plan de réconciliation.
 - Legacy : reste en lecture seule pendant toute bascule (voir `MIGRATE_LEGACY_TO_REBUILD.md` §6) ; aucune suppression du legacy prévue à ce stade.
+
+## Serveur actuel (constaté en octobre 2026)
+
+Les chemins et noms ci-dessus sont des exemples. Sur le serveur en service :
+
+- dépôt dans `/var/www/lionsmed/`, commandes lancées depuis `/var/www/lionsmed/rebuild` avec le venv actif
+  (`python manage.py … --settings=config.settings.production`) ;
+- service applicatif : `lionsmed.service` (`sudo systemctl restart lionsmed`) ;
+- le même serveur héberge d'autres sites : ne jamais redémarrer un autre service ;
+- Nginx : réglages de lionsmed dans `/etc/nginx/sites-enabled/lionsmed`, `client_max_body_size 60M`
+  depuis le 6 octobre 2026 (20M auparavant ; copie de l'ancien fichier dans
+  `~/lionsmed-nginx-sauvegarde.conf`). Les fichiers `taktakauto` et `taktakimmo` du même dossier
+  appartiennent aux autres sites. Après une modification : `sudo nginx -t`, puis seulement si le test
+  réussit `sudo systemctl reload nginx` ;
+- le site est derrière Cloudflare (`/etc/nginx/conf.d/cloudflare-realip.conf`), qui plafonne lui-même
+  la taille d'un envoi (100 Mo sur les offres standard).
+
+Contrôle sans accès serveur : `https://lionsmed.tn/static/staticfiles.json` doit pointer vers les
+versions attendues de `css/prive.css` et `css/lions.css` après chaque mise en ligne.

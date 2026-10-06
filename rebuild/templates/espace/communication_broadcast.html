@@ -10,7 +10,6 @@
 {% if form.errors %}<div class="form-errors" role="alert" tabindex="-1"><p>Vérifiez les informations du formulaire.</p>{{ form.non_field_errors }}<ul>
 {% if form.members.errors %}<li><a href="#destinataires">Membres du club : {{ form.members.errors|striptags }}</a></li>{% endif %}
 {% if form.extra_emails.errors %}<li><a href="#adresses-externes">Adresses externes : {{ form.extra_emails.errors|striptags }}</a></li>{% endif %}
-{% if form.sender_mailbox.errors %}<li><a href="#{{ form.sender_mailbox.id_for_label }}">Envoyer depuis : {{ form.sender_mailbox.errors|striptags }}</a></li>{% endif %}
 {% if form.subject.errors %}<li><a href="#{{ form.subject.id_for_label }}">Objet : {{ form.subject.errors|striptags }}</a></li>{% endif %}
 {% if form.body.errors %}<li><a href="#{{ form.body.id_for_label }}">Message : {{ form.body.errors|striptags }}</a></li>{% endif %}
 {% if form.campaign_key.errors %}<li>Formulaire expiré : rechargez la page avant de réessayer.</li>{% endif %}
@@ -65,7 +64,6 @@
 <section class="workspace-panel com-message" aria-labelledby="message-titre">
 <h2 id="message-titre">Rédigez votre message</h2>
 <div class="lot2-form-grid">
-{% if form.sender_mailbox %}<div class="lot2-wide">{% include 'components/forms/field.html' with field=form.sender_mailbox %}</div>{% endif %}
 <div class="lot2-wide">{% include 'components/forms/field.html' with field=form.subject %}</div>
 <div class="lot2-wide">{% include 'components/forms/field.html' with field=form.body %}</div>
 </div>
@@ -89,7 +87,7 @@
 <div><dt>Adresses externes</dt><dd data-summary-external>{{ counts.external }}</dd></div>
 <div class="com-resume__total"><dt>Total</dt><dd data-summary-total>{{ counts.total }}</dd></div>
 </dl>
-{% if sender_mailbox and not form.sender_mailbox %}<p class="com-resume__note">Envoyé depuis <strong>{{ sender_mailbox.address }}</strong>, l’adresse de votre fonction.</p>{% endif %}
+{% if sender_mailbox %}<p class="com-resume__note">Envoyé depuis <strong>{{ sender_mailbox.address }}</strong>, l’adresse de votre fonction.</p>{% endif %}
 <p class="com-resume__note com-js-seul" data-summary-note>{% if counts.total %}{{ counts.total }} destinataire{{ counts.total|pluralize }} recevr{{ counts.total|pluralize:"a,ont" }} chacun un e-mail individuel.{% else %}Aucun destinataire pour l’instant.{% endif %}</p>
 <p class="visually-hidden" aria-live="polite" data-summary-live></p>
 <noscript><p class="com-resume__note">Le nombre de destinataires est calculé et affiché à l’étape de vérification, avant tout envoi.</p></noscript>

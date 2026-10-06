@@ -15,7 +15,7 @@ from django.views.decorators.http import require_http_methods, require_safe
 from apps.communications.selectors import delivery_enabled
 from apps.core.permissions import capability_required
 from . import catalog
-from .access import mailboxes_for
+from .access import holders, mailboxes_for
 from .forms import ComposeForm
 from .models import InboundEmail, OutgoingEmail
 from .selectors import inbox_rows, mailbox_tabs, outgoing_recipients, readers, sent_rows, sync_status
@@ -62,7 +62,8 @@ def inbox(request, mailbox):
     page = Paginator(InboundEmail.objects.filter(mailbox=mailbox.key).defer("body_text", "body_html", "references"),
                      PER_PAGE).get_page(request.GET.get("page"))
     return render(request, "espace/mailbox_inbox.html", _context(
-        request, mailbox, "inbox", page_obj=page, rows=inbox_rows(page.object_list), sync=sync_status(mailbox)))
+        request, mailbox, "inbox", page_obj=page, rows=inbox_rows(page.object_list), sync=sync_status(mailbox),
+        shared=len(holders(mailbox)) > 1))
 
 
 def _theme_script_hash():
@@ -92,7 +93,8 @@ def message(request, mailbox, email_id):
         request, mailbox, "inbox", email=email,
         # body_html n'est écrit que par sanitizer.clean_html (liste blanche de balises, sans attribut d'origine).
         body_html=mark_safe(email.body_html) if email.body_html else "",
-        readers=readers(email) if mailbox.shared else [],
+        # Qui a ouvert le message : utile dès que la boîte a plusieurs titulaires.
+        readers=readers(email) if len(holders(mailbox)) > 1 else [],
         reply_all=len(email.recipients) + len(email.copies) > 1))
     response["Content-Security-Policy"] = MESSAGE_CSP
     return response

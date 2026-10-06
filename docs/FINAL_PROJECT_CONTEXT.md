@@ -193,3 +193,127 @@ Détails et procédure : `docs/FUNCTIONAL_CORRECTIONS_REPORT.md` et
   verts (matrice HTTP/services et nouveau rôle). Suite complète non relancée.
 - Check Django et détection des migrations propres ; `migrate --check` signale
   les migrations en attente des lots récents. Aucun commit/push/déploiement.
+
+### Communication : sélection libre et suivi par destinataire — 5 octobre 2026
+
+- `/espace/communication/` : les destinataires sont désormais les **membres cochés**
+  (liste des membres éligibles, recherche instantanée, « Tout sélectionner »,
+  raccourci « Responsables », « Tout désélectionner ») **et/ou des adresses externes**,
+  deux listes indépendantes. Plus aucun groupe implicite : une adresse externe seule
+  n'envoie qu'à cette adresse. Dédoublonnage insensible à la casse, y compris entre un
+  membre coché et une adresse externe.
+- Éligibilité : une seule définition, `services.eligible_broadcast_members()` (profil
+  actif, compte actif, rôle résolu sans ambiguïté et différent d'Invité). Tout identifiant
+  hors de cette liste est refusé par le formulaire **et** par le service.
+- Parcours Rédaction → Vérification → Envoi sur la même route ; le bouton final annonce
+  le nombre réel (« Envoyer à N destinataires »). Clé d'idempotence inchangée : un double
+  envoi ne crée ni seconde campagne ni second message.
+- Historique en cartes et nouvelle route de suivi
+  `espace/communication/historique/<uuid>/` : état par destinataire lu dans l'outbox
+  (Envoyé / En attente / Échec, tentatives, raison lisible). Statut global calculé
+  (En cours, Terminé, Terminé avec erreurs, Échec), jamais stocké pour l'affichage.
+  « Envoyé » = accepté par le serveur de messagerie ; aucun statut « Délivré ».
+- Relance manuelle des seuls échecs de livraison (`retry_failed_broadcast`), sur les
+  mêmes lignes d'outbox, tracée dans l'audit. Nouveau code d'erreur `recipient_refused`
+  (adresse rejetée par le serveur SMTP), politique de reprise inchangée.
+- Conséquence à connaître : les rôles autorisés à communiquer voient l'adresse e-mail
+  des membres éligibles dans cette page, indépendamment du partage de coordonnées de
+  l'annuaire.
+- Migration communications `0009` (choix d'audience `SELECTION`, aucun changement de
+  schéma), non appliquée à la base locale réelle. Permissions inchangées.
+- Une adresse saisie comme externe qui est celle d'un compte connu mais non éligible
+  (inactif, suspendu, invité) est refusée par le formulaire et par le service ; une
+  adresse inconnue ou celle d'un membre éligible non coché reste permise.
+- L'entrée « Communication » du menu latéral reste active sur l'historique et le suivi.
+- 60 tests du module de campagne ; 373 tests ciblés exécutés, 372 verts et 1 ignoré (le
+  contrôle navigateur opt-in) : communications, agenda, fondations, parcours fonctionnels,
+  éditorial public, rôles, satisfaction, votes. Contrôle Chrome opt-in
+  `apps.communications.tests.test_browser` + `tools/browser_communication.cjs` : clair et
+  sombre à 320/390/768/1280/1440 px, clavier, double clic, relance, parcours sans
+  JavaScript. Suite complète non relancée. Aucun commit/push/déploiement.
+
+### Audit et corrections d'affichage de tout le site — 6 octobre 2026
+
+- Audit de 87 pages pour 8 profils (ordinateur, mobile, clair, sombre) puis correction en six lots ;
+  plan, décisions et reste connu dans `docs/PLAN_CORRECTIONS_AFFICHAGE.md`.
+- Causes communes corrigées dans les styles partagés : boutons sans classe au style du navigateur
+  (calendrier, onglets de vote), retrait de la loupe des champs de recherche écrasé, badges étirés,
+  traits des notes de bloc coupés à 62 caractères, titres privés coupés à 13 caractères ou dans une
+  autre police, textes d'exemple à 3,94:1, contour des champs à 2,92:1 sur fond teinté.
+- Menu latéral : icônes de « Communication » et « Contenu public », cloche réparée, icône par défaut.
+- Pages reprises : détail d'une demande, feuille de présence (une ligne par membre), historique des
+  communications compact, fenêtre « Nouvel événement », tableau de bord (3 dernières notifications
+  pour tous les profils, lien calendrier masqué à l'invité), statistiques (libellés de catégories).
+- Anneau de focus clavier : or doublé d'un liseré foncé (l'or seul faisait 1,4 à 1,6:1 en thème clair).
+- Une règle de style du chantier Communication du 5 octobre s'appliquait à toutes les pages privées ;
+  elle est désormais limitée à ses écrans.
+- Nouvel outil : `apps.core.tests.test_site_audit_browser` + `tools/browser_site_audit.cjs`
+  (optionnel, `LIONSMED_SITE_AUDIT=1`), 0 constat bloquant ; deux anciens scripts navigateur réparés.
+- Seconde passe le même jour : dates du calendrier en français, cibles tactiles restantes, cartes des
+  statistiques ; audit étendu aux vues Semaine et Jour et à la vérification de la double
+  authentification (506 visites, 89 pages, 0 constat bloquant).
+- Suite complète : 600 tests exécutés, 593 verts, 7 ignorés (six contrôles navigateur optionnels,
+  tous verts lancés à part, et un test QR sans bibliothèque). Aucune migration. Aucun
+  commit/push/déploiement.
+
+### Parcours « créer une action et la publier » — 6 octobre 2026
+
+- Audit du parcours réel dans le navigateur (création, brouillon, publication, page publique, refus),
+  puis correction ; détail dans `docs/PLAN_CORRECTIONS_AFFICHAGE.md`.
+- Images visibles dans l'espace de gestion dès le brouillon : nouvelle route privée
+  `editorial_management:image_preview` (capability `public_content.access_management`). La route
+  publique `editorial:image` reste fermée tant que le contenu n'est pas publié.
+- Publication refusée, ou image refusée, après enregistrement : on arrive toujours sur la page de
+  l'action enregistrée en brouillon, avec la raison. Plus de brouillon caché derrière un formulaire de
+  création, plus de message « slug » pour une action.
+- Retirer ou ajouter une image ne dépublie plus une action publiée (même règle que le bouton
+  d'enregistrement d'une action publiée). Suppression : case de confirmation vérifiée côté serveur.
+- Défaut ancien réparé : « Remettre en brouillon » provoquait une erreur serveur (argument `kind`
+  absent de la route `editorial_management:draft`).
+- Fichier refusé à l'envoi (plus de 5 Mo, plus de dix fichiers) : page 400 lisible
+  (`apps.core.views.bad_request`, `templates/400.html`) et, avec JavaScript, avertissement avant
+  l'envoi dans le formulaire d'action (`static/js/action_form.js`, aperçu des images choisies).
+- Page publique d'une action : cinq vignettes au plus (les suivantes dans la visionneuse), titre long
+  sur deux lignes, bloc des partenaires aéré.
+- Tests : `apps/editorial/tests/test_action_management.py` (10). Suite complète : 610 tests exécutés,
+  603 verts, 7 ignorés. Audit du site : 506 visites, 0 constat bloquant. Aucune migration. Aucun
+  commit/push/déploiement.
+- Constaté, non corrigé (décision à prendre) : le filtre d'envoi `PhotoSizeLimitHandler` s'applique à
+  tous les fichiers, donc un document de plus de 5 Mo est refusé alors que le formulaire des
+  documents annonce 50 Mo (correction préparée dans une session séparée, à rapatrier). Serveur :
+  `client_max_body_size` de lionsmed passé de 20 à 60 Mo le 6 octobre 2026.
+
+
+### Messagerie : boîtes e-mail institutionnelles — 6 octobre 2026
+
+Nouvelle app `apps/mailboxes` et page « Messagerie » (`/espace/messagerie/`). Déployé et migré le 6 octobre 2026
+(`mailboxes.0001`, `communications.0010`, timer `lionsmed-mailboxes`) ; procédure dans `docs/DEPLOY_REBUILD.md`.
+
+- **Principe** : les dix adresses `…@lionsmed.tn` appartiennent aux fonctions. Catalogue fixe
+  (`catalog.py`) ; aucun compte n'est rattaché durablement à une boîte.
+- **Source de vérité des accès : le rôle applicatif** (capability `mailbox.use`, vérifiée boîte par boîte).
+  Première version livrée le 6 octobre avec le mandat comme source ; le propriétaire a tranché le jour même,
+  à la mise en service, pour le rôle (« tant que la personne a le rôle, elle a accès à ses messages ») :
+  la production n'utilisait aucun mandat et les rôles y sont déjà tenus à jour. Un mandat ne donne aucun accès.
+- **Correspondance** : Président → `president@` ; Vice-président → `vice.president@` (partagée par les
+  comptes de ce rôle) ; Secrétaire → `secretariat@` ; Trésorier → `tresorier@` ; Président fondateur →
+  `president.fondateur@` ; Directeur → `directeur@` ; GMT → `gmt@` ; GST → `gst@` ; LCIF → `lcif@` ;
+  Marketing & Communication → `marketing.communication@`. Super administrateur, Bureau, GLT, Membre et
+  Invité n'ont pas de boîte. Un compte n'a qu'un rôle, donc au plus une boîte.
+- **Réception** : relève IMAP planifiée en lecture seule, copie locale (`InboundEmail`), sans doublon,
+  pages toujours disponibles si le serveur de messagerie est en panne. HTML réécrit par liste blanche,
+  images jamais chargées, CSP stricte sur la page de lecture.
+- **Envoi** : par l'outbox existante, avec les identifiants de la boîte, une ligne par destinataire ;
+  « Envoyé » garde son sens (accepté par le serveur). Dossier « Envoyés » = messages écrits dans Lionsmed.
+- **Communication** : une campagne part de l'adresse de fonction de son auteur, sans rien choisir ;
+  sans boîte (ou boîte non reliée), adresse générale comme avant. Le test synchrone
+  « Envoyer un test » n'a pas été modifié : il part toujours de l'adresse générale.
+- **Avis** : notification dans Lionsmed + e-mail à l'adresse personnelle des titulaires (expéditeur,
+  objet, lien — jamais le contenu), avec garde-fous contre les boucles.
+
+Limites assumées de cette première version : pièces jointes non consultables ni envoyables (elles sont
+seulement listées), pas de transfert, pas de recherche, pas de brouillon, pas de dossier autre que la boîte
+de réception, messages envoyés depuis un autre logiciel absents de « Envoyés », état lu/non lu propre à
+Lionsmed. L'accès ne s'éteint pas tout seul en fin d'Année Lions : il suit le rôle,
+à changer lors de la passation. Mise en service faite le 6 octobre 2026 (dix boîtes reliées, relève
+automatique active).

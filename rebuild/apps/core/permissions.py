@@ -26,6 +26,12 @@ BROADCAST_EMAIL_ROLES = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.VICE_P
 # Cotisations (recette V2) : seul le Trésorier (+ Super Admin) modifie ; le reste du
 # bureau (PRESIDENT/SECRETAIRE/BUREAU) consulte sans modifier — décision explicite du
 # club, qui retire ce droit de modification à PRESIDENT/SECRETAIRE.
+# Messagerie : les dix fonctions qui disposent d'une adresse e-mail du club. Tenir le rôle
+# suffit à ouvrir la boîte de la fonction (décision du propriétaire, oct. 2026) ; la boîte
+# précise de chaque rôle est dans apps.mailboxes.catalog. Ni le Super administrateur (compte
+# technique) ni les rôles Bureau, GLT, Membre et Invité n'ont de boîte.
+MAILBOX_ROLES = frozenset({Role.PRESIDENT, Role.VICE_PRESIDENT, Role.SECRETAIRE, Role.TRESORIER,
+    Role.PRESIDENT_FONDATEUR, Role.DIRECTEUR, Role.GMT, Role.GST, Role.LCIF, Role.MARKETING_COMMUNICATION})
 DUES_MANAGERS = frozenset({Role.SUPER_ADMIN, Role.TRESORIER})
 DUES_VIEWERS = BUREAU_LEVEL | {Role.TRESORIER}
 CAPABILITIES = {
@@ -51,6 +57,8 @@ CAPABILITIES = {
     "communication.send_member_broadcast": BROADCAST_EMAIL_ROLES,
     "communication.view_member_broadcast": BROADCAST_EMAIL_ROLES,
     "dues.view_own": PERSONAL, "dues.manage": DUES_MANAGERS, "dues.view_management": DUES_VIEWERS,
+    # Toujours vérifiée avec la boîte en objet : un rôle n'ouvre que la boîte de sa fonction.
+    "mailbox.use": MAILBOX_ROLES,
     "statistics.view": MANAGERS,
     # Votes et satisfaction (Phase B). INVITE jamais électeur ; DIRECTEUR/BUREAU sans gestion.
     "vote.manage": MANAGERS, "vote.cast": MEMBERS, "vote.view_results": MEMBERS,
@@ -117,6 +125,9 @@ def can(user, capability, obj=None):
         if capability == "notification.view_own":
             from apps.communications.models import Notification
             return isinstance(obj, Notification) and obj.recipient_id == user.pk
+        if capability == "mailbox.use":
+            from apps.mailboxes.catalog import Mailbox
+            return isinstance(obj, Mailbox) and role in obj.roles
         prefix = capability.split(".")[0]
         if prefix in public_types:
             return getattr(getattr(obj, "_meta", None), "label_lower", None) == public_types[prefix]

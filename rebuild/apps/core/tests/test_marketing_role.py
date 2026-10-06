@@ -27,6 +27,7 @@ class MarketingRoleTests(TestCase):
             "satisfaction.respond", "public_content.access_management", "action.create",
             "action.edit", "action.publish", "editorial.manage", "image.manage",
             "communication.send_member_broadcast", "communication.view_member_broadcast",
+            "mailbox.use",  # la boîte marketing.communication@ de la fonction, et elle seule
         }
         self.assertEqual({key for key in CAPABILITIES if can(self.user, key)}, expected)
 

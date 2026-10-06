@@ -23,7 +23,8 @@ class SuperAdminTests(TestCase):
 
     def test_every_capability_except_processing_requests_and_email_change(self):
         missing = {name for name in CAPABILITIES if not can(self.admin, name)}
-        self.assertEqual(missing, {"application.manage", "contact.manage", "account.change_email"})
+        # « mailbox.use » : le compte technique ne tient aucune fonction du club, donc aucune boîte e-mail.
+        self.assertEqual(missing, {"application.manage", "contact.manage", "account.change_email", "mailbox.use"})
 
     def test_inboxes_are_read_only(self):
         request = submit(ContactForm(submission("contact")))

@@ -170,13 +170,12 @@ def _external_event_key(campaign_id, email):
 
 
 @transaction.atomic
-def queue_member_broadcast(*, actor, subject, body, idempotency_key, member_ids=(), extra_emails=(), sender_mailbox=""):
+def queue_member_broadcast(*, actor, subject, body, idempotency_key, member_ids=(), extra_emails=()):
     """Met en file un e-mail individuel par destinataire : membres cochés et adresses
     externes, jamais un groupe implicite. Sans member_ids, aucun membre ne reçoit rien.
 
-    L'expéditeur est décidé ici : la boîte institutionnelle de l'auteur s'il en tient une
-    (apps.mailboxes.access.sender_for), sinon l'adresse générale du site. `sender_mailbox`
-    ne sert qu'à choisir entre plusieurs boîtes tenues ; toute autre valeur est refusée."""
+    L'expéditeur n'est pas un paramètre : c'est la boîte institutionnelle de la fonction de
+    l'auteur s'il en tient une (apps.mailboxes.access.sender_for), sinon l'adresse générale."""
     if not can(actor, "communication.send_member_broadcast"):
         raise PermissionDenied
     from apps.mailboxes.access import sender_for
@@ -191,7 +190,7 @@ def queue_member_broadcast(*, actor, subject, body, idempotency_key, member_ids=
     members, external, eligible = _resolve_selection(member_ids, extra_emails)
     if not members and not external:
         raise ValidationError("Sélectionnez au moins un membre ou ajoutez une adresse externe.")
-    mailbox = sender_for(actor, sender_mailbox or "")
+    mailbox = sender_for(actor)
     sender = mailbox.key if mailbox else ""
     campaign, created = MemberEmailCampaign.objects.get_or_create(
         idempotency_key=idempotency_key,

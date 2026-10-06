@@ -9,10 +9,6 @@ impose un libellé canonique pour les sept fonctions du bureau et refuse leurs v
 libres (« Premier vice président », « 1ère VP »…). Une fonction hors catalogue (« Responsable
 d'une commission ») reste possible et s'affiche après les sept fonctions. Les variantes déjà
 enregistrées ne sont ni réécrites ni perdues : elles restent reconnues pour l'ordre public.
-
-Les responsabilités hors bureau qui disposent d'une adresse e-mail du club (RESPONSIBILITY_FUNCTIONS)
-sont reconnues de la même façon, sans rang : leur place sur « Notre bureau » ne change pas.
-La clé d'une fonction est ce qui relie un mandat à sa boîte e-mail (apps.mailboxes.catalog).
 """
 import re
 import unicodedata
@@ -51,30 +47,6 @@ BUREAU_FUNCTIONS = (
       "maitre du protocole"},
      {"cheffe du protocole"}),
 )
-# Même forme que BUREAU_FUNCTIONS. Aucun rapprochement approximatif : « Responsable effectif »
-# sans « GMT » ou « Responsable d'une commission » restent des fonctions libres.
-RESPONSIBILITY_FUNCTIONS = (
-    ("PRESIDENT_FONDATEUR", "Président fondateur", "Présidente fondatrice",
-     {"president fondateur", "president fondateur du club"},
-     {"presidente fondatrice", "presidente fondatrice du club"}),
-    ("DIRECTEUR", "Directeur", "Directrice",
-     {"directeur", "directeur du club"},
-     {"directrice", "directrice du club"}),
-    ("GMT", "Responsable effectif (GMT)", "Responsable effectif (GMT)",
-     {"responsable effectif gmt", "gmt", "responsable gmt", "president gmt", "presidente gmt"},
-     set()),
-    ("GST", "Responsable service (GST)", "Responsable service (GST)",
-     {"responsable service gst", "gst", "responsable gst", "president gst", "presidente gst"},
-     set()),
-    ("LCIF", "Coordinateur LCIF", "Coordinatrice LCIF",
-     {"coordinateur lcif", "lcif", "responsable lcif"},
-     {"coordinatrice lcif"}),
-    ("MARKETING_COMMUNICATION", "Responsable marketing et communication", "Responsable marketing et communication",
-     {"responsable marketing et communication", "responsable marketing communication", "marketing et communication",
-      "marketing communication", "responsable communication", "responsable marketing",
-      "responsable de la communication", "responsable du marketing"},
-     set()),
-)
 UNRANKED = len(BUREAU_FUNCTIONS)
 NOT_SELECTABLE = {"VICE_PRESIDENT"}
 # alias normalisé → (rang, clé, libellé canonique correspondant au genre de la saisie)
@@ -82,10 +54,7 @@ _BY_ALIAS = {}
 for _rank, (_key, _masculine, _feminine, _masc_aliases, _fem_aliases) in enumerate(BUREAU_FUNCTIONS):
     _BY_ALIAS.update({alias: (_rank, _key, _masculine) for alias in _masc_aliases})
     _BY_ALIAS.update({alias: (_rank, _key, _feminine) for alias in _fem_aliases})
-for _key, _masculine, _feminine, _masc_aliases, _fem_aliases in RESPONSIBILITY_FUNCTIONS:
-    _BY_ALIAS.update({alias: (UNRANKED, _key, _masculine) for alias in _masc_aliases})
-    _BY_ALIAS.update({alias: (UNRANKED, _key, _feminine) for alias in _fem_aliases})
-_LABELS = {key: {masculine, feminine} for key, masculine, feminine, _, _ in BUREAU_FUNCTIONS + RESPONSIBILITY_FUNCTIONS}
+_LABELS = {key: {masculine, feminine} for key, masculine, feminine, _, _ in BUREAU_FUNCTIONS}
 
 
 def normalize_function(label):
@@ -122,16 +91,6 @@ def selectable_labels():
     for key, masculine, feminine, _, _ in BUREAU_FUNCTIONS:
         if key in NOT_SELECTABLE:
             continue
-        labels.append(masculine)
-        if feminine != masculine:
-            labels.append(feminine)
-    return labels
-
-
-def responsibility_labels():
-    """Libellés des responsabilités hors bureau dotées d'une adresse e-mail, formes masculine puis féminine."""
-    labels = []
-    for _, masculine, feminine, _, _ in RESPONSIBILITY_FUNCTIONS:
         labels.append(masculine)
         if feminine != masculine:
             labels.append(feminine)

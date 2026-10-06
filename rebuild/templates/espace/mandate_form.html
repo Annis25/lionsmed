@@ -14,7 +14,7 @@
       <div class="lot2-wide">{% include 'components/forms/field.html' with field=form.validated %}</div>
       <div class="lot2-wide">{% include 'components/forms/field.html' with field=form.public_authorized %}</div>
     </div>
-    <p class="app-note">Un mandat décrit une fonction exercée au sein du club ; il ne modifie jamais le rôle ni les droits du compte. Seule exception : un mandat validé et en cours ouvre, dans « Messagerie », la boîte e-mail de la fonction lorsqu’elle en possède une (présidence, vice-présidence, secrétariat, trésorerie, président fondateur, direction, GMT, GST, LCIF, marketing et communication).</p>
+    <p class="app-note">Un mandat décrit une fonction exercée au sein du club ; il ne modifie jamais le rôle ni les droits du compte.</p>
     <div class="lot2-actions"><button class="btn btn--solid" type="submit">{% if mandate %}Enregistrer{% else %}Ajouter le mandat{% endif %}</button><a class="btn btn--ghost" href="{% url 'governance:mandates' %}">Annuler</a></div>
   </form>
 </section>

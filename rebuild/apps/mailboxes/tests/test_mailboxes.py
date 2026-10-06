@@ -1,4 +1,4 @@
-"""Boîtes e-mail institutionnelles : l'accès suit le mandat, jamais la personne.
+"""Boîtes e-mail institutionnelles : l'accès suit le rôle de la fonction, jamais la personne.
 
 Les lettres entre crochets renvoient à la liste de contrôle du cahier des charges (A à U).
 Aucun test ne contacte un serveur de messagerie : la relève passe par un faux serveur IMAP
@@ -19,7 +19,9 @@ from apps.communications.outbox import deliver_batch
 from apps.communications.services import queue_member_broadcast
 from apps.core.models import AuditEvent
 from apps.core.tests.test_foundations import account
-from apps.governance.models import LionsYear, Mandate, Role
+from apps.core.permissions import CAPABILITIES, can
+from apps.governance.models import Role, RoleGrant
+from apps.governance.services import set_role
 from apps.members.models import MemberProfile
 
 from .. import catalog
@@ -83,30 +85,25 @@ class FakeServer:
 @override_settings(MAILBOX_PASSWORDS=PASSWORDS)
 class MailboxTestCase(TestCase):
     def setUp(self):
-        today = timezone.localdate()
-        self.today = today
-        self.year = LionsYear.objects.create(starts_on=today - timedelta(days=60), ends_on=today + timedelta(days=300))
-        self.secretary = account("secretaire@example.invalid", role=Role.SECRETAIRE)
-        self.president = self.person("anis@example.invalid", "Anis", Role.PRESIDENT, "Président")
-        self.treasurer = self.person("tresoriere@example.invalid", "Leila", Role.TRESORIER, "Trésorière")
-        # Deux vice-présidents dont les rôles applicatifs diffèrent : seule leur fonction les réunit.
-        self.vp1 = self.person("vp1@example.invalid", "Sami", Role.VICE_PRESIDENT, "1er Vice-Président")
-        self.vp2 = self.person("vp2@example.invalid", "Rania", Role.BUREAU, "2e Vice-Présidente")
+        self.secretary = self.person("secretaire@example.invalid", "Eya", Role.SECRETAIRE)
+        self.president = self.person("anis@example.invalid", "Anis", Role.PRESIDENT)
+        self.treasurer = self.person("tresoriere@example.invalid", "Leila", Role.TRESORIER)
+        # Deux comptes pour un même rôle : ils partagent la boîte de la vice-présidence.
+        self.vp1 = self.person("vp1@example.invalid", "Sami", Role.VICE_PRESIDENT)
+        self.vp2 = self.person("vp2@example.invalid", "Rania", Role.VICE_PRESIDENT)
         self.member = account("membre@example.invalid", role=Role.MEMBRE)
         self.server = FakeServer()
 
-    def person(self, email, first_name, role, function=None):
+    def person(self, email, first_name, role):
         user = account(email, role=role)
         user.first_name = first_name
         user.save(update_fields=["first_name"])
-        if function:
-            self.mandate(user, function)
         return user
 
-    def mandate(self, user, function, validated=True, **dates):
-        return Mandate.objects.create(profile=user.member_profile, function=function, lions_year=self.year,
-            starts_on=dates.get("starts_on", self.year.starts_on), ends_on=dates.get("ends_on", self.year.ends_on),
-            validated_at=timezone.now() if validated else None, validated_by=self.secretary if validated else None)
+    def hand_over(self, outgoing, incoming, role):
+        """Passation faite par le club dans « Membres et mandats » : le rôle change de titulaire."""
+        set_role(actor=self.secretary, target_user=outgoing, role=Role.MEMBRE)
+        set_role(actor=self.secretary, target_user=incoming, role=role)
 
     def sync(self, mailbox=PRESIDENT):
         # La relève suivante est possible aussitôt : le délai de reprise ne concerne que les pannes.
@@ -141,7 +138,7 @@ class AccessTests(MailboxTestCase):
         self.assertRedirects(client.get(reverse("mailboxes:home")), self.url("inbox", TREASURY))
 
     def test_both_vice_presidents_share_one_mailbox_and_one_history(self):
-        # [C] [D] [E] même boîte, mêmes messages, quel que soit le rôle applicatif de chacun.
+        # [C] [D] [E] même boîte, mêmes messages pour les deux comptes du rôle Vice-président.
         self.assertEqual(mailboxes_for(self.vp1), [VICE])
         self.assertEqual(mailboxes_for(self.vp2), [VICE])
         self.assertEqual(set(holders(VICE)), {self.vp1, self.vp2})
@@ -158,9 +155,11 @@ class AccessTests(MailboxTestCase):
         self.assertContains(client.get(self.url("message", VICE, email.pk)), "Ouvert par Sami")
 
     def test_account_without_mailbox_has_no_messagerie(self):
-        # [G] ni menu, ni page — y compris pour un responsable sans mandat et pour le compte technique.
+        # [G] ni menu, ni page — y compris pour un rôle sans boîte (Bureau, GLT) et le compte technique.
         admin = account("admin@example.invalid", role=Role.SUPER_ADMIN)
-        for user in (self.member, self.secretary, admin):
+        bureau = account("bureau@example.invalid", role=Role.BUREAU)
+        glt = account("glt@example.invalid", role=Role.GLT)
+        for user in (self.member, bureau, glt, admin):
             client = self.login(user)
             self.assertEqual(mailboxes_for(user), [])
             self.assertEqual(client.get(reverse("mailboxes:home")).status_code, 403)
@@ -170,31 +169,61 @@ class AccessTests(MailboxTestCase):
         self.client.logout()
         self.assertIn("/connexion/", self.client.get(self.url("inbox")).url)
 
-    def test_only_a_validated_running_mandate_of_an_active_member_opens_a_mailbox(self):
-        pending = self.person("attente@example.invalid", "Nour", Role.MEMBRE)
-        self.mandate(pending, "Secrétaire", validated=False)
-        future = self.person("futur@example.invalid", "Hedi", Role.MEMBRE)
-        self.mandate(future, "Secrétaire", starts_on=self.today + timedelta(days=10))
-        self.assertEqual(mailboxes_for(pending), [])
+    def test_only_an_active_member_holding_the_role_right_now_opens_a_mailbox(self):
+        self.assertTrue(can(self.treasurer, "mailbox.use", TREASURY))
+        self.assertFalse(can(self.treasurer, "mailbox.use", PRESIDENT))
+        self.assertFalse(can(self.treasurer, "mailbox.use", object()))
+        # Rôle prévu pour plus tard, rôle retiré, profil suspendu ou invité, compte désactivé : pas d'accès.
+        future = account("futur@example.invalid", role=None)
+        RoleGrant.objects.create(user=future, role=Role.SECRETAIRE, starts_at=timezone.now() + timedelta(days=10))
         self.assertEqual(mailboxes_for(future), [])
+        RoleGrant.objects.filter(user=self.vp2).update(revoked_at=timezone.now())
+        self.assertEqual(mailboxes_for(self.vp2), [])
+        self.assertEqual(holders(VICE), [self.vp1])
         MemberProfile.objects.filter(user=self.treasurer).update(status=MemberProfile.Status.SUSPENDED)
         self.assertEqual(mailboxes_for(self.treasurer), [])
         self.assertEqual(holders(TREASURY), [])
-        # Fonction sans boîte, et boîte non reliée à Lionsmed (mot de passe absent du serveur).
-        self.mandate(self.member, "Protocole")
-        self.mandate(self.member, "Responsable effectif (GMT)")
+        MemberProfile.objects.filter(user=self.secretary).update(status=MemberProfile.Status.GUEST)
+        self.assertEqual(mailboxes_for(self.secretary), [])
+        self.president.is_active = False
+        self.president.save(update_fields=["is_active"])
+        self.assertEqual(holders(PRESIDENT), [])
+        # Un mandat (« Notre bureau ») ne donne aucun accès : seul le rôle compte.
+        from apps.governance.models import LionsYear, Mandate
+        today = timezone.localdate()
+        year = LionsYear.objects.create(starts_on=today - timedelta(days=60), ends_on=today + timedelta(days=300))
+        Mandate.objects.create(profile=self.member.member_profile, function="Trésorier", lions_year=year,
+            starts_on=year.starts_on, ends_on=year.ends_on, validated_at=timezone.now(), validated_by=self.vp1)
         self.assertEqual(mailboxes_for(self.member), [])
+        # Rôle doté d'une boîte, mais boîte non reliée à Lionsmed (mot de passe absent du serveur).
+        gmt = account("gmt@example.invalid", role=Role.GMT)
+        self.assertEqual(mailboxes_for(gmt), [])
         with self.settings(MAILBOX_PASSWORDS={**PASSWORDS, "gmt": SECRET}):
-            self.assertEqual(mailboxes_for(self.member), [catalog.get("gmt")])
+            self.assertEqual(mailboxes_for(gmt), [catalog.get("gmt")])
 
-    def test_mandate_change_moves_reading_sending_and_history_to_the_new_holder(self):
+    def test_each_of_the_ten_roles_opens_exactly_its_own_mailbox(self):
+        self.assertEqual(len(catalog.MAILBOXES), 10)
+        claimed = [role for mailbox in catalog.MAILBOXES for role in mailbox.roles]
+        self.assertEqual(len(claimed), len(set(claimed)))  # aucun rôle n'ouvre deux boîtes
+        self.assertEqual(set(claimed), set(CAPABILITIES["mailbox.use"]))
+        self.assertFalse({Role.SUPER_ADMIN, Role.BUREAU, Role.GLT, Role.MEMBRE, Role.INVITE} & set(claimed))
+        expected = {Role.PRESIDENT: "president@lionsmed.tn", Role.VICE_PRESIDENT: "vice.president@lionsmed.tn",
+                    Role.SECRETAIRE: "secretariat@lionsmed.tn", Role.TRESORIER: "tresorier@lionsmed.tn",
+                    Role.PRESIDENT_FONDATEUR: "president.fondateur@lionsmed.tn", Role.DIRECTEUR: "directeur@lionsmed.tn",
+                    Role.GMT: "gmt@lionsmed.tn", Role.GST: "gst@lionsmed.tn", Role.LCIF: "lcif@lionsmed.tn",
+                    Role.MARKETING_COMMUNICATION: "marketing.communication@lionsmed.tn"}
+        with self.settings(MAILBOX_PASSWORDS={mailbox.key: SECRET for mailbox in catalog.MAILBOXES}):
+            for index, (role, address) in enumerate(expected.items()):
+                user = account(f"role{index}@example.invalid", role=role)
+                self.assertEqual([mailbox.address for mailbox in mailboxes_for(user)], [address])
+
+    def test_role_change_moves_reading_sending_and_history_to_the_new_holder(self):
         # [F] l'ancien titulaire perd tout, le nouveau reprend la boîte et son historique.
         self.server.add(raw_message(subject="Courrier du district"))
         self.sync()
         email = InboundEmail.objects.get()
         successor = self.person("successeur@example.invalid", "Karim", Role.MEMBRE)
-        Mandate.objects.filter(profile=self.president.member_profile).update(ends_on=self.today)
-        self.mandate(successor, "Président", starts_on=self.today)
+        self.hand_over(self.president, successor, Role.PRESIDENT)
         self.assertEqual(mailboxes_for(self.president), [])
         self.assertEqual(holders(PRESIDENT), [successor])
         client = self.login(self.president)
@@ -408,14 +437,13 @@ class NotificationTests(MailboxTestCase):
         self.assertEqual(set(Notification.objects.values_list("recipient__email", flat=True)), {"vp1@example.invalid", "vp2@example.invalid"})
         self.assertEqual(set(self.notices().values_list("recipient", flat=True)), {"vp1@example.invalid", "vp2@example.invalid"})
 
-    def test_after_a_mandate_change_only_the_new_holder_is_notified(self):
+    def test_after_a_role_change_only_the_new_holder_is_notified(self):
         # [N] y compris pour un avis mis en file juste avant le changement.
         self.ready()
         self.server.add(raw_message(subject="Avant le changement"))
         self.sync()
         successor = self.person("successeur@example.invalid", "Karim", Role.MEMBRE)
-        Mandate.objects.filter(profile=self.president.member_profile).update(ends_on=self.today)
-        self.mandate(successor, "Président", starts_on=self.today)
+        self.hand_over(self.president, successor, Role.PRESIDENT)
         self.server.add(raw_message(subject="Après le changement"))
         self.sync()
         deliver_batch()
@@ -595,82 +623,28 @@ class CommunicationSenderTests(MailboxTestCase):
         self.assertContains(self.client.get(reverse("communications:broadcast")), "Envoyé depuis <strong>president@lionsmed.tn</strong>")
 
     def test_author_without_mailbox_keeps_the_general_address(self):
-        campaign = self.queue(self.secretary)
+        bureau = account("bureau@example.invalid", role=Role.BUREAU)
+        campaign = self.queue(bureau)
         self.assertEqual(campaign.sender_mailbox, "")
         deliver_batch()
         self.assertEqual(mail.outbox[0].from_email, "noreply@example.invalid")
-        self.assertNotContains(self.login(self.secretary).get(reverse("communications:broadcast")), "Envoyé depuis")
+        self.assertNotContains(self.login(bureau).get(reverse("communications:broadcast")), "Envoyé depuis")
+        # Rôle doté d'une boîte, mais boîte non reliée à Lionsmed : adresse générale, comme avant.
+        with self.settings(MAILBOX_PASSWORDS={}):
+            self.assertEqual(self.queue(self.president).sender_mailbox, "")
 
     def test_another_function_address_cannot_be_forged(self):
-        with self.assertRaises(PermissionDenied):
+        # L'adresse d'envoi ne se choisit nulle part : un champ ajouté au formulaire est sans effet.
+        self.assertEqual(sender_for(self.treasurer), TREASURY)
+        self.assertIsNone(sender_for(self.member))
+        with self.assertRaises(TypeError):
             self.queue(self.treasurer, sender_mailbox="president")
-        with self.assertRaises(PermissionDenied):
-            self.queue(self.secretary, sender_mailbox="secretariat")  # rôle de secrétaire, mais aucun mandat
-        with self.assertRaises(PermissionDenied):
-            sender_for(self.president, "boite-inventee")
         client = self.login(self.treasurer)
+        page = client.get(reverse("communications:broadcast"))
+        self.assertNotContains(page, 'name="sender_mailbox"')
         client.post(reverse("communications:broadcast"), {"campaign_key": str(uuid4()), "subject": "Objet", "body": "Texte",
             "members": [str(self.member.pk)], "extra_emails": "", "action": "send", "confirmed": "yes", "sender_mailbox": "president"})
         self.assertEqual(list(MemberEmailCampaign.objects.values_list("sender_mailbox", flat=True)), ["tresorier"])
-
-    def test_holder_of_several_mailboxes_chooses_among_them_only(self):
-        self.mandate(self.president, "Secrétaire")
-        self.assertEqual(mailboxes_for(self.president), [PRESIDENT, catalog.get("secretariat")])
-        with self.assertRaises(ValidationError):
-            self.queue(self.president)
-        self.assertEqual(self.queue(self.president, sender_mailbox="secretariat").sender_mailbox, "secretariat")
-        client = self.login(self.president)
-        page = client.get(reverse("communications:broadcast"))
-        self.assertContains(page, "Envoyer depuis")
-        self.assertContains(page, '<option value="secretariat">secretariat@lionsmed.tn</option>', html=True)
-        self.assertNotContains(page, "tresorier@lionsmed.tn")
-        data = {"campaign_key": str(uuid4()), "subject": "Objet", "body": "Texte", "members": [str(self.member.pk)],
-                "extra_emails": "", "action": "send", "confirmed": "yes"}
-        response = client.post(reverse("communications:broadcast"), {**data, "sender_mailbox": "tresorier"})
-        self.assertContains(response, "Cette adresse d’envoi ne vous est pas attribuée.")
-        client.post(reverse("communications:broadcast"), {**data, "sender_mailbox": "president"})
-        self.assertEqual(MemberEmailCampaign.objects.latest("created_at").sender_mailbox, "president")
-        # Les deux boîtes apparaissent dans la Messagerie, chacune avec son adresse.
-        inbox = client.get(self.url("inbox"))
-        self.assertContains(inbox, "secretariat@lionsmed.tn")
-        self.assertContains(inbox, 'aria-label="Vos boîtes e-mail"')
-
-
-class FunctionCatalogueTests(TestCase):
-    def test_functions_owning_a_mailbox_are_recognised_without_guessing(self):
-        from apps.governance.functions import canonical_label, function_key, function_rank, responsibility_labels, selectable_labels, validate_function, UNRANKED
-        expected = {"Président fondateur": "PRESIDENT_FONDATEUR", "Directrice": "DIRECTEUR", "Responsable effectif (GMT)": "GMT",
-                    "Responsable service (GST)": "GST", "Coordinatrice LCIF": "LCIF",
-                    "Responsable marketing et communication": "MARKETING_COMMUNICATION"}
-        for label, key in expected.items():
-            self.assertEqual(function_key(label), key)
-            self.assertEqual(validate_function(label), label)
-            self.assertIn(label, responsibility_labels())
-            # Hors des sept fonctions du bureau : l'ordre public de « Notre bureau » ne bouge pas.
-            self.assertEqual(function_rank(label), UNRANKED)
-            self.assertNotIn(label, selectable_labels())
-        self.assertEqual(canonical_label("GMT"), "Responsable effectif (GMT)")
-        with self.assertRaises(ValidationError):
-            validate_function("Responsable GMT")  # variante : le libellé de la liste est imposé
-        for label in ("Responsable effectif", "Président de commission", "Responsable formation (GLT)", "Vice-Président"):
-            self.assertNotIn(function_key(label), {key for mailbox in catalog.MAILBOXES for key in mailbox.functions})
-
-    def test_every_mailbox_maps_to_known_functions_and_no_function_opens_two(self):
-        from apps.governance.functions import BUREAU_FUNCTIONS, RESPONSIBILITY_FUNCTIONS
-        known = {row[0] for row in BUREAU_FUNCTIONS + RESPONSIBILITY_FUNCTIONS}
-        claimed = [key for mailbox in catalog.MAILBOXES for key in mailbox.functions]
-        self.assertEqual(len(catalog.MAILBOXES), 10)
-        self.assertTrue(set(claimed) <= known)
-        self.assertEqual(len(claimed), len(set(claimed)))
-        self.assertEqual(catalog.get("vice-president").functions, {"VICE_PRESIDENT_1", "VICE_PRESIDENT_2"})
-
-    def test_mandate_form_offers_these_functions(self):
-        manager = account("secretaire@example.invalid", role=Role.SECRETAIRE)
-        self.client.force_login(manager)
-        page = self.client.get(reverse("governance:mandate_add"))
-        self.assertContains(page, "Autres responsabilités")
-        self.assertContains(page, "Coordinateur LCIF")
-        self.assertContains(page, "ouvre, dans « Messagerie », la boîte e-mail de la fonction")
 
 
 class ImapSessionTests(TestCase):

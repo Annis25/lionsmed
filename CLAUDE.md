@@ -77,6 +77,19 @@ QA navigateur manuelle (Playwright, pas de dépendance npm committée) :
 LIONSMED_BROWSER_URL=http://localhost:8000 node tools/browser.cjs
 # variantes : tools/browser_members.cjs (espace privé), tools/browser_public.cjs
 ```
+
+Audit d'affichage de tout le site (87 pages, 8 profils, ordinateur et mobile, clair et sombre) : contrôle
+optionnel qui parcourt chaque page atteignable et échoue sur tout constat bloquant (bouton au style
+navigateur par défaut, entrée de menu sans icône, contraste, lien en erreur, erreur console…) :
+
+```sh
+LIONSMED_SITE_AUDIT=1 PLAYWRIGHT_MODULE=/chemin/vers/playwright \
+  python manage.py test apps.core.tests.test_site_audit_browser --settings=config.settings.test --noinput
+```
+À relancer après toute modification de `static/css/lions.css`, `static/css/prive.css` ou d'un gabarit
+partagé (`templates/base/`, `templates/components/`) : une règle de style non limitée à sa page touche
+toutes les autres (cas réel d'octobre 2026). Le plan et l'état des corrections d'affichage sont dans
+`docs/PLAN_CORRECTIONS_AFFICHAGE.md`.
 Ces scripts vérifient par page : overflow horizontal, exactement un `<h1>`, aucun contrôle
 interactif sans label accessible, cibles tactiles ≥44px, absence d'animation (`reducedMotion`),
 et présence de `noindex` tant que `PUBLIC_INDEXING_ENABLED` n'est pas activé.
@@ -108,13 +121,13 @@ un module monté sous `espace/` (privé) — mais **le nom du fichier public n'e
 - `agenda.private_urls`, `communications.private_urls` : privés (`espace/`)
 - `members.public_urls` (public, profil public) / `members.urls` (**privé**, `espace/` — nommage
   inversé par rapport aux autres apps, source d'erreur fréquente)
-- `governance.urls`, `documents.urls`, `dues.urls`, `voting.urls`, `satisfaction.urls` : privés
+- `governance.urls`, `documents.urls`, `dues.urls`, `voting.urls`, `satisfaction.urls`, `mailboxes.urls` : privés
   uniquement (`espace/`), pas de routes publiques pour ces domaines
 
 Ne jamais monter un `urls.py` sans vérifier dans `config/urls.py` s'il est inclus à la racine ou
 sous `espace/`.
 
-### Les 12 apps métier (`apps/`)
+### Les 13 apps métier (`apps/`)
 
 | App | Responsabilité |
 |---|---|
@@ -130,6 +143,7 @@ sous `espace/`.
 | `documents` | Bibliothèque de documents privés, ACL nominatives, scan antivirus obligatoire |
 | `dues` | Cotisations annuelles déclaratives et historique de correction |
 | `communications` | Contact, notifications in-app, outbox e-mail, campagnes de diffusion membres |
+| `mailboxes` | Messagerie : les dix boîtes e-mail institutionnelles (relève IMAP, lecture, envoi au nom de la fonction) |
 
 Convention de fichiers par app (respectée partout, pas une suggestion) : `models.py` porte les
 contraintes de données ; `forms.py` valide les entrées HTTP ; `selectors.py` regroupe les requêtes
@@ -175,13 +189,52 @@ satisfaction, campagnes de diffusion) passe par `communications.OutboxMessage` +
   exécutions qui se chevauchent ne posent aucun problème, pas de verrou externe nécessaire.
 - Un message devenu définitivement non pertinent avant envoi (mot de passe déjà défini, droit
   retiré, objet cible supprimé...) passe en `FAILED`/`error_code="not_applicable"` immédiatement,
-  sans les 5 tentatives de retry réservées aux échecs SMTP transitoires
-  (`error_code="delivery_failed"`).
+  sans les 5 tentatives de retry réservées aux échecs de livraison
+  (`error_code="delivery_failed"`, ou `"recipient_refused"` quand le serveur SMTP a rejeté
+  l'adresse — même politique de reprise, seul le libellé du suivi change).
+- Une campagne de diffusion n'a pas d'état propre à l'affichage : historique et suivi par
+  destinataire (`apps/communications/selectors.py`) sont recalculés depuis les
+  `OutboxMessage` de la campagne. « Envoyé » = `SENT` = accepté par le serveur SMTP, jamais
+  « délivré ». La relance manuelle (`services.retry_failed_broadcast`) ne reprend que les
+  échecs de livraison, sur les mêmes lignes — jamais de seconde ligne ni de second système.
+- Destinataires d'une campagne = membres cochés + adresses externes, deux listes
+  indépendantes : `queue_member_broadcast` n'a aucun groupe par défaut, et l'éligibilité
+  d'un membre n'a qu'une définition, `services.eligible_broadcast_members()`.
 - `outbox_status` est l'outil de supervision opérationnelle : compteurs par état + âge du plus
   ancien `PENDING`. **N'affiche jamais** destinataire, sujet ou contenu — ne pas le remplacer par
   une requête ORM manuelle qui exposerait ces champs dans un log/terminal partagé.
 - SMTP est désactivé par défaut (`EMAIL_BACKEND` = dummy) tant que `LIONSMED_SMTP_ENABLED=true`
   n'est pas positionné explicitement (`config/settings/production.py`).
+
+### Boîtes e-mail institutionnelles (`apps/mailboxes`, « Messagerie »)
+
+Les dix adresses `…@lionsmed.tn` appartiennent aux **fonctions** du club, jamais aux personnes.
+
+- Catalogue fixe dans `apps/mailboxes/catalog.py` (clé, adresse, fonctions rattachées) : aucun modèle
+  « boîte », aucune liste « telle personne ouvre telle boîte ». Ne pas ajouter de onzième boîte.
+- **L'accès vient du rôle** (décision du propriétaire, 6 oct. 2026 : « tant que la personne a le rôle,
+  elle a accès à ses messages ») : capability `mailbox.use` (dix rôles, `MAILBOX_ROLES`), toujours vérifiée
+  avec la boîte en objet — un rôle n'ouvre que la boîte de sa fonction (`Mailbox.roles` du catalogue).
+  `apps/mailboxes/access.py` en est le seul point d'entrée. Un `Mandate` n'y joue aucun rôle. SUPER_ADMIN,
+  BUREAU, GLT, MEMBRE et INVITE n'ont pas de boîte ; les comptes du rôle VICE_PRESIDENT partagent
+  `vice.president@`. Chaque vue passe par `mailbox_view`, chaque service par `require_mailbox` : le menu
+  n'est jamais la protection.
+- Mots de passe : uniquement dans `.env` (`LIONSMED_MAILBOX_PASSWORD_<CLÉ>` → `settings.MAILBOX_PASSWORDS`),
+  jamais en base, dans un log, un gabarit ou un test. Une boîte sans mot de passe est inactive (invisible).
+- Réception : `manage.py sync_mailboxes` (timer `lionsmed-mailboxes.timer`), lecture seule IMAP
+  (`BODY.PEEK`), jamais pendant l'affichage d'une page. Idempotent (UID + empreinte du Message-ID uniques),
+  bail en base, erreurs réduites à un code fixe. Supervision : `manage.py mailbox_status` (compteurs seuls).
+- Le HTML d'un e-mail reçu n'est **jamais** stocké ni affiché tel quel : `sanitizer.clean_html` le réécrit
+  depuis une liste blanche (aucun attribut d'origine, aucune image) et `InboundEmail.body_html` ne doit être
+  écrit que par lui. La page de lecture ajoute une `Content-Security-Policy` stricte. Aucun contenu de
+  pièce jointe n'est stocké (nom, type, taille seulement) tant qu'un passage par ClamAV n'existe pas.
+- Envoi : toujours par l'outbox existante (`OutboxMessage.sender_mailbox`, types `MAILBOX_MESSAGE` et
+  `MAILBOX_NOTICE`), avec les identifiants de la boîte (`transport.connection_for`). Aucun champ « De »
+  ni choix d'adresse dans les formulaires : l'expéditeur est décidé par le serveur à partir du rôle
+  (`access.sender_for` pour une campagne).
+- Avis de nouveau message vers l'adresse personnelle des titulaires : simple notification, marquée
+  (`X-Lionsmed-Notification`, `Auto-Submitted`, Message-ID en `@lionsmed-avis.invalid`) ; un avis revenu
+  dans une boîte n'est pas importé, une réponse automatique ne déclenche pas d'e-mail, plafond horaire par boîte.
 
 ### Fichiers privés et images publiques
 
@@ -194,9 +247,14 @@ satisfaction, campagnes de diffusion) passe par `communications.OutboxMessage` +
   joignable, y compris si ClamAV n'est simplement pas configuré (`CLAMD_SOCKET`/`CLAMD_HOST` non
   définis dans `config/settings/base.py`).
 - `PUBLIC_IMAGE_ROOT` : dérivés d'images publiques (couche `PublicImage`), distincts des originaux
-  privés dans `MediaAsset`.
+  privés dans `MediaAsset`. La route publique `editorial:image` ne sert une image que si elle illustre
+  un contenu **publié** ; l'espace de gestion affiche donc ses images (brouillons compris) par
+  `editorial_management:image_preview`, jamais par `image.get_absolute_url`.
 - Upload de photo : `apps.members.upload_handlers.PhotoSizeLimitHandler` en premier
-  `FILE_UPLOAD_HANDLERS` (limite avant même l'écriture en mémoire/tmp).
+  `FILE_UPLOAD_HANDLERS` (limite avant même l'écriture en mémoire/tmp). Le refus survient avant
+  toute vue (lecture du corps par le middleware CSRF) : il ne peut pas devenir une erreur de
+  formulaire, d'où la page 400 lisible (`apps.core.views.bad_request`, `handler400`). Ce filtre
+  s'applique aujourd'hui à **tous** les fichiers, documents compris (5 Mo).
 
 ### Import legacy (`apps/core/legacy_pipeline.py`, `manage.py import_legacy`)
 

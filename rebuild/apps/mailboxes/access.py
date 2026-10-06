@@ -1,52 +1,43 @@
 """Qui peut ouvrir quelle boîte institutionnelle — seule définition de cet accès.
 
-La source de vérité est le mandat (apps.governance.Mandate) : validé par le club, en cours à la
-date du jour, et portant une fonction rattachée à la boîte (apps.mailboxes.catalog). Aucune liste
-« telle personne ouvre telle boîte » n'existe : terminer un mandat ou en valider un nouveau suffit
-à retirer ou donner l'accès, la lecture, l'envoi et les notifications, sans autre manipulation.
-
-Ce n'est pas une capacité de apps.core.permissions.CAPABILITIES : ces capacités dépendent du rôle
-applicatif, alors qu'un 1er et un 2e Vice-Président, par exemple, peuvent porter des rôles
-différents. Le rôle ne sert ici qu'à vérifier que le compte a toujours accès à l'espace privé.
+La règle est celle du club : tant qu'une personne tient le rôle d'une fonction, elle a accès à
+la boîte de cette fonction (capacité « mailbox.use » de apps.core.permissions, vérifiée avec la
+boîte en objet). Aucune liste « telle personne ouvre telle boîte » n'existe : changer le rôle
+d'un compte dans « Membres et mandats » suffit à retirer ou donner la lecture, l'envoi et les
+avis, sans autre manipulation. Un mandat (« Notre bureau ») n'y joue aucun rôle.
 """
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.utils import timezone
-from apps.core.permissions import can
-from apps.governance.functions import function_key
-from apps.governance.models import Mandate
-from apps.members.models import MemberProfile
+from apps.core.permissions import can, effective_role
+from apps.governance.models import RoleGrant
 from .catalog import MAILBOXES, is_active
 
 
-def _current_mandates(today=None):
-    today = today or timezone.localdate()
-    return Mandate.objects.filter(
-        validated_at__isnull=False, starts_on__lte=today, ends_on__gt=today,
-        profile__status=MemberProfile.Status.ACTIVE, profile__user__is_active=True)
-
-
-def holders(mailbox, *, today=None):
+def holders(mailbox):
     """Titulaires actuels de la boîte (comptes), dans un ordre stable."""
-    users = {}
-    for mandate in _current_mandates(today).select_related("profile__user"):
-        if function_key(mandate.function) in mailbox.functions:
-            users[mandate.profile.user_id] = mandate.profile.user
-    return [user for _, user in sorted(users.items(), key=lambda row: str(row[0]))
-            if can(user, "account.access_private_area")]
+    now = timezone.now()
+    grants = (RoleGrant.objects.filter(role__in=mailbox.roles, starts_at__lte=now)
+              .filter(Q(ends_at__isnull=True) | Q(ends_at__gt=now))
+              .filter(Q(revoked_at__isnull=True) | Q(revoked_at__gt=now)).select_related("user"))
+    users = {grant.user_id: grant.user for grant in grants}
+    # can() tranche : compte actif, profil de membre actif, rôle unique et sans ambiguïté.
+    return [user for _, user in sorted(users.items(), key=lambda row: str(row[0])) if can(user, "mailbox.use", mailbox)]
 
 
-def held_mailboxes(user, *, today=None):
-    """Boîtes que les mandats en cours du compte lui confient, reliées à Lionsmed ou non."""
-    if not can(user, "account.access_private_area"):
+def held_mailboxes(user):
+    """Boîtes que le rôle du compte lui confie, reliées à Lionsmed ou non."""
+    # Appelée à chaque page de l'espace privé (menu) : un seul contrôle complet, puis le
+    # rôle déjà validé est rapproché du catalogue, plutôt que dix contrôles identiques.
+    if not can(user, "mailbox.use"):
         return []
-    labels = _current_mandates(today).filter(profile__user_id=user.pk).values_list("function", flat=True)
-    keys = {function_key(label) for label in labels}
-    return [mailbox for mailbox in MAILBOXES if mailbox.functions & keys]
+    role = effective_role(user)
+    return [mailbox for mailbox in MAILBOXES if role in mailbox.roles]
 
 
-def mailboxes_for(user, *, today=None):
-    """Boîtes réellement utilisables par le compte : confiées par un mandat et reliées à Lionsmed."""
-    return [mailbox for mailbox in held_mailboxes(user, today=today) if is_active(mailbox)]
+def mailboxes_for(user):
+    """Boîtes réellement utilisables par le compte : confiées par son rôle et reliées à Lionsmed."""
+    return [mailbox for mailbox in held_mailboxes(user) if is_active(mailbox)]
 
 
 def require_mailbox(user, mailbox):
@@ -56,18 +47,8 @@ def require_mailbox(user, mailbox):
     return mailbox
 
 
-def sender_for(user, requested=""):
-    """Boîte depuis laquelle le compte envoie, décidée par le serveur.
+def sender_for(user):
+    """Boîte depuis laquelle le compte envoie ses communications, ou None : adresse générale du site.
 
-    Sans boîte : chaîne vide (adresse générale du site). Une seule boîte : celle-ci. Plusieurs :
-    `requested` doit en désigner une. Toute autre valeur — boîte d'une autre fonction, clé
-    fabriquée — est un refus, jamais un repli silencieux sur une autre identité."""
-    from django.core.exceptions import ValidationError
-    allowed = {mailbox.key: mailbox for mailbox in mailboxes_for(user)}
-    if requested:
-        if requested not in allowed:
-            raise PermissionDenied
-        return allowed[requested]
-    if len(allowed) > 1:
-        raise ValidationError("Choisissez l’adresse depuis laquelle envoyer ce message.")
-    return next(iter(allowed.values()), None)
+    Décidée par le serveur à partir du rôle : rien de ce que transmet le navigateur ne la choisit."""
+    return next(iter(mailboxes_for(user)), None)
