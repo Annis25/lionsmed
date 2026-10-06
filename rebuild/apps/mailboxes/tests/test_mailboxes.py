@@ -633,6 +633,22 @@ class CommunicationSenderTests(MailboxTestCase):
         with self.settings(MAILBOX_PASSWORDS={}):
             self.assertEqual(self.queue(self.president).sender_mailbox, "")
 
+    def test_every_role_with_a_mailbox_can_write_a_communication_from_its_address(self):
+        with self.settings(MAILBOX_PASSWORDS={mailbox.key: SECRET for mailbox in catalog.MAILBOXES}):
+            for index, mailbox in enumerate(catalog.MAILBOXES):
+                role = next(iter(mailbox.roles))
+                with self.subTest(role=role):
+                    user = account(f"fonction{index}@example.invalid", role=role)
+                    page = self.login(user).get(reverse("communications:broadcast"))
+                    self.assertContains(page, f"Envoyé depuis <strong>{mailbox.address}</strong>")
+                    self.assertContains(self.client.get(reverse("core:dashboard")), "Communication")
+                    self.assertEqual(self.queue(user).sender_mailbox, mailbox.key)
+        # Sans boîte : GLT et simple membre n'écrivent toujours pas de communication.
+        for role in (Role.GLT, Role.MEMBRE):
+            user = account(f"sans-boite-{role.lower()}@example.invalid", role=role)
+            self.assertFalse(can(user, "communication.send_member_broadcast"))
+            self.assertEqual(self.login(user).get(reverse("communications:broadcast")).status_code, 403)
+
     def test_another_function_address_cannot_be_forged(self):
         # L'adresse d'envoi ne se choisit nulle part : un champ ajouté au formulaire est sans effet.
         self.assertEqual(sender_for(self.treasurer), TREASURY)

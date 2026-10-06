@@ -18,20 +18,21 @@ APPLICATION_INBOX_ROLES = frozenset({Role.PRESIDENT, Role.GMT})
 # Palier « bureau » des documents : BUREAU/PRESIDENT/SECRETAIRE/SUPER_ADMIN. DIRECTEUR en est
 # exclu tant que ses capacités avancées ne sont pas confirmées humainement.
 BUREAU_LEVEL = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.SECRETAIRE, Role.BUREAU})
-# Communication générale : périmètre explicitement validé, indépendant de la simple
-# visibilité d'un lien de navigation. Les responsables techniques (GST/GMT/GLT/LCIF)
-# et DIRECTEUR n'y accèdent pas par défaut.
-BROADCAST_EMAIL_ROLES = frozenset({Role.SUPER_ADMIN, Role.PRESIDENT, Role.VICE_PRESIDENT,
-    Role.SECRETAIRE, Role.TRESORIER, Role.BUREAU, Role.MARKETING_COMMUNICATION})
-# Cotisations (recette V2) : seul le Trésorier (+ Super Admin) modifie ; le reste du
-# bureau (PRESIDENT/SECRETAIRE/BUREAU) consulte sans modifier — décision explicite du
-# club, qui retire ce droit de modification à PRESIDENT/SECRETAIRE.
 # Messagerie : les dix fonctions qui disposent d'une adresse e-mail du club. Tenir le rôle
 # suffit à ouvrir la boîte de la fonction (décision du propriétaire, oct. 2026) ; la boîte
 # précise de chaque rôle est dans apps.mailboxes.catalog. Ni le Super administrateur (compte
 # technique) ni les rôles Bureau, GLT, Membre et Invité n'ont de boîte.
 MAILBOX_ROLES = frozenset({Role.PRESIDENT, Role.VICE_PRESIDENT, Role.SECRETAIRE, Role.TRESORIER,
     Role.PRESIDENT_FONDATEUR, Role.DIRECTEUR, Role.GMT, Role.GST, Role.LCIF, Role.MARKETING_COMMUNICATION})
+# Communication générale : périmètre explicitement validé, indépendant de la simple
+# visibilité d'un lien de navigation. Élargi le 6 octobre 2026 par le propriétaire : tout rôle
+# doté d'une boîte e-mail peut écrire une communication, qui part de l'adresse de sa fonction
+# (Président fondateur, Directeur, GMT, GST et LCIF s'ajoutent ainsi au périmètre d'origine).
+# Super administrateur et Bureau écrivent depuis l'adresse générale ; GLT n'y accède pas.
+BROADCAST_EMAIL_ROLES = frozenset({Role.SUPER_ADMIN, Role.BUREAU}) | MAILBOX_ROLES
+# Cotisations (recette V2) : seul le Trésorier (+ Super Admin) modifie ; le reste du
+# bureau (PRESIDENT/SECRETAIRE/BUREAU) consulte sans modifier — décision explicite du
+# club, qui retire ce droit de modification à PRESIDENT/SECRETAIRE.
 DUES_MANAGERS = frozenset({Role.SUPER_ADMIN, Role.TRESORIER})
 DUES_VIEWERS = BUREAU_LEVEL | {Role.TRESORIER}
 CAPABILITIES = {

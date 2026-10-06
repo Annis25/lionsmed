@@ -242,10 +242,11 @@ class PresidentFondateurRoleTests(TestCase):
                 self.assertTrue(can(self.fondateur, capability))
 
     def test_narrower_president_specific_inboxes_not_included(self):
-        """Périmètre volontairement plus étroit que Président sur ces trois points
-        précis (boîtes de contact/candidature, diffusion Bureau) : à élargir seulement
-        sur nouvelle confirmation explicite du club."""
+        """Périmètre volontairement plus étroit que Président sur ces deux points
+        précis (boîtes de contact/candidature) : à élargir seulement sur nouvelle
+        confirmation explicite du club. La communication aux membres, elle, a été ouverte
+        le 6 octobre 2026 à tout rôle doté d'une boîte e-mail, dont celui-ci."""
         from apps.core.permissions import can
         self.assertFalse(can(self.fondateur, "contact.manage"))
         self.assertFalse(can(self.fondateur, "application.manage"))
-        self.assertFalse(can(self.fondateur, "communication.send_member_broadcast"))
+        self.assertTrue(can(self.fondateur, "communication.send_member_broadcast"))
