@@ -57,6 +57,10 @@ CAPABILITIES = {
     "notification.view_own": PERSONAL, "notification.send": MANAGERS,
     "communication.send_member_broadcast": BROADCAST_EMAIL_ROLES,
     "communication.view_member_broadcast": BROADCAST_EMAIL_ROLES,
+    # Chaque fonction ne voit que son propre historique (décision du propriétaire, oct. 2026 :
+    # voir communications.selectors.visible_campaigns). Seul le Super administrateur garde la
+    # vue d'ensemble : les envois sont conservés à titre d'audit, il faut qu'un compte puisse les relire tous.
+    "communication.view_all_member_broadcasts": frozenset({Role.SUPER_ADMIN}),
     "dues.view_own": PERSONAL, "dues.manage": DUES_MANAGERS, "dues.view_management": DUES_VIEWERS,
     # Toujours vérifiée avec la boîte en objet : un rôle n'ouvre que la boîte de sa fonction.
     "mailbox.use": MAILBOX_ROLES,

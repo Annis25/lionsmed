@@ -14,11 +14,11 @@ from apps.core.throttling import consume
 from apps.editorial.views import public_context
 from apps.editorial.publication import require
 from apps.members.models import MembershipApplication
-from .models import ContactRequest, MemberEmailCampaign
+from .models import ContactRequest
 from .forms import ApplicationForm,ContactForm, MemberBroadcastForm
 from .services import (submit, change_state, eligible_broadcast_members, queue_member_broadcast,
     resolve_broadcast_selection, retry_failed_broadcast)
-from .selectors import campaign_recipients, delivery_enabled, selectable_members, with_tracking
+from .selectors import campaign_recipients, delivery_enabled, selectable_members, visible_campaigns, with_tracking
 from .emailing import render_broadcast
 
 @sensitive_post_parameters()
@@ -182,15 +182,19 @@ def member_broadcast(request):
 @capability_required("communication.view_member_broadcast")
 @require_safe
 def member_broadcast_history(request):
-    page = Paginator(MemberEmailCampaign.objects.select_related("created_by"), 20).get_page(request.GET.get("page"))
-    return render(request, "espace/communication_history.html", {"page_obj": page, "campaigns": with_tracking(page.object_list)})
+    from apps.mailboxes.access import sender_for
+    page = Paginator(visible_campaigns(request.user).select_related("created_by"), 20).get_page(request.GET.get("page"))
+    return render(request, "espace/communication_history.html", {
+        "page_obj": page, "campaigns": with_tracking(page.object_list), "sender_mailbox": sender_for(request.user),
+        "sees_all": can(request.user, "communication.view_all_member_broadcasts")})
 
 
 @capability_required("communication.view_member_broadcast")
 @require_http_methods(["GET", "POST"])
 def member_broadcast_detail(request, campaign_id):
     """Suivi par destinataire d'une campagne ; POST = relance de ses échecs de livraison."""
-    campaign = get_object_or_404(MemberEmailCampaign.objects.select_related("created_by"), pk=campaign_id)
+    # Une communication d'une autre fonction n'existe pas pour ce compte, même avec son adresse exacte.
+    campaign = get_object_or_404(visible_campaigns(request.user).select_related("created_by"), pk=campaign_id)
     if request.method == "POST":
         retried = retry_failed_broadcast(actor=request.user, campaign=campaign)
         if retried:

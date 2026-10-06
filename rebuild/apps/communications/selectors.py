@@ -7,10 +7,10 @@ from uuid import UUID
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from apps.governance.models import Role
-from .models import OutboxMessage
+from .models import MemberEmailCampaign, OutboxMessage
 from .services import RETRYABLE_ERROR_CODES, is_responsible
 
 BROADCAST_KIND = "MEMBER_BROADCAST"
@@ -30,6 +30,23 @@ RETRY_REASONS = {
     "recipient_refused": "Adresse refusée par le serveur de messagerie, nouvelle tentative programmée.",
     "delivery_failed": "Serveur de messagerie momentanément indisponible, nouvelle tentative programmée.",
 }
+
+
+def visible_campaigns(user):
+    """Communications que le compte peut relire : celles parties de l'adresse de sa fonction
+    et celles qu'il a lui-même envoyées.
+
+    L'historique suit la fonction, comme la boîte e-mail : à la passation, le nouveau titulaire
+    retrouve les envois faits depuis l'adresse de la fonction, l'ancien ne garde que les siens.
+    Seule définition de cette visibilité : liste, détail et relance passent tous par ici."""
+    from apps.core.permissions import can
+    from apps.mailboxes.access import held_mailboxes
+    campaigns = MemberEmailCampaign.objects.all()
+    if can(user, "communication.view_all_member_broadcasts"):
+        return campaigns
+    own = Q(created_by_id=user.pk)
+    keys = [mailbox.key for mailbox in held_mailboxes(user)]
+    return campaigns.filter(own | Q(sender_mailbox__in=keys)) if keys else campaigns.filter(own)
 
 
 def delivery_enabled():

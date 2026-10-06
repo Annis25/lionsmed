@@ -16,7 +16,7 @@ from django.utils import timezone
 
 from apps.communications.models import MemberEmailCampaign, Notification, OutboxMessage
 from apps.communications.outbox import deliver_batch
-from apps.communications.services import queue_member_broadcast
+from apps.communications.services import queue_member_broadcast, retry_failed_broadcast
 from apps.core.models import AuditEvent
 from apps.core.tests.test_foundations import account
 from apps.core.permissions import CAPABILITIES, can
@@ -604,9 +604,52 @@ class SendingTests(MailboxTestCase):
 
 
 class CommunicationSenderTests(MailboxTestCase):
-    def queue(self, actor, **extra):
-        return queue_member_broadcast(actor=actor, subject="Assemblée générale", body="Rendez-vous samedi.",
+    def queue(self, actor, subject="Assemblée générale", **extra):
+        return queue_member_broadcast(actor=actor, subject=subject, body="Rendez-vous samedi.",
             idempotency_key=uuid4(), member_ids=[self.member.pk], **extra)[0]
+
+    def history(self, user):
+        """Objets des communications que le compte voit dans son historique."""
+        page = self.login(user).get(reverse("communications:broadcast_history"))
+        return {campaign.subject for campaign in page.context["campaigns"]}
+
+    def test_each_function_reads_only_its_own_communication_history(self):
+        bureau = account("bureau@example.invalid", role=Role.BUREAU)
+        admin = account("admin@example.invalid", role=Role.SUPER_ADMIN)
+        from_president = self.queue(self.president, "Mot du président")
+        from_treasurer = self.queue(self.treasurer, "Appel de cotisation")
+        self.queue(bureau, "Note du bureau")
+        self.assertEqual(self.history(self.president), {"Mot du président"})
+        self.assertEqual(self.history(self.treasurer), {"Appel de cotisation"})
+        self.assertEqual(self.history(bureau), {"Note du bureau"})
+        self.assertEqual(self.history(self.vp1), set())
+        # Le compte technique garde la vue d'ensemble, à titre d'audit.
+        self.assertEqual(self.history(admin), {"Mot du président", "Appel de cotisation", "Note du bureau"})
+        # L'adresse exacte d'une communication d'une autre fonction ne donne rien : ni lecture, ni relance.
+        client = self.login(self.president)
+        foreign = reverse("communications:broadcast_detail", args=[from_treasurer.pk])
+        self.assertEqual(client.get(foreign).status_code, 404)
+        self.assertEqual(client.post(foreign).status_code, 404)
+        with self.assertRaises(PermissionDenied):
+            retry_failed_broadcast(actor=self.president, campaign=from_treasurer)
+        self.assertEqual(client.get(reverse("communications:broadcast_detail", args=[from_president.pk])).status_code, 200)
+        self.assertContains(client.get(reverse("communications:broadcast_history")), "Communications envoyées depuis president@lionsmed.tn")
+
+    def test_history_follows_the_function_at_handover_and_authors_keep_their_own_sends(self):
+        self.queue(self.president, "Mot du président")
+        successor = self.person("successeur@example.invalid", "Karim", Role.MEMBRE)
+        set_role(actor=self.secretary, target_user=self.president, role=Role.BUREAU)
+        set_role(actor=self.secretary, target_user=successor, role=Role.PRESIDENT)
+        # Le nouveau titulaire retrouve les envois de la fonction ; l'ancien garde les siens, rien d'autre.
+        self.queue(successor, "Vœux du nouveau président")
+        self.assertEqual(self.history(successor), {"Mot du président", "Vœux du nouveau président"})
+        self.assertEqual(self.history(self.president), {"Mot du président"})
+        # Envoi ancien, parti de l'adresse générale : il reste visible de son auteur.
+        with self.settings(MAILBOX_PASSWORDS={}):
+            old = self.queue(self.treasurer, "Avant la Messagerie")
+        self.assertEqual(old.sender_mailbox, "")
+        self.assertEqual(self.history(self.treasurer), {"Avant la Messagerie"})
+        self.assertEqual(self.history(self.secretary), set())
 
     def test_campaign_leaves_from_the_function_address_of_its_author(self):
         # [S] Président → president@, Trésorier → tresorier@, sans rien saisir.

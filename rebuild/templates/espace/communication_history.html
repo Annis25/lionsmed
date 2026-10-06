@@ -1,7 +1,7 @@
 {% extends 'base/private.html' %}
 {% block title %}Historique des communications · Lions Club Sfax-Méditerranée{% endblock %}
 {% block content %}
-<div class="app-titre"><h1>Communication</h1><p class="app-titre__contexte">Les messages envoyés sont conservés à titre d’audit et ne sont pas modifiables.</p></div>
+<div class="app-titre"><h1>Communication</h1><p class="app-titre__contexte">{% if sees_all %}Toutes les communications du club.{% elif sender_mailbox %}Communications envoyées depuis {{ sender_mailbox.address }}, et celles que vous avez envoyées vous-même.{% else %}Communications que vous avez envoyées.{% endif %} Elles sont conservées à titre d’audit et ne sont pas modifiables.</p></div>
 {% include 'components/private/communication_tabs.html' with active='history' %}
 {% if campaigns %}
 <ul class="com-historique">

@@ -252,7 +252,11 @@ def retry_failed_broadcast(*, actor, campaign):
     dans le journal d'audit."""
     if not can(actor, "communication.send_member_broadcast"):
         raise PermissionDenied
-    campaign = MemberEmailCampaign.objects.select_for_update().get(pk=campaign.pk)
+    from .selectors import visible_campaigns
+    campaign = visible_campaigns(actor).select_for_update().filter(pk=campaign.pk).first()
+    if campaign is None:
+        # Communication d'une autre fonction : ni consultable, ni relançable.
+        raise PermissionDenied
     retried = OutboxMessage.objects.filter(
         kind="MEMBER_BROADCAST", object_id=campaign.pk, state="FAILED", error_code__in=RETRYABLE_ERROR_CODES,
     ).update(state="PENDING", attempts=0, available_at=timezone.now(), error_code="",

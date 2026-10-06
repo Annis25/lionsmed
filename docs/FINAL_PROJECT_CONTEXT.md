@@ -309,7 +309,12 @@ Nouvelle app `apps/mailboxes` et page « Messagerie » (`/espace/messagerie/`). 
   sans boîte (ou boîte non reliée), adresse générale comme avant. Décision du propriétaire du 6 octobre
   2026 : tout rôle doté d'une boîte peut écrire une communication — Président fondateur, Directeur, GMT,
   GST et LCIF rejoignent donc `BROADCAST_EMAIL_ROLES` (ils voient aussi l'historique commun des envois).
-  Super administrateur et Bureau écrivent depuis l'adresse générale ; GLT n'y accède pas. Le test synchrone
+  Super administrateur et Bureau écrivent depuis l'adresse générale ; GLT n'y accède pas.
+- **Historique propre à chaque fonction** (décision du propriétaire, 6 octobre 2026) : un compte ne relit
+  que les communications parties de l'adresse de sa fonction et celles qu'il a lui-même envoyées
+  (`communications.selectors.visible_campaigns`, seule définition : liste, détail et relance). À la passation,
+  le nouveau titulaire retrouve les envois de la fonction. Le Super administrateur garde la vue d'ensemble
+  (capability `communication.view_all_member_broadcasts`), les envois étant conservés à titre d'audit. Le test synchrone
   « Envoyer un test » n'a pas été modifié : il part toujours de l'adresse générale.
 - **Avis** : notification dans Lionsmed + e-mail à l'adresse personnelle des titulaires (expéditeur,
   objet, lien — jamais le contenu), avec garde-fous contre les boucles.
